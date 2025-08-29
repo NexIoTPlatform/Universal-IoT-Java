@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="5.0" etag="xxx" version="22.1.16" type="device">
+  <diagram name="部署视图" id="deployment-view">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- 用户/应用 -->
+        <mxCell id="Users" value="用户/应用" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="U1" value="控制台/开放API" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Users">
+          <mxGeometry y="30" width="120" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 设备与外部 -->
+        <mxCell id="Edge" value="设备与外部" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="DEV" value="设备" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Edge">
+          <mxGeometry y="30" width="120" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="BROKER" value="MQTT Broker" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Edge">
+          <mxGeometry y="52" width="120" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 平台核心服务 -->
+        <mxCell id="Core" value="平台核心服务" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="200" y="40" width="200" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="GW" value="API Gateway + Auth (RBAC/Tenant)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="ACCESS" value="接入服务（MQTT/HTTP/CoAP/NB-IoT）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="ROUTER" value="协议路由" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="INV" value="编解码调用器" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="96" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="RULE" value="规则引擎/流处理" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="118" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="TWIN" value="设备与产品服务（影子/拓扑/OTA）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="140" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="PUSH" value="推送/集成服务" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="162" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="JOB" value="任务调度" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="184" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="MAGIC" value="MagicAPI (Jar 插件，配置启用)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Core">
+          <mxGeometry y="206" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 外置编解码引擎 -->
+        <mxCell id="Codec" value="外置编解码引擎（独立部署）" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="440" y="40" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="CREG" value="插件管理与包仓库" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Codec">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="CEXEC" value="执行引擎：Java/JS/Magic/Groovy" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Codec">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="CSAN" value="安全沙箱/权限" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Codec">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 基础设施 -->
+        <mxCell id="Infra" value="基础设施" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="680" y="40" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="MYSQL" value="MySQL（tk.mybatis）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="BUS" value="消息总线：Kafka/Redis Streams/RabbitMQ" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="REDIS" value="Redis（禁用 KEYS）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="TSDB" value="时序数据库" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="96" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OSS" value="对象存储/文件/固件" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="118" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OBS" value="观测：Prometheus/Grafana/ELK" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="140" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="CONF" value="配置中心/注册发现" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="Infra">
+          <mxGeometry y="162" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线 -->
+        <mxCell id="edge1" edge="1" parent="1" source="U1" target="GW">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" edge="1" parent="1" source="GW" target="MAGIC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" edge="1" parent="1" source="GW" target="ACCESS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" edge="1" parent="1" source="ACCESS" target="BROKER">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" edge="1" parent="1" source="DEV" target="BROKER">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" edge="1" parent="1" source="ACCESS" target="ROUTER">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" edge="1" parent="1" source="ROUTER" target="INV">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge8" edge="1" parent="1" source="INV" target="CEXEC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge9" edge="1" parent="1" source="CEXEC" target="INV">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge10" edge="1" parent="1" source="INV" target="BUS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge11" edge="1" parent="1" source="BUS" target="RULE">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge12" edge="1" parent="1" source="RULE" target="TWIN">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge13" edge="1" parent="1" source="RULE" target="PUSH">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge14" edge="1" parent="1" source="RULE" target="TSDB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge15" edge="1" parent="1" source="RULE" target="MYSQL">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge16" edge="1" parent="1" source="TWIN" target="MYSQL">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge17" edge="1" parent="1" source="PUSH" target="OSS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge18" edge="1" parent="1" source="GW" target="MYSQL">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge19" edge="1" parent="1" source="GW" target="REDIS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge20" edge="1" parent="1" source="Core" target="OBS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge21" edge="1" parent="1" source="Codec" target="OBS">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge22" edge="1" parent="1" source="Core" target="CONF">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge23" edge="1" parent="1" source="Codec" target="CONF">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

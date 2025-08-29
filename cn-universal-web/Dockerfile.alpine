@@ -1,0 +1,29 @@
+# 使用 OpenJDK 21 Alpine 版本 (镜像更小)
+FROM openjdk:21-alpine
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装必要的工具
+RUN apk add --no-cache curl
+
+# 创建应用用户
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+
+# 复制应用文件
+COPY target/cn-universal-web/ ./
+
+# 设置权限
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# 暴露端口
+EXPOSE 9092
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:9092/actuator/health || exit 1
+
+# 启动命令
+ENTRYPOINT ["java", "-jar", "cn-universal-web.jar"]

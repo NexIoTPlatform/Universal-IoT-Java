@@ -1,0 +1,13 @@
+## db.setting文件
+url = jdbc:clickhouse://172.16.66.46:8123/univ
+user = clickhouse
+pass =Tqw7kXJi
+driver=
+## 可选配置
+# 是否在日志中显示执行的SQL
+showSql = true
+# 是否格式化显示的SQL
+formatSql = false
+# 是否显示SQL参数
+showParams = true
+sqlLevel = debug

@@ -1,0 +1,30 @@
+# 使用 OpenJDK 21 作为基础镜像
+FROM openjdk:21
+
+# 设置工作目录
+WORKDIR /app
+
+# 安装必要的工具
+RUN microdnf update -y && microdnf install -y \
+    curl \
+    && microdnf clean all
+
+# 创建应用用户
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# 复制应用文件
+COPY target/cn-universal-web/ ./
+
+# 设置权限
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# 暴露端口
+EXPOSE 9092
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:9092/actuator/health || exit 1
+
+# 启动命令
+ENTRYPOINT ["java", "-jar", "cn-universal-web.jar"]

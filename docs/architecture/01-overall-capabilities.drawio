@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-01T00:00:00.000Z" agent="5.0" etag="xxx" version="22.1.16" type="device">
+  <diagram name="平台整体能力图" id="overall-capabilities">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- 接入能力 -->
+        <mxCell id="IA" value="接入能力" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="IA1" value="MQTT（系统必备）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IA">
+          <mxGeometry y="30" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="IA2" value="HTTP / WebSocket" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IA">
+          <mxGeometry y="52" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="IA3" value="CoAP / LwM2M / NB-IoT / 4G" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IA">
+          <mxGeometry y="74" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="IA4" value="设备认证：Token/证书/签名" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="IA">
+          <mxGeometry y="96" width="160" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 协议与编解码 -->
+        <mxCell id="PC" value="协议与编解码（外置引擎）" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="240" y="40" width="200" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="PC1" value="协议插件市场 / 热更新 / 动态加载" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="PC">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="PC2" value="多语言执行：Java / JS / Magic / Groovy" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="PC">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="PC3" value="内置 &amp; 自定义函数 / 类型扩展" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="PC">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="PC4" value="安全沙箱 / 多租户权限 / 版本化与灰度" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="PC">
+          <mxGeometry y="96" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="PC5" value="编解码 &amp; 反编解码 / 在线调试" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="PC">
+          <mxGeometry y="118" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="PC6" value="存储适配：MySQL / OSS / 自定义实现" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="PC">
+          <mxGeometry y="140" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 设备与产品能力 -->
+        <mxCell id="DP" value="设备与产品能力" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="40" width="160" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="DP1" value="设备注册/认证" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DP">
+          <mxGeometry y="30" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DP2" value="产品/模型/Topic 模板" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DP">
+          <mxGeometry y="52" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DP3" value="设备影子：属性/服务/事件" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DP">
+          <mxGeometry y="74" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DP4" value="拓扑/分组/标签" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DP">
+          <mxGeometry y="96" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DP5" value="OTA 管理" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DP">
+          <mxGeometry y="118" width="160" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 流处理与规则引擎 -->
+        <mxCell id="RE" value="流处理与规则引擎" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="RE1" value="消息总线解耦（Kafka/Redis Streams/RabbitMQ）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="RE">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="RE2" value="规则编排/算子库（过滤/聚合/窗口/异常）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="RE">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="RE3" value="派生指标/事件" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="RE">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="RE4" value="幂等/重试/容错" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="RE">
+          <mxGeometry y="96" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 数据与存储 -->
+        <mxCell id="DS" value="数据与存储" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="280" y="200" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="DS1" value="MySQL（tk.mybatis 管理配置/资产）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DS">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DS2" value="时序库（TDengine/InfluxDB/可插拔）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DS">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DS3" value="对象存储（文件/固件/编解码包）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DS">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DS4" value="数据生命周期与冷热分层" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DS">
+          <mxGeometry y="96" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 开放与集成 -->
+        <mxCell id="OP" value="开放与集成" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="200" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="OP1" value="开放 API / SDK" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OP">
+          <mxGeometry y="30" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OP2" value="MagicAPI（Jar 配置启用）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OP">
+          <mxGeometry y="52" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OP3" value="数据推送：Webhook/MQTT/Kafka/HTTP" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OP">
+          <mxGeometry y="74" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OP4" value="第三方平台适配" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OP">
+          <mxGeometry y="96" width="160" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 安全与治理 -->
+        <mxCell id="SG" value="安全与治理" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SG1" value="租户与 RBAC / API 网关 / 限流审计" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="SG">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="SG2" value="密钥与凭据管理" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="SG">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="SG3" value="合规：禁用 Redis KEYS，使用扫描/流" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="SG">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 运维与可观测性 -->
+        <mxCell id="OM" value="运维与可观测性" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="280" y="360" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="OM1" value="配置中心/灰度/回滚" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OM">
+          <mxGeometry y="30" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OM2" value="Metrics/Tracing/Logging（Prometheus/Grafana/ELK）" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OM">
+          <mxGeometry y="52" width="200" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="OM3" value="任务调度与告警" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="OM">
+          <mxGeometry y="74" width="200" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 开发者体验 -->
+        <mxCell id="DX" value="开发者体验" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="360" width="160" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="DX1" value="示例与文档/规范" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DX">
+          <mxGeometry y="30" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DX2" value="设备仿真/脚本/沙盒环境" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DX">
+          <mxGeometry y="52" width="160" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="DX3" value="Topic 模板与代码生成" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="DX">
+          <mxGeometry y="74" width="160" height="22" as="geometry" />
+        </mxCell>
+
+        <!-- 连接线 -->
+        <mxCell id="edge1" edge="1" parent="1" source="IA1" target="DP1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" edge="1" parent="1" source="PC5" target="RE1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" edge="1" parent="1" source="RE2" target="DS2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" edge="1" parent="1" source="OP3" target="RE1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" edge="1" parent="1" source="SG1" target="OP1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" edge="1" parent="1" source="OM2" target="RE1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" edge="1" parent="1" source="DX2" target="IA1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

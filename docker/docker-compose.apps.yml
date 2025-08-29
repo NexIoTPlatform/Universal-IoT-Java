@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  backend:
+    image: cn-universal-backend:latest
+    container_name: cn-universal-backend
+    restart: unless-stopped
+    ports:
+      - "9092:9092"
+    environment:
+      # 使用外部服务配置
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=9092
+    networks:
+      - iot-network
+    volumes:
+      - ./logs:/app/logs
+
+  # 前端服务
+  frontend:
+    image: cn-universal-frontend:latest
+    container_name: cn-universal-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - iot-network
+
+networks:
+  iot-network:
+    driver: bridge

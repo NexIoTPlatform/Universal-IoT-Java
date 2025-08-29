@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=cn.universal.plugins.protocolapi.starter.MagicAPIAutoConfiguration
+org.springframework.boot.ApplicationRunner=cn.universal.plugins.protocolapi.starter.MagicAPIPluginStarter

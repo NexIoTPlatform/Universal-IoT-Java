@@ -1,0 +1,65 @@
+git######################################################################
+
+classpath.txt
+
+# 1. 清除所有缓存（保留本地文件）
+#git rm -r --cached .
+# 或清除单个文件：git rm --cached <文件名>
+
+# 2. 重新添加所有文件（应用新规则）
+#git add .
+
+# 3. 提交更改
+#git commit -m "更新 .gitignore 规则"
+
+###########################################
+.DS_Store
+.DS_Store/
+.gradle
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+######################################################################
+# IDE
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+uploadPath/
+
+### NetBeans ###
+nbproject/private/
+build/*
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+######################################################################
+# Others
+*.log
+*.xml.versionsBackup
+
+!*/build/*.java
+!*/build/*.html
+!*/build/*.xml
+/.vscode/settings.json
+/logs/
+/.specstory/
+/cn-universal-web/logs/cn-universal/sys-error.*.gz
+/cn-universal-web/logs/cn-universal/sys-info.*.gz
+/cn-universal-web/logs/cn-universal/tcp.2025-*.gz
+/cn-universal-web/logs/cn-universal/api.2025-*.gz
+/.cursorindexingignore
