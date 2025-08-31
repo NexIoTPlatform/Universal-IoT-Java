@@ -16,7 +16,6 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.domain.R;
 import cn.universal.common.exception.IoTException;
-import cn.universal.common.utils.DingTalkUtil;
 import cn.universal.common.utils.ErrorUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -52,7 +51,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  /** 未知异常处理 */
+  /**
+   * 未知异常处理
+   */
   @ExceptionHandler(value = Exception.class)
   @ResponseBody
   public R exceptionHandler(Exception e) {
@@ -136,11 +137,12 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public R handleMysql(Exception e) {
     log.error("数据库异常，请及时处理={}", ErrorUtil.errorInfoToString(e));
-    DingTalkUtil.send("数据库异常，请及时处理" + ExceptionUtil.getSimpleMessage(e));
     return R.error("数据库异常，请联系管理员");
   }
 
-  /** 处理认证异常 */
+  /**
+   * 处理认证异常
+   */
   @ExceptionHandler(AuthenticationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public void handleAuthenticationException(
@@ -163,7 +165,9 @@ public class GlobalExceptionHandler {
     response.getWriter().write(JSONUtil.toJsonStr(errorResponse));
   }
 
-  /** 处理 OAuth2 认证异常 */
+  /**
+   * 处理 OAuth2 认证异常
+   */
   @ExceptionHandler(OAuth2AuthenticationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public void handleOAuth2AuthenticationException(
@@ -193,7 +197,9 @@ public class GlobalExceptionHandler {
     response.getWriter().write(JSONUtil.toJsonStr(errorResponse));
   }
 
-  /** 获取错误信息 */
+  /**
+   * 获取错误信息
+   */
   private String getErrorMessage(AuthenticationException exception) {
     if (exception instanceof BadCredentialsException) {
       return exception.getMessage();
