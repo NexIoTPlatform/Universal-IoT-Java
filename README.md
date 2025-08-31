@@ -1,10 +1,23 @@
 # Universal IoT 物联网平台
 
-文档地址：https://phoenixhai.github.io/universal-iot-docs/
-
-演示地址：http://iot.192886.xyz:81/  test/Haha@2025
-
 ### 各位大佬，熬夜开源不易，点个star，进群获取db文件！！
+
+
+
+#### 文档地址：https://nexiotplatform.github.io/universal-iot-docs/
+
+#### 后台地址：http://iot.192886.xyz:81/  
+
+账号密码：test/Haha@2025
+
+
+#### 调试IDE：http://iot.192886.xyz:81/magic/debug/index.html    
+
+账号密码：test/Haha@2025
+
+
+乱删除数据、会拉黑！
+
 
 ## 平台简介
 
@@ -120,3 +133,7 @@ Universal IoT
 ### 开源和商业
 
 开源版本暂不包含TCP和天翼物联模块，可自行二次开发扩展，商用授权需获取授权
+
+### 参考项目
+
+若依、Antdv、jetlink、ssssssss-team、阿里云、华为云、腾讯云、AEP、OneNet等物联网平台
