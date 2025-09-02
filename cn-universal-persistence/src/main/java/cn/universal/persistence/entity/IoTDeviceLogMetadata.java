@@ -28,29 +28,38 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IoTDeviceLogMetadata implements Serializable {
 
-  @Id private Long id;
+  @Id
+  private Long id;
 
   @Column(name = "iot_id")
   private String iotId;
 
-  /** 产品唯一标识 */
+  /**
+   * 产品唯一标识
+   */
   @Column(name = "product_key")
   private String productKey;
 
-  /** 设备名称 */
+  /**
+   * 设备名称
+   */
   @Column(name = "device_name")
   private String deviceName;
 
   @Column(name = "device_id")
   private String deviceId;
 
-  /** 消息类型 */
+  /**
+   * 消息类型
+   */
   @Column(name = "message_type")
   private String messageType;
 
   private String event;
 
-  /** 属性 */
+  /**
+   * 属性
+   */
   private String property;
 
   private String ext1;
@@ -59,11 +68,15 @@ public class IoTDeviceLogMetadata implements Serializable {
 
   private String ext3;
 
-  /** 发生时间 */
+  /**
+   * 发生时间
+   */
   @Column(name = "create_time")
   private Integer createTime;
 
-  /** 其他 */
+  /**
+   * 其他
+   */
   private String content;
 
   private static final long serialVersionUID = 1L;

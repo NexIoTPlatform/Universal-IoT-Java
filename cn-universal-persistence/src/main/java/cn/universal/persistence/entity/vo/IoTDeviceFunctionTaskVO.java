@@ -26,7 +26,8 @@ import lombok.Data;
 public class IoTDeviceFunctionTaskVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  @Id private Long id;
+  @Id
+  private Long id;
   private String taskName;
   private String productKey;
 

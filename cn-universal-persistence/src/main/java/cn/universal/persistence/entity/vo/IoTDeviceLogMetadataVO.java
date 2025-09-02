@@ -26,19 +26,29 @@ public class IoTDeviceLogMetadataVO {
   /** 日志ID，非自增 */
   //  private Long id;
 
-  /** 设备编码 */
+  /**
+   * 设备编码
+   */
   private String iotId;
 
-  /** 设备序列号 */
+  /**
+   * 设备序列号
+   */
   private String deviceId;
 
-  /** 产品ID */
+  /**
+   * 产品ID
+   */
   private String productKey;
 
-  /** 设备名称 */
+  /**
+   * 设备名称
+   */
   private String deviceName;
 
-  /** 消息类型 */
+  /**
+   * 消息类型
+   */
   private String messageType;
 
   private String event;

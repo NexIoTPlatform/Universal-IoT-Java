@@ -27,21 +27,33 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class NetworkBO extends Network {
 
-  /** 网络类型名称 */
+  /**
+   * 网络类型名称
+   */
   private String typeName;
 
-  /** 是否正在运行 */
+  /**
+   * 是否正在运行
+   */
   private boolean running;
 
-  /** 状态名称 */
+  /**
+   * 状态名称
+   */
   private String stateName;
 
-  /** 创建时间格式化 */
+  /**
+   * 创建时间格式化
+   */
   private String createDateStr;
 
-  /** 网络类型列表（多个类型） */
+  /**
+   * 网络类型列表（多个类型）
+   */
   private List<String> types;
 
-  /** 启用/停用状态名称 */
+  /**
+   * 启用/停用状态名称
+   */
   private String enableName;
 }

@@ -20,7 +20,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/** Treeselect树结构实体类 @Author ruoyi */
+/**
+ * Treeselect树结构实体类 @Author ruoyi
+ */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -28,13 +30,19 @@ public class TreeSelect implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /** 节点ID */
+  /**
+   * 节点ID
+   */
   private Long id;
 
-  /** 节点名称 */
+  /**
+   * 节点名称
+   */
   private String label;
 
-  /** 子节点 */
+  /**
+   * 子节点
+   */
   @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<TreeSelect> children;
 

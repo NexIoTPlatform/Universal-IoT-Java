@@ -44,7 +44,9 @@ public class RuleModelVO implements Serializable {
   @Schema(description = "规则名称")
   private String ruleName;
 
-  /** 数据级别 */
+  /**
+   * 数据级别
+   */
   @Schema(description = "数据级别")
   private String dataLevel;
 
