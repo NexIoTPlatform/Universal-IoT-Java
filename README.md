@@ -86,6 +86,18 @@ Universal IoT
 
 ### 功能截图
 
+
+#### 直接使用天翼产品
+
+<img src="__MACOSX/shot/99.gif">
+
+#### 可视化流程编排
+<img src="__MACOSX/shot/53.png">
+
+#### 协议统一管理与IDE
+<img src="__MACOSX/shot/54.png">
+
+
 |                            |                            |                            |
 |----------------------------|----------------------------|----------------------------|
 | ![](/__MACOSX/shot/01.png) | ![](/__MACOSX/shot/02.png) | ![](/__MACOSX/shot/03.png) |
@@ -96,16 +108,6 @@ Universal IoT
 | ![](/__MACOSX/shot/16.png) | ![](/__MACOSX/shot/17.png) | ![](/__MACOSX/shot/18.png) |
 | ![](/__MACOSX/shot/19.png) | ![](/__MACOSX/shot/20.png) | ![](/__MACOSX/shot/21.png) |
 | ![](/__MACOSX/shot/22.png) | ![](/__MACOSX/shot/23.png) | ![](/__MACOSX/shot/24.png) |
-
-### 直接使用天翼产品
-
-<img src="__MACOSX/shot/99.gif">
-
-### 可视化流程编排
-<img src="__MACOSX/shot/53.png">
-
-### 协议统一管理与IDE
-<img src="__MACOSX/shot/54.png">
 
 
 |                            |                            |                            | 
