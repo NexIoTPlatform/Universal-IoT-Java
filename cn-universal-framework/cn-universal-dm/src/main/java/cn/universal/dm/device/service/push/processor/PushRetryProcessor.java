@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,9 +51,15 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
   private static final int DEFAULT_MAX_RETRY_COUNT = 3;
   private static final int DEFAULT_RETRY_INTERVAL_MINUTES = 5;
 
-  // 专用重试线程池
+  // 专用重试线程池 - 使用自定义线程池避免ForkJoinPool耗尽
   private final java.util.concurrent.ExecutorService retryExecutor =
-      java.util.concurrent.Executors.newFixedThreadPool(10);
+      java.util.concurrent.Executors.newFixedThreadPool(
+          retryThreadPoolSize,
+          r -> {
+            Thread t = new Thread(r, "push-retry-" + System.currentTimeMillis());
+            t.setDaemon(true);
+            return t;
+          });
 
   @Override
   public String getName() {
@@ -67,6 +74,43 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
   @Override
   public int getOrder() {
     return 200; // 较低优先级，在统计后执行
+  }
+
+  /** 获取线程池状态信息 */
+  public String getThreadPoolStatus() {
+    if (retryExecutor instanceof java.util.concurrent.ThreadPoolExecutor) {
+      java.util.concurrent.ThreadPoolExecutor executor =
+          (java.util.concurrent.ThreadPoolExecutor) retryExecutor;
+      return String.format(
+          "PushRetry线程池状态: 核心线程数=%d, 最大线程数=%d, 当前线程数=%d, 活跃线程数=%d, 队列大小=%d, 已完成任务数=%d",
+          executor.getCorePoolSize(),
+          executor.getMaximumPoolSize(),
+          executor.getPoolSize(),
+          executor.getActiveCount(),
+          executor.getQueue().size(),
+          executor.getCompletedTaskCount());
+    }
+    return "PushRetry线程池状态: 无法获取详细信息";
+  }
+
+  /** 应用关闭时清理资源 */
+  @PreDestroy
+  public void destroy() {
+    log.info("[推送重试] 开始关闭PushRetryProcessor...");
+    if (retryExecutor != null && !retryExecutor.isShutdown()) {
+      retryExecutor.shutdown();
+      try {
+        if (!retryExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
+          log.warn("[推送重试] 线程池未能在30秒内正常关闭，强制关闭");
+          retryExecutor.shutdownNow();
+        }
+      } catch (InterruptedException e) {
+        log.warn("[推送重试] 等待线程池关闭时被中断");
+        retryExecutor.shutdownNow();
+        Thread.currentThread().interrupt();
+      }
+    }
+    log.info("[推送重试] PushRetryProcessor已关闭");
   }
 
   @Override
@@ -112,39 +156,56 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
         return;
       }
 
-      // 使用CompletableFuture添加超时处理
+      // 使用异步处理，避免阻塞ForkJoinPool
       CompletableFuture<Void> addToQueueFuture =
           CompletableFuture.runAsync(
               () -> {
-                // 添加到重试队列
-                redisTemplate.opsForList().rightPush(retryKey, retryData);
-                redisTemplate.expire(retryKey, java.time.Duration.ofDays(1));
+                try {
+                  // 添加到重试队列
+                  redisTemplate.opsForList().rightPush(retryKey, retryData);
+                  redisTemplate.expire(retryKey, java.time.Duration.ofDays(1));
+                  log.debug("[推送重试] Redis添加队列成功: deviceId={}, channel={}",
+                      result.getDeviceId(), result.getChannel());
+                } catch (Exception e) {
+                  log.error("[推送重试] Redis添加队列失败: deviceId={}, channel={}",
+                      result.getDeviceId(), result.getChannel(), e);
+                }
               },
               retryExecutor);
 
       CompletableFuture<Void> incrementCountFuture =
           CompletableFuture.runAsync(
               () -> {
-                // 增加重试次数
-                redisTemplate.opsForValue().increment(countKey);
-                redisTemplate.expire(countKey, java.time.Duration.ofDays(1));
+                try {
+                  // 增加重试次数
+                  redisTemplate.opsForValue().increment(countKey);
+                  redisTemplate.expire(countKey, java.time.Duration.ofDays(1));
+                  log.debug("[推送重试] Redis增加计数成功: deviceId={}, channel={}",
+                      result.getDeviceId(), result.getChannel());
+                } catch (Exception e) {
+                  log.error("[推送重试] Redis增加计数失败: deviceId={}, channel={}",
+                      result.getDeviceId(), result.getChannel(), e);
+                }
               },
               retryExecutor);
 
-      // 等待两个操作完成，设置超时
+      // 异步处理结果，不阻塞当前线程
       CompletableFuture.allOf(addToQueueFuture, incrementCountFuture)
-          .get(redisTimeoutSeconds, TimeUnit.SECONDS);
-
-      log.info(
-          "[推送重试] 添加失败推送到重试队列: deviceId={}, channel={}, retryCount={}",
-          result.getDeviceId(),
-          result.getChannel(),
-          currentRetryCount + 1);
-    } catch (TimeoutException e) {
-      log.warn(
-          "[推送重试] Redis操作超时，跳过添加重试队列: deviceId={}, channel={}",
-          result.getDeviceId(),
-          result.getChannel());
+          .thenRun(() -> {
+            log.info(
+                "[推送重试] 添加失败推送到重试队列成功: deviceId={}, channel={}, retryCount={}",
+                result.getDeviceId(),
+                result.getChannel(),
+                currentRetryCount + 1);
+          })
+          .exceptionally(throwable -> {
+            log.error(
+                "[推送重试] 添加失败推送到重试队列异常: deviceId={}, channel={}",
+                result.getDeviceId(),
+                result.getChannel(),
+                throwable);
+            return null;
+          });
     } catch (Exception e) {
       log.error(
           "[推送重试] 添加失败推送到重试队列失败: deviceId={}, channel={}",
@@ -398,22 +459,12 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
         currentRetryCount + 1);
   }
 
-  /** 获取重试次数 */
+  /** 获取重试次数 - 同步方法，直接调用Redis */
   private Integer getRetryCount(String countKey) {
     try {
-      // 使用CompletableFuture添加超时处理
-      CompletableFuture<String> future =
-          CompletableFuture.supplyAsync(
-              () -> {
-                return redisTemplate.opsForValue().get(countKey);
-              },
-              retryExecutor);
-
-      String count = future.get(redisTimeoutSeconds, TimeUnit.SECONDS);
+      // 直接调用Redis，避免异步复杂性
+      String count = redisTemplate.opsForValue().get(countKey);
       return count != null ? Integer.valueOf(count) : 0;
-    } catch (TimeoutException e) {
-      log.warn("[推送重试] Redis操作超时，key={}, 使用默认值0", countKey);
-      return 0;
     } catch (Exception e) {
       log.error("[推送重试] 获取重试次数失败，key={}", countKey, e);
       return 0;
@@ -514,22 +565,34 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
               result.getErrorCode(),
               result.getPushTime().format(DATETIME_FORMATTER));
 
-      // 使用CompletableFuture添加超时处理
+      // 使用异步处理，避免阻塞ForkJoinPool
       CompletableFuture<Void> future =
           CompletableFuture.runAsync(
               () -> {
-                redisTemplate.opsForList().rightPush(failedKey, failedData);
-                redisTemplate.expire(failedKey, java.time.Duration.ofDays(7)); // 失败记录保留7天
+                try {
+                  redisTemplate.opsForList().rightPush(failedKey, failedData);
+                  redisTemplate.expire(failedKey, java.time.Duration.ofDays(7)); // 失败记录保留7天
+                  log.debug("[推送重试] 记录失败推送成功: deviceId={}, channel={}",
+                      result.getDeviceId(), result.getChannel());
+                } catch (Exception e) {
+                  log.error("[推送重试] 记录失败推送Redis操作失败: deviceId={}, channel={}",
+                      result.getDeviceId(), result.getChannel(), e);
+                }
               },
               retryExecutor);
 
-      future.get(redisTimeoutSeconds, TimeUnit.SECONDS);
-    } catch (TimeoutException e) {
-      log.warn(
-          "[推送重试] 记录失败推送超时，deviceId={}, channel={}", result.getDeviceId(), result.getChannel());
+      // 异步处理结果，不阻塞当前线程
+      future.thenRun(() -> {
+        log.debug("[推送重试] 记录失败推送完成: deviceId={}, channel={}",
+            result.getDeviceId(), result.getChannel());
+      }).exceptionally(throwable -> {
+        log.error("[推送重试] 记录失败推送异常: deviceId={}, channel={}",
+            result.getDeviceId(), result.getChannel(), throwable);
+        return null;
+      });
     } catch (Exception e) {
-      log.error(
-          "[推送重试] 记录失败推送失败，deviceId={}, channel={}", result.getDeviceId(), result.getChannel(), e);
+      log.error("[推送重试] 记录失败推送失败: deviceId={}, channel={}",
+          result.getDeviceId(), result.getChannel(), e);
     }
   }
 
@@ -610,21 +673,4 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
     }
   }
 
-  /** 组件销毁时关闭线程池 */
-  @jakarta.annotation.PreDestroy
-  public void destroy() {
-    if (retryExecutor != null && !retryExecutor.isShutdown()) {
-      log.info("[推送重试] 正在关闭重试线程池");
-      retryExecutor.shutdown();
-      try {
-        if (!retryExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-          retryExecutor.shutdownNow();
-        }
-      } catch (InterruptedException e) {
-        retryExecutor.shutdownNow();
-        Thread.currentThread().interrupt();
-      }
-      log.info("[推送重试] 重试线程池已关闭");
-    }
-  }
 }
