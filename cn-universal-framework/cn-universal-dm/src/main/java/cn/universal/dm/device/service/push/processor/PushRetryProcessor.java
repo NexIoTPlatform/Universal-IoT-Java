@@ -34,9 +34,6 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
   @Autowired private PushStatisticsProcessor pushStatisticsProcessor;
 
   // 配置参数
-  @Value("${push.retry.thread.pool.size:10}")
-  private int retryThreadPoolSize;
-
   @Value("${push.retry.redis.timeout:5}")
   private int redisTimeoutSeconds;
 
@@ -52,9 +49,10 @@ public class PushRetryProcessor implements UPProcessor<BaseUPRequest> {
   private static final int DEFAULT_RETRY_INTERVAL_MINUTES = 5;
 
   // 专用重试线程池 - 使用自定义线程池避免ForkJoinPool耗尽
+  // 直接使用默认值初始化，简单可靠
   private final java.util.concurrent.ExecutorService retryExecutor =
       java.util.concurrent.Executors.newFixedThreadPool(
-          retryThreadPoolSize,
+          10, // 默认线程池大小
           r -> {
             Thread t = new Thread(r, "push-retry-" + System.currentTimeMillis());
             t.setDaemon(true);
