@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class IotRedisFunction {
+public class IoTRedisFunctions {
 
   @Resource private StringRedisTemplate stringRedisTemplate;
   private static final String DEVICE_PREFIX = "univiot:device:";

@@ -12,7 +12,9 @@
 
 package cn.universal.plugins.protocolapi.extend;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.universal.core.engine.reflection.JavaReflection;
+import java.util.Map;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -22,10 +24,9 @@ public class FunctionRegistrar implements ApplicationContextAware {
 
   @Override
   public void setApplicationContext(ApplicationContext context) {
-    // Spring容器就绪后注册univFunction
-    IotRedisFunction iotRedisFunction = context.getBean(IotRedisFunction.class);
-    UnivFunction univFunction = context.getBean(UnivFunction.class);
-    JavaReflection.registerFunction(iotRedisFunction);
-    JavaReflection.registerFunction(univFunction);
+    Map<String, IdeMagicFunction> beansOfType = context.getBeansOfType(IdeMagicFunction.class);
+    if (CollUtil.isNotEmpty(beansOfType)) {
+      beansOfType.forEach((key, value) -> JavaReflection.registerFunction(value));
+    }
   }
 }
