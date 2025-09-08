@@ -94,7 +94,7 @@ Universal IoT
 
 |                              |                              |                             |
 |------------------------------|------------------------------|-----------------------------|
-| ![](/__MACOSX/shot/dian.png) | ![](/__MACOSX/shot/shui.png) | ![](/__MACOSX/shot/mai.png) |
+| ![](/__MACOSX/shot/dian.jpg) | ![](/__MACOSX/shot/shui.jpg) | ![](/__MACOSX/shot/mai.jpg) |
 
 
 ## 界面展示
