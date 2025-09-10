@@ -12,9 +12,6 @@ import cn.universal.core.engine.annotation.Function;
 import java.nio.charset.Charset;
 import org.springframework.stereotype.Component;
 
-/**
- * 16进制相关操作
- */
 @Component
 public class HexFunctions implements IdeMagicFunction {
 
@@ -79,7 +76,8 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("hex左侧补齐到指定字节数，填充字节值")
-  public String hex_padLeft(@Comment(name = "hex", value = "十六进制字符串") String hex,
+  public String hex_padLeft(
+      @Comment(name = "hex", value = "十六进制字符串") String hex,
       @Comment(name = "bytes", value = "目标字节数") Integer bytes,
       @Comment(name = "pad", value = "填充值 十六进制两位") String padHex) {
     if (hex == null || bytes == null || bytes < 0) {
@@ -189,7 +187,8 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("CRC-CS校验验证（忽略大小写）")
-  public Boolean crc_csVerify(@Comment(name = "data", value = "十六进制字符串") String hex,
+  public Boolean crc_csVerify(
+      @Comment(name = "data", value = "十六进制字符串") String hex,
       @Comment(name = "cs", value = "期望CS，两位HEX") String expectedCs) {
     if (StrUtil.isBlank(hex) || StrUtil.isBlank(expectedCs)) {
       return false;
@@ -200,8 +199,7 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("DL/T645 简易帧解析：返回json{head,addr,ctrl,len,data,cs,tail}")
-  public String hex_645SimpleParse(
-      @Comment(name = "frame", value = "完整帧 十六进制") String frame) {
+  public String hex_645SimpleParse(@Comment(name = "frame", value = "完整帧 十六进制") String frame) {
     JSONObject obj = new JSONObject();
     if (StrUtil.isBlank(frame)) {
       return JSONUtil.toJsonStr(obj);
@@ -240,6 +238,66 @@ public class HexFunctions implements IdeMagicFunction {
   }
 
   // =====================
+  // ASCII/可见字符
+  // =====================
+
+  @Function
+  @Comment("十六进制转ASCII字符串（直接按字节转换）")
+  public String hex_toAscii(@Comment(name = "hex", value = "十六进制") String hex) {
+    if (!hex_isValid(hex)) {
+      return null;
+    }
+    String s = hex_stripSpaces(hex);
+    byte[] bytes = HexUtil.decodeHex(s);
+    return new String(bytes, java.nio.charset.StandardCharsets.US_ASCII);
+  }
+
+  @Function
+  @Comment("ASCII字符串转十六进制（大写）")
+  public String hex_fromAscii(@Comment(name = "str", value = "ASCII字符串") String str) {
+    if (str == null) {
+      return null;
+    }
+    byte[] bytes = str.getBytes(java.nio.charset.StandardCharsets.US_ASCII);
+    return HexUtil.encodeHexStr(bytes).toUpperCase();
+  }
+
+  @Function
+  @Comment("十六进制转ASCII（不可见字符转为点号.）")
+  public String hex_toAsciiSafe(@Comment(name = "hex", value = "十六进制") String hex) {
+    if (!hex_isValid(hex)) {
+      return null;
+    }
+    String s = hex_stripSpaces(hex);
+    StringBuilder out = new StringBuilder(s.length() / 2);
+    for (int i = 0; i < s.length(); i += 2) {
+      int b = Integer.parseInt(s.substring(i, i + 2), 16);
+      if (b >= 32 && b <= 126) {
+        out.append((char) b);
+      } else {
+        out.append('.');
+      }
+    }
+    return out.toString();
+  }
+
+  @Function
+  @Comment("是否全部为ASCII可见字符(0x20-0x7E)")
+  public Boolean hex_isAsciiPrintable(@Comment(name = "hex", value = "十六进制") String hex) {
+    if (!hex_isValid(hex)) {
+      return false;
+    }
+    String s = hex_stripSpaces(hex);
+    for (int i = 0; i < s.length(); i += 2) {
+      int b = Integer.parseInt(s.substring(i, i + 2), 16);
+      if (b < 32 || b > 126) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // =====================
   // HEX常用工具
   // =====================
 
@@ -264,7 +322,8 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("指定位宽大小端转换（每word长度2/4/8字节）")
-  public String hex_swapEndian(@Comment(name = "hex", value = "十六进制") String hex,
+  public String hex_swapEndian(
+      @Comment(name = "hex", value = "十六进制") String hex,
       @Comment(name = "wordBytes", value = "位宽字节：2/4/8") Integer wordBytes) {
     if (!hex_isValid(hex) || wordBytes == null || wordBytes <= 0) {
       return null;
@@ -327,7 +386,8 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("BCD(十六进制)转十进制字符串，带小数位scale")
-  public String hex_bcdToDec(@Comment(name = "hex", value = "BCD编码HEX") String hex,
+  public String hex_bcdToDec(
+      @Comment(name = "hex", value = "BCD编码HEX") String hex,
       @Comment(name = "scale", value = "小数位数") Integer scale) {
     if (!hex_isValid(hex)) {
       return null;
@@ -354,7 +414,8 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("十进制字符串转BCD(HEX)，指定字节数与小数位scale")
-  public String hex_decToBcd(@Comment(name = "value", value = "十进制字符串") String value,
+  public String hex_decToBcd(
+      @Comment(name = "value", value = "十进制字符串") String value,
       @Comment(name = "bytes", value = "目标字节数") Integer bytes,
       @Comment(name = "scale", value = "小数位数") Integer scale) {
     if (StrUtil.isBlank(value) || bytes == null || bytes <= 0) {
@@ -391,7 +452,8 @@ public class HexFunctions implements IdeMagicFunction {
 
   @Function
   @Comment("构建645读帧：68 + addr(12) + 68 + ctrl + len + data(可选编码) + cs + 16")
-  public String hex_645Build(@Comment(name = "addr", value = "地址HEX(12位)") String addrHex,
+  public String hex_645Build(
+      @Comment(name = "addr", value = "地址HEX(12位)") String addrHex,
       @Comment(name = "ctrl", value = "控制码 两位HEX") String ctrl,
       @Comment(name = "data", value = "数据区HEX(未编码)") String dataHex,
       @Comment(name = "encode33", value = "数据区是否+0x33") Boolean encode33) {
@@ -402,8 +464,10 @@ public class HexFunctions implements IdeMagicFunction {
     if (!StrUtil.isEmpty(data) && !hex_isValid(data)) {
       return null;
     }
-    String enc = StrUtil.isEmpty(data) ? ""
-        : (Boolean.TRUE.equals(encode33) ? hex_add33(data) : data.toUpperCase());
+    String enc =
+        StrUtil.isEmpty(data)
+            ? ""
+            : (Boolean.TRUE.equals(encode33) ? hex_add33(data) : data.toUpperCase());
     String len = hex_645MakeLen(enc);
     String noCs = "68" + addrHex.toUpperCase() + "68" + ctrl.toUpperCase() + len + enc;
     String cs = hex_645MakeCs(noCs);
