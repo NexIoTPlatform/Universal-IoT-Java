@@ -1,4 +1,4 @@
-# NexIoT(原名Universal-IoT) 物联网平台
+# NexIoT(Universal-IoT) 物联网平台
 
 ### 各位大佬，熬夜开源不易，点个star，进群获取db文件！！
 
