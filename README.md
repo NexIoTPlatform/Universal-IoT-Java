@@ -96,6 +96,9 @@ Universal IoT
 |------------------------------|------------------------------|-----------------------------|
 | ![](/__MACOSX/shot/dian.jpg) | ![](/__MACOSX/shot/shui.jpg) | ![](/__MACOSX/shot/mai.jpg) |
 
+#### 视频教程
+
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=115169061702385&bvid=BV1sJaZzBEfr&cid=32251904289&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
 
 ## 界面展示
 
@@ -145,9 +148,9 @@ Universal IoT
 
 有任何问题加入QQ群
 
-| 在线沟通                       |                            | 
-|----------------------------|----------------------------|
-| ![](/__MACOSX/shot/qq.png) | ![](/__MACOSX/shot/wx.png) | 
+| 在线沟通                       |                            |                                |
+|----------------------------|----------------------------|--------------------------------|
+| ![](/__MACOSX/shot/qq.png) | ![](/__MACOSX/shot/wx.png) | ![](/__MACOSX/shot/douyin.jpg) | 
 
 
 
