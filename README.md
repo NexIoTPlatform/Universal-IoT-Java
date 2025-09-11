@@ -96,9 +96,10 @@ Universal IoT
 |------------------------------|------------------------------|-----------------------------|
 | ![](/__MACOSX/shot/dian.jpg) | ![](/__MACOSX/shot/shui.jpg) | ![](/__MACOSX/shot/mai.jpg) |
 
-#### 视频教程
 
-<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=115169061702385&bvid=BV1sJaZzBEfr&cid=32251904289&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
+
+## [点击跳转B站视频教程](https://player.bilibili.com/player.html?isOutside=true&aid=115169061702385&bvid=BV1sJaZzBEfr&cid=32251904289&p=1 "B站视频教程")
+
 
 ## 界面展示
 
