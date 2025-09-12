@@ -1,4 +1,4 @@
-# NexIoT(Universal-IoT) 物联网平台
+# NexIoT(原名Universal-IoT) 物联网平台
 
 ### 各位大佬，熬夜开源不易，点个star，进群获取db文件！！
 
@@ -97,10 +97,6 @@ Universal IoT
 | ![](/__MACOSX/shot/dian.jpg) | ![](/__MACOSX/shot/shui.jpg) | ![](/__MACOSX/shot/mai.jpg) |
 
 
-
-## [点击跳转B站视频教程](https://player.bilibili.com/player.html?isOutside=true&aid=115169061702385&bvid=BV1sJaZzBEfr&cid=32251904289&p=1 "B站视频教程")
-
-
 ## 界面展示
 
 ### 架构图
@@ -149,9 +145,9 @@ Universal IoT
 
 有任何问题加入QQ群
 
-| 在线沟通                       |                            |                                |
-|----------------------------|----------------------------|--------------------------------|
-| ![](/__MACOSX/shot/qq.png) | ![](/__MACOSX/shot/wx.png) | ![](/__MACOSX/shot/douyin.jpg) | 
+| 在线沟通                       |                            | 
+|----------------------------|----------------------------|
+| ![](/__MACOSX/shot/qq.png) | ![](/__MACOSX/shot/wx.png) | 
 
 
 
