@@ -938,20 +938,6 @@
     where JSON_EXTRACT(configuration, concat('$.', 'gatewayEUI')) = #{bo.unionId}
     ORDER BY create_time DESC
   </select>
-
-  <select id="selectInterPhoneDevice"
-    resultType="cn.universal.persistence.entity.vo.InterPhoneInstanceVO">
-    SELECT dev.device_id,
-           dev.device_name,
-           dev.state,
-           dev.create_time,
-           dev.online_time,
-           dev.coordinate,
-           ds.metadata
-    FROM iot_device dev
-           left join iot_device_shadow ds on dev.device_id = ds.device_id
-    WHERE dev.product_key = '658940dc59765da0afc52cc7'
-  </select>
   <select id="getGatewayDeviceList"
     resultType="cn.universal.persistence.entity.vo.GatewayDeviceVo">
     select device_id, device_name, product_key, iot_id

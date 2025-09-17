@@ -184,7 +184,6 @@ public interface IoTDeviceMapper extends BaseMapper<IoTDevice> {
 
   List<IoTDevice> queryMileSightList(@Param("bo") NetworkBO bo);
 
-  List<InterPhoneInstanceVO> selectInterPhoneDevice(IoTAPIQuery iotAPIQuery);
 
   List<GatewayDeviceVo> getGatewayDeviceList(@Param("bo") IoTGwDeviceBO bo);
 
