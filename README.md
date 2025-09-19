@@ -1,8 +1,4 @@
-<div align="center">
-
-#  🚀 NexIoT物联网平台
-
-</div>
+# 🚀 NexIoT物联网平台
 
 <div align="center">
 
@@ -28,6 +24,7 @@
 - [🏗️ 技术架构](#️-技术架构)
 - [📈 正在推进](#-正在推进)
 - [💡 最佳实践](#-最佳实践)
+- [🎥 视频教程](#-视频教程)
 - [📸 界面展示](#-界面展示)
 - [🤝 贡献指南](#-贡献指南)
 - [📄 开源协议](#-开源协议)
@@ -173,6 +170,43 @@ cd cn-universal-web & ./bin/restart.sh
 |                              |                              |                             |
 |------------------------------|------------------------------|-----------------------------|
 | ![电表设备](/__MACOSX/shot/dian.jpg) | ![水浸设备](/__MACOSX/shot/shui.jpg) | ![设备展示](/__MACOSX/shot/mai.jpg) |
+
+## 🎥 视频教程
+
+我们提供了详细的视频教程，帮助您快速上手NexIoT平台。所有教程都是基于真实设备进行实战演示。
+
+### 📡 天翼物联接入教程
+
+#### 🌊 NB水浸传感器系列
+
+1. **【手把手实战：水浸传感器开箱：初见与硬件解析】**
+   - 📺 [B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+   - 📝 内容：设备开箱、硬件介绍、基本功能测试
+
+2. **【手把手实战：NexIoT接入Ctwing参数配置】**
+   - 📺 [B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+   - 📝 内容：天翼物联平台参数配置、设备注册流程
+
+3. **【手把手实战：NB水浸传感器CTWing接入全流程】**
+   - 📺 [B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+   - 📝 内容：完整的设备接入流程，从配置到数据上报
+
+### 🔌 TCP直连接入教程
+
+#### ⚡ DL/T64电表系列
+
+1. **【【开源】手把手实战：DL/T64电表TCP直连接入】**
+   - 📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+   - 📝 内容：TCP协议解析、设备直连配置、数据解析
+
+2. **【【开源】手把手实战：产品创建与SNI解读】**
+   - 📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+   - 📝 内容：产品创建流程、SNI设备标识解析、协议调试
+
+
+### 🎯 更多教程
+
+我们正在持续制作更多设备的接入教程，尽情期待
 
 ## 📸 界面展示
 
