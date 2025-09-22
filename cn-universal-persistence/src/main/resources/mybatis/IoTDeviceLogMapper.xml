@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTDeviceLogMapper">
+  <resultMap id="BaseResultMap" type="cn.universal.persistence.entity.IoTDeviceLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id"/>
+    <result column="iot_id" jdbcType="VARCHAR" property="iotId"/>
+    <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+    <result column="ext_device_id" jdbcType="VARCHAR" property="extDeviceId"/>
+    <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
+    <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+    <result column="message_type" jdbcType="VARCHAR" property="messageType"/>
+    <result column="command_id" jdbcType="VARCHAR" property="commandId"/>
+    <result column="command_status" jdbcType="TINYINT" property="commandStatus"/>
+    <result column="create_id" jdbcType="VARCHAR" property="createId"/>
+    <result column="point" jdbcType="VARCHAR" property="point"/>
+    <result column="event" jdbcType="VARCHAR" property="event"/>
+    <result column="instance" jdbcType="VARCHAR" property="instance"/>
+    <result column="create_time" jdbcType="INTEGER" property="createTime"/>
+    <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+  </resultMap>
+
+  <select id="queryLogPageV2List" resultType="cn.universal.persistence.entity.vo.IoTDeviceLogVO">
+    select *
+    from iot_device_log
+    <where>
+      <if test="iotId != null and iotId != ''">
+        and iot_id = #{iotId}
+      </if>
+      <if test="deviceId != null and deviceId != ''">
+        and device_id = #{deviceId}
+      </if>
+      <if test="extDeviceId != null and extDeviceId != ''">
+        and ext_device_id = #{extDeviceId}
+      </if>
+      <if test="productKey != null and productKey != ''">
+        and product_key = #{productKey}
+      </if>
+      <if test="deviceName != null and deviceName != ''">
+        and device_name like concat('%',#{deviceName},'%')
+      </if>
+      <if test="messageType != null and messageType != ''">
+        and message_type = #{messageType}
+      </if>
+      <if test="params!=null and params.event != null and params.event != ''">
+        and JSON_EXTRACT(content,concat('$.','event')) = #{params.event}
+      </if>
+      <if test="params!=null and params.properties != null and params.properties != ''">
+        and json_contains_path(content,'all',concat('$.properties.',#{params.properties}))
+      </if>
+      <if test="params!=null and  params.beginCreateTime != null">
+        and create_time&gt;=#{params.beginCreateTime}
+      </if>
+      <if test="params!=null and params.endCreateTime != null">
+        and create_time&lt;=#{params.endCreateTime}
+      </if>
+    </where>
+    order by create_time desc
+  </select>
+  <select id="queryLogById" resultType="cn.universal.persistence.entity.vo.IoTDeviceLogVO">
+    select *
+    from iot_device_log
+    <where>
+      1=1
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="iotId != null and iotId != ''">
+        and iot_id = #{iotId}
+      </if>
+      <if test="productKey != null and productKey != ''">
+        and product_key = #{productKey}
+      </if>
+    </where>
+
+  </select>
+
+  <select id="queryLogPageList" resultType="cn.universal.persistence.entity.vo.IoTDeviceLogVO">
+    select *
+    from iot_device_log
+    <where>
+      <if test="iotId != null and iotId != ''">
+        and iot_id = #{iotId}
+      </if>
+      <if test="deviceId != null and deviceId != ''">
+        and device_id = #{deviceId}
+      </if>
+      <if test="extDeviceId != null and extDeviceId != ''">
+        and ext_device_id = #{extDeviceId}
+      </if>
+      <if test="productKey != null and productKey != ''">
+        and product_key = #{productKey}
+      </if>
+      <if test="deviceName != null and deviceName != ''">
+        and device_name like concat('%',#{deviceName},'%')
+      </if>
+      <if test="messageType != null and messageType != ''">
+        and message_type = #{messageType}
+      </if>
+      <if test="companyNo != null and companyNo != ''">
+        and company_no like concat('%',#{companyNo},'%')
+      </if>
+      <if test="protocol != null and protocol != ''">
+        and protocol = #{protocol}
+      </if>
+      <if test="params.event != null and params.event != ''">
+        and JSON_EXTRACT(content,concat('$.','event')) = #{params.event}
+      </if>
+      <if test="params.properties != null and params.properties != ''">
+        and json_contains_path(content,'all',concat('$.properties.',#{params.properties}))
+      </if>
+      <if test="params.beginCreateTime != null">
+        and create_time&gt;=#{params.beginCreateTime}
+      </if>
+      <if test="params.endCreateTime != null">
+        and create_time&lt;=#{params.endCreateTime}
+      </if>
+    </where>
+    order by create_time desc
+  </select>
+
+  <select id="queryEventTotalByEventAndId" resultType="java.lang.String">
+    SELECT create_time
+    FROM iot_device_log
+    WHERE iot_id = #{iotId}
+      AND message_type = 'EVENT'
+      AND `event` = #{event}
+    ORDER BY create_time desc LIMIT 1
+  </select>
+
+
+  <select id="queryCoordinatesLogByIotId" resultType="cn.universal.persistence.entity.IoTDeviceLog">
+    select *
+    from iot_device_log
+    where iot_id = #{iotId}
+      and message_type = 'PROPERTIES'
+      and content like '%coordinate%'
+    order by id desc limit 1,1
+  </select>
+  <select id="queryLogIdByTime" resultType="java.lang.Long">
+    SELECT id from
+    <choose>
+      <when test="tablesIndex != null and tablesIndex &lt; 0 ">
+        iot_device_log
+      </when>
+      <otherwise>
+        iot_device_log_${tablesIndex}
+      </otherwise>
+    </choose>
+    <![CDATA[   where create_time>=#{time}  limit 1
+    ]]>
+  </select>
+  <delete id="deleteLogById">
+    DELETE from
+    <choose>
+      <when test="tablesIndex != null and tablesIndex &lt;  0 ">
+        iot_device_log
+      </when>
+      <otherwise>
+        iot_device_log_${tablesIndex}
+      </otherwise>
+    </choose>
+    <![CDATA[    WHERE id<=#{id}  limit 500000
+    ]]>
+
+  </delete>
+  <select id="queryLogIdByProductKeyAndTime" resultType="java.lang.Long">
+    SELECT id from
+    <choose>
+      <when test="tablesIndex != null and tablesIndex &lt; 0 ">
+        iot_device_log
+      </when>
+      <otherwise>
+        iot_device_log_${tablesIndex}
+      </otherwise>
+    </choose>
+    <![CDATA[   where create_time>=#{time} AND product_key=#{productKey}   limit 1
+    ]]>
+  </select>
+  <delete id="deleteLogByTask">
+
+    DELETE from
+    <choose>
+      <when test="tablesIndex != null and tablesIndex &lt;  0 ">
+        iot_device_log
+      </when>
+      <otherwise>
+        iot_device_log_${tablesIndex}
+      </otherwise>
+    </choose>
+    <![CDATA[    WHERE id<=#{id} AND product_key=#{productKey}  limit 80000
+    ]]>
+
+  </delete>
+</mapper>
