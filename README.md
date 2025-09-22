@@ -203,7 +203,7 @@ cd cn-universal-web & ./bin/restart.sh
    - 📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
    - 📝 内容：产品创建流程、SNI设备标识解析、协议调试
 
-3. **【【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
+3. **【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
    - 📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
    - 📝 内容：数据流介绍、调试IDE的编写和调试、645电表的编写
 
