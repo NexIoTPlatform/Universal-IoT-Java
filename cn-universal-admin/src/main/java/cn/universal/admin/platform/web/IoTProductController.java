@@ -20,16 +20,22 @@ import cn.universal.admin.common.annotation.Log;
 import cn.universal.admin.common.enums.BusinessType;
 import cn.universal.admin.common.utils.SecurityUtils;
 import cn.universal.admin.network.service.INetworkService;
+import cn.universal.admin.platform.dto.ConnectionInfoDTO;
+import cn.universal.admin.platform.service.ConnectionInfoService;
 import cn.universal.admin.platform.service.IIoTDeviceService;
 import cn.universal.admin.platform.service.IIoTProductService;
 import cn.universal.admin.platform.service.impl.IoTProductServiceImpl;
 import cn.universal.admin.system.service.ISysDictTypeService;
 import cn.universal.admin.system.service.IoTDeviceProtocolService;
 import cn.universal.admin.system.web.BaseController;
+import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTConstant.ProtocolModule;
 import cn.universal.common.constant.IoTConstant.TcpFlushType;
+import cn.universal.common.event.EventTopics;
+import cn.universal.common.event.processer.EventPublisher;
 import cn.universal.common.exception.IoTException;
 import cn.universal.core.service.IoTDownlFactory;
+import cn.universal.ossm.service.ISysOssService;
 import cn.universal.persistence.entity.IoTDevice;
 import cn.universal.persistence.entity.IoTDeviceEvents;
 import cn.universal.persistence.entity.IoTDeviceFunction;
@@ -55,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,29 +82,20 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/admin/v1/product")
 public class IoTProductController extends BaseController {
 
-  @Autowired
-  private IIoTProductService devProductService;
-  @Autowired
-  private IIoTDeviceService iIotDeviceService;
-  @Autowired
-  private ISysDictTypeService dictTypeService;
-  @Resource
-  private INetworkService iNetworkService;
-  @Resource
-  private IoTDeviceProtocolService ioTDeviceProtocolService;
-  @Resource
-  private IoTProductMapper ioTProductMapper;
-  @Autowired
-  private IoTProductServiceImpl ioTProductServiceImpl;
-  @Autowired
-  private ApplicationEventPublisher eventPublisher;
+  @Autowired private IIoTProductService devProductService;
+  @Autowired private IIoTDeviceService iIotDeviceService;
+  @Autowired private ISysDictTypeService dictTypeService;
+  @Resource private INetworkService iNetworkService;
+  @Resource private IoTDeviceProtocolService ioTDeviceProtocolService;
+  @Resource private IoTProductMapper ioTProductMapper;
+  @Autowired private IoTProductServiceImpl ioTProductServiceImpl;
+  @Autowired private EventPublisher eventPublisher;
+  @Autowired private ISysOssService iSysOssService;
+  @Autowired private ConnectionInfoService connectionInfoService;
 
-  /**
-   * 查询设备产品列表
-   */
+  /** 查询设备产品列表 */
   @GetMapping("/list")
   public TableDataInfo list(IoTProductQuery query) {
-    // 只能看自己设备，除非是特殊设置和超管
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     if (!iotUser.viewAllProduct()) {
       query.setSelf(true);
@@ -118,20 +114,21 @@ public class IoTProductController extends BaseController {
     return getDataTable(list);
   }
 
-  /**
-   * 获取产品详情通过 ProductKey
-   */
+  /** 获取产品详情通过 ProductKey */
   @GetMapping("/get/pro/{key}")
   public AjaxResult<IoTProduct> getProByKey(@PathVariable("key") String key) {
-    return devProductService.selectDevProductByKey(key);
+    return devProductService.selectIoTProductByKey(key);
   }
 
-  /**
-   * 查询设备产品列表
-   */
+  /** 获取网关绑定的子产品列表 */
+  @GetMapping("/gateway/subProducts/{key}")
+  public AjaxResult<List<IoTProduct>> gatewaySubProducts(@PathVariable("key") String gwProductKey) {
+    return devProductService.selectGatewaySubProductsByKey(gwProductKey);
+  }
+
+  /** 查询设备产品列表 */
   @GetMapping("/v2/list")
   public TableDataInfo v2List(IoTProductQuery query) {
-    // 只能看自己设备，除非是特殊设置和超管
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     if (!iotUser.viewAllProduct()) {
       query.setSelf(true);
@@ -150,12 +147,10 @@ public class IoTProductController extends BaseController {
     return getDataTable(list);
   }
 
-  /**
-   * 查询设备产品列表
-   */
+  /** 查询设备产品列表 */
   @GetMapping("/v3/list")
   public TableDataInfo v3List(IoTProductQuery query) {
-    // 只能看自己设备，除非是特殊设置和超管
+    //
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     if (!iotUser.viewAllProduct()) {
       query.setSelf(true);
@@ -175,12 +170,10 @@ public class IoTProductController extends BaseController {
     return getDataTable(list);
   }
 
-  /**
-   * 查询设备产品列表
-   */
+  /** 查询设备产品列表 */
   @GetMapping("/v4/list")
   public TableDataInfo v4List(IoTProductQuery query) {
-    // 只能看自己设备，除非是特殊设置和超管
+    //
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     if (!iotUser.viewAllProduct()) {
       query.setSelf(true);
@@ -200,70 +193,47 @@ public class IoTProductController extends BaseController {
     return getDataTable(list);
   }
 
-  /**
-   * 查询所有设备产品列表
-   */
+  /** 查询所有设备产品列表 */
   @GetMapping("/all/list")
   public TableDataInfo v3List() {
     List<IoTProductVO> list = devProductService.selectDevProductAllList();
     return getDataTable(list);
   }
 
-  /**
-   * 物模型新增内容
-   */
+  /** 物模型新增内容 */
   @PostMapping("/metadata/add")
   @Log(title = "物模型新增内容", businessType = BusinessType.INSERT)
   public AjaxResult<Void> metadataAdd(@RequestBody IoTProductBO ioTProductBO) {
     return toAjax(devProductService.insertMetadata(ioTProductBO));
   }
 
-  /**
-   * 物模型修改内容
-   */
+  /** 物模型修改内容 */
   @PostMapping("/metadata/update")
   @Log(title = "物模型修改内容", businessType = BusinessType.UPDATE)
   public AjaxResult<Void> metadataUpdate(@RequestBody IoTProductBO ioTProductBO) {
     return toAjax(devProductService.updateMetadata(ioTProductBO));
   }
 
-  /**
-   * 物模型删除内容
-   */
+  /** 物模型删除内容 */
   @PostMapping("/metadata/delete")
   @Log(title = "物模型删除内容", businessType = BusinessType.DELETE)
   public AjaxResult<Void> metadataDelete(@RequestBody IoTProductBO ioTProductBO) {
     return toAjax(devProductService.deleteMetadata(ioTProductBO));
   }
 
-  /**
-   * 物模型查询内容
-   */
+  /** 物模型查询内容 */
   @PostMapping("/metadata/get")
   public AjaxResult<IoTProductBO> metadataGet(@RequestBody IoTProductBO ioTProductBO) {
     return AjaxResult.success(devProductService.getMetadata(ioTProductBO));
   }
 
-  /** 导出设备产品列表 */
-  //    @PostMapping("/export")
-  //    public void export(HttpServletResponse response, IoTProduct ioTProduct)
-  //    {
-  //        List<IoTProduct> list = devProductService.selectDevProductList(ioTProduct);
-  //        ExcelUtil<IoTProduct> util = new ExcelUtil<IoTProduct>(IoTProduct.class);
-  //        util.exportExcel(response, list, "设备产品数据");
-  //    }
-
-  /**
-   * 获取设备产品详细信息
-   */
+  /** 获取设备产品详细信息 */
   @GetMapping(value = "/{id}")
   public AjaxResult getInfo(@PathVariable("id") String id) {
     return AjaxResult.success(devProductService.selectDevProductById(id));
   }
 
-  /**
-   * 查询可绑定网关列表
-   */
+  /** 查询可绑定网关列表 */
   @Operation(summary = "查询可绑定网关产品列表")
   @GetMapping("/gateway/list")
   public AjaxResult<List<IoTProductVO>> getGatewayList() {
@@ -271,20 +241,16 @@ public class IoTProductController extends BaseController {
     return AjaxResult.success(list);
   }
 
-  /**
-   * 查询可绑定网关子设备产品列表
-   */
+  /** 查询可绑定网关子设备产品列表 */
   @Operation(summary = "查询可绑定网关子设备产品列表")
-  @GetMapping("/subdevice/{productKey}")
+  @GetMapping("/sub/device/{productKey}")
   public AjaxResult<List<IoTProductVO>> getGatewaySubDeviceList(
       @PathVariable("productKey") String productKey) {
     List<IoTProductVO> list = devProductService.getGatewaySubDeviceList(productKey);
     return AjaxResult.success(list);
   }
 
-  /**
-   * 查询电信公共产品列表
-   */
+  /** 查询电信公共产品列表 */
   @PostMapping(value = "/ctwing/pubpro")
   public AjaxResult getCtwingPubPro(@RequestBody String downRequest) {
     String creatorId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
@@ -299,23 +265,27 @@ public class IoTProductController extends BaseController {
     downProRequest.set("data", data);
     return AjaxResult.success(
         IoTDownlFactory.safeInvokeDown(
-            ProtocolModule.ctaiot.name(), "downPro", downProRequest.toString()));
+            ProtocolModule.ctaiot.name(),
+            IoTConstant.DOWN_TO_THIRD_PLATFORM,
+            downProRequest.toString()));
   }
 
-  /**
-   * 新增设备产品
-   */
+  /** 新增设备产品 */
   @PostMapping
   @Log(title = "新增产品", businessType = BusinessType.INSERT)
   public AjaxResult add(@RequestBody IoTProduct ioTProduct) {
     String unionId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
     ioTProduct.setCreatorId(unionId);
+    // 发布产品配置更新事件
+    Map<String, Object> eventData = new HashMap<>();
+    eventData.put("type", "product");
+    eventData.put("productKey", ioTProduct.getProductKey());
+    eventData.put("operation", "ADD");
+    eventPublisher.publishEvent(EventTopics.PRODUCT_CONFIG_UPDATED, eventData);
     return toAjax(devProductService.insertDevProduct(ioTProduct));
   }
 
-  /**
-   * 新增设备产品NB
-   */
+  /** 新增设备产品NB */
   @PostMapping(value = "/nb")
   @Log(title = "新增产品NB", businessType = BusinessType.INSERT)
   public AjaxResult addNb(@RequestBody String downRequest) {
@@ -343,12 +313,12 @@ public class IoTProductController extends BaseController {
     downProRequest.set("data", data);
     return AjaxResult.success(
         IoTDownlFactory.safeInvokeDown(
-            ProtocolModule.ctaiot.name(), "downPro", downProRequest.toString()));
+            ProtocolModule.ctaiot.name(),
+            IoTConstant.DOWN_TO_THIRD_PLATFORM,
+            downProRequest.toString()));
   }
 
-  /**
-   * 新增电信公共产品
-   */
+  /** 新增电信公共产品 */
   @PostMapping(value = "/ctwing/pubproadd")
   @Log(title = "新增电信公共产品", businessType = BusinessType.INSERT)
   public AjaxResult addCtwingPubPro(@RequestBody String downRequest) {
@@ -367,12 +337,12 @@ public class IoTProductController extends BaseController {
     downProRequest.set("data", data);
     return AjaxResult.success(
         IoTDownlFactory.safeInvokeDown(
-            ProtocolModule.ctaiot.name(), "downPro", downProRequest.toString()));
+            ProtocolModule.ctaiot.name(),
+            IoTConstant.DOWN_TO_THIRD_PLATFORM,
+            downProRequest.toString()));
   }
 
-  /**
-   * 修改设备产品
-   */
+  /** 修改设备产品 */
   @PostMapping(value = "/updateNetworkUnionId")
   @Log(title = "修改网络组件", businessType = BusinessType.UPDATE)
   public AjaxResult editNetwork(@RequestBody IoTProductBO ioTProductBO) {
@@ -387,9 +357,7 @@ public class IoTProductController extends BaseController {
             ioTProductBO.getId(), ioTProductBO.getNetworkUnionId()));
   }
 
-  /**
-   * 子设备绑定网关
-   */
+  /** 子设备绑定网关 */
   @Operation(summary = "子设备绑定网关")
   @PutMapping("/gateway")
   @Log(title = "子设备绑定网关", businessType = BusinessType.UPDATE)
@@ -407,9 +375,7 @@ public class IoTProductController extends BaseController {
     return toAjax(devProductService.updateDevProduct(productVO));
   }
 
-  /**
-   * 修改设备产品
-   */
+  /** 修改设备产品 */
   @PutMapping
   @Log(title = "修改设备产品", businessType = BusinessType.UPDATE)
   public AjaxResult edit(@RequestBody IoTProductBO ioTProductBO) {
@@ -434,42 +400,45 @@ public class IoTProductController extends BaseController {
       downProRequest.set("productKey", ioTProductBO.getProductKey());
       return AjaxResult.success(
           IoTDownlFactory.safeInvokeDown(
-              ProtocolModule.ctaiot.name(), "downPro", downProRequest.toString()));
+              ProtocolModule.ctaiot.name(),
+              IoTConstant.DOWN_TO_THIRD_PLATFORM,
+              downProRequest.toString()));
     }
     IoTProduct ioTProduct = BeanUtil.toBean(ioTProductBO, IoTProduct.class);
-    return toAjax(devProductService.updateDevProduct(ioTProduct));
+    int result = devProductService.updateDevProduct(ioTProduct);
+    if (result > 0) {
+      // 发布产品配置更新事件
+      Map<String, Object> eventData = new HashMap<>();
+      eventData.put("type", "product");
+      eventData.put("productKey", ioTProduct.getProductKey());
+      eventData.put("operation", "UPDATE");
+      eventPublisher.publishEvent(EventTopics.PRODUCT_CONFIG_UPDATED, eventData);
+    }
+    return toAjax(result);
   }
 
-  /**
-   * 修改产品配置信息
-   */
+  /** 修改产品配置信息 */
   @PutMapping("/config")
   @Log(title = "修改产品配置信息", businessType = BusinessType.UPDATE)
   public AjaxResult editConfig(@RequestBody IoTProductVO devProduct) {
     return toAjax(devProductService.updateDevProductConfig(devProduct));
   }
 
-  /**
-   * 修改产品其他配置信息
-   */
+  /** 修改产品其他配置信息 */
   @PutMapping("/otherConfig")
   @Log(title = "修改产品其他配置信息", businessType = BusinessType.UPDATE)
   public AjaxResult editOtherConfig(@RequestBody String otherConfig) {
     return toAjax(devProductService.updateDevProductOtherConfig(otherConfig));
   }
 
-  /**
-   * 修改产品存储策略
-   */
+  /** 修改产品存储策略 */
   @PutMapping("/storeConfig")
   @Log(title = "修改产品存储策略", businessType = BusinessType.UPDATE)
   public AjaxResult editOtherConfig(@RequestBody IoTProductVO devProduct) {
     return toAjax(devProductService.updateDevProductStoreConfig(devProduct));
   }
 
-  /**
-   * 删除设备产品
-   */
+  /** 删除设备产品 */
   @DeleteMapping("/{ids}")
   @Log(title = "删除设备产品", businessType = BusinessType.DELETE)
   public AjaxResult remove(@PathVariable String[] ids) {
@@ -480,7 +449,7 @@ public class IoTProductController extends BaseController {
         throw new IoTException("没有该产品");
       }
       if (!iotUser.isAdmin() && !ioTProduct.getCreatorId().equals(iotUser.getUnionId())) {
-        throw new IoTException("您没有权限操作此产品！");
+        throw new IoTException("没有产品权限");
       }
       IoTDevice ioTDevice = IoTDevice.builder().productKey(ioTProduct.getProductKey()).build();
       List<IoTDevice> ioTDeviceList =
@@ -501,7 +470,9 @@ public class IoTProductController extends BaseController {
 
         return AjaxResult.success(
             IoTDownlFactory.safeInvokeDown(
-                ProtocolModule.ctaiot.name(), "downPro", downProRequest.toString()));
+                ProtocolModule.ctaiot.name(),
+                IoTConstant.DOWN_TO_THIRD_PLATFORM,
+                downProRequest.toString()));
       }
       // tcp产品删除时同时删除network表
       if (ProtocolModule.tcp.name().equals(ioTProduct.getThirdPlatform())) {
@@ -512,22 +483,25 @@ public class IoTProductController extends BaseController {
       }
       // 删除协议
       ioTDeviceProtocolService.deleteDevProtocolById(ioTProduct.getProductKey());
+      
+      // 发布产品删除事件
+      Map<String, Object> eventData = new HashMap<>();
+      eventData.put("type", "product");
+      eventData.put("productKey", ioTProduct.getProductKey());
+      eventData.put("operation", "DELETE");
+      eventPublisher.publishEvent(EventTopics.PRODUCT_CONFIG_UPDATED, eventData);
     }
     return toAjax(devProductService.deleteDevProductByIds(ids));
   }
 
-  /**
-   * 查询设备产品物模型属性列表
-   */
+  /** 查询设备产品物模型属性列表 */
   @GetMapping("/properties/{id}")
   public AjaxResult getPropertiesList(@PathVariable("id") String id) {
     List<IoTDeviceProperties> list = devProductService.selectDevProperties(id);
     return AjaxResult.success(list);
   }
 
-  /**
-   * 查询设备产品物模型属性列表(功能下发属性)
-   */
+  /** 查询设备产品物模型属性列表(功能下发属性) */
   @GetMapping("/functionProperties/{id}")
   public AjaxResult getFunctionPropertiesList(@PathVariable("id") String id) {
     List<IoTDeviceProperties> list = devProductService.selectDevProperties(id);
@@ -535,7 +509,8 @@ public class IoTProductController extends BaseController {
     List<IoTDeviceProperties> dataRw =
         list.stream().filter((item) -> "rw".equals(item.getMode())).collect(Collectors.toList());
     // 获取设备公共字段
-    List<SysDictData> data = dictTypeService.selectDictDataByType("device_common_property");
+    List<SysDictData> data =
+        dictTypeService.selectDictDataByType(IoTConstant.DEVICE_SHADOW_CUSTOMIZED_PROPERTY);
     // 根据公共字段过滤
     if (Validator.isNotNull(data)) {
       for (SysDictData datum : data) {
@@ -558,27 +533,21 @@ public class IoTProductController extends BaseController {
     return AjaxResult.success(dataRw);
   }
 
-  /**
-   * 查询设备产品物模型事件列表
-   */
+  /** 查询设备产品物模型事件列表 */
   @GetMapping("/events/{id}")
   public AjaxResult getEventsList(@PathVariable("id") String id) {
     List<IoTDeviceEvents> list = devProductService.selectDevEvents(id);
     return AjaxResult.success(list);
   }
 
-  /**
-   * 查询设备产品物模型方法列表
-   */
+  /** 查询设备产品物模型方法列表 */
   @GetMapping("/functions/{id}")
   public AjaxResult getFunctionsList(@PathVariable("id") String id) {
     List<IoTDeviceFunction> list = devProductService.selectDevFunctions(id);
     return AjaxResult.success(list);
   }
 
-  /**
-   * 根据产品key查model配置
-   */
+  /** 根据产品key查model配置 */
   @GetMapping("/model/{id}")
   public AjaxResult getmodel(@PathVariable("id") String id) {
     IoTDeviceModelVO ioTDeviceModelVO = devProductService.getModelByProductKey(id);
@@ -590,7 +559,7 @@ public class IoTProductController extends BaseController {
     return AjaxResult.success(devProductService.selectMetadataByDevId(devId));
   }
 
-  @GetMapping("/devnumber")
+  @GetMapping("/device/count")
   public AjaxResult countDevNumberByProductKey() {
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     Map<String, Integer> products =
@@ -599,13 +568,11 @@ public class IoTProductController extends BaseController {
     return AjaxResult.success(products);
   }
 
-  /**
-   * 导出设备产品列表
-   */
+  /** 导出设备产品列表 */
   @PostMapping("/export")
   @Log(title = "产品导出", businessType = BusinessType.EXPORT)
   public void export(HttpServletResponse response, IoTProductQuery query) {
-    // 只能看自己设备，除非是特殊设置和超管
+    //
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     query.setSelf(!iotUser.isAdmin());
     if (query.isSelf()) {
@@ -646,15 +613,13 @@ public class IoTProductController extends BaseController {
     }
   }
 
-  /**
-   * 批量导入产品
-   */
+  /** 批量导入产品 */
   @PostMapping("/import")
   @Log(title = "产品批量导入", businessType = BusinessType.IMPORT)
   @Transactional(rollbackFor = Exception.class)
   public AjaxResult<Void> importProduct(MultipartFile file) throws Exception {
     // 模板
-    // 只能看自己设备，除非是特殊设置和超管
+    //
     String unionId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
     try {
       // 读取JSON文件内容
@@ -675,9 +640,41 @@ public class IoTProductController extends BaseController {
     }
   }
 
-  /**
-   * 下载导入模版
-   */
+  /** 上传产品图片并保存到产品信息 */
+  @Operation(summary = "上传产品图片")
+  @PostMapping("/uploadImage")
+  @Log(title = "上传产品图片", businessType = BusinessType.UPDATE)
+  public AjaxResult<Map<String, String>> uploadProductImage(
+      @RequestParam("id") String id, @RequestParam("file") MultipartFile file) {
+    if (file == null || file.isEmpty()) {
+      throw new IoTException("上传文件不能为空");
+    }
+    IoTProductVO product = devProductService.selectDevProductById(id);
+    if (product == null) {
+      throw new IoTException("产品不存在");
+    }
+    String unionId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
+    // 上传到 OSS，沿用系统统一上传逻辑
+    var oss = iSysOssService.upload(file, unionId);
+    String url = oss.getUrl();
+
+    // 更新产品 photoUrl 字段（保持前端期望结构）
+    IoTProduct update = new IoTProduct();
+    update.setId(product.getId());
+    JSONObject photo = new JSONObject();
+    photo.set("img", url);
+    photo.set("detail", "");
+    update.setPhotoUrl(photo.toString());
+    devProductService.updateDevProduct(update);
+
+    Map<String, String> data = new HashMap<>(2);
+    data.put("url", url);
+    String name = oss.getOriginalName();
+    data.put("fileName", name.substring(name.lastIndexOf('/') + 1, name.lastIndexOf(".")));
+    return AjaxResult.success(data);
+  }
+
+  /** 下载导入模版 */
   @PostMapping("/import/template")
   public void downloadTemplate(HttpServletResponse response) {
     List<IoTProductImportBO> list = new ArrayList<>();
@@ -723,9 +720,7 @@ public class IoTProductController extends BaseController {
     return getDataTable(maps);
   }
 
-  /**
-   * 绑定证书到产品
-   */
+  /** 绑定证书到产品 */
   @PostMapping("/bindCertificate")
   @Log(title = "绑定证书", businessType = BusinessType.UPDATE)
   public AjaxResult bindCertificate(@RequestParam String productKey, @RequestParam String sslKey) {
@@ -733,13 +728,35 @@ public class IoTProductController extends BaseController {
     return toAjax(result);
   }
 
-  /**
-   * 解绑证书
-   */
+  /** 解绑证书 */
   @PostMapping("/unbindCertificate")
   @Log(title = "解绑证书", businessType = BusinessType.UPDATE)
   public AjaxResult unbindCertificate(@RequestParam String productKey) {
     int result = devProductService.unbindCertificate(productKey);
     return toAjax(result);
+  }
+
+  /** 查看连接信息 */
+  @PostMapping("/connect/info")
+  @Log(title = "查看连接信息", businessType = BusinessType.OTHER)
+  public AjaxResult connectInfo(@RequestParam String productKey) {
+    try {
+      ConnectionInfoDTO connectionInfo = connectionInfoService.getConnectionInfo(productKey);
+      return AjaxResult.success(connectionInfo);
+    } catch (Exception e) {
+      return AjaxResult.error("获取连接信息失败：" + e.getMessage());
+    }
+  }
+
+  /** 查看MQTT密码 */
+  @PostMapping("/connect/mqtt/password")
+  @Log(title = "查看连接信息密码", businessType = BusinessType.GRANT)
+  public AjaxResult connectInfoPassword(@RequestParam String productKey) {
+    try {
+      ConnectionInfoDTO passwordInfo = connectionInfoService.getMqttPasswordInfo(productKey);
+      return AjaxResult.success(passwordInfo);
+    } catch (Exception e) {
+      return AjaxResult.error("获取密码信息失败：" + e.getMessage());
+    }
   }
 }

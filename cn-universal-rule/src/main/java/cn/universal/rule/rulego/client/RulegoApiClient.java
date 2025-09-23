@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  * rulego API客户端 - 基于Hutool实现
  *
  * @author Aleo
- * @since 2025/09/01
+ * @since 2025/01/15
  */
 @Slf4j
 @Component
@@ -335,7 +335,7 @@ public class RulegoApiClient {
 
       // 创建RulegoChainInfo对象
       var chainInfo =
-          RulegoChainInfo.builder()
+          cn.universal.rule.rulego.model.RulegoChainInfo.builder()
               .id(ruleChainObj.getStr("id"))
               .name(ruleChainObj.getStr("name"))
               .root(ruleChainObj.getBool("root", false))
@@ -373,7 +373,7 @@ public class RulegoApiClient {
       log.debug("解析到items数组，长度: {}", items.size());
 
       // 转换items为RulegoChainInfo列表
-      var chainInfoList = new java.util.ArrayList<RulegoChainInfo>();
+      var chainInfoList = new java.util.ArrayList<cn.universal.rule.rulego.model.RulegoChainInfo>();
 
       for (int i = 0; i < items.size(); i++) {
         var item = items.getJSONObject(i);
@@ -383,7 +383,7 @@ public class RulegoApiClient {
 
         // 创建RulegoChainInfo对象
         var chainInfo =
-            RulegoChainInfo.builder()
+            cn.universal.rule.rulego.model.RulegoChainInfo.builder()
                 .id(ruleChain.getStr("id"))
                 .name(ruleChain.getStr("name"))
                 .root(ruleChain.getBool("root", false))

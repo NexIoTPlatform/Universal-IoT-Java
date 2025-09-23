@@ -20,34 +20,22 @@ import lombok.Data;
 @Builder
 public class IoTDeviceEvents implements Serializable {
 
-  /**
-   * 事件标识
-   */
+  /** 事件标识 */
   private String id;
 
-  /**
-   * 事件名称
-   */
+  /** 事件名称 */
   private String name;
 
-  /**
-   * 事件级别
-   */
+  /** 事件级别 */
   private String level;
 
-  /**
-   * 描述
-   */
+  /** 描述 */
   private String description;
 
-  /**
-   * 事件总数
-   */
+  /** 事件总数 */
   private String qty;
 
-  /**
-   * 最新事件上报时间
-   */
+  /** 最新事件上报时间 */
   private String time;
 
   // 是否设置存储策略

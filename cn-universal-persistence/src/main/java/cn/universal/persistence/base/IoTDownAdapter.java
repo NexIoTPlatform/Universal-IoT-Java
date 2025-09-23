@@ -178,7 +178,7 @@ public abstract class IoTDownAdapter<T extends BaseDownRequest> {
             .createTime(System.currentTimeMillis() / 1000)
             .deviceName(downRequest.getData().getStr("deviceName", downRequest.getDeviceId()))
             .state(DeviceStatus.offline.getCode())
-            .iotId(IdUtil.simpleUUID())
+            .iotId(downRequest.getProductKey()+downRequest.getDeviceId())
             .application(downRequest.getApplicationId())
             .creatorId(downRequest.getAppUnionId())
             .productName(downRequest.getIoTProduct().getName())

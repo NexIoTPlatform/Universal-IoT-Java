@@ -40,73 +40,53 @@ public class RulegoChainLog implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 主键ID
-   */
+  /** 主键ID */
   @Id
   @KeySql(genId = SQenGenId.class)
   @Schema(description = "主键ID")
   private Long id;
 
-  /**
-   * rulego规则链ID
-   */
+  /** rulego规则链ID */
   @Schema(description = "rulego规则链ID")
   @Column(name = "rulego_id")
   private String rulegoId;
 
-  /**
-   * 规则链名称
-   */
+  /** 规则链名称 */
   @Schema(description = "规则链名称")
   @Column(name = "chain_name")
   private String chainName;
 
-  /**
-   * 执行ID
-   */
+  /** 执行ID */
   @Schema(description = "执行ID")
   @Column(name = "execution_id")
   private String executionId;
 
-  /**
-   * 输入数据
-   */
+  /** 输入数据 */
   @Schema(description = "输入数据")
   @Column(name = "input_data")
   private String inputData;
 
-  /**
-   * 输出数据
-   */
+  /** 输出数据 */
   @Schema(description = "输出数据")
   @Column(name = "output_data")
   private String outputData;
 
-  /**
-   * 执行状态：success-成功，failed-失败
-   */
+  /** 执行状态：success-成功，failed-失败 */
   @Schema(description = "执行状态")
   @Column(name = "execution_status")
   private String executionStatus;
 
-  /**
-   * 错误信息
-   */
+  /** 错误信息 */
   @Schema(description = "错误信息")
   @Column(name = "error_message")
   private String errorMessage;
 
-  /**
-   * 执行耗时(毫秒)
-   */
+  /** 执行耗时(毫秒) */
   @Schema(description = "执行耗时")
   @Column(name = "execution_time")
   private Long executionTime;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Schema(description = "创建时间")
   @Column(name = "create_time")
   private Date createTime;

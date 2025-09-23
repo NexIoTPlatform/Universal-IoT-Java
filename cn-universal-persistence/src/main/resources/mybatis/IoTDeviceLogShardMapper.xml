@@ -9,21 +9,14 @@
     <id column="id" jdbcType="BIGINT" property="id"/>
     <result column="iot_id" jdbcType="VARCHAR" property="iotId"/>
     <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
-    <result column="ext_device_id" jdbcType="VARCHAR" property="extDeviceId"/>
     <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
     <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
     <result column="message_type" jdbcType="VARCHAR" property="messageType"/>
-    <result column="company_no" jdbcType="VARCHAR" property="companyNo"/>
-    <result column="protocol" jdbcType="VARCHAR" property="protocol"/>
-    <result column="device_node" jdbcType="VARCHAR" property="deviceNode"/>
     <result column="command_id" jdbcType="VARCHAR" property="commandId"/>
     <result column="command_status" jdbcType="TINYINT" property="commandStatus"/>
-    <result column="create_id" jdbcType="VARCHAR" property="createId"/>
-    <result column="org_id" jdbcType="VARCHAR" property="orgId"/>
     <result column="point" jdbcType="VARCHAR" property="point"/>
     <result column="event" jdbcType="VARCHAR" property="event"/>
-    <result column="instance" jdbcType="VARCHAR" property="instance"/>
-    <result column="create_time" jdbcType="INTEGER" property="createTime"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     <result column="content" jdbcType="LONGVARCHAR" property="content"/>
   </resultMap>
   <select id="queryLogPageV2ByIdList"
@@ -58,9 +51,6 @@
       </if>
       <if test="deviceId != null and deviceId != ''">
         and device_id = #{deviceId}
-      </if>
-      <if test="extDeviceId != null and extDeviceId != ''">
-        and ext_device_id = #{extDeviceId}
       </if>
       <if test="productKey != null and productKey != ''">
         and product_key = #{productKey}
@@ -114,9 +104,6 @@
       <if test="deviceId != null and deviceId != ''">
         and device_id = #{deviceId}
       </if>
-      <if test="extDeviceId != null and extDeviceId != ''">
-        and ext_device_id = #{extDeviceId}
-      </if>
       <if test="productKey != null and productKey != ''">
         and product_key = #{productKey}
       </if>
@@ -125,12 +112,6 @@
       </if>
       <if test="messageType != null and messageType != ''">
         and message_type = #{messageType}
-      </if>
-      <if test="companyNo != null and companyNo != ''">
-        and company_no like concat('%',#{companyNo},'%')
-      </if>
-      <if test="protocol != null and protocol != ''">
-        and protocol = #{protocol}
       </if>
       <if test="params.event != null and params.event != ''">
         and JSON_EXTRACT(content,concat('$.','event')) = #{params.event}
@@ -164,17 +145,12 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="iotId != null">iot_id,</if>
       <if test="deviceId != null and deviceId != ''">device_id,</if>
-      <if test="extDeviceId != null">ext_device_id,</if>
       <if test="product_key != null">product_key,</if>
       <if test="device_name != null">device_name,</if>
       <if test="message_type != null">message_type,</if>
-      <if test="company_no != null">company_no,</if>
-      <if test="protocol != null">protocol,</if>
-      <if test="device_node != null">device_node,</if>
-      <if test="org_id != null">org_id,</if>
+      <if test="command_id != null">command_id,</if>
+      <if test="command_status != null">command_status,</if>
       <if test="event != null">event,</if>
-      <if test="create_id != null">create_id,</if>
-      <if test="instance != null">instance,</if>
       <if test="point != null">point,</if>
       <if test="content != null">content,</if>
       <if test="create_time != null">create_time,</if>
@@ -182,17 +158,12 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="iotId != null">#{iotId},</if>
       <if test="deviceId != null and deviceId != ''">#{deviceId},</if>
-      <if test="extDeviceId != null">#{extDeviceId},</if>
       <if test="product_key != null">#{productKey},</if>
       <if test="device_name != null">#{deviceName},</if>
       <if test="message_type != null">#{messageType},</if>
-      <if test="company_no != null">#{companyNo},</if>
-      <if test="protocol != null">#{protocol},</if>
-      <if test="device_node != null">#{deviceNode},</if>
-      <if test="org_id != null">#{orgId},</if>
+      <if test="command_id != null">#{commandId},</if>
+      <if test="command_status != null">#{commandStatus},</if>
       <if test="event != null">#{event},</if>
-      <if test="create_id != null">#{createId},</if>
-      <if test="instance != null">#{instance},</if>
       <if test="point != null">#{point},</if>
       <if test="content != null">#{content},</if>
       <if test="create_time != null">#{createTime},</if>

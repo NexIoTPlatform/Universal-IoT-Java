@@ -33,31 +33,20 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IoTDeviceFenceRel implements Serializable {
 
-  @Id
-  private Long id;
+  @Id private Long id;
 
-  /**
-   * 围栏id
-   */
+  /** 围栏id */
   private Long fenceId;
 
-  /**
-   * 设备唯一标识符
-   */
+  /** 设备唯一标识符 */
   private String iotId;
 
-  /**
-   * 设备序列号
-   */
+  /** 设备序列号 */
   private String deviceId;
 
-  /**
-   * 创建人
-   */
+  /** 创建人 */
   private String creatorId;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   private Date createDate;
 }

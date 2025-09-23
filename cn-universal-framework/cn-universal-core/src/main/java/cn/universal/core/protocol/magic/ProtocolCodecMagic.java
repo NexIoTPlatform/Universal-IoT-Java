@@ -142,7 +142,7 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
       MagicScript script = MagicScript.create(location, null);
       MagicScriptRuntime compile = script.compile();
       // 处理内部实现了哪些方法
-      evalMethodCache(definition, compile);
+      evalMethodCache(provider, compile);
       log.info("编译耗时：{}", (System.currentTimeMillis() - t) + "ms");
       t = System.currentTimeMillis();
       if (codecMethod.equals(CodecMethod.decode)) {
@@ -159,7 +159,7 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
     }
   }
 
-  private void evalMethodCache(ProtocolSupportDefinition definition, MagicScriptRuntime compile) {
+  private void evalMethodCache(String provider, MagicScriptRuntime compile) {
     String[] varNames = compile.getVarNames();
     if (varNames != null && varNames.length > 0) {
       Set<String> methods = new HashSet<>();
@@ -170,7 +170,8 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
           methods.add(method);
         }
       }
-      methodCache.put(definition.getId(), methods);
+      methodCache.put(provider, methods);
+      log.info("evalMethodCache provider={}, methods={}", provider, methods);
     }
   }
 
@@ -180,6 +181,9 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
       if (!magicDecoderProvider.containsKey(decodeRequest.getDefinition().getProvider())) {
         // 增加同步锁，防止异常
         synchronized (magicDecoderProvider) {
+          log.info(
+              "magic decoder not exist,key={}, start reload ",
+              decodeRequest.getDefinition().getProvider());
           load(decodeRequest.getDefinition(), CodecMethod.decode);
         }
       }
@@ -212,7 +216,12 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
   public String encode(ProtocolEncodeRequest encodeRequest) throws CodecException {
     try {
       if (!magicEncoderProvider.containsKey(encodeRequest.getDefinition().getProvider())) {
-        load(encodeRequest.getDefinition(), CodecMethod.encode);
+        log.info(
+            "magic encode not exist,key={}, start reload ",
+            encodeRequest.getDefinition().getProvider());
+        synchronized (magicEncoderProvider) {
+          load(encodeRequest.getDefinition(), CodecMethod.encode);
+        }
       }
       // 如果编解码内部不包含 encode 方法，则直接返回原串
       if (methodCache.get(encodeRequest.getDefinition().getId()) == null
@@ -227,7 +236,6 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
       context.set("payload", encodeRequest.getPayload());
       context.set("context", encodeRequest.getContext());
       Object execute = magicScript.execute(context);
-      log.debug("execute={}", execute.getClass());
       return str(execute);
     } catch (Exception e) {
       String error = ExceptionUtil.getRootCauseMessage(e);
@@ -242,10 +250,18 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
 
   @Override
   public void remove(String provider) {
+    log.info("开始remove magic provider={}", provider);
     if (StrUtil.isNotBlank(provider)) {
-      magicEncoderProvider.remove(provider);
-      magicDecoderProvider.remove(provider);
-      magicPreDecoderProvider.remove(provider);
+      MagicScript encodeV = magicEncoderProvider.remove(provider);
+      MagicScript decodeV = magicDecoderProvider.remove(provider);
+      MagicScript preDecodeV = magicPreDecoderProvider.remove(provider);
+      Set<String> methodV = methodCache.remove(provider);
+      log.info(
+          "remove encodeV={},decodeV={},preDecodeV={},methodV={}",
+          encodeV,
+          decodeV,
+          preDecodeV,
+          methodV);
     }
   }
 
@@ -257,7 +273,12 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
     try {
       if (!magicPreDecoderProvider.containsKey(
           protocolDecodeRequest.getDefinition().getProvider())) {
-        load(protocolDecodeRequest.getDefinition(), CodecMethod.preDecode);
+        log.info(
+            "magic preDecode not exist,key={}, start reload ",
+            protocolDecodeRequest.getDefinition().getProvider());
+        synchronized (magicPreDecoderProvider) {
+          load(protocolDecodeRequest.getDefinition(), CodecMethod.preDecode);
+        }
       }
       // 如果编解码内部不包含 preDecode 方法，则直接返回原串
       if (methodCache.get(protocolDecodeRequest.getDefinition().getId()) == null
@@ -307,7 +328,10 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
   public String iotToYour(ProtocolEncodeRequest encodeRequest) throws CodecException {
     try {
       if (!magicEncoderProvider.containsKey(encodeRequest.getDefinition().getProvider())) {
-        load(encodeRequest.getDefinition(), CodecMethod.iotToYour);
+        synchronized (magicEncoderProvider) {
+          log.info("magic encoder not exist,key={}", encodeRequest.getDefinition().getProvider());
+          load(encodeRequest.getDefinition(), CodecMethod.iotToYour);
+        }
       }
       // 如果编解码内部不包含 iotToYour 方法，则使用encode方法
       if (methodCache.get(encodeRequest.getDefinition().getId()) == null
@@ -339,7 +363,10 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
   public String yourToIot(ProtocolDecodeRequest decodeRequest) throws CodecException {
     try {
       if (!magicDecoderProvider.containsKey(decodeRequest.getDefinition().getProvider())) {
-        load(decodeRequest.getDefinition(), CodecMethod.yourToIot);
+        log.info("magic decoder not exist,key={}", decodeRequest.getDefinition().getProvider());
+        synchronized (magicDecoderProvider) {
+          load(decodeRequest.getDefinition(), CodecMethod.yourToIot);
+        }
       }
       // 如果编解码内部不包含 yourToIot 方法，则使用decode方法
       if (methodCache.get(decodeRequest.getDefinition().getId()) == null

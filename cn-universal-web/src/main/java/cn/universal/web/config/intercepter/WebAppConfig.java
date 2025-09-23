@@ -29,6 +29,6 @@ public class WebAppConfig implements WebMvcConfigurer {
     registry.addInterceptor(new APILogPrintIntercepter()).addPathPatterns("/api/**");
     registry
         .addInterceptor(IPWhitelistInterceptor)
-        .addPathPatterns("/iot/**", "/api/**", "/debug/**", "/test/**", "/emqx/**");
+        .addPathPatterns("/iot/**", "/api/**", "/debug/**", "/test/**", "/emqx/**","/ct/aiot/**");
   }
 }

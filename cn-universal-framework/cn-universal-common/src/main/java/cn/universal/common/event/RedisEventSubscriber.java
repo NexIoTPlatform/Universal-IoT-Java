@@ -154,7 +154,10 @@ public class RedisEventSubscriber {
   private boolean isOwnMessage(EventMessage message) {
     try {
       String nodeId = message.getNodeId();
-      return instanceIdProvider.getInstanceId().equals(nodeId);
+      String instanceId = instanceIdProvider.getInstanceId();
+      final boolean b = instanceId.equalsIgnoreCase(nodeId);
+      log.info("判断是否自己的消息={},nodeId={}, instanceId={}", b, nodeId, instanceId);
+      return b;
     } catch (Exception e) {
       return false;
     }

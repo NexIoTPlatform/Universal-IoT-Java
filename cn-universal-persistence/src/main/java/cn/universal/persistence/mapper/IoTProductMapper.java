@@ -141,4 +141,10 @@ public interface IoTProductMapper extends BaseMapper<IoTProduct> {
 
   /** 根据network_union_id查找productKey */
   String findProductKeyByNetworkUnionId(String networkUnionId);
+
+  /** 查询mqtt绑定使用networkUnionId的产品列表* */
+  List<IoTProductBO> selectMqttProductsUseNetwork(String networkUnionId);
+
+  /** 查询tcp绑定使用networkUnionId的产品* */
+  IoTProductBO selectTcpProductsUseNetwork(String productKey);
 }

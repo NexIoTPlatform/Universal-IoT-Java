@@ -44,7 +44,7 @@
       <charset>utf-8</charset>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
+      <level>DEBUG</level>
     </filter>
   </appender>
 
@@ -61,7 +61,7 @@
       <charset>utf-8</charset>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
+      <level>DEBUG</level>
     </filter>
   </appender>
 
@@ -78,7 +78,7 @@
       <charset>utf-8</charset>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>INFO</level>
+      <level>DEBUG</level>
     </filter>
   </appender>
 
@@ -118,7 +118,7 @@
   </springProfile>
 
   <!-- 环境差异化配置 -->
-  <springProfile name="test,test2">
+  <springProfile name="test,test2,huo">
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
         <pattern>${console.log.pattern}</pattern>
@@ -133,22 +133,25 @@
       <!-- 从 root 中移除 tcp appender -->
     </root>
     <!-- 精确控制 API 日志 -->
-    <logger name="api_log" level="DEBUG" additivity="true">
+    <logger name="cn.universal.web" level="DEBUG" additivity="false">
       <appender-ref ref="api_log"/>
     </logger>
     <!-- 精确控制 MQTT 日志 -->
-    <logger name="mqtt" level="DEBUG" additivity="true">
+    <logger name="cn.universal.mqtt" level="INFO" additivity="true">
       <appender-ref ref="mqtt"/>
     </logger>
-
     <!-- 精确控制 TCP 日志 -->
-    <logger name="tcp" level="DEBUG" additivity="true">
+    <logger name="cn.tcp" level="INFO" additivity="true">
       <appender-ref ref="tcp"/>
     </logger>
-    <logger name="cn.universal" level="DEBUG"/>
+
+
     <logger name="org.springframework.data.redis.listener" level="DEBUG"/>
     <logger name="org.springframework.data.redis" level="DEBUG"/>
-
+    <!-- 为 cn.universal 绑定支持 DEBUG 的 Appender -->
+    <logger name="cn.universal" level="INFO" additivity="false">
+      <appender-ref ref="file_info"/> <!-- 仅输出到全局 INFO 日志 -->
+    </logger>
   </springProfile>
 
   <springProfile name="prod,beta,out">
@@ -158,20 +161,21 @@
       <!-- 从 root 中移除 tcp appender -->
     </root>
     <!-- 精确控制 API 日志 -->
-    <logger name="api_log" level="DEBUG" additivity="true">
+    <logger name="cn.universal.web" level="DEBUG" additivity="false">
       <appender-ref ref="api_log"/>
     </logger>
     <!-- 精确控制 MQTT 日志 -->
-    <logger name="mqtt" level="INFO" additivity="true">
+    <logger name="cn.universal.mqtt" level="INFO" additivity="true">
       <appender-ref ref="mqtt"/>
     </logger>
-
     <!-- 精确控制 TCP 日志 -->
-    <logger name="tcp" level="INFO" additivity="true">
+    <logger name="cn.tcp" level="INFO" additivity="true">
       <appender-ref ref="tcp"/>
     </logger>
 
-    <logger name="cn.universal" level="INFO"/>
+    <logger name="cn.universal" level="INFO" additivity="false">
+      <appender-ref ref="file_info"/> <!-- 仅输出到全局 INFO 日志 -->
+    </logger>
   </springProfile>
 
   <!-- 通用 logger 配置 -->

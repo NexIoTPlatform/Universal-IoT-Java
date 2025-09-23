@@ -30,22 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CommonRequest {
 
-  /**
-   * http请求超时时间
-   */
+  /** http请求超时时间 */
   private static final Integer HTTP_TIME_OUT = 1200;
 
-  /**
-   * URL状态信息
-   */
+  /** URL状态信息 */
   public static class UrlStatus {
 
     private int failureCount = 0;
     private long lastFailureTime = 0;
     private long nextAllowTime = 0;
 
-    public UrlStatus() {
-    }
+    public UrlStatus() {}
 
     public int getFailureCount() {
       return failureCount;
@@ -75,25 +70,19 @@ public class CommonRequest {
   private static String CACHE_NOTICE = "DNotice:";
 
   // 存储URL状态信息，30分钟后过期
-  private static Cache<String, UrlStatus> urlStatusCache = Caffeine.newBuilder()
-      .expireAfterWrite(30, TimeUnit.MINUTES).maximumSize(256).build();
+  private static Cache<String, UrlStatus> urlStatusCache =
+      Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.MINUTES).maximumSize(256).build();
 
-  /**
-   * 分级阈值配置
-   */
+  /** 分级阈值配置 */
   private static final int LEVEL_1_THRESHOLD = 3; // 轻微故障阈值
 
   private static final int LEVEL_2_THRESHOLD = 6; // 中等故障阈值
   private static final int LEVEL_3_THRESHOLD = 10; // 严重故障阈值
 
-  /**
-   * 基础延迟时间（秒）
-   */
+  /** 基础延迟时间（秒） */
   private static final int BASE_DELAY_SECONDS = 30;
 
-  /**
-   * 最大延迟时间（分钟）
-   */
+  /** 最大延迟时间（分钟） */
   private static final int MAX_DELAY_MINUTES = 10;
 
   private static ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
@@ -115,8 +104,7 @@ public class CommonRequest {
     if (isUrlBlocked(url)) {
       UrlStatus status = urlStatusCache.getIfPresent(url);
       long remainingSeconds = (status.getNextAllowTime() - System.currentTimeMillis()) / 1000;
-      log.warn("当前地址[{}]因连续失败{}次，暂时限制访问，还需等待{}秒", url,
-          status.getFailureCount(), remainingSeconds);
+      log.warn("当前地址[{}]因连续失败{}次，暂时限制访问，还需等待{}秒", url, status.getFailureCount(), remainingSeconds);
       return null;
     }
 
@@ -124,7 +112,7 @@ public class CommonRequest {
       HttpRequest request = HttpUtil.createPost(url);
       request.timeout(HTTP_TIME_OUT);
       String timestamp = String.valueOf(System.currentTimeMillis());
-      String signature = String.valueOf((timestamp + url).hashCode());
+      String signature = MD5.create().digestHex16((timestamp + body));
       request.header("X-Timestamp", timestamp);
       request.header("X-Signature", signature);
       request.header(Header.CONTENT_TYPE, "application/json");
@@ -146,9 +134,7 @@ public class CommonRequest {
     return null;
   }
 
-  /**
-   * 检查URL是否被阻止
-   */
+  /** 检查URL是否被阻止 */
   private static boolean isUrlBlocked(String url) {
     UrlStatus status = urlStatusCache.getIfPresent(url);
     if (status == null) {
@@ -159,9 +145,7 @@ public class CommonRequest {
     return currentTime < status.getNextAllowTime();
   }
 
-  /**
-   * 处理请求成功
-   */
+  /** 处理请求成功 */
   private static void handleSuccess(String url) {
     UrlStatus status = urlStatusCache.getIfPresent(url);
     if (status != null) {
@@ -172,9 +156,7 @@ public class CommonRequest {
     }
   }
 
-  /**
-   * 处理请求失败 - 智能退避策略
-   */
+  /** 处理请求失败 - 智能退避策略 */
   private static void handleFailure(String url) {
     UrlStatus status = urlStatusCache.getIfPresent(url);
     if (status == null) {
@@ -190,8 +172,12 @@ public class CommonRequest {
     status.setNextAllowTime(System.currentTimeMillis() + delayMillis);
 
     String delayInfo = formatDelayInfo(delayMillis);
-    log.warn("URL[{}]第{}次失败，采用{}策略，下次可访问时间：{}", url, failureCount,
-        getStrategyLevel(failureCount), delayInfo);
+    log.warn(
+        "URL[{}]第{}次失败，采用{}策略，下次可访问时间：{}",
+        url,
+        failureCount,
+        getStrategyLevel(failureCount),
+        delayInfo);
 
     // 严重故障时发送通知
     if (failureCount >= LEVEL_3_THRESHOLD) {
@@ -199,9 +185,7 @@ public class CommonRequest {
     }
   }
 
-  /**
-   * 计算延迟时间 - 指数退避算法
-   */
+  /** 计算延迟时间 - 指数退避算法 */
   private static long calculateDelay(int failureCount) {
     if (failureCount <= 1) {
       return 0; // 首次失败不延迟
@@ -226,9 +210,7 @@ public class CommonRequest {
     return delaySeconds * 1000; // 转换为毫秒
   }
 
-  /**
-   * 获取策略级别描述
-   */
+  /** 获取策略级别描述 */
   private static String getStrategyLevel(int failureCount) {
     if (failureCount <= LEVEL_1_THRESHOLD) {
       return "轻微故障-线性退避";
@@ -239,9 +221,7 @@ public class CommonRequest {
     }
   }
 
-  /**
-   * 格式化延迟信息
-   */
+  /** 格式化延迟信息 */
   private static String formatDelayInfo(long delayMillis) {
     long seconds = delayMillis / 1000;
     if (seconds < 60) {
@@ -257,16 +237,15 @@ public class CommonRequest {
     }
   }
 
-  /**
-   * 发送失败通知
-   */
+  /** 发送失败通知 */
   private static void sendFailureNotification(String url, int failureCount) {
     String noticeKey = CACHE_NOTICE + url;
     UrlStatus noticeStatus = urlStatusCache.getIfPresent(noticeKey);
 
     // 每小时最多发送一次通知
-    if (noticeStatus == null || (System.currentTimeMillis() - noticeStatus.getLastFailureTime())
-        > TimeUnit.HOURS.toMillis(1)) {
+    if (noticeStatus == null
+        || (System.currentTimeMillis() - noticeStatus.getLastFailureTime())
+            > TimeUnit.HOURS.toMillis(1)) {
 
       log.error("严重故障警告：URL[{}]连续失败{}次，已进入长时间限制状态", url, failureCount);
 
@@ -276,6 +255,7 @@ public class CommonRequest {
       urlStatusCache.put(noticeKey, newNoticeStatus);
 
       // TODO: 集成钉钉/企微等通知
+      // DingTalkUtil.send("严重故障：地址 " + url + " 连续失败 " + failureCount + " 次");
     }
   }
 

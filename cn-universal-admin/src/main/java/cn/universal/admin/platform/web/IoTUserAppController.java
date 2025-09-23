@@ -16,11 +16,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+
 import cn.hutool.http.Header;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
+
 import cn.hutool.json.JSONUtil;
 import cn.universal.admin.common.annotation.Log;
 import cn.universal.admin.common.enums.BusinessType;
@@ -138,6 +139,28 @@ public class IoTUserAppController extends BaseController {
   }
 
   /** 获取用户应用信息详细信息 */
+  @Operation(summary = "启用推送")
+  @PostMapping(value = "/{appUniqueId}/{pushType}/{enable}")
+  public AjaxResult<Void> enableOrDisablePush(
+      @PathVariable("appUniqueId") String appUniqueId,
+      @PathVariable("pushType") String pushType,
+      @PathVariable("enable") boolean enable) {
+    IoTUserApplication application =
+        iotUserApplicationService.selectIotUserApplicationById(appUniqueId);
+    IoTUser user = loginIoTUnionUser(SecurityUtils.getUnionId());
+    if (!user.isAdmin()
+        && ObjectUtil.isNotEmpty(application)
+        && !application.getUnionId().equals(user.getUnionId())) {
+      throw new IoTException("你无权操作");
+    }
+    boolean flag = iotUserApplicationService.enableOrDisablePushCfg(appUniqueId, pushType, enable);
+    if (flag) {
+      return AjaxResult.success();
+    }
+    return AjaxResult.error("失败");
+  }
+
+  /** 获取用户应用信息详细信息 */
   @Operation(summary = "获取用户应用信息详细信息")
   @GetMapping(value = "/{appUniqueId}")
   public AjaxResult<IoTUserApplication> getInfo(@PathVariable("appUniqueId") String appUniqueId) {
@@ -198,21 +221,21 @@ public class IoTUserAppController extends BaseController {
   @Transactional
   @Log(title = "重置密钥", businessType = BusinessType.UPDATE)
   public AjaxResult<Void> resetSecret(@RequestBody IoTUserApplication iotUserApplication) {
-    IoTUserApplication oldapplication =
-        iotUserApplicationService.selectIotUserApplicationById(iotUserApplication.getAppUniqueId());
     IoTUser user = loginIoTUnionUser(SecurityUtils.getUnionId());
+    
+    // 权限检查
+    IoTUserApplication oldApplication = 
+        iotUserApplicationService.selectIotUserApplicationById(iotUserApplication.getAppUniqueId());
     if (!user.isAdmin()
-        && ObjectUtil.isNotEmpty(oldapplication)
-        && !oldapplication.getUnionId().equals(user.getUnionId())) {
+        && ObjectUtil.isNotEmpty(oldApplication)
+        && !oldApplication.getUnionId().equals(user.getUnionId())) {
       throw new IoTException("你无权操作");
     }
-    //    iotUserApplication.setAppId(RandomUtil.randomString(16));
-    iotUserApplication.setAppSecret(RandomUtil.randomString(32));
-    iotUserApplication.setUnionId(user.getUnionId());
-    if (iotUserApplicationService.updateIotUserApplication(iotUserApplication) == 0) {
+    // 调用service层方法完成密钥重置和MQTT配置同步
+    if (!iotUserApplicationService.resetAppSecretAndSyncMqtt(
+        iotUserApplication.getAppUniqueId(), user.getUnionId())) {
       throw new IoTException("应用密钥重置失败");
     }
-
     return AjaxResult.success();
   }
 
@@ -238,7 +261,6 @@ public class IoTUserAppController extends BaseController {
     Map<String, String> map = new HashMap<>();
     map.put("message", "success");
     iotUserApplication.setUnionId(app.getUnionId());
-    iotUserApplication.setUpTopic(app.getUnionId() + StrUtil.C_SLASH + app.getAppId());
     iotUserApplicationService.updateIotUserApplication(iotUserApplication);
     return AjaxResult.success(map);
   }

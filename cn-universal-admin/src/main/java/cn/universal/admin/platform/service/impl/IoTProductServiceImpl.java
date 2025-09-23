@@ -25,10 +25,12 @@ import cn.hutool.http.HttpStatus;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.universal.dm.device.service.protocol.ProtocolClusterService;
 import cn.universal.admin.common.service.BaseServiceImpl;
 import cn.universal.admin.common.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTProductService;
 import cn.universal.admin.system.service.IoTDeviceProtocolService;
+import cn.universal.cache.annotation.MultiLevelCacheable;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTConstant.DeviceNode;
 import cn.universal.common.constant.IoTConstant.ProductFlushType;
@@ -192,31 +194,54 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
   }
 
   @Override
-  //  @Cacheable(cacheNames = "iot_dev_product_list", unless = "#result == null", keyGenerator =
-  // "redisKeyGenerate")
+  // 分页查询不使用缓存，因为分页参数会导致缓存键不同，效率低下
   public List<IoTProductVO> selectDevProductV4List(IoTProductQuery ioTProductQuery) {
-    Page<IoTProductVO> page =
-        PageHelper.startPage(ioTProductQuery.getPageNum(), ioTProductQuery.getPageSize());
+    // 设置分页参数
+    PageHelper.startPage(ioTProductQuery.getPageNum(), ioTProductQuery.getPageSize());
+
+    // 优化：一次SQL查询获取产品列表和设备数量，避免N+1查询
     List<IoTProductVO> devProductVOS = ioTProductMapper.selectDevProductV3List(ioTProductQuery);
-    List<IoTProductVO> results =
-        ioTProductMapper.countDevNumberByProductKey(ioTProductQuery.getCreatorId());
-    if (CollUtil.isNotEmpty(results)) {
-      final Map<String, Integer> collect =
-          results.stream()
-              .collect(Collectors.toMap(IoTProductVO::getProductKey, IoTProductVO::getDevNum));
+
+    // 处理图片URL
+    if (CollUtil.isNotEmpty(devProductVOS)) {
       for (IoTProductVO devProduct : devProductVOS) {
-        devProduct.setDevNum(collect.getOrDefault(devProduct.getProductKey(), 0));
         if (JSONUtil.isTypeJSON(devProduct.getPhotoUrl())) {
           JSONObject photo = JSONUtil.parseObj(devProduct.getPhotoUrl());
           devProduct.setImage(photo.getStr("img", ""));
         }
       }
     }
-    // 按设备数量倒序排序
-    //    if (CollUtil.isNotEmpty(devProductVOS)) {
-    //      devProductVOS.sort(Comparator.comparingInt(IoTProductVO::getDevNum).reversed());
-    //    }
-    return page;
+
+    return devProductVOS;
+  }
+
+  /** 获取不分页的产品列表（用于缓存） 缓存基础产品数据，不包含分页信息 */
+  @MultiLevelCacheable(
+      cacheNames = "selectDevProductV4ListNoPage",
+      keyGenerator = "redisKeyGenerate",
+      unless = "#result == null",
+      l1Expire = 30)
+  public List<IoTProductVO> selectDevProductV4ListNoPage(IoTProductQuery ioTProductQuery) {
+    // 创建不分页的查询条件
+    IoTProductQuery noPageQuery = new IoTProductQuery();
+    BeanUtil.copyProperties(ioTProductQuery, noPageQuery);
+    noPageQuery.setPageNum(1);
+    noPageQuery.setPageSize(Integer.MAX_VALUE); // 获取所有数据
+
+    // 优化：一次SQL查询获取产品列表和设备数量，避免N+1查询
+    List<IoTProductVO> devProductVOS = ioTProductMapper.selectDevProductV3List(noPageQuery);
+
+    // 处理图片URL
+    if (CollUtil.isNotEmpty(devProductVOS)) {
+      for (IoTProductVO devProduct : devProductVOS) {
+        if (JSONUtil.isTypeJSON(devProduct.getPhotoUrl())) {
+          JSONObject photo = JSONUtil.parseObj(devProduct.getPhotoUrl());
+          devProduct.setImage(photo.getStr("img", ""));
+        }
+      }
+    }
+
+    return devProductVOS;
   }
 
   @Override
@@ -237,7 +262,9 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
       cacheNames = {
         "iot_all_dev_product_list",
         "iot_dev_product_list",
-        "selectAllEnableNetworkProductKey"
+        "selectAllEnableNetworkProductKey",
+        "selectDevProductV4ListNoPage",
+        "countDevNumberByProductKey"
       },
       allEntries = true)
   public int insertDevProduct(IoTProduct ioTProduct) {
@@ -257,6 +284,9 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     if (StrUtil.isBlank(ioTProduct.getProductSecret())) {
       ioTProduct.setProductSecret(IdUtil.fastSimpleUUID());
     }
+    if (StrUtil.isBlank(ioTProduct.getConfiguration())) {
+      ioTProduct.setConfiguration(buildProductCfg(ioTProduct));
+    }
     ioTProduct.setProductKey(productKey);
     ioTProduct.setMetadata(defaultMetadata);
     ioTProduct.setThirdConfiguration(thirdConfig);
@@ -268,9 +298,30 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     return i;
   }
 
+  /** 默认创建mqtt设置自动注册 */
+  private String buildProductCfg(IoTProduct ioTProduct) {
+    JSONObject cfg = new JSONObject();
+    boolean isMqtt = false;
+    String thirdPlatform = ioTProduct == null ? null : ioTProduct.getThirdPlatform();
+    if (thirdPlatform == null) {
+      return JSONUtil.toJsonStr(cfg);
+    }
+    if (ProtocolModule.tcp.name().equalsIgnoreCase(thirdPlatform)
+        || ProtocolModule.mqtt.name().equalsIgnoreCase(thirdPlatform)
+        || ProtocolModule.udp.name().equalsIgnoreCase(thirdPlatform)) {
+      cfg.set(IoTConstant.ALLOW_INSERT, true);
+    }
+    return JSONUtil.toJsonStr(cfg);
+  }
+
   @Override
   @CacheEvict(
-      cacheNames = {"iot_all_dev_product_list", "iot_dev_product_list"},
+      cacheNames = {
+        "iot_all_dev_product_list",
+        "iot_dev_product_list",
+        "selectDevProductV4ListNoPage",
+        "countDevNumberByProductKey"
+      },
       allEntries = true)
   public int insertList(List<IoTProduct> ioTProductList) {
     int i = ioTProductMapper.insertList(ioTProductList);
@@ -280,7 +331,13 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
   /** 产品协议导入 */
   @Override
   @CacheEvict(
-      cacheNames = {"iot_all_dev_product_list", "iot_dev_product_list", "supportMQTTNetwork"},
+      cacheNames = {
+        "iot_all_dev_product_list",
+        "iot_dev_product_list",
+        "supportMQTTNetwork",
+        "selectDevProductV4ListNoPage",
+        "countDevNumberByProductKey"
+      },
       allEntries = true)
   public String importProduct(List<IoTProductImportBO> productImportBos, String unionId) {
     Long timeMillis = System.currentTimeMillis();
@@ -357,7 +414,9 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
         devProduct -> {
           R r =
               IoTDownlFactory.safeInvokeDown(
-                  ProtocolModule.ctaiot.name(), "downPro", devProduct.getThirdDownRequest());
+                  ProtocolModule.ctaiot.name(),
+                  IoTConstant.DOWN_TO_THIRD_PLATFORM,
+                  devProduct.getThirdDownRequest());
           if (!R.SUCCESS.equals(r.getCode())) {
             failedList.add(devProduct);
           } else {
@@ -395,7 +454,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     ioTProductAction.create(null, unionId);
     String result =
         String.format(
-            "导入普通产品总数：%s 个,成功：%s个；导入电信产品总数：%s 个，成功：%s 个；导入协议总数：%s 个，成功：%s 个。",
+            "导入普通产品总数：%s 个,成功：%s个；导入电信ctwing产品总数：%s 个，成功：%s 个；导入协议总数：%s 个，成功：%s 个。",
             customProductList.size() + duplicateNum.get(),
             customSuccess,
             ctwingProductList.size(),
@@ -413,7 +472,13 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
    */
   @Override
   @CacheEvict(
-      cacheNames = {"iot_all_dev_product_list", "iot_dev_product_list", "supportMQTTNetwork"},
+      cacheNames = {
+        "iot_all_dev_product_list",
+        "iot_dev_product_list",
+        "supportMQTTNetwork",
+        "selectDevProductV4ListNoPage",
+        "countDevNumberByProductKey"
+      },
       allEntries = true)
   public int updateDevProduct(IoTProduct ioTProduct) {
     IoTUser iotUser = queryIotUser(SecurityUtils.getUnionId());
@@ -423,7 +488,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     String appUnionId = iotUser.getUnionId();
     IoTProduct pro = ioTProductMapper.selectByPrimaryKey(ioTProduct.getId());
     if (!appUnionId.equals(pro.getCreatorId()) && !iotUser.isAdmin()) {
-      throw new IoTException("您没有权限操作此产品！");
+      throw new IoTException("没有产品权限");
     }
     if (Objects.nonNull(ioTProduct.getClassifiedId())) {
       IoTProductSort ioTProductSort =
@@ -432,7 +497,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     }
 
     int count = ioTProductMapper.updateDevProduct(ioTProduct);
-    log.info("修改产品记录数={},修改人={}", count, appUnionId);
+    log.info("updateDevProduct,操作成功={},userId={}", count, appUnionId);
     ioTProductAction.update(ioTProduct);
     return count;
   }
@@ -445,7 +510,13 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
    */
   @Override
   @CacheEvict(
-      cacheNames = {"iot_all_dev_product_list", "iot_dev_product_list", "supportMQTTNetwork"},
+      cacheNames = {
+        "iot_all_dev_product_list",
+        "iot_dev_product_list",
+        "supportMQTTNetwork",
+        "selectDevProductV4ListNoPage",
+        "countDevNumberByProductKey"
+      },
       allEntries = true)
   public int deleteDevProductByIds(String[] ids) {
     String appUnionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
@@ -453,7 +524,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     for (String id : ids) {
       IoTProduct ioTProduct = ioTProductMapper.selectDevProductById(id);
       if (!appUnionId.equals(ioTProduct.getCreatorId())) {
-        throw new IoTException("您没有权限操作此产品！");
+        throw new IoTException("无产品权限");
       }
       count = +deleteDevProductById(id);
     }
@@ -468,7 +539,13 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
    */
   @Override
   @CacheEvict(
-      cacheNames = {"iot_all_dev_product_list", "iot_dev_product_list", "supportMQTTNetwork"},
+      cacheNames = {
+        "iot_all_dev_product_list",
+        "iot_dev_product_list",
+        "supportMQTTNetwork",
+        "selectDevProductV4ListNoPage",
+        "countDevNumberByProductKey"
+      },
       allEntries = true)
   public int deleteDevProductById(String id) {
     String appUnionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
@@ -477,7 +554,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
       throw new IoTException("产品不存在");
     }
     if (!appUnionId.equals(ioTProduct.getCreatorId())) {
-      throw new IoTException("您没有权限操作此产品！");
+      throw new IoTException("无产品权限");
     }
     IoTDevice ioTDevice = IoTDevice.builder().productKey(ioTProduct.getProductKey()).build();
     int count = ioTDeviceMapper.selectCount(ioTDevice);
@@ -507,7 +584,8 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
         "iot_dev_action",
         "selectDevCount",
         "supportMQTTNetwork",
-        "iot_dev_product_list"
+        "iot_dev_product_list",
+        "getProductConfiguration"
       },
       allEntries = true)
   public int updateDevProductConfig(IoTProductVO devProduct) {
@@ -518,7 +596,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
       throw new IoTException("产品不存在");
     }
     if (!appUnionId.equals(product.getCreatorId())) {
-      throw new IoTException("您没有权限操作此产品！");
+      throw new IoTException("无产品权限");
     }
     // 获取新的产品配置信息
     JSONObject newConfig = JSONUtil.parseObj(devProduct.getConfiguration());
@@ -802,7 +880,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     String appUnionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
     IoTProduct product = ioTProductMapper.getProductByProductKey(ioTProductBO.getProductKey());
     if (!appUnionId.equals(product.getCreatorId())) {
-      throw new IoTException("您没有权限操作此产品！");
+      throw new IoTException("无产品权限");
     }
     ioTProductBO.setPath(getPath(ioTProductBO));
     int delCount = ioTProductMapper.deleteMetadata(ioTProductBO);
@@ -840,7 +918,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     String appUnionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
     IoTProduct product = ioTProductMapper.getProductByProductKey(ioTProductBO.getProductKey());
     if (!appUnionId.equals(product.getCreatorId())) {
-      throw new IoTException("您没有权限操作此产品！");
+      throw new IoTException("无产品权限");
     }
     ioTProductBO.beanToJson();
     //    if(getMetadata(ioTProductBO)!=null){
@@ -884,17 +962,39 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
   }
 
   @Override
+  @MultiLevelCacheable(
+      cacheNames = "countDevNumberByProductKey",
+      keyGenerator = "redisKeyGenerate",
+      unless = "#result == null",
+      l1Expire = 30)
   public Map<String, Integer> countDevNumberByProductKey(String unionId) {
     List<IoTProductVO> results = ioTProductMapper.countDevNumberByProductKey(unionId);
     return results.stream()
         .collect(Collectors.toMap(IoTProductVO::getProductKey, IoTProductVO::getDevNum));
   }
 
+  /** 设备数量变化时清除相关缓存 当设备新增、删除、修改时调用此方法 */
+  @CacheEvict(
+      cacheNames = {"countDevNumberByProductKey", "selectDevProductV4ListNoPage"},
+      allEntries = true)
+  public void evictDeviceCountCache() {
+    // 此方法用于手动清除设备数量相关缓存
+    // 当设备数据发生变化时调用
+  }
+
   @Override
-  public AjaxResult<IoTProduct> selectDevProductByKey(String key) {
+  public AjaxResult<IoTProduct> selectIoTProductByKey(String key) {
     IoTProduct ioTProduct = new IoTProduct();
     ioTProduct.setProductKey(key);
     return AjaxResult.success(ioTProductMapper.selectOne(ioTProduct));
+  }
+
+  @Override
+  public AjaxResult<List<IoTProduct>> selectGatewaySubProductsByKey(String gwProductKey) {
+    IoTProduct ioTProduct = new IoTProduct();
+    ioTProduct.setGwProductKey(gwProductKey);
+    ioTProduct.setState((byte) 0);
+    return AjaxResult.success(ioTProductMapper.select(ioTProduct));
   }
 
   /** 修改产品其他配置信息 */
@@ -917,7 +1017,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
     IoTProduct product = ioTProductMapper.selectDevProductById(newConfig.getStr("productId"));
     IoTUser iotUser = queryIotUser(SecurityUtils.getUnionId());
     if (!product.getCreatorId().equals(iotUser.getUnionId())) {
-      throw new IoTException("您没有权限操作此产品！");
+      throw new IoTException("无产品权限");
     }
     // 获取第三方配置
     String thirdConfiguration = product.getThirdConfiguration();
@@ -1042,7 +1142,20 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
 
   @Override
   public void flushNettyServer(String config, String productKey, TcpFlushType type) {
-
+    JSONObject object = new JSONObject();
+    object.set("type", ProductFlushType.server.name());
+    object.set("productKey", productKey);
+    object.set("customType", type.name());
+    eventPublisher.publishEvent(EventTopics.PRODUCT_CONFIG_UPDATED, object);
+    // 使用ProtocolClusterService进行集群操作
+    ProtocolClusterService tcpClusterService = SpringUtil.getBean(ProtocolClusterService.class);
+    if (tcpClusterService != null) {
+      switch (type) {
+        case start -> tcpClusterService.start(productKey);
+        case reload -> tcpClusterService.restart(productKey);
+        case close -> tcpClusterService.stop(productKey);
+      }
+    }
   }
 
   @Override

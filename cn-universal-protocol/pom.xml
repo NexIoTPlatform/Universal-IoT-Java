@@ -10,11 +10,10 @@
     <groupId>cn.universal.iot</groupId>
     <version>1.5-SNAPSHOT</version>
   </parent>
-  <description>扩展协议都在这里</description>
+
   <modules>
-    <!-- 云云对接插件 -->
-    <module>cn-universal-http-protocol</module>
-    <!-- MQTT是核心插件，必须依赖-->
+    <!-- 设备插件 -->
     <module>cn-universal-mqtt-protocol</module>
+    <module>cn-universal-http-protocol</module>
   </modules>
 </project> 

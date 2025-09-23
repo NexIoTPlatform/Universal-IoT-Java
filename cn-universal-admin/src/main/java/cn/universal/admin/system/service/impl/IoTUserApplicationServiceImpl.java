@@ -13,6 +13,9 @@
 package cn.universal.admin.system.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.universal.admin.common.service.BaseServiceImpl;
 import cn.universal.admin.common.utils.SecurityUtils;
 import cn.universal.admin.system.service.IIoTUserApplicationService;
@@ -28,9 +31,12 @@ import cn.universal.persistence.mapper.OauthClientDetailsMapper;
 import jakarta.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 /**
@@ -39,6 +45,7 @@ import tk.mybatis.mapper.entity.Example;
  * @since 2025-12-30
  */
 @Service
+@Slf4j
 public class IoTUserApplicationServiceImpl extends BaseServiceImpl
     implements IIoTUserApplicationService {
 
@@ -46,6 +53,12 @@ public class IoTUserApplicationServiceImpl extends BaseServiceImpl
   @Resource private IIotUserService iIotUserService;
 
   @Resource private OauthClientDetailsMapper oauthClientDetailsMapper;
+
+  @Value("${mqtt.cfg.enable:true}")
+  private boolean sysMqttEnabled;
+
+  @Value("${mqtt.cfg.host:tcp://localhost:1883}")
+  private String sysMqttHost;
 
   @Override
   public boolean EnDisableIoTUser(String unionId, boolean isEnable) {
@@ -211,5 +224,112 @@ public class IoTUserApplicationServiceImpl extends BaseServiceImpl
       IoTUserApplication application, IoTUser iotUser) {
     application.setUnionId(iotUser.isAdmin() ? null : iotUser.getUnionId());
     return iotUserApplicationMapper.selectApplicationList(application);
+  }
+
+  @Override
+  public boolean enableOrDisablePushCfg(String appUniqueId, String pushType, boolean isEnable) {
+    IoTUserApplication application =
+        iotUserApplicationMapper.selectOne(
+            IoTUserApplication.builder().appUniqueId(appUniqueId).build());
+    if (application == null) {
+      return false;
+    }
+    // 获取当前推送配置
+    String pushCfgStr = application.getCfg();
+    JSONObject pushCfg;
+    if (StrUtil.isBlank(pushCfgStr)) {
+      pushCfg = new JSONObject();
+    } else {
+      pushCfg = JSONUtil.parseObj(pushCfgStr);
+    }
+
+    switch (pushType) {
+      case "mqtt":
+        if (isEnable) {
+          // MQTT启用：设置url为sysMqttHost、support为true、enable为true
+          // password为app_secret、username为app_id
+          JSONObject mqttConfig = new JSONObject();
+          mqttConfig.set("enable", true);
+          mqttConfig.set("support", true);
+          mqttConfig.set("url", sysMqttHost);
+          mqttConfig.set("password", application.getAppSecret());
+          mqttConfig.set("username", application.getAppId());
+          mqttConfig.set("clientId", application.getAppId());
+
+          pushCfg.set("mqtt", mqttConfig);
+        } else {
+          // MQTT禁用：只设置enable为false
+          if (pushCfg.containsKey("mqtt")) {
+            JSONObject mqttConfig = pushCfg.getJSONObject("mqtt");
+            mqttConfig.set("enable", false);
+            pushCfg.set("mqtt", mqttConfig);
+          }
+        }
+        break;
+      case "http":
+        if (isEnable) {
+          // HTTP启用：设置enable和support为true
+          JSONObject httpConfig = pushCfg.getJSONObject("http");
+          httpConfig.set("enable", true);
+          httpConfig.set("support", true);
+          pushCfg.set("http", httpConfig);
+        } else {
+          // HTTP禁用：设置enable为false
+          if (pushCfg.containsKey("http")) {
+            JSONObject httpConfig = pushCfg.getJSONObject("http");
+            httpConfig.set("enable", false);
+            pushCfg.set("http", httpConfig);
+          }
+        }
+        break;
+      default:
+        return false;
+    }
+    // 更新推送配置
+    application.setCfg(pushCfg.toString());
+    int result = iotUserApplicationMapper.updateIotUserApplication(application);
+    return result > 0;
+  }
+
+  @Override
+  @Transactional
+  public boolean resetAppSecretAndSyncMqtt(String appUniqueId, String unionId) {
+    // 查询应用信息
+    IoTUserApplication application =
+        iotUserApplicationMapper.selectOne(
+            IoTUserApplication.builder().appUniqueId(appUniqueId).build());
+
+    if (application == null) {
+      return false;
+    }
+    // 生成新的应用密钥
+    String newAppSecret = cn.hutool.core.util.RandomUtil.randomString(32);
+    application.setAppSecret(newAppSecret);
+
+    // 更新应用信息
+    if (iotUserApplicationMapper.updateByPrimaryKeySelective(application) == 0) {
+      return false;
+    }
+    // 检查MQTT是否开启，如果开启则同步更新MQTT配置中的密码
+    String oldCfg = application.getCfg();
+    if (StrUtil.isNotBlank(oldCfg)) {
+      JSONObject cfg = JSONUtil.parseObj(oldCfg);
+      if (cfg.containsKey("mqtt")) {
+        JSONObject mqttConfig = cfg.getJSONObject("mqtt");
+        if (mqttConfig.getBool("enable", false)) {
+          // MQTT已启用，更新密码
+          mqttConfig.set("password", newAppSecret);
+          cfg.set("mqtt", mqttConfig);
+
+          // 更新配置
+          IoTUserApplication updateCfg = new IoTUserApplication();
+          updateCfg.setAppUniqueId(appUniqueId);
+          updateCfg.setCfg(cfg.toString());
+          iotUserApplicationMapper.updateByPrimaryKeySelective(updateCfg);
+          log.info("应用 {} 密钥重置后，MQTT配置密码已同步更新", appUniqueId);
+        }
+      }
+    }
+    return true;
   }
 }

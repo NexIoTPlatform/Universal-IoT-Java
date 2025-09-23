@@ -20,33 +20,21 @@ import lombok.Data;
 @Builder
 public class IoTDeviceFunction implements Serializable {
 
-  /**
-   * 功能标识
-   */
+  /** 功能标识 */
   private String id;
 
-  /**
-   * 功能名称
-   */
+  /** 功能名称 */
   private String name;
 
-  /**
-   * 是否是配置
-   */
+  /** 是否是配置 */
   private boolean config;
 
-  /**
-   * 描述
-   */
+  /** 描述 */
   private String description;
 
-  /**
-   * 功能来源
-   */
+  /** 功能来源 */
   private String source;
 
-  /**
-   * 输入
-   */
+  /** 输入 */
   private String inputs;
 }

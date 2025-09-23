@@ -33,41 +33,29 @@ public class WxMiniUserInfoVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * $column.columnComment
-   */
+  /** $column.columnComment */
   private Long uuid;
 
   // 用户是否订阅该公众号标识，值为0时，代表此用户没有关注该公众号。
   private Integer subscribe;
 
-  /**
-   * 用户微信openid
-   */
+  /** 用户微信openid */
   @Column(name = "open_id")
   private String openId;
 
-  /**
-   * 开放平台id
-   */
+  /** 开放平台id */
   @Column(name = "union_id")
   private String unionId;
 
-  /**
-   * 微信名
-   */
+  /** 微信名 */
   @Column(name = "nick_name")
   private String nickName;
 
-  /**
-   * 公众号id
-   */
+  /** 公众号id */
   @Column(name = "app_id")
   private String appId;
 
-  /**
-   * 微信头像
-   */
+  /** 微信头像 */
   @Column(name = "head_img_url")
   private String headImgUrl;
 
@@ -77,9 +65,7 @@ public class WxMiniUserInfoVO implements Serializable {
   @Column(name = "update_time")
   private Date updateTime;
 
-  /**
-   * 手机
-   */
+  /** 手机 */
   @Column(name = "phone")
   private String phone;
 }

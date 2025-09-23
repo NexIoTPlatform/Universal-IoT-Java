@@ -104,6 +104,10 @@ public class HttpPushStrategy implements PushStrategy {
       // 添加时间戳和签名
       String timestamp = String.valueOf(System.currentTimeMillis());
       httpRequest.header("X-Timestamp", timestamp);
+      if (StrUtil.isNotBlank(httpConfig.getHeader())
+          && StrUtil.isNotBlank(httpConfig.getSecret())) {
+        httpRequest.header(httpConfig.getHeader(), httpConfig.getSecret());
+      }
       httpRequest.header(Header.CONTENT_TYPE, "application/json");
 
       // 添加自定义请求头（如果有配置）
@@ -121,11 +125,7 @@ public class HttpPushStrategy implements PushStrategy {
       // 执行请求
       HttpResponse response = httpRequest.execute();
       String result = response.body();
-      log.warn(
-          "[HTTP推送] 推送, url={}, status={}, messageJson={}",
-          httpConfig.getUrl(),
-          response != null ? response.getStatus() : "null",
-          result);
+
       // 检查响应状态
       if (response == null || response.getStatus() != 200) {
         log.warn(
@@ -143,8 +143,11 @@ public class HttpPushStrategy implements PushStrategy {
             "HTTP状态码错误: " + (response != null ? response.getStatus() : "null"),
             "HTTP_ERROR");
       }
-
-      log.info("[HTTP推送] 推送成功, url={}, deviceId={}", httpConfig.getUrl(), request.getIotId());
+      log.info(
+          "[HTTP推送] 推送成功, url={}, status={}, messageJson={}",
+          httpConfig.getUrl(),
+          response != null ? response.getStatus() : "null",
+          result);
       removeSuccess(httpConfig.getUrl());
 
       return IoTPushResult.success(

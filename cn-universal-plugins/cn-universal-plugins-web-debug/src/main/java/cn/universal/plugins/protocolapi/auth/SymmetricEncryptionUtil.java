@@ -7,9 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-/**
- * JDK 21 对称加密工具类，支持AES和DES算法
- */
+/** JDK 21 对称加密工具类，支持AES和DES算法 */
 public class SymmetricEncryptionUtil {
 
   // 密钥长度常量
@@ -39,14 +37,16 @@ public class SymmetricEncryptionUtil {
   static {
     try {
       // 初始化内置密钥的Base64编码
-      BUILTIN_AES_KEY_BASE64 = Base64.getEncoder()
-          .encodeToString(BUILTIN_AES_KEY.getBytes(StandardCharsets.UTF_8));
-      BUILTIN_DES_KEY_BASE64 = Base64.getEncoder()
-          .encodeToString(BUILTIN_DES_KEY.getBytes(StandardCharsets.UTF_8));
+      BUILTIN_AES_KEY_BASE64 =
+          Base64.getEncoder().encodeToString(BUILTIN_AES_KEY.getBytes(StandardCharsets.UTF_8));
+      BUILTIN_DES_KEY_BASE64 =
+          Base64.getEncoder().encodeToString(BUILTIN_DES_KEY.getBytes(StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new RuntimeException("初始化内置密钥失败", e);
     }
   }
+
+  // 其他方法保持不变...
 
   /**
    * 使用内置AES密钥加密
@@ -114,15 +114,16 @@ public class SymmetricEncryptionUtil {
     byte[] ciphertext = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
 
     // 拼接IV、密文和标签（GCM会自动处理标签）
-    return Base64.getEncoder().encodeToString(iv) + ":" + Base64.getEncoder()
-        .encodeToString(ciphertext);
+    return Base64.getEncoder().encodeToString(iv)
+        + ":"
+        + Base64.getEncoder().encodeToString(ciphertext);
   }
 
   /**
    * 使用AES/GCM解密
    *
    * @param ciphertext 密文（格式：IV:密文:标签）
-   * @param base64Key  密钥的Base64编码
+   * @param base64Key 密钥的Base64编码
    * @return 明文
    */
   public static String aesGcmDecrypt(String ciphertext, String base64Key) throws Exception {
@@ -173,7 +174,7 @@ public class SymmetricEncryptionUtil {
    * 使用DES解密
    *
    * @param ciphertext 密文的Base64编码
-   * @param base64Key  密钥的Base64编码
+   * @param base64Key 密钥的Base64编码
    * @return 明文
    */
   public static String desDecrypt(String ciphertext, String base64Key) {

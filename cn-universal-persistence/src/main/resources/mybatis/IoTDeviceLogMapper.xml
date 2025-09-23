@@ -9,17 +9,14 @@
     <id column="id" jdbcType="BIGINT" property="id"/>
     <result column="iot_id" jdbcType="VARCHAR" property="iotId"/>
     <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
-    <result column="ext_device_id" jdbcType="VARCHAR" property="extDeviceId"/>
     <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
     <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
     <result column="message_type" jdbcType="VARCHAR" property="messageType"/>
     <result column="command_id" jdbcType="VARCHAR" property="commandId"/>
     <result column="command_status" jdbcType="TINYINT" property="commandStatus"/>
-    <result column="create_id" jdbcType="VARCHAR" property="createId"/>
     <result column="point" jdbcType="VARCHAR" property="point"/>
     <result column="event" jdbcType="VARCHAR" property="event"/>
-    <result column="instance" jdbcType="VARCHAR" property="instance"/>
-    <result column="create_time" jdbcType="INTEGER" property="createTime"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     <result column="content" jdbcType="LONGVARCHAR" property="content"/>
   </resultMap>
 
@@ -32,9 +29,6 @@
       </if>
       <if test="deviceId != null and deviceId != ''">
         and device_id = #{deviceId}
-      </if>
-      <if test="extDeviceId != null and extDeviceId != ''">
-        and ext_device_id = #{extDeviceId}
       </if>
       <if test="productKey != null and productKey != ''">
         and product_key = #{productKey}
@@ -88,9 +82,6 @@
       <if test="deviceId != null and deviceId != ''">
         and device_id = #{deviceId}
       </if>
-      <if test="extDeviceId != null and extDeviceId != ''">
-        and ext_device_id = #{extDeviceId}
-      </if>
       <if test="productKey != null and productKey != ''">
         and product_key = #{productKey}
       </if>
@@ -99,12 +90,6 @@
       </if>
       <if test="messageType != null and messageType != ''">
         and message_type = #{messageType}
-      </if>
-      <if test="companyNo != null and companyNo != ''">
-        and company_no like concat('%',#{companyNo},'%')
-      </if>
-      <if test="protocol != null and protocol != ''">
-        and protocol = #{protocol}
       </if>
       <if test="params.event != null and params.event != ''">
         and JSON_EXTRACT(content,concat('$.','event')) = #{params.event}

@@ -12,14 +12,12 @@
 
 package cn.universal.http.protocol.service;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.domain.R;
-import cn.universal.core.service.ICodec;
 import cn.universal.dm.device.service.AbstractDownService;
 import cn.universal.http.protocol.config.HttpModuleInfo;
 import cn.universal.http.protocol.entity.HttpDownRequest;
@@ -40,14 +38,11 @@ import org.springframework.stereotype.Service;
  */
 @Service("httpDownService")
 @Slf4j
-public class HttpDownService extends AbstractDownService<HttpDownRequest> implements ICodec {
+public class HttpDownService extends AbstractDownService<HttpDownRequest> {
 
-  @Resource
-  private HttpModuleInfo httpModuleInfo;
-  @Resource
-  private HttpDownHandle httpDownHandle;
-  @Resource
-  private HttpDownProcessorChain httpDownProcessorChain;
+  @Resource private HttpModuleInfo httpModuleInfo;
+  @Resource private HttpDownHandle httpDownHandle;
+  @Resource private HttpDownProcessorChain httpDownProcessorChain;
 
   @Override
   public String code() {
@@ -110,18 +105,14 @@ public class HttpDownService extends AbstractDownService<HttpDownRequest> implem
     String down = config.getStr("down");
     // 支持第三方增删改或者下发功能且function对象不为空，则编解码，并复制编解码后的结果
     if ((StrUtil.isNotBlank(down)
-        && ListUtil.of(down.split(",")).contains(value.getCmd().getValue()))
+            && ListUtil.of(down.split(",")).contains(value.getCmd().getValue()))
         || CollectionUtil.isNotEmpty(value.getFunction())) {
-      String deResult = spliceDown(value.getProductKey(), JSONUtil.toJsonStr(value));
-      //      log.info("电信设备={} 编解码结果={}", value.getDeviceId(), deResult);
+      String deResult =
+          encodeWithShadow(
+              value.getProductKey(), value.getDeviceId(), JSONUtil.toJsonStr(value.getFunction()));
       value.setDownResult(deResult);
     }
     return value;
-  }
-
-  @Override
-  public String spliceDown(String productKey, String payload) {
-    return super.spliceDown(productKey, payload);
   }
 
   @Override

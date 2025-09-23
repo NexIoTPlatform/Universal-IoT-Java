@@ -27,15 +27,11 @@ public class IoTDeviceTypeVO {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 设备类型
-   */
+  /** 设备类型 */
   @Schema(description = "设备类型")
   private String deviceType;
 
-  /**
-   * 设备类型名称
-   */
+  /** 设备类型名称 */
   @Schema(description = "设备类型名称")
   private String deviceTypeName;
 

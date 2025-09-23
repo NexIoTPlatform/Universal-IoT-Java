@@ -75,6 +75,6 @@ public class SysOss implements Serializable {
   private String updateBy;
 
   /** 服务商 */
-  @Column(name = "third")
+  @Column(name = "service")
   private String service;
 }

@@ -15,7 +15,6 @@ package cn.universal.dm.device.service;
 import cn.hutool.core.util.IdUtil;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.core.message.UPRequest;
-import cn.universal.core.service.ICodec;
 import cn.universal.core.service.ICodecService;
 import cn.universal.core.service.IUP;
 import java.util.List;
@@ -33,7 +32,7 @@ import org.springframework.scheduling.annotation.Async;
  */
 @Slf4j
 public abstract class AbstractUPService<T extends UPRequest> extends AbstratIoTService
-    implements IUP, ICodec {
+    implements IUP {
 
   @Autowired protected ICodecService codecService;
 
@@ -112,10 +111,4 @@ public abstract class AbstractUPService<T extends UPRequest> extends AbstratIoTS
 
   /** 当前iot组件名称 */
   protected abstract String currentComponent();
-
-  @Override
-  public UPRequest preDecode(String productKey, String message) {
-    // 使用新的统一编解码服务
-    return codecService.preDecode(productKey, message);
-  }
 }

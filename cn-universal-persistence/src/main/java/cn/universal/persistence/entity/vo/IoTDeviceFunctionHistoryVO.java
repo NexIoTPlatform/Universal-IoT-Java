@@ -27,8 +27,7 @@ import lombok.Data;
 public class IoTDeviceFunctionHistoryVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  @Id
-  private Long id;
+  @Id private Long id;
   private String iotId;
   private String productKey;
   private String deviceId;

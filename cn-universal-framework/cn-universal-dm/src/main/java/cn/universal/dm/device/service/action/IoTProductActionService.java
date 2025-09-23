@@ -44,6 +44,7 @@ public class IoTProductActionService implements IoTProductAction {
         "iot_dev_action",
         "selectDevCount",
         "iot_dev_product_list",
+        "selectDevProductV4List",
         "iot_product_device"
       },
       allEntries = true)
@@ -62,6 +63,7 @@ public class IoTProductActionService implements IoTProductAction {
         "iot_dev_action",
         "selectDevCount",
         "iot_dev_product_list",
+        "selectDevProductV4List",
         "iot_product_device"
       },
       allEntries = true)
@@ -76,6 +78,7 @@ public class IoTProductActionService implements IoTProductAction {
         "iot_dev_action",
         "selectDevCount",
         "iot_dev_product_list",
+        "selectDevProductV4List",
         "iot_product_device"
       },
       allEntries = true)
@@ -99,6 +102,7 @@ public class IoTProductActionService implements IoTProductAction {
         "iot_dev_action",
         "selectDevCount",
         "iot_dev_product_list",
+        "selectDevProductV4List",
         "iot_product_device"
       },
       allEntries = true)
@@ -116,6 +120,7 @@ public class IoTProductActionService implements IoTProductAction {
         "iot_dev_action",
         "selectDevCount",
         "iot_dev_product_list",
+        "selectDevProductV4List",
         "iot_product_device"
       },
       allEntries = true)

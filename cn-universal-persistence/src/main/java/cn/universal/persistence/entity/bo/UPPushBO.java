@@ -34,9 +34,7 @@ public class UPPushBO implements Serializable {
   // 重试配置
   private RetryConfig retry;
 
-  /**
-   * HTTP 推送配置
-   */
+  /** HTTP 推送配置 */
   @Data
   @Builder
   public static class HttpPushConfig implements Serializable {
@@ -49,9 +47,7 @@ public class UPPushBO implements Serializable {
     private boolean support;
   }
 
-  /**
-   * MQTT 推送配置
-   */
+  /** MQTT 推送配置 */
   @Data
   @Builder
   public static class MqttPushConfig implements Serializable {
@@ -65,9 +61,7 @@ public class UPPushBO implements Serializable {
     private String username;
   }
 
-  /**
-   * Kafka 推送配置
-   */
+  /** Kafka 推送配置 */
   @Data
   @Builder
   public static class KafkaPushConfig implements Serializable {
@@ -77,9 +71,7 @@ public class UPPushBO implements Serializable {
     private boolean support;
   }
 
-  /**
-   * RocketMQ 推送配置
-   */
+  /** RocketMQ 推送配置 */
   @Data
   @Builder
   public static class RocketMQPushConfig implements Serializable {
@@ -89,63 +81,43 @@ public class UPPushBO implements Serializable {
     private boolean support;
   }
 
-  /**
-   * 统计配置
-   */
+  /** 统计配置 */
   @Data
   @Builder
   public static class StatisticsConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 是否启用统计
-     */
+    /** 是否启用统计 */
     private boolean enable = true;
 
-    /**
-     * 统计数据保留时间（天）
-     */
+    /** 统计数据保留时间（天） */
     private Integer retentionDays = 30;
 
-    /**
-     * 异步统计
-     */
+    /** 异步统计 */
     private boolean async = true;
   }
 
-  /**
-   * 重试配置
-   */
+  /** 重试配置 */
   @Data
   @Builder
   public static class RetryConfig implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 是否启用重试
-     */
+    /** 是否启用重试 */
     private boolean enable = true;
 
-    /**
-     * 最大重试次数
-     */
+    /** 最大重试次数 */
     private Integer maxCount = 3;
 
-    /**
-     * 重试间隔（分钟）
-     */
+    /** 重试间隔（分钟） */
     private Integer intervalMinutes = 5;
 
-    /**
-     * 重试队列保留时间（天）
-     */
+    /** 重试队列保留时间（天） */
     private Integer queueRetentionDays = 1;
 
-    /**
-     * 失败记录保留时间（天）
-     */
+    /** 失败记录保留时间（天） */
     private Integer failedRetentionDays = 7;
   }
 }

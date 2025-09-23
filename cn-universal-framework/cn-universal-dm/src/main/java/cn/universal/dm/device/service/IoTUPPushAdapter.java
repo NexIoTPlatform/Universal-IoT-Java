@@ -162,7 +162,7 @@ public abstract class IoTUPPushAdapter<T extends BaseUPRequest> {
 
               String applicationId = deviceDTO.getApplicationId();
               if (applicationId == null || applicationId.trim().isEmpty()) {
-                log.warn("[分组] 应用ID为空，设备ID: {}, 丢弃消息", deviceDTO.getIotId());
+                log.warn("[分组] 应用ID为空，设备ID: {}, 丢弃消息", deviceDTO.getDeviceId());
                 return false;
               }
               return true;

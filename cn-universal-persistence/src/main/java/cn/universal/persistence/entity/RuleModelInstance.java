@@ -37,28 +37,20 @@ public class RuleModelInstance implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 主键ID
-   */
+  /** 主键ID */
   @Id
   @KeySql(genId = SQenGenId.class)
   private Long id;
 
-  /**
-   * 模型id
-   */
+  /** 模型id */
   @Column(name = "model_id")
   private Long modelId;
 
-  /**
-   * 关联类型
-   */
+  /** 关联类型 */
   @Column(name = "relation_type")
   private String relationType;
 
-  /**
-   * 关联id
-   */
+  /** 关联id */
   @Column(name = "relation_id")
   private String relationId;
 }

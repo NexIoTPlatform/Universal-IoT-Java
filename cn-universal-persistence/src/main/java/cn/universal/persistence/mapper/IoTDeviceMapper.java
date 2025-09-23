@@ -22,7 +22,6 @@ import cn.universal.persistence.entity.bo.IoTDeviceHistoryBO;
 import cn.universal.persistence.entity.bo.IoTGwDeviceBO;
 import cn.universal.persistence.entity.bo.NetworkBO;
 import cn.universal.persistence.entity.vo.GatewayDeviceVo;
-import cn.universal.persistence.entity.vo.InterPhoneInstanceVO;
 import cn.universal.persistence.entity.vo.IoTDeviceCompanyVO;
 import cn.universal.persistence.entity.vo.IoTDeviceCountVO;
 import cn.universal.persistence.entity.vo.IoTDeviceModelVO;
@@ -67,22 +66,18 @@ public interface IoTDeviceMapper extends BaseMapper<IoTDevice> {
 
   List<IoTDeviceVO> apiDeviceList(IoTAPIQuery apiQuery);
 
-  /**
-   * 查询设备
-   *
-   * @param id 设备主键
-   * @return 设备
-   */
+  /** 查询设备 */
   public IoTDevice selectDevInstanceById(String id);
 
-  /**
-   * 查询设备列表
-   *
-   * @param ioTDevice 设备
-   * @return 设备集合
-   */
+  /** 查询设备列表 */
   public List<IoTDevice> selectDevInstanceList(
       @Param("ioTDevice") IoTDevice ioTDevice, @Param("unionId") String unionId);
+
+  /** 按第三方平台过滤的设备列表（新接口专用） */
+  List<IoTDevice> selectDevInstanceListByPlatform(
+      @Param("ioTDevice") IoTDevice ioTDevice,
+      @Param("thirdPlatform") String thirdPlatform,
+      @Param("unionId") String unionId);
 
   public List<IoTDevice> selectDevInstanceUnList(
       @Param("ioTDevice") IoTDevice ioTDevice, @Param("unionId") String unionId);
@@ -90,20 +85,10 @@ public interface IoTDeviceMapper extends BaseMapper<IoTDevice> {
   List<IoTDevice> selectDevInstanceForExport(
       @Param("ioTDevice") IoTDevice ioTDevice, @Param("unionId") String unionId);
 
-  /**
-   * 新增设备
-   *
-   * @param ioTDevice 设备
-   * @return 结果
-   */
+  /** 新增设备 */
   public int insertDevInstance(IoTDevice ioTDevice);
 
-  /**
-   * 修改设备
-   *
-   * @param ioTDevice 设备
-   * @return 结果
-   */
+  /** 修改设备 */
   public int updateDevInstance(IoTDevice ioTDevice);
 
   int bindApp(@Param("id") String[] id, @Param("appUniqueId") String appUniqueId);
@@ -114,20 +99,10 @@ public interface IoTDeviceMapper extends BaseMapper<IoTDevice> {
   /** 设备应用解绑 */
   int apiUnBindApp(@Param("iotId") String iotId);
 
-  /**
-   * 删除设备
-   *
-   * @param id 设备主键
-   * @return 结果
-   */
+  /** 删除设备 */
   public int deleteDevInstanceById(String id);
 
-  /**
-   * 批量删除设备
-   *
-   * @param ids 需要删除的数据主键集合
-   * @return 结果
-   */
+  /** 批量删除设备 */
   public int deleteDevInstanceByIds(String[] ids);
 
   /** 根据分组id获取设备集合 */
@@ -140,6 +115,9 @@ public interface IoTDeviceMapper extends BaseMapper<IoTDevice> {
       @Param("supportChild") Boolean supportChild, @Param("apps") String apps);
 
   IoTDevice getOneByDeviceId(@Param("query") IoTDeviceQuery query);
+
+  IoTDevice selectIoTDevice(
+      @Param("productKey") String productKey, @Param("deviceId") String deviceId);
 
   IoTDevice getOneByIotId(@Param("query") IoTDeviceQuery query);
 
@@ -183,7 +161,6 @@ public interface IoTDeviceMapper extends BaseMapper<IoTDevice> {
   void clearDevBindInfo(IoTDevice instance);
 
   List<IoTDevice> queryMileSightList(@Param("bo") NetworkBO bo);
-
 
   List<GatewayDeviceVo> getGatewayDeviceList(@Param("bo") IoTGwDeviceBO bo);
 

@@ -12,6 +12,7 @@
 
 package cn.universal.core.service;
 
+import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.domain.R;
 import cn.universal.common.exception.IoTException;
 import cn.universal.core.protocol.ProtocolModuleInfo;
@@ -109,7 +110,7 @@ public class IoTDownlFactory implements ApplicationContextAware {
       switch (operation) {
         case "down":
           return service.doAction(msg);
-        case "downPro":
+        case IoTConstant.DOWN_TO_THIRD_PLATFORM:
           return service.downToThirdPlatform(msg);
         default:
           return R.error("不支持的操作: " + operation);

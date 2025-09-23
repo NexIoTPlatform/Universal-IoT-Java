@@ -14,6 +14,7 @@ package cn.universal.mqtt.protocol.system;
 
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.IdUtil;
+import cn.universal.dm.device.service.push.MQTTPushService;
 import cn.universal.mqtt.protocol.entity.MQTTProductConfig;
 import cn.universal.mqtt.protocol.entity.MQTTUPRequest;
 import cn.universal.mqtt.protocol.metrics.MqttMetricsMananer;
@@ -37,9 +38,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Service;
 
 @Slf4j(topic = "mqtt")
-@Service
+@Service("sysMQTTManager")
 public class SysMQTTManager
-    implements SysMQTTStatusProvider, ApplicationListener<ApplicationReadyEvent> {
+    implements SysMQTTStatusProvider, ApplicationListener<ApplicationReadyEvent>, MQTTPushService {
 
   /** 使用内置MQTT的集合 */
   private final Set<String> convertProductKey = new ConcurrentHashSet<>();
@@ -364,6 +365,7 @@ public class SysMQTTManager
   }
 
   /** 发布消息（添加连接状态检查） */
+  @Override
   public boolean publishMessage(String topic, byte[] payload, int qos, boolean retained) {
     try {
       if (systemMqttClient == null || !systemMqttClient.isConnected()) {

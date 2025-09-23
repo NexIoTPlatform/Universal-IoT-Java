@@ -46,12 +46,6 @@
       <groupId>io.lettuce</groupId>
       <artifactId>lettuce-core</artifactId>
     </dependency>
-
-    <!-- Redis 相关依赖 -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-redis</artifactId>
-    </dependency>
     <!-- GraalJS - 替代 Nashorn -->
     <dependency>
       <groupId>org.graalvm.js</groupId>
@@ -70,12 +64,6 @@
       <artifactId>spring-security-crypto</artifactId>
     </dependency>
 
-
-    <!--    <dependency>-->
-    <!--      <groupId>org.apache.commons</groupId>-->
-    <!--      <artifactId>commons-pool2</artifactId>-->
-    <!--    </dependency>-->
-    <!-- Lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>

@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,7 +85,7 @@ public class IoTDeviceGroupServiceImpl extends BaseServiceImpl implements IIoTDe
     // 生成设备分组树
     List<IoTDeviceGroupVO> roots = collect.get(0L);
     ioTDeviceGroupVO.setChildren(roots);
-    buildGroupTree(roots, collect);
+    groupTree(roots, collect);
     return groupVos;
   }
 
@@ -192,12 +193,23 @@ public class IoTDeviceGroupServiceImpl extends BaseServiceImpl implements IIoTDe
   }
 
   /**
-   * 绑定设备到分组
+   * 绑定设备到分组 iot_dev_action
    *
    * @param devGroup
    * @return
    */
   @Override
+  @CacheEvict(
+      cacheNames = {
+        "iot_dev_instance_bo",
+        "iot_dev_metadata_bo",
+        "iot_dev_shadow_bo",
+        "iot_dev_action",
+        "selectDevCount",
+        "iot_dev_product_list",
+        "iot_product_device"
+      },
+      allEntries = true)
   public AjaxResult<Void> bindDevToGroup(IoTDeviceGroupBO devGroup) {
     // 判断分组是否存在
     Long groupId = devGroup.getId();
@@ -292,6 +304,17 @@ public class IoTDeviceGroupServiceImpl extends BaseServiceImpl implements IIoTDe
    */
   @Override
   @Transactional
+  @CacheEvict(
+      cacheNames = {
+        "iot_dev_instance_bo",
+        "iot_dev_metadata_bo",
+        "iot_dev_shadow_bo",
+        "iot_dev_action",
+        "selectDevCount",
+        "iot_dev_product_list",
+        "iot_product_device"
+      },
+      allEntries = true)
   public AjaxResult<Void> unBindDevByGroupId(String groupId, String[] devId) {
     for (int i = 0; i < devId.length; i++) {
       ioTDeviceTagsMapper.delete(IoTDeviceTags.builder().iotId(devId[i]).value(groupId).build());
@@ -299,14 +322,8 @@ public class IoTDeviceGroupServiceImpl extends BaseServiceImpl implements IIoTDe
     return AjaxResult.success();
   }
 
-  /**
-   * 生成设备分组树
-   *
-   * @param ioTDeviceGroupVO
-   * @param groups
-   * @return
-   */
-  private void buildGroupTree(
+  /** 生成设备分组列表 */
+  private void groupTree(
       List<IoTDeviceGroupVO> ioTDeviceGroupVO, Map<Long, List<IoTDeviceGroupVO>> groups) {
     if (ioTDeviceGroupVO == null) {
       return;
@@ -315,7 +332,7 @@ public class IoTDeviceGroupServiceImpl extends BaseServiceImpl implements IIoTDe
       if (ioTDeviceGroupVO.get(i).getHasChild() == 1) {
         List<IoTDeviceGroupVO> devGroups = groups.get(ioTDeviceGroupVO.get(i).getId());
         ioTDeviceGroupVO.get(i).setChildren(devGroups);
-        buildGroupTree(devGroups, groups);
+        groupTree(devGroups, groups);
       }
     }
     return;

@@ -17,8 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IoTCertificate implements Serializable {
 
-  @Id
-  private Long id;
+  @Id private Long id;
 
   @Column(name = "ssl_key")
   private String sslKey;

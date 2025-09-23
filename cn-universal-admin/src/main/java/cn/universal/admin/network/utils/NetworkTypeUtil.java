@@ -29,7 +29,7 @@ public class NetworkTypeUtil {
 
   /** 支持的网络类型列表 */
   public static final List<String> SUPPORTED_TYPES =
-      Arrays.asList("TCP_CLIENT", "TCP_SERVER", "MQTT_CLIENT", "MQTT_SERVER");
+      Arrays.asList("TCP_CLIENT", "TCP_SERVER", "MQTT_CLIENT", "MQTT_SERVER", "UDP");
 
   /**
    * 解析网络类型字符串，支持逗号分隔的多个类型

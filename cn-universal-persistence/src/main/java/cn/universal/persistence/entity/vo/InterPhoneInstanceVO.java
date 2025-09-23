@@ -32,51 +32,32 @@ public class InterPhoneInstanceVO {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 设备自身序号
-   */
+  /** 设备自身序号 */
   private String deviceId;
 
-  /**
-   * 设备实例名称
-   */
+  /** 设备实例名称 */
   private String deviceName;
 
-  /**
-   * 0-离线，1-在线
-   */
+  /** 0-离线，1-在线 */
   private Integer state;
 
-  /**
-   * 设备创建时间
-   */
+  /** 设备创建时间 */
   private Long createTime;
 
-  /**
-   * 设备上线时间
-   */
+  /** 设备上线时间 */
   private Long onlineTime;
 
-  /**
-   * 经度
-   */
+  /** 经度 */
   private BigDecimal longitude;
 
-  /**
-   * 纬度
-   */
+  /** 纬度 */
   private BigDecimal latitude;
 
-  /**
-   * 经纬度
-   */
+  /** 经纬度 */
   private String coordinate;
 
-  /**
-   * 设备属性值
-   */
-  @Builder.Default
-  private Map<String, Object> metadata = new HashMap<>();
+  /** 设备属性值 */
+  @Builder.Default private Map<String, Object> metadata = new HashMap<>();
 
   public void setCoordinate(String coordinate) {
     this.coordinate = coordinate;

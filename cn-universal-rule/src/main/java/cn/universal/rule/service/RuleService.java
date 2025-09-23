@@ -88,7 +88,7 @@ public class RuleService {
                       target -> {
                         try {
                           log.info(
-                              "匹配到规则引擎，调用转发,ruleId:{},deviceId={}",
+                              "匹配到规则引擎，调用转发ruleId:{},deviceId={}",
                               ruleModel.getId(),
                               instance.getDeviceId());
                           ruleTransmitTemplate.transmit(result, target);

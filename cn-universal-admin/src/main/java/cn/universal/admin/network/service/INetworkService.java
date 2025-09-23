@@ -29,25 +29,15 @@ import java.util.List;
  */
 public interface INetworkService {
 
-  boolean start(String productKey);
-
-  boolean stop(String productKey);
-
-  Object get(String productKey);
-
   boolean del(String productKey);
 
   List<NetworkVO> selectNetworkList(NetworkBO bo);
-
-  NetworkVO getDetail(Long id);
 
   List<IoTDevice> queryMileSightList(NetworkBO bo);
 
   R insertDevInstance(IoTDeviceBO devInstancebo);
 
   R deleteDevInstanceByIds(String[] ids);
-
-  void reloadTcpClient(String applicationId);
 
   /**
    * 查询网络组件列表

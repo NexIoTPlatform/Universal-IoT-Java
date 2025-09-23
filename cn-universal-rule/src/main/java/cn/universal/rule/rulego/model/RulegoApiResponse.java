@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
  *
  * @param <T> 数据类型泛型
  * @author Aleo
- * @since 2025/09/01
+ * @since 2025/01/15
  */
 @Data
 @Builder

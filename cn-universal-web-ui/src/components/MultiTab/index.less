@@ -1,0 +1,21 @@
+@import '../index';
+
+@multi-tab-prefix-cls: ~"@{ant-pro-prefix}-multi-tab";
+@multi-tab-wrapper-prefix-cls: ~"@{ant-pro-prefix}-multi-tab-wrapper";
+
+.@{multi-tab-prefix-cls} {
+  margin: -23px -24px 24px -24px;
+  background: #fff;
+}
+
+.topmenu .@{multi-tab-wrapper-prefix-cls} {
+  max-width: 98%;
+  margin: 0 auto;
+}
+
+.@{multi-tab-wrapper-prefix-cls} > .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
+  border-color: #fff;
+  border-top-right-radius: 30px;
+  background: #fff;
+  box-shadow: 2px 0 4px rgb(0 21 41 / 5%);
+}

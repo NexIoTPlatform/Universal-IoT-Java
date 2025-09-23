@@ -343,17 +343,28 @@ public class IoTProductDeviceService {
     return productsMap;
   }
 
-  /**
-   * 查询网络类型
-   *
-   * @param productKey 产品key
-   * @return int 总数
-   */
+  /** 查询网络类型 */
   @Cacheable(cacheNames = "selectNetworkUnionId", key = "#productKey", unless = "#result == null")
   public String selectNetworkUnionId(String productKey) {
     if (StrUtil.isBlank(productKey)) {
       return null;
     }
     return ioTProductMapper.selectNetworkUnionId(productKey);
+  }
+
+  /** 查询产品配置信息 */
+  @Cacheable(
+      cacheNames = "getProductConfiguration",
+      key = "#productKey",
+      unless = "#result == null")
+  public JSONObject getProductConfiguration(String productKey) {
+    // status-0 正常
+    IoTProduct product =
+        IoTProduct.builder().productKey(productKey).state(IoTConstant.NORMAL.byteValue()).build();
+    product = ioTProductMapper.selectOne(product);
+    if (product == null || StrUtil.isBlank(product.getConfiguration())) {
+      return null;
+    }
+    return JSONUtil.parseObj(product.getConfiguration());
   }
 }
