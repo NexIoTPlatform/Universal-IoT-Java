@@ -13,7 +13,6 @@
 package cn.universal.ossm.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.universal.common.exception.IoTException;
 import cn.universal.ossm.entity.SysOss;
@@ -39,7 +38,7 @@ public class SysOssServiceImpl implements ISysOssService {
 
   @Resource private SysOssMapper sysOssMapper;
 
-  @Value("${codec.path:cn-universal}")
+  @Value("${codec.path:nexiot/}")
   private String prePath;
 
   @Override
@@ -58,10 +57,14 @@ public class SysOssServiceImpl implements ISysOssService {
     if (file.getOriginalFilename() == null) {
       throw new IoTException("文件名为空！");
     }
-    String originalfileName =
-        prePath + file.getOriginalFilename().replace(".", RandomUtil.randomString(8) + ".");
-    String suffix =
-        StrUtil.sub(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
+    // 获取文件扩展名
+    String originalFilename = file.getOriginalFilename();
+    String suffix = "";
+    if (originalFilename != null && originalFilename.contains(".")) {
+      suffix = StrUtil.sub(originalFilename, originalFilename.lastIndexOf("."), originalFilename.length());
+    }
+    // 生成基于 Unix 时间戳的文件名
+    String originalfileName = prePath + System.currentTimeMillis() + suffix;
     ICloudStorageService storage = OssFactory.instance();
     UploadResult uploadResult;
     try {

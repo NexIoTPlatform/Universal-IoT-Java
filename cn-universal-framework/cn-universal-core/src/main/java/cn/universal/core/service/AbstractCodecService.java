@@ -119,6 +119,11 @@ public abstract class AbstractCodecService implements ICodecService {
   /** 编码 */
   @Override
   public String encode(String productKey, String payload) {
+    return encode(productKey, payload, null);
+  }
+
+  @Override
+  public String encode(String productKey, String payload, Object context) {
     ProtocolSupportDefinition protocolDef =
         getProtocolDefinitionWithScriptIfNeeded(productKey, CodecMethod.encode);
     String result = null;
@@ -127,14 +132,15 @@ public abstract class AbstractCodecService implements ICodecService {
     if (protocolDef != null && protocolDef.supportMethod(CodecMethod.encode)) {
       ProtocolCodecSupport protocolCodecSupport = getProtocolCodecProvider(protocolDef.getType());
       try {
-        result = protocolCodecSupport.encode(new ProtocolEncodeRequest(protocolDef, payload));
+        result =
+            protocolCodecSupport.encode(new ProtocolEncodeRequest(protocolDef, payload, context));
       } catch (CodecException e) {
         log.error("产品编号={} 原始报文={} 编码报错", productKey, payload, e);
       }
     }
 
     long t2 = System.currentTimeMillis();
-    log.info("产品编号={} 原始报文={} 编码={} 耗时={}ms", productKey, payload, result, (t2 - t1));
+    log.info("产品编号={} 原始报文={}  编码={} 耗时={}ms", productKey, payload, result, (t2 - t1));
     return result;
   }
 

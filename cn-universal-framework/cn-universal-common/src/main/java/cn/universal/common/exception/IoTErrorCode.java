@@ -59,7 +59,7 @@ public enum IoTErrorCode {
 
   APPLICATION_NOT_FOR_YOU(801, "应用没有操作权限！"),
   /** 产品 */
-  PRODUCT_NOT_FOR_YOU(901, "您没有权限操作此产品！"),
+  PRODUCT_NOT_FOR_YOU(901, "无产品权限"),
   PRODUCT_NOT_EXIST(902, "产品不存在");
 
   private Integer code;

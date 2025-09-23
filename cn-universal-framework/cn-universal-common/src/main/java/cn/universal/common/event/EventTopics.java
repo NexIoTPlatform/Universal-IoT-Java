@@ -35,6 +35,11 @@ public class EventTopics {
   /** TCP下行指令事件（模式匹配） 用于处理TCP下行指令 */
   public static final String TCP_DOWN = "tcp:down:*";
 
+  // ==================== UDP相关事件 ====================
+
+  /** UDP下行指令事件（模式匹配） 用于处理UDP下行指令 */
+  public static final String UDP_DOWN = "udp:down:*";
+
   // ==================== 产品配置相关事件 ====================
 
   /** 产品配置更新事件 用于通知产品配置变更 */
@@ -55,5 +60,15 @@ public class EventTopics {
    */
   public static String getTcpDownTopic(String instanceId) {
     return "tcp:down:" + instanceId;
+  }
+
+  /**
+   * 获取UDP下行指令主题（带实例ID）
+   *
+   * @param instanceId 实例ID
+   * @return 完整的UDP下行指令主题
+   */
+  public static String getUdpDownTopic(String instanceId) {
+    return "udp:down:" + instanceId;
   }
 }

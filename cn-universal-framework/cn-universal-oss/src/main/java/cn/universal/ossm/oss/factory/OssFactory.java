@@ -14,6 +14,7 @@ package cn.universal.ossm.oss.factory;
 
 import cn.hutool.core.lang.Assert;
 import cn.universal.common.utils.SpringUtils;
+import cn.universal.ossm.oss.constant.CloudConstant;
 import cn.universal.ossm.oss.enumd.CloudServiceEnumd;
 import cn.universal.ossm.oss.service.ICloudStorageService;
 import java.util.Map;
@@ -21,18 +22,18 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /** 文件上传Factory @Author Lion Li */
 public class OssFactory {
-
-  //  private static ISysConfigService sysConfigService;
-  //
-  //  static {
-  //    OssFactory.sysConfigService = SpringUtils.getBean(ISysConfigService.class);
-  //  }
+//
+//    private static ISysConfigService sysConfigService;
+//
+//    static {
+//      OssFactory.sysConfigService = SpringUtils.getBean(ISysConfigService.class);
+//    }
 
   private static final Map<String, ICloudStorageService> SERVICES = new ConcurrentHashMap<>();
 
   public static ICloudStorageService instance() {
-    //    String type = sysConfigService.selectConfigByKey(CloudConstant.CLOUD_STORAGE_CONFIG_KEY);
-    return instance("aliyun");
+//        String type = sysConfigService.selectConfigByKey(CloudConstant.CLOUD_STORAGE_CONFIG_KEY);
+    return instance("qiniu");
   }
 
   public static ICloudStorageService instance(String type) {

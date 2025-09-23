@@ -16,6 +16,7 @@
     <module>cn-universal-core</module>
     <module>cn-universal-exception</module>
     <module>cn-universal-config</module>
+    <module>cn-universal-notice</module>
     <module>cn-universal-oss</module>
     <module>cn-universal-dm</module>
     <!--    <module>cn-universal-rocketmq</module>-->
