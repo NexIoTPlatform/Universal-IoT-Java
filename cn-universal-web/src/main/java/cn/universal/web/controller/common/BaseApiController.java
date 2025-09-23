@@ -155,7 +155,7 @@ public class BaseApiController {
   protected void checkProductSelf(String productKey) {
     int flag = iotProductDeviceService.selectProductCount(productKey, iotUnionId());
     if (flag <= 0) {
-      throw new IoTException("您没有权限操作此产品！", IoTErrorCode.PRODUCT_NOT_FOR_YOU.getCode());
+      throw new IoTException("无产品权限", IoTErrorCode.PRODUCT_NOT_FOR_YOU.getCode());
     }
   }
 }

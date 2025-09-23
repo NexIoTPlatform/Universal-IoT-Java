@@ -1,6 +1,7 @@
 package cn.universal.mqtt.protocol.third;
 
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.universal.mqtt.protocol.entity.MQTTProductConfig;
 import cn.universal.mqtt.protocol.topic.MQTTTopicManager;
@@ -44,10 +45,11 @@ public class ThirdMQTTConfigParser {
       }
 
       Map<String, Object> configMap = JSONUtil.parseObj(configuration).toBean(Map.class);
-      String brokerHost =
-          getStringValue(
-              configMap, "host", getStringValue(configMap, "url", "tcp://localhost:1883"));
-
+      String brokerHost = getStringValue(configMap, "host", getStringValue(configMap, "url", null));
+      // 如果brokerHost为空，则之间忽略
+      if (StrUtil.isNullOrUndefined(brokerHost)) {
+        return null;
+      }
       MQTTProductConfig.MQTTProductConfigBuilder builder =
           MQTTProductConfig.builder()
               .networkUnionId(networkUnionId)

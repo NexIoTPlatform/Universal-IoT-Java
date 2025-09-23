@@ -53,6 +53,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class UnivFunctions implements IdeMagicFunction {
+
+  private final String url = "http://apilocate.amap.com/position?";
+  // 地址逆编码
+  private static final String reUrl = "https://restapi.amap.com/v3/geocode/regeo?";
+  private static final String key = "f404bbd3dc312d7c0e1ed4c4a1472f5f";
   private final String imei = "86";
   private static final double X_PI = 3.14159265358979324 * 3000.0 / 180.0;
   private static final double PI = 3.14159265358979324;
@@ -61,8 +66,7 @@ public class UnivFunctions implements IdeMagicFunction {
 
   private static final double EE = 0.00669342162296594323;
   private AtomicLong currentSerialNumber = new AtomicLong(1L);
-  @Resource
-  private StringRedisTemplate stringRedisTemplate;
+  @Resource private StringRedisTemplate stringRedisTemplate;
 
   @Function
   @Comment("基于CSQ信号强度评估")
@@ -376,7 +380,109 @@ public class UnivFunctions implements IdeMagicFunction {
     return URLDecoder.decode(str, CharsetUtil.CHARSET_UTF_8);
   }
 
+  @Function
+  @Comment("wifi查询坐标")
+  public String locateByWifi(@Comment(name = "target", value = "字符串列表") List<String> wifis) {
+    // 高德坐标查询
+    String queryUrl =
+        url
+            + "accesstype=1&imei="
+            + imei
+            + "&macs="
+            + String.join("|", wifis)
+            + "&output=json&key="
+            + key;
+    JSONObject obj = new JSONObject();
+    String lng = "";
+    String lat = "";
+    try {
+      if (CollectionUtil.isNotEmpty(wifis)) {
+        String result = JSONUtil.parseObj(HttpUtil.get(queryUrl, 5000)).getStr("result");
+        if (StrUtil.isNotEmpty(result)) {
+          JSONObject jsonObject = JSONUtil.parseObj(result);
+          String[] finalLocation = jsonObject.getStr("location").split(",");
+          lng = finalLocation[0];
+          lat = finalLocation[1];
+          obj.set("location", jsonObject.getStr("desc"));
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      obj.set("lng", lng);
+      obj.set("lat", lat);
+    }
+    return JSONUtil.toJsonStr(obj);
+  }
 
+  @Function
+  @Comment("基站查询坐标")
+  public String locateByLbs(
+      @Comment(name = "target", value = "是否是CDMA卡") Boolean isCDMA,
+      @Comment(name = "target", value = "字符串列表") List<String> lbs) {
+    JSONObject obj = new JSONObject();
+    String lng = "";
+    String lat = "";
+    if (CollectionUtil.isEmpty(lbs)) {
+      return JSONUtil.toJsonStr(obj);
+    }
+    // 460,00,22572,11037,-60|460,00,22572,21845,-70|460,00,22572,21037,-70
+    String bts = lbs.get(0);
+    lbs.remove(0);
+    String nearbts = String.join("|", lbs);
+    // 高德坐标查询
+    String queryUrl =
+        url
+            + "accesstype=0&imei="
+            + imei
+            + "&cdma="
+            + (isCDMA ? "1" : "0")
+            + "&bts="
+            + bts
+            + "&nearbts="
+            + nearbts
+            + "&output=json&key="
+            + key;
+    try {
+      String result = JSONUtil.parseObj(HttpUtil.get(queryUrl, 5000)).getStr("result");
+      if (StrUtil.isNotEmpty(result)) {
+        JSONObject jsonObject = JSONUtil.parseObj(result);
+        String[] finalLocation = jsonObject.getStr("location").split(",");
+        lng = finalLocation[0];
+        lat = finalLocation[1];
+        obj.set("location", jsonObject.getStr("desc"));
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      obj.set("lng", lng);
+      obj.set("lat", lat);
+    }
+    return JSONUtil.toJsonStr(obj);
+  }
+
+  // 入参经度在前纬度在后，逗号分隔
+  @Function
+  @Comment("坐标转地址")
+  public static String coordinateToAddr(
+      @Comment(name = "target", value = "字符串") String coordinate) {
+    JSONObject obj = new JSONObject();
+    // 高德坐标查询
+    String queryUrl =
+        reUrl + "location=" + coordinate + "&extensions=service&radius=100&output=json&key=" + key;
+    try {
+      String result = JSONUtil.parseObj(HttpUtil.get(queryUrl, 5000)).getStr("regeocode");
+      if (StrUtil.isNotEmpty(result)) {
+        JSONObject jsonObject = JSONUtil.parseObj(result);
+        String address = jsonObject.getStr("formatted_address");
+        return address;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
 
   /***
    * CRC每个字节异或
@@ -466,9 +572,7 @@ public class UnivFunctions implements IdeMagicFunction {
     return String.format("%04X", v & 0xFFFF);
   }
 
-  /**
-   * 字符串每两位倒转
-   */
+  /** 字符串每两位倒转 */
   @Function
   @Comment("字符串每两位倒转")
   public String reverseTwoDigit(@Comment(name = "target", value = "字符串") String str) {
@@ -478,51 +582,9 @@ public class UnivFunctions implements IdeMagicFunction {
     return String.join("", inputList);
   }
 
-  // =====================
-  // 645/对接常用 十六进制工具
-  // 命名统一以 hex_ 前缀，便于 Magic-API 检索
-  // =====================
-
-  @Function
-  @Comment("hex按字节加0x33（DL/T645编码）")
-  public String hex_add33(@Comment(name = "target", value = "十六进制字符串") String hex) {
-    if (StrUtil.isBlank(hex)) {
-      return hex;
-    }
-    if (hex.length() % 2 != 0) {
-      return null;
-    }
-    StringBuilder sb = new StringBuilder(hex.length());
-    for (int i = 0; i < hex.length(); i += 2) {
-      int b = Integer.parseInt(hex.substring(i, i + 2), 16);
-      int v = (b + 0x33) & 0xFF;
-      sb.append(String.format("%02X", v));
-    }
-    return sb.toString();
-  }
-
-  @Function
-  @Comment("hex按字节减0x33（DL/T645解码）")
-  public String hex_sub33(@Comment(name = "target", value = "十六进制字符串") String hex) {
-    if (StrUtil.isBlank(hex)) {
-      return hex;
-    }
-    if (hex.length() % 2 != 0) {
-      return null;
-    }
-    StringBuilder sb = new StringBuilder(hex.length());
-    for (int i = 0; i < hex.length(); i += 2) {
-      int b = Integer.parseInt(hex.substring(i, i + 2), 16);
-      int v = (b - 0x33) & 0xFF;
-      sb.append(String.format("%02X", v));
-    }
-    return sb.toString();
-  }
 
 
-  /**
-   * int强转float
-   */
+  /** int强转float */
   @Function
   @Comment("int强转float")
   public Float intToFloat(@Comment(name = "target", value = "字符串") Integer number) {
@@ -532,9 +594,7 @@ public class UnivFunctions implements IdeMagicFunction {
     return Float.intBitsToFloat(number);
   }
 
-  /**
-   * long强转double
-   */
+  /** long强转double */
   @Function
   @Comment("long强转double")
   public Double longToDouble(@Comment(name = "target", value = "字符串") Long number) {
@@ -544,9 +604,7 @@ public class UnivFunctions implements IdeMagicFunction {
     return Double.longBitsToDouble(number);
   }
 
-  /**
-   * 地球坐标系转火星坐标系
-   */
+  /** 地球坐标系转火星坐标系 */
   @Function
   @Comment("地球坐标系转火星坐标系")
   public String wgs84ToGcj02(@Comment(name = "target", value = "字符串") String coordinate) {
@@ -565,9 +623,7 @@ public class UnivFunctions implements IdeMagicFunction {
     return JSONUtil.toJsonStr(obj);
   }
 
-  /**
-   * 火星坐标系转地球坐标系
-   */
+  /** 火星坐标系转地球坐标系 */
   @Function
   @Comment("火星坐标系转地球坐标系")
   public String gcj02ToWgs84(@Comment(name = "target", value = "字符串") String coordinate) {
@@ -585,9 +641,7 @@ public class UnivFunctions implements IdeMagicFunction {
     return JSONUtil.toJsonStr(obj);
   }
 
-  /**
-   * 车辆 十六进制转中文gbk 内部bytebuf中转
-   */
+  /** 车辆 十六进制转中文gbk 内部bytebuf中转 */
   @Function
   @Comment("车辆 十六进制转中文gbk  内部bytebuf中转")
   public String hexToGBK(@Comment(name = "target", value = "字符串") String str) {
@@ -598,9 +652,7 @@ public class UnivFunctions implements IdeMagicFunction {
     return new String(a, Charset.forName("gbk")).trim();
   }
 
-  /**
-   * 车辆 中文gbk转十六进制 内部bytebuf中转
-   */
+  /** 车辆 中文gbk转十六进制 内部bytebuf中转 */
   @Function
   @Comment("车辆 中文gbk转十六进制  内部bytebuf中转")
   public String GBKToHex(@Comment(name = "target", value = "字符串") String str) {

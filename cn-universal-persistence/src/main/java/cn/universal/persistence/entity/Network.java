@@ -29,17 +29,12 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Network implements Serializable {
 
-  @Id
-  private Integer id;
+  @Id private Integer id;
 
-  /**
-   * TCP_CLIENT,MQTT_CLIENT,HTTP_CLIENT,WEB_SOCKET_CLIENT
-   */
+  /** TCP_CLIENT,MQTT_CLIENT,HTTP_CLIENT,WEB_SOCKET_CLIENT */
   private String type;
 
-  /**
-   * 唯一标识
-   */
+  /** 唯一标识 */
   @Column(name = "product_key")
   private String productKey;
 
@@ -48,27 +43,19 @@ public class Network implements Serializable {
 
   private String name;
 
-  /**
-   * 详细描述
-   */
+  /** 详细描述 */
   private String description;
 
   @Column(name = "create_date")
   private Date createDate;
 
-  /**
-   * enable,disable
-   */
+  /** enable,disable */
   private Boolean state;
 
-  /**
-   * 配置内容
-   */
+  /** 配置内容 */
   private String configuration;
 
-  /**
-   * 创建用户
-   */
+  /** 创建用户 */
   @Column(name = "create_user")
   private String createUser;
 

@@ -193,12 +193,7 @@ public class ApiControllerV1 extends BaseApiController {
     return IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(param);
   }
 
-  /**
-   * 设备修改（只修改名称，经纬度）
-   *
-   * <p>{ "deviceId": "24E124535B176069", "deviceName": "对外开放接口测试_改", "longitude":
-   * "40.44801283677155", "latitude": "120.29184397901454" }
-   */
+  /** 设备修改名称，经纬度 */
   @PostMapping("/device/update/{productKey}/{deviceId}")
   public R updateIoTDevice(
       @PathVariable("productKey") String productKey,

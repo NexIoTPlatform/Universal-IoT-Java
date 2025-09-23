@@ -19,7 +19,7 @@ public class HexFunctions implements IdeMagicFunction {
   // 基础十六进制操作（前缀：hex_）
   // =====================
   @Function
-  @Comment("hex按字节加0x33（DL/T645编码）")
+  @Comment("hex按字节加0x33,取低8位（DL/T645编码）")
   public String hex_add33(@Comment(name = "target", value = "十六进制字符串") String hex) {
     if (StrUtil.isBlank(hex)) {
       return hex;
@@ -520,5 +520,141 @@ public class HexFunctions implements IdeMagicFunction {
       obj.set("ok", false);
       return JSONUtil.toJsonStr(obj);
     }
+  }
+
+  // =====================
+  // 定点数/整数 转 HEX（支持小端）
+  // =====================
+
+  @Function
+  @Comment("十进制字符串转定点HEX（大端），bytes为输出总字节数，scale为小数位")
+  public String hex_fromDecScaled(
+      @Comment(name = "decimal", value = "十进制，如1.20") String decimal,
+      @Comment(name = "scale", value = "小数位，例如3表示*1000") Integer scale,
+      @Comment(name = "bytes", value = "输出字节数，例如4/2") Integer bytes) {
+    if (StrUtil.isBlank(decimal) || scale == null || scale < 0 || bytes == null || bytes <= 0) {
+      return null;
+    }
+    java.math.BigDecimal val;
+    try {
+      val = new java.math.BigDecimal(decimal.trim());
+    } catch (Exception e) {
+      return null;
+    }
+    java.math.BigDecimal factor = java.math.BigDecimal.TEN.pow(scale);
+    java.math.BigDecimal scaled = val.multiply(factor).setScale(0, java.math.RoundingMode.HALF_UP);
+    if (scaled.compareTo(java.math.BigDecimal.ZERO) < 0) {
+      return null;
+    }
+    java.math.BigInteger bi = scaled.toBigInteger();
+    String hex = bi.toString(16).toUpperCase();
+    // 按字节长度左侧补0
+    int targetLen = bytes * 2;
+    if (hex.length() > targetLen) {
+      // 超出位宽，截断高位（协议通常不允许，此处返回null更安全）
+      return null;
+    }
+    return StrUtil.padPre(hex, targetLen, '0');
+  }
+
+  @Function
+  @Comment("十进制字符串转定点HEX（小端，按字节反转），bytes为输出总字节数，scale为小数位")
+  public String hex_fromDecScaledLE(
+      @Comment(name = "decimal", value = "十进制，如1.20") String decimal,
+      @Comment(name = "scale", value = "小数位，例如3表示*1000") Integer scale,
+      @Comment(name = "bytes", value = "输出字节数，例如4/2") Integer bytes) {
+    String be = hex_fromDecScaled(decimal, scale, bytes);
+    if (be == null) {
+      return null;
+    }
+    return hex_reverse(be);
+  }
+
+  @Function
+  @Comment("整数转HEX（大端），bytes为输出总字节数")
+  public String hex_fromInt(
+      @Comment(name = "value", value = "整数") Integer value,
+      @Comment(name = "bytes", value = "输出字节数") Integer bytes) {
+    if (value == null || value < 0 || bytes == null || bytes <= 0) {
+      return null;
+    }
+    String hex = Integer.toHexString(value).toUpperCase();
+    int targetLen = bytes * 2;
+    if (hex.length() > targetLen) {
+      return null;
+    }
+    return StrUtil.padPre(hex, targetLen, '0');
+  }
+
+  @Function
+  @Comment("整数转HEX（小端，按字节反转），bytes为输出总字节数")
+  public String hex_fromIntLE(
+      @Comment(name = "value", value = "整数") Integer value,
+      @Comment(name = "bytes", value = "输出字节数") Integer bytes) {
+    String be = hex_fromInt(value, bytes);
+    if (be == null) {
+      return null;
+    }
+    return hex_reverse(be);
+  }
+
+  @Function
+  @Comment("确保HEX为偶数长度（左侧补0）")
+  public String hex_even(
+      @Comment(name = "hex", value = "HEX字符串") String hex) {
+    if (hex == null) {
+      return null;
+    }
+    String cleaned = hex.replaceAll("[^0-9A-Fa-f]", "").toUpperCase();
+    return (cleaned.length() % 2 == 0) ? cleaned : ("0" + cleaned);
+  }
+
+  @Function
+  @Comment("十进制字符串(不带小数缩放)转HEX并左侧补0到N字节。例如: '2.45' -> 去点 '245' -> 十进制245 -> HEX 00F5(2字节)")
+  public String hex_fromDecNoScalePad(
+      @Comment(name = "decimal", value = "十进制字符串，可含小数点，如2.45") String decimal,
+      @Comment(name = "bytes", value = "输出总字节数，例如4") Integer bytes) {
+    if (StrUtil.isBlank(decimal) || bytes == null || bytes <= 0) {
+      return null;
+    }
+    String cleaned = decimal.trim();
+    // 去除小数点，不做缩放，直接把所有数字拼起来作为十进制整数
+    cleaned = cleaned.replace(".", "");
+    if (!cleaned.matches("^[0-9]+$")) {
+      return null;
+    }
+    java.math.BigInteger bi = new java.math.BigInteger(cleaned);
+    String hex = bi.toString(16).toUpperCase();
+    int targetLen = bytes * 2;
+    if (hex.length() > targetLen) {
+      return null;
+    }
+    return StrUtil.padPre(hex, targetLen, '0');
+  }
+
+  @Function
+  @Comment("HEX左侧补0到N字节长度（不改变内容）。例如: 'F5' + 2字节 => '00F5'")
+  public String hex_padToBytes(
+      @Comment(name = "hex", value = "HEX字符串") String hex,
+      @Comment(name = "bytes", value = "目标字节数") Integer bytes) {
+    if (hex == null || bytes == null || bytes <= 0) {
+      return null;
+    }
+    String cleaned = hex.replaceAll("[^0-9A-Fa-f]", "").toUpperCase();
+    if (cleaned.length() % 2 != 0) {
+      cleaned = "0" + cleaned;
+    }
+    int targetLen = bytes * 2;
+    if (cleaned.length() > targetLen) {
+      return null;
+    }
+    return StrUtil.padPre(cleaned, targetLen, '0');
+  }
+
+  @Function
+  @Comment("HEX按字节大小端转换（每2位反转顺序）。等同hex_reverse，单独暴露以便magic-api调用链更直观")
+  public String hex_swapEndianBytes(
+      @Comment(name = "hex", value = "HEX字符串") String hex) {
+    return hex_reverse(hex);
   }
 }

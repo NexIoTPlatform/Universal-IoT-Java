@@ -21,9 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * 角色和菜单关联 sys_role_menu @Author ruoyi
- */
+/** 角色和菜单关联 sys_role_menu @Author ruoyi */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
@@ -33,16 +31,11 @@ import lombok.experimental.Accessors;
 public class SysRoleMenu implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  @Id
-  private Long uuid;
+  @Id private Long uuid;
 
-  /**
-   * 角色ID
-   */
+  /** 角色ID */
   private Long roleId;
 
-  /**
-   * 菜单ID
-   */
+  /** 菜单ID */
   private Long menuId;
 }

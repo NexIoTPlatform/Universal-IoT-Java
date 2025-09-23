@@ -19,9 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 字典类型group分组 @Author ruoyi
- */
+/** 字典类型group分组 @Author ruoyi */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

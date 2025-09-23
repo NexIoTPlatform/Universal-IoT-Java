@@ -27,48 +27,30 @@ public class IoTDeviceGroupVO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 分组ID，非自增
-   */
+  /** 分组ID，非自增 */
   private Long id;
 
-  /**
-   * 分组名称
-   */
+  /** 分组名称 */
   private String groupName;
 
-  /**
-   * 分组标识
-   */
+  /** 分组标识 */
   private String groupCode;
 
-  /**
-   * 群组描述
-   */
+  /** 群组描述 */
   private String groupDescribe;
 
-  /**
-   * 父id
-   */
+  /** 父id */
   private Long parentId;
 
-  /**
-   * 是否有子分组
-   */
+  /** 是否有子分组 */
   private Integer hasChild;
 
-  /**
-   * 分组级别
-   */
+  /** 分组级别 */
   private Integer groupLevel;
 
-  /**
-   * 设备列表
-   */
+  /** 设备列表 */
   private List<IoTDeviceVO> instanceVOS;
 
-  /**
-   * 分组子集
-   */
+  /** 分组子集 */
   private List<IoTDeviceGroupVO> children;
 }

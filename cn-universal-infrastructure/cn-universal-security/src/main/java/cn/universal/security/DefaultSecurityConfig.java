@@ -167,8 +167,11 @@ public class DefaultSecurityConfig {
                     .permitAll()
                     .requestMatchers("/emqx/**")
                     .permitAll()
+                    .requestMatchers("/ct/aiot/**")
+                    .permitAll()
                     // 测试接口
                     .requestMatchers("/test/**")
+
                     .permitAll()
                     .requestMatchers("/monitor/**")
                     .permitAll()
@@ -226,6 +229,8 @@ public class DefaultSecurityConfig {
                     .permitAll()
                     // 测试和监控点
                     .requestMatchers("/test/**", "/monitor/**")
+                    .permitAll()
+                    .requestMatchers("/ct/aiot/**")
                     .permitAll()
                     // 前端相关
                     .requestMatchers(

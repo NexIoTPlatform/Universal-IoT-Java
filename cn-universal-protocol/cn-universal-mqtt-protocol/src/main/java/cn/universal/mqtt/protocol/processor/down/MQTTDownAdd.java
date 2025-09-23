@@ -84,7 +84,7 @@ public class MQTTDownAdd extends IoTDownAdapter<MQTTDownRequest>
             .createTime(System.currentTimeMillis() / 1000)
             .deviceName(downRequest.getDownCommonData().getDeviceName())
             .state(DeviceStatus.offline.getCode())
-            .iotId(IdUtil.simpleUUID())
+            .iotId(downRequest.getProductKey()+downRequest.getDeviceId())
             .application(downRequest.getApplicationId())
             .creatorId(downRequest.getAppUnionId())
             .productName(downRequest.getIoTProduct().getName())

@@ -28,31 +28,21 @@ public class IoTProductSortBO implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 分类ID（新增时为空）
-   */
+  /** 分类ID（新增时为空） */
   private String id;
 
-  /**
-   * 父分类ID
-   */
+  /** 父分类ID */
   @NotNull(message = "父分类ID不能为空")
   private String parentId;
 
-  /**
-   * 分类名称
-   */
+  /** 分类名称 */
   @NotBlank(message = "分类名称不能为空")
   private String classifiedName;
 
-  /**
-   * 标识
-   */
+  /** 标识 */
   private String identification;
 
-  /**
-   * 说明
-   */
+  /** 说明 */
   private String description;
 
   /**

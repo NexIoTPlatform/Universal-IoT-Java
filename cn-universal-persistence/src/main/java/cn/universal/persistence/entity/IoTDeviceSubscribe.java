@@ -30,70 +30,47 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IoTDeviceSubscribe implements Serializable {
 
-  @Id
-  private Long id;
+  @Id private Long id;
 
-  /**
-   * 消息类别：属性（PROPERTIES），指令（REPLY），事件（EVENT），上下线（EVENT：online,offline），所有
-   */
+  /** 消息类别：属性（PROPERTIES），指令（REPLY），事件（EVENT），上下线（EVENT：online,offline），所有 */
   @Column(name = "msg_type")
   private String msgType;
 
-  /**
-   * 订阅级别：设备级，产品级
-   */
+  /** 订阅级别：设备级，产品级 */
   @Column(name = "sub_type")
   private String subType;
 
-  /**
-   * 设备deviceId
-   */
+  /** 设备deviceId */
   @Column(name = "device_id")
   private String deviceId;
 
-  /**
-   * 产品ID或者设备唯一标识
-   */
+  /** 产品ID或者设备唯一标识 */
   @Column(name = "product_key")
   private String productKey;
 
-  /**
-   * 产品ID或者设备唯一标识
-   */
+  /** 产品ID或者设备唯一标识 */
   @Column(name = "iot_id")
   private String iotId;
 
-  /**
-   * 订阅地址
-   */
+  /** 订阅地址 */
   private String url;
 
-  /**
-   * 主题
-   */
+  /** 主题 */
   private String topic;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Column(name = "create_date")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createDate;
 
-  /**
-   * 创建人
-   */
+  /** 创建人 */
   private String creater;
 
-  /**
-   * 实例编号(应用标识)
-   */
+  /** 实例编号(应用标识) */
   @Column(name = "`instance`")
   private String instance;
 
-  /**
-   * 是否启用
-   */
+  /** 是否启用 */
   private Boolean enabled;
 
   private static final long serialVersionUID = 1L;

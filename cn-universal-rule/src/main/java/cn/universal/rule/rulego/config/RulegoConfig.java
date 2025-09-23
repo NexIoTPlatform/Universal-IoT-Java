@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Configuration;
  * rulego配置类
  *
  * @author Aleo
- * @since 2025/09/01
+ * @since 2025/01/15
  */
 @Data
 @Configuration

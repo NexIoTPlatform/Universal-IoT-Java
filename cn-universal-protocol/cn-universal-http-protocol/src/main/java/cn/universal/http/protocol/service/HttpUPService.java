@@ -16,7 +16,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.core.message.UPRequest;
-import cn.universal.core.service.ICodec;
 import cn.universal.core.service.ICodecService;
 import cn.universal.dm.device.service.AbstractUPService;
 import cn.universal.dm.device.service.action.IoTDeviceActionAfterService;
@@ -43,7 +42,7 @@ import org.springframework.stereotype.Service;
  */
 @Service("httpUPService")
 @Slf4j
-public class HttpUPService extends AbstractUPService<HttpUPRequest> implements ICodec {
+public class HttpUPService extends AbstractUPService<HttpUPRequest> {
 
   @Value("${iot.register.auto.unionId}")
   private String unionId;
@@ -118,11 +117,6 @@ public class HttpUPService extends AbstractUPService<HttpUPRequest> implements I
     processorChain.process(jsonObject, ioTDeviceDTO, httpUPRequests);
     log.info("[HTTP上行][模拟调试] httpUPRequests.size={} content={}", httpUPRequests.size(), debugMsg);
     httpUPHandle.up(httpUPRequests);
-  }
-
-  @Override
-  public String version() {
-    return null;
   }
 
   @Override

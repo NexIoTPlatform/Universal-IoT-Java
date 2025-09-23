@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>cn-universal-plugins-web-debug</artifactId>
-  <description>IoT-Connector-Debug的IDE不开放前端源码了</description>
+
   <properties>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>

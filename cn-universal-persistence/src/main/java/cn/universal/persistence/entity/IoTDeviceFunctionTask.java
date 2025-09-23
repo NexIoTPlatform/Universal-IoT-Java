@@ -55,8 +55,6 @@ public class IoTDeviceFunctionTask implements Serializable {
   private String command;
   private String commandData;
 
-  /**
-   * 状态 0.待执行；1.已执行；2.正在执行
-   */
+  /** 状态 0.待执行；1.已执行；2.正在执行 */
   private Integer status;
 }

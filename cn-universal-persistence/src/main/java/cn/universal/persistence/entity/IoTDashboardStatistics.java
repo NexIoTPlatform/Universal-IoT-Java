@@ -32,51 +32,35 @@ public class IoTDashboardStatistics implements Serializable {
   @KeySql(useGeneratedKeys = true)
   private Long id;
 
-  /**
-   * 统计日期
-   */
+  /** 统计日期 */
   @Column(name = "stat_date")
   private LocalDate statDate;
 
-  /**
-   * 产品Key，NULL表示全产品
-   */
+  /** 产品Key，NULL表示全产品 */
   @Column(name = "product_key")
   private String productKey;
 
-  /**
-   * 推送渠道，NULL表示全渠道
-   */
+  /** 推送渠道，NULL表示全渠道 */
   @Column(name = "channel")
   private String channel;
 
-  /**
-   * 指标类型
-   */
+  /** 指标类型 */
   @Column(name = "metric_type")
   private String metricType;
 
-  /**
-   * 指标值
-   */
+  /** 指标值 */
   @Column(name = "metric_value")
   private Long metricValue;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Column(name = "create_time")
   private LocalDateTime createTime;
 
-  /**
-   * 更新时间
-   */
+  /** 更新时间 */
   @Column(name = "update_time")
   private LocalDateTime updateTime;
 
-  /**
-   * 指标类型枚举
-   */
+  /** 指标类型枚举 */
   public enum MetricType {
     DEVICE_TOTAL("device_total", "设备总数"),
     DEVICE_ONLINE("device_online", "在线设备数"),

@@ -17,7 +17,6 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.constant.IoTConstant.DownCmd;
 import cn.universal.common.domain.R;
-import cn.universal.core.service.ICodec;
 import cn.universal.dm.device.service.AbstractDownService;
 import cn.universal.mqtt.protocol.config.MqttModuleInfo;
 import cn.universal.mqtt.protocol.entity.MQTTDownRequest;
@@ -37,12 +36,10 @@ import org.springframework.stereotype.Service;
  */
 @Service("mqttDownService")
 @Slf4j(topic = "mqtt")
-public class MQTTDownService extends AbstractDownService<MQTTDownRequest> implements ICodec {
+public class MQTTDownService extends AbstractDownService<MQTTDownRequest> {
 
-  @Resource
-  private MqttModuleInfo mqttModuleInfo;
-  @Resource
-  private MQTTDownProcessorChain mqttDownProcessorChain;
+  @Resource private MqttModuleInfo mqttModuleInfo;
+  @Resource private MQTTDownProcessorChain mqttDownProcessorChain;
 
   @Override
   protected MQTTDownRequest convert(String request) {
@@ -60,16 +57,21 @@ public class MQTTDownService extends AbstractDownService<MQTTDownRequest> implem
     }
     IoTProduct ioTProduct = getProduct(value.getProductKey());
     value.setIoTProduct(ioTProduct);
-    //设置IoTDeviceDTO
-    IoTDeviceDTO ioTDeviceDTO = getIoTDeviceDTO(
-        IoTDeviceQuery.builder().productKey(value.getProductKey()).deviceId(value.getDeviceId())
-            .build());
+    // 设置IoTDeviceDTO
+    IoTDeviceDTO ioTDeviceDTO =
+        getIoTDeviceDTO(
+            IoTDeviceQuery.builder()
+                .productKey(value.getProductKey())
+                .deviceId(value.getDeviceId())
+                .build());
     value.setIoTDeviceDTO(ioTDeviceDTO);
-    value.getDownCommonData().setConfiguration(JSONUtil.parseObj(ioTProduct.getConfiguration()));
+    value.getDownCommonData().setConfiguration(parseProductConfigurationSafely(ioTProduct));
     // 功能且function对象不为空，则编解码，并复制编解码后的内容
-    if (DownCmd.DEV_FUNCTION.equals(value.getCmd()) && CollectionUtil.isNotEmpty(
-        value.getFunction())) {
-      String deResult = spliceDown(value.getProductKey(), JSONUtil.toJsonStr(value.getFunction()));
+    if (DownCmd.DEV_FUNCTION.equals(value.getCmd())
+        && CollectionUtil.isNotEmpty(value.getFunction())) {
+      String deResult =
+          encodeWithShadow(
+              value.getProductKey(), value.getDeviceId(), JSONUtil.toJsonStr(value.getFunction()));
       //      log.info("电信设备={} 编解码结果={}", value.getDeviceId(), deResult);
       value.setPayload(deResult);
     }

@@ -13,8 +13,8 @@
 package cn.universal.persistence.entity.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Transient;
 import lombok.Data;
+import java.time.LocalDateTime;
 
 @Data
 @Schema(description = "设备日志视图对象")
@@ -24,94 +24,39 @@ public class IoTDeviceLogVO {
 
   /*-----------------日志信息---------------------*/
 
-  /**
-   * 日志ID，非自增
-   */
+  /** 日志ID，非自增 */
   private Long id;
 
-  /**
-   * 设备编码
-   */
+  /** 设备编码 */
   private String iotId;
 
-  /**
-   * 设备序列号
-   */
+  /** 设备序列号 */
   private String deviceId;
 
-  /**
-   * 第三方设备ID唯一标识符
-   */
-  @Transient
-  private String extDeviceId;
-
-  /**
-   * 产品ID
-   */
+  /** 产品ID */
   private String productKey;
 
-  /**
-   * 设备名称
-   */
+  /** 设备名称 */
   private String deviceName;
 
-  /**
-   * 消息类型
-   */
+  /** 消息类型 */
   private String messageType;
 
-  /**
-   * 公司名称
-   */
-  private String companyNo;
+  /** 指令ID */
+  private String commandId;
 
-  /**
-   * 协议名称
-   */
-  private String protocol;
+  /** 指令状态 */
+  private Integer commandStatus;
 
-  /**
-   * 节点类型
-   */
-  private String deviceNode;
-
-  /**
-   * 设备分类编号
-   */
-  private String classifiedId;
-
-  /**
-   * 组织ID
-   */
-  private String orgId;
-
-  /**
-   * 事件名称
-   */
+  /** 事件名称 */
   private String event;
 
-  /**
-   * 创建人
-   */
-  private String createId;
-
-  /**
-   * 实例名称
-   */
-  private String instance;
-
-  /**
-   * 经纬度
-   */
+  /** 经纬度 */
   private String point;
 
-  /**
-   * 内容
-   */
+  /** 内容 */
   private String content;
 
-  /**
-   * 创建时间
-   */
-  private Long createTime;
+  /** 创建时间 */
+  private LocalDateTime createTime;
 }

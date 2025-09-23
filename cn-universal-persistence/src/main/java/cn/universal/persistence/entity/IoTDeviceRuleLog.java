@@ -29,36 +29,25 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IoTDeviceRuleLog implements Serializable {
 
-  @Id
-  private Long id;
+  @Id private Long id;
 
-  /**
-   * 业务ID
-   */
+  /** 业务ID */
   @Column(name = "c_id")
   private String cId;
 
-  /**
-   * 业务名称
-   */
+  /** 业务名称 */
   @Column(name = "c_name")
   private String cName;
 
-  /**
-   * 执行状态
-   */
+  /** 执行状态 */
   @Column(name = "c_status")
   private Byte cStatus;
 
-  /**
-   * 1-场景联动，2-数据流转
-   */
+  /** 1-场景联动，2-数据流转 */
   @Column(name = "c_type")
   private Byte cType;
 
-  /**
-   * 条件
-   */
+  /** 条件 */
   private String conditions;
 
   @Column(name = "create_time")
