@@ -1,0 +1,18 @@
+# 使用 Python 内置 HTTP 服务器作为最简单的静态文件服务
+FROM python:3.11-slim
+
+# 设置工作目录
+WORKDIR /app
+
+# 复制前端构建文件
+COPY dist/ ./
+
+# 暴露端口
+EXPOSE 80
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:80/health || exit 1
+
+# 启动 Python HTTP 服务器
+CMD ["python", "-m", "http.server", "80"]

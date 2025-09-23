@@ -1,0 +1,168 @@
+// 还原到原始的输入框样式
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-select-selector,
+.ant-picker {
+  border-radius: 2px !important;
+  // border: 1px solid #d9d9d9 !important;
+  transition: all 0.3s ease !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  background: #fff !important;
+
+  &:hover {
+    border-color: #40a9ff !important;
+  }
+
+  &:focus,
+  &-focused {
+    border-color: #1890ff !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+  }
+}
+
+// 输入框容器样式
+.ant-form-item-control-input {
+  .ant-input,
+  .ant-input-affix-wrapper {
+    height: 32px !important;
+    padding: 4px 11px !important;
+  }
+}
+
+// 选择器样式
+.ant-select {
+  .ant-select-selector {
+    height: 32px !important;
+    padding: 4px 11px !important;
+    border-radius: 2px !important;
+
+    .ant-select-selection-item {
+      line-height: 24px !important;
+      font-size: 14px !important;
+    }
+  }
+
+  .ant-select-arrow {
+    color: #bfbfbf !important;
+  }
+}
+
+// 日期选择器样式
+.ant-picker {
+  height: 32px !important;
+  padding: 4px 11px !important;
+  border-radius: 2px !important;
+
+  .ant-picker-input > input {
+    font-size: 14px !important;
+  }
+}
+
+// 搜索区域样式 - 还原到原始状态
+.table-page-search-wrapper {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-bottom: 16px !important;
+
+  .ant-form-inline {
+    .ant-form-item {
+      margin-bottom: 16px !important;
+      margin-right: 16px !important;
+
+      .ant-form-item-label {
+        label {
+          font-size: 14px !important;
+          font-weight: 400 !important;
+          color: #333 !important;
+          line-height: 32px !important;
+        }
+      }
+
+      .ant-form-item-control {
+        .ant-input,
+        .ant-input-affix-wrapper,
+        .ant-select-selector {
+          background: #fff !important;
+          // border: 1px solid #d9d9d9 !important;
+
+          &:hover {
+            border-color: #40a9ff !important;
+          }
+
+          &:focus {
+            border-color: #1890ff !important;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+          }
+        }
+      }
+    }
+  }
+
+  .table-page-search-submitButtons {
+    margin-bottom: 0 !important;
+
+    .ant-btn {
+      margin-right: 8px !important;
+
+      &:last-child {
+        margin-right: 0 !important;
+      }
+    }
+  }
+}
+
+// 表格操作区域样式 - 还原到原始状态
+.table-operations {
+  background: transparent !important;
+  padding: 0 !important;
+  margin-bottom: 16px !important;
+  border: none !important;
+
+  .ant-btn {
+    margin-right: 8px !important;
+
+    &:last-child {
+      margin-right: 0 !important;
+    }
+  }
+}
+
+// 输入框前缀图标样式
+.ant-input-affix-wrapper {
+  .ant-input-prefix {
+    color: #bfbfbf !important;
+    margin-right: 8px !important;
+  }
+
+  .ant-input-suffix {
+    color: #bfbfbf !important;
+    margin-left: 8px !important;
+  }
+}
+
+// 禁用状态样式
+.ant-input[disabled],
+.ant-input-affix-wrapper[disabled],
+.ant-select-disabled .ant-select-selector {
+  background-color: #f5f5f5 !important;
+  border-color: #d9d9d9 !important;
+  color: #bfbfbf !important;
+}
+
+// 错误状态样式
+.ant-input-status-error,
+.ant-input-affix-wrapper-status-error,
+.ant-select-status-error .ant-select-selector {
+  border-color: #ff4d4f !important;
+
+  &:hover {
+    border-color: #ff7875 !important;
+  }
+
+  &:focus {
+    border-color: #ff4d4f !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
+  }
+} 

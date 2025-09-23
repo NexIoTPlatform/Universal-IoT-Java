@@ -1,0 +1,147 @@
+@import "~ant-design-vue/es/style/themes/default.less";
+
+.ant-layout-sider-children {
+  ::-webkit-scrollbar-track {
+    background: hsla(0, 0%, 100%, .15);
+    border-radius: 3px;
+    box-shadow: inset 0 0 5px rgb(37 37 37 / 5%);
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsla(0, 0%, 100%, .2);
+    border-radius: 3px;
+    box-shadow: inset 0 0 5px hsl(0deg 0% 100% / 5%);
+  }
+}
+
+// 菜单头部布局样式
+.menu-header-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 64px;
+  padding: 0 16px;
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    flex: 1;
+
+    .logo {
+      height: 32px;
+      width: auto;
+      margin-right: 12px;
+      object-fit: contain;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .collapse-button-section {
+    flex-shrink: 0;
+    margin-left: 12px;
+
+    .collapse-trigger {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      &:focus {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .anticon {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// 收起状态下的菜单头部样式
+.ant-layout-sider-collapsed {
+  .menu-header-wrapper {
+    .logo-section {
+      h1 {
+        display: none;
+      }
+
+      .logo {
+        margin-right: 0;
+      }
+    }
+
+    .collapse-button-section {
+      margin-left: 8px;
+    }
+  }
+}
+
+// 响应式适配
+@media (max-width: 768px) {
+  .menu-header-wrapper {
+    padding: 0 12px;
+
+    .logo-section {
+      .logo {
+        height: 28px;
+        margin-right: 8px;
+      }
+
+      h1 {
+        font-size: 16px;
+      }
+    }
+  }
+}
+
+// 移除内容区域的额外padding，因为现在使用非固定布局
+
+// 头部欢迎信息样式（保留用于兼容）
+.header-welcome-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 24px;
+
+  .welcome-text {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2129;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+
+  .welcome-time {
+    font-size: 13px;
+    color: #86909c;
+    line-height: 1.2;
+
+    .highlight {
+      color: #3370ff;
+      font-weight: 600;
+    }
+  }
+}

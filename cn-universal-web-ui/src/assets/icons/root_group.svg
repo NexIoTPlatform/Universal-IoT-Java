@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Generator: Sketch 60 (88103) - https://sketch.com -->
+  <title>根分组</title>
+  <desc>Created with Sketch.</desc>
+  <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <g id="物联网平台_设备_分组_分组概览_20200106" transform="translate(-322.000000, -140.000000)">
+      <g id="编组-4" transform="translate(260.000000, 112.000000)">
+        <g id="根分组" transform="translate(62.000000, 28.000000)">
+          <rect id="矩形" x="0" y="0" width="16" height="16"></rect>
+          <path
+            d="M16,0 L16,6 L10,6 L10,3 L1,3 L1,12 L10,12 L10,10 L16,10 L16,16 L10,16 L10,13 L0,13 L0,2 L10,2 L10,0 L16,0 Z M6,5 L6,7 L8,7 L8,8 L5.999,8 L6,10 L5,10 L4.999,8 L3,8 L3,7 L5,7 L5,5 L6,5 Z M14,2 L12,2 L12,4 L14,4 L14,2 Z"
+            id="形状结合" fill="#575D6C"></path>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
