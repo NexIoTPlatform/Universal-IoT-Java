@@ -157,7 +157,8 @@ cd cn-universal-web & ./bin/restart.sh
 
 ## 📈 正在推进
 
-- **🔄 小程序开发**：付费图鸟定制UI，具备指令控制、属性、告警查看，轻量化、多管理员
+- **🔄 小程序开发**：正在定制UI，具备指令控制、属性、告警查看，轻量化
+- **🔄 扩展推送**：MQTT / RocketMQ / DB / Kafka
 - **🔄 其他**：也可以提一些意见
 
 ## 💡 最佳实践
@@ -179,32 +180,28 @@ cd cn-universal-web & ./bin/restart.sh
 #### 🌊 NB水浸传感器系列
 
 1. **【手把手实战：水浸传感器开箱：初见与硬件解析】**
-   - 📺 [B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-   - 📝 内容：设备开箱、硬件介绍、基本功能测试
+    - 📺 [B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：设备开箱、硬件介绍、基本功能测试
 
 2. **【手把手实战：NexIoT接入Ctwing参数配置】**
-   - 📺 [B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-   - 📝 内容：天翼物联平台参数配置、设备注册流程
+    - 📺 [B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：天翼物联平台参数配置、设备注册流程
 
 3. **【手把手实战：NB水浸传感器CTWing接入全流程】**
-   - 📺 [B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-   - 📝 内容：完整的设备接入流程，从配置到数据上报
+    - 📺 [B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：完整的设备接入流程，从配置到数据上报
 
 ### 🔌 TCP直连接入教程
 
 #### ⚡ DL/T64电表系列
 
-1. **【开源】手把手实战：DL/T64电表TCP直连接入】**
-   - 📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-   - 📝 内容：TCP协议解析、设备直连配置、数据解析
+1. **【【开源】手把手实战：DL/T64电表TCP直连接入】**
+    - 📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：TCP协议解析、设备直连配置、数据解析
 
-2. **【开源】手把手实战：产品创建与SNI解读】**
-   - 📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-   - 📝 内容：产品创建流程、SNI设备标识解析、协议调试
-
-3. **【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
-   - 📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-   - 📝 内容：数据流介绍、调试IDE的编写和调试、645电表的编写
+2. **【【开源】手把手实战：产品创建与SNI解读】**
+    - 📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：产品创建流程、SNI设备标识解析、协议调试
 
 
 ### 🎯 更多教程
@@ -254,7 +251,7 @@ cd cn-universal-web & ./bin/restart.sh
 
 有任何问题加入QQ群
 
-| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) |
+| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.jpg) |
 
 ## 🤝 贡献指南
 
@@ -283,9 +280,9 @@ cd cn-universal-web & ./bin/restart.sh
    ```
 
 4. **创建 Pull Request**
-   - 在 Gitee 上创建 Pull Request
-   - 详细描述你的修改内容
-   - 等待代码审查
+    - 在 Gitee 上创建 Pull Request
+    - 详细描述你的修改内容
+    - 等待代码审查
 
 ### 📝 代码规范
 
@@ -319,21 +316,21 @@ cd cn-universal-web & ./bin/restart.sh
 ### 📜 授权说明
 
 1. **授权用户可无限期在其内部使用**
-   - 企业授权用户不含分公司、子公司及第三方公司
-   - 个人授权用户仅可个人使用，不可用于在职公司或任何第三方
+    - 企业授权用户不含分公司、子公司及第三方公司
+    - 个人授权用户仅可个人使用，不可用于在职公司或任何第三方
 
 2. **授权用户不可向第三方发行或转让授权源码**
-   - 无论有偿或无偿
-   - 不可申请包含本项目的授权源码的软件著作权
-   - 用户可申请自主二次研发部分源码的软件著作权
+    - 无论有偿或无偿
+    - 不可申请包含本项目的授权源码的软件著作权
+    - 用户可申请自主二次研发部分源码的软件著作权
 
 3. **授权用户仅可通过项目形式进行源码的二次开发**
-   - 完成的定制化软件必须加密打包后才可交付客户
-   - 如需交付项目源码，必须为客户购买对应的商业授权
+    - 完成的定制化软件必须加密打包后才可交付客户
+    - 如需交付项目源码，必须为客户购买对应的商业授权
 
 ### 🔒 开源和商业
 
-开源版本暂不包含 **TCP**、**天翼物联ctaiot** 模块。可自行二次开发扩展，商用使用需获取授权。
+开源版本暂不包含 **TCP**、**天翼物联ctaiot** 模块。可自行二次开发扩展，商用授权需获取授权。
 
 ### 🙏 致谢
 
