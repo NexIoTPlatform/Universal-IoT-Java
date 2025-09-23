@@ -114,7 +114,12 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>cn.universal.iot</groupId>
+      <artifactId>cn-universal-notice</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
 </project>
