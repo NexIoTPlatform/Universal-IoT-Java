@@ -251,7 +251,7 @@ cd cn-universal-web & ./bin/restart.sh
 
 有任何问题加入QQ群
 
-| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.jpg) |
+| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.png) |
 
 ## 🤝 贡献指南
 
