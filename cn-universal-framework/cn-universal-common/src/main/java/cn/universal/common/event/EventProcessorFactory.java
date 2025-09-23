@@ -1,8 +1,11 @@
 package cn.universal.common.event;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.universal.common.event.processer.FenceEventProcessor;
 import cn.universal.common.event.processer.ProductConfigProcessor;
 import cn.universal.common.event.processer.TcpDownProcessor;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,10 +28,6 @@ public class EventProcessorFactory {
   // TCP下行指令处理器
   @Autowired(required = false)
   private TcpDownProcessor tcpDownProcessor;
-
-  // 产品配置处理器
-  @Autowired(required = false)
-  private ProductConfigProcessor productConfigProcessor;
 
   /** 处理电子围栏事件 */
   public void handleFenceEvent(EventMessage message) {
@@ -58,27 +57,33 @@ public class EventProcessorFactory {
 
   /** 处理产品配置更新事件 */
   public void handleProductConfigUpdated(EventMessage message) {
-    if (productConfigProcessor != null) {
-      try {
-        productConfigProcessor.handleProductConfigUpdated(message);
-      } catch (Exception e) {
-        log.error("[事件处理器] 产品配置更新处理失败", e);
+    try {
+      Map<String, ProductConfigProcessor> beans =
+          SpringUtil.getBeansOfType(ProductConfigProcessor.class);
+      if (MapUtil.isNotEmpty(beans)) {
+        beans.forEach(
+            (k, v) -> {
+              v.handleProductConfigUpdated(message);
+            });
       }
-    } else {
-      log.warn("[事件处理器] ProductConfigProcessor未找到，跳过产品配置更新处理");
+    } catch (Exception e) {
+      log.error("[事件处理器] 产品配置更新处理失败", e);
     }
   }
 
   /** 处理产品配置更新事件 */
   public void handleProtocolUpdated(EventMessage message) {
-    if (productConfigProcessor != null) {
-      try {
-        productConfigProcessor.handleProtocolUpdated(message);
-      } catch (Exception e) {
-        log.error("[事件处理器] 产品协议更新处理失败", e);
+    try {
+      Map<String, ProductConfigProcessor> beans =
+          SpringUtil.getBeansOfType(ProductConfigProcessor.class);
+      if (MapUtil.isNotEmpty(beans)) {
+        beans.forEach(
+            (k, v) -> {
+              v.handleProductConfigUpdated(message);
+            });
       }
-    } else {
-      log.warn("[事件处理器] ProductConfigProcessor未找到，产品协议更新处理失败");
+    } catch (Exception e) {
+      log.error("[事件处理器] 产品协议更新处理失败", e);
     }
   }
 }

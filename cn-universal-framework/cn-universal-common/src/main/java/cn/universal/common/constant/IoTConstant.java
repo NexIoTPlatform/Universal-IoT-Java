@@ -23,7 +23,8 @@ import java.util.stream.Stream;
 
 /** IoT常量 */
 public interface IoTConstant {
-
+  /*发送直通第三方平台*/
+  String DOWN_TO_THIRD_PLATFORM = "downToThirdPlatform";
   String CURRENT_INSTANCE_ID = "instanceId";
   public final String CERT_DEFAULT_KEY = "default-tcp";
   public final String HTTP_UP_BLACK_LIST = "httpUpBlackList";
@@ -126,6 +127,7 @@ public interface IoTConstant {
 
   public static final String TRACE_ID = "traceId";
 
+
   static final String defaultMetadata =
       """
       {"tags":[],"events":[{"id":"online","name":"上线","valueType":{"type":"string"}},{"id":"offline","name":"下线","valueType":{"type":"string"}}],"functions":[],"properties":[]}""";
@@ -134,9 +136,11 @@ public interface IoTConstant {
     ctaiot,
     ezviz,
     onenet,
-    lechen,
+    imoulife,
     tcp,
-    sniTcp
+    udp,
+    mqtt,
+    http
   }
 
   /** 非设备真实上报事件 */
@@ -203,8 +207,109 @@ public interface IoTConstant {
     }
   }
 
-  /** 下行指令 */
+  /** 下行指令 - 重新设计为更通俗易懂的指令 */
   enum DownCmd {
+    // 设备管理指令
+    DEVICE_ADD("设备添加"),
+    DEVICE_DELETE("设备删除"),
+    DEVICE_UPDATE("设备更新"),
+    DEVICE_INFO("设备信息查询"),
+    DEVICE_STATUS("设备状态查询"),
+    DEVICE_ONLINE_CHECK("设备在线检查"),
+    
+    // 摄像头控制指令
+    CAMERA_TURN("摄像头转动"),
+    CAMERA_PTZ_CONTROL("云台控制"),
+    CAMERA_SNAPSHOT("摄像头截图"),
+    CAMERA_LIVE_STREAM("摄像头直播"),
+    CAMERA_PLAYBACK("摄像头回放"),
+    CAMERA_RECORD_START("开始录像"),
+    CAMERA_RECORD_STOP("停止录像"),
+    CAMERA_FLIP_SET("画面翻转设置"),
+    
+    // 存储相关物模型函数
+    STORAGE_LOCAL_STREAM_SET_FUNC("storageLocalStreamSet"),
+    STORAGE_LOCAL_STREAM_QUERY_FUNC("storageLocalStreamQuery"),
+    STORAGE_LOCAL_PLAN_SET_FUNC("storageLocalPlanSet"),
+    STORAGE_LOCAL_PLAN_QUERY_FUNC("storageLocalPlanQuery"),
+    STORAGE_CLOUD_RECORDS_QUERY_FUNC("storageCloudRecordsQuery"),
+    STORAGE_CLOUD_UNUSED_LIST_FUNC("storageCloudUnusedList"),
+    STORAGE_CLOUD_CALL_COUNT_QUERY_FUNC("storageCloudCallCountQuery"),
+    STORAGE_CLOUD_SERVICE_SET_FUNC("storageCloudServiceSet"),
+    STORAGE_CLOUD_LIST_QUERY_FUNC("storageCloudListQuery"),
+    STORAGE_CLOUD_UNBIND_FUNC("storageCloudUnbind"),
+    STORAGE_CLOUD_OPEN_FUNC("storageCloudOpen"),
+    STORAGE_FREE_CLOUD_SET_FUNC("storageFreeCloudSet"),
+    STORAGE_SDCARD_FORMAT_FUNC("storageSdcardFormat"),
+    STORAGE_SDCARD_INFO_GET_FUNC("storageSdcardInfoGet"),
+    STORAGE_SDCARD_STATUS_GET_FUNC("storageSdcardStatusGet"),
+    STORAGE_CLOUD_VIDEO_COUNT_QUERY_FUNC("storageCloudVideoCountQuery"),
+    STORAGE_LOCAL_VIDEO_COUNT_QUERY_FUNC("storageLocalVideoCountQuery"),
+    VIDEO_DOWNLOAD_FUNC("videoDownload"),
+    
+    // 设备相关物模型函数
+    DEVICE_SOUND_VOLUME_GET_FUNC("deviceSoundVolumeGet"),
+    DEVICE_SOUND_VOLUME_SET_FUNC("deviceSoundVolumeSet"),
+    DEVICE_CAMERA_STATUS_GET_FUNC("deviceCameraStatusGet"),
+    DEVICE_WIFI_SET_FUNC("deviceWifiSet"),
+    DEVICE_WIFI_SCAN_FUNC("deviceWifiScan"),
+    DEVICE_UPGRADE_FUNC("deviceUpgrade"),
+    DEVICE_VERSION_QUERY_FUNC("deviceVersionQuery"),
+    DEVICE_CLOUD_INFO_GET_FUNC("deviceCloudInfoGet"),
+    DEVICE_ENABLE_SET_FUNC("deviceEnableSet"),
+    DEVICE_RESTART_FUNC("deviceRestart"),
+    
+    // 报警相关物模型函数
+    ALARM_MESSAGE_QUERY_FUNC("alarmMessageQuery"),
+    
+    // 存储管理指令
+    STORAGE_INFO("存储信息查询"),
+    STORAGE_FORMAT("存储格式化"),
+    STORAGE_CLOUD_ENABLE("云存储开启"),
+    STORAGE_CLOUD_DISABLE("云存储关闭"),
+    STORAGE_LOCAL_ENABLE("本地存储开启"),
+    STORAGE_LOCAL_DISABLE("本地存储关闭"),
+    STORAGE_LOCAL_STREAM_SET("设置本地录像视频流"),
+    STORAGE_LOCAL_STREAM_QUERY("查询本地录像视频流"),
+    STORAGE_LOCAL_PLAN_SET("设置本地录像计划"),
+    STORAGE_LOCAL_PLAN_QUERY("查询本地录像计划"),
+    STORAGE_CLOUD_RECORDS_QUERY("查询云录像片段"),
+    STORAGE_CLOUD_UNUSED_LIST("获取未启用的云存储服务"),
+    STORAGE_CLOUD_CALL_COUNT_QUERY("查询云存储开通接口剩余调用次数"),
+    STORAGE_CLOUD_SERVICE_SET("设置云存储服务开关"),
+    STORAGE_CLOUD_LIST_QUERY("查询设备云存储服务"),
+    STORAGE_CLOUD_UNBIND("解绑设备云存储"),
+    STORAGE_CLOUD_OPEN("开通设备云存储"),
+    STORAGE_FREE_CLOUD_SET("设置免费云存储服务"),
+    STORAGE_SDCARD_FORMAT("格式化SD卡"),
+    STORAGE_SDCARD_INFO_GET("获取SD卡信息"),
+    STORAGE_SDCARD_STATUS_GET("获取SD卡状态"),
+    STORAGE_CLOUD_VIDEO_COUNT_QUERY("查询云录像数量"),
+    STORAGE_LOCAL_VIDEO_COUNT_QUERY("查询本地录像数量"),
+    VIDEO_DOWNLOAD("下载录像"),
+    
+    // 设备设置指令
+    DEVICE_RESTART("设备重启"),
+    DEVICE_UPGRADE("设备升级"),
+    DEVICE_WIFI_SET("WiFi设置"),
+    DEVICE_WIFI_SCAN("WiFi扫描"),
+    DEVICE_SOUND_VOLUME_GET("获取设备音量"),
+    DEVICE_SOUND_VOLUME_SET("设置设备音量"),
+    DEVICE_CAMERA_STATUS_GET("获取摄像头状态"),
+    DEVICE_VERSION_QUERY("查询设备版本信息"),
+    DEVICE_CLOUD_INFO_GET("获取设备云存储信息"),
+    DEVICE_ENABLE_SET("设置设备使能开关"),
+    
+    // 报警管理指令
+    ALARM_MESSAGE_QUERY("查询报警消息"),
+    
+    // 产品管理指令
+    PRODUCT_ADD("产品添加"),
+    PRODUCT_UPDATE("产品更新"),
+    PRODUCT_DELETE("产品删除"),
+    PRODUCT_PUBLISH("产品发布"),
+    
+    // 兼容旧版本指令（保留）
     DEV_ADD,
     DEV_ADDS,
     DEV_FUNCTION,
@@ -214,7 +319,6 @@ public interface IoTConstant {
     MANUAL_CAPTURE,
     DEV_CONTROLLING,
     DEV_MONITOR_PLAY,
-
     DEV_ELECTRIC_QUANTITY,
     DEV_DOOR_KEYS,
     DEV_OPENDOOR_RECORD,
@@ -264,7 +368,6 @@ public interface IoTConstant {
     FRAME_REVERSE_STATUS,
     SOUND_VOLUME_SIZE_GET,
     CAMERA_STATUS,
-    CAMERA_SNAPSHOT,
     CONTROL_DEVICE_WIFI,
     WIFI_AROUND,
     UPGRADE_DEVICE,
@@ -277,7 +380,15 @@ public interface IoTConstant {
     ALARM_MESSAGE,
     DEV_MONITOR_CHECK_ONLINE;
 
-    private DownCmd() {}
+    private String description;
+
+    DownCmd() {
+      this.description = super.toString().toLowerCase();
+    }
+
+    DownCmd(String description) {
+      this.description = description;
+    }
 
     @JsonCreator
     public static DownCmd find(String value) {
@@ -290,6 +401,10 @@ public interface IoTConstant {
     @JsonValue
     public String getValue() {
       return super.toString().toLowerCase();
+    }
+
+    public String getDescription() {
+      return description;
     }
   }
 

@@ -13,6 +13,7 @@
 package cn.universal.ossm.oss.enumd;
 
 import cn.universal.ossm.oss.service.impl.AliyunCloudStorageServiceImpl;
+import cn.universal.ossm.oss.service.impl.QiniuCloudStorageServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,7 +23,7 @@ import lombok.Getter;
 public enum CloudServiceEnumd {
 
   /** 七牛云 */
-  //  QINIU("qiniu", QiniuCloudStorageServiceImpl.class),
+  QINIU("qiniu", QiniuCloudStorageServiceImpl.class),
 
   /** 阿里云 */
   ALIYUN("aliyun", AliyunCloudStorageServiceImpl.class);

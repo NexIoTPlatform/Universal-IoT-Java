@@ -42,7 +42,7 @@ public class RedisEventPublisher implements EventPublisher {
       String message = JSONUtil.toJsonStr(eventMessage);
       redisTemplate.convertAndSend(topic, message);
 
-      log.debug("[Redis事件发布] 发布事件到主题: {}, 消息: {}", topic, message);
+      log.info("[Redis事件发布] 发布事件到主题: {}, 消息: {}", topic, message);
     } catch (Exception e) {
       log.error("[Redis事件发布] 发布事件失败: topic={}, event={}", topic, event, e);
     }

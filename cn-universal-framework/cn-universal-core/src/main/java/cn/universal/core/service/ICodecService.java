@@ -68,6 +68,15 @@ public interface ICodecService {
   String encode(String productKey, String payload);
 
   /**
+   * 编码
+   *
+   * @param productKey 产品Key
+   * @param payload 原始数据
+   * @return 编码后的字符串
+   */
+  String encode(String productKey, String payload, Object context);
+
+  /**
    * 预解码
    *
    * @param productKey 产品Key
