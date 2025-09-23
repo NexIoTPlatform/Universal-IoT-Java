@@ -90,6 +90,18 @@ public class IoTDeviceController extends BaseController {
     return getDataTable(list);
   }
 
+  /** 新：按第三方平台过滤的设备列表（用于萤石/乐橙） */
+  @GetMapping("/listByPlatform")
+  public TableDataInfo listByPlatform(
+      IoTDevice ioTDevice,
+      @RequestParam(value = "thirdPlatform", required = false) String thirdPlatform) {
+    IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+    startPage();
+    List<IoTDevice> list =
+        iIotDeviceService.selectDevInstanceListByPlatform(ioTDevice, iotUser, thirdPlatform);
+    return getDataTable(list);
+  }
+
   /** 查询分组未绑定设备列表 */
   @GetMapping("/list/{groupId}")
   public TableDataInfo list(@PathVariable("groupId") String groupId, IoTDevice ioTDevice) {
@@ -152,27 +164,18 @@ public class IoTDeviceController extends BaseController {
 
   /** 获取设备详细信息 */
   @GetMapping(value = "/{id}")
-  public AjaxResult getInfo(@PathVariable("id") String id) {
-
+  public AjaxResult getIotDeviceInfo(@PathVariable("id") String id) {
     IoTDevice ioTDevice = iIotDeviceService.selectDevInstanceById(id);
-    //    if (ObjectUtil.isEmpty(ioTDevice)) {
-    //      throw new IoTException("设备不存在");
-    //    }
-    //    IoTUser iotUser = checkParent(SecurityUtils.getUnionId());
-    //    if (!iotUser.isAdmin() && !ioTDevice.getCreatorId()
-    //        .equals(iotUser.getUnionId())) {
-    //      throw new IoTException("你无权操作");
-    //    }
-    // 是否有编解码插件
     int count = ioTDeviceProtocolService.countProtocol(ioTDevice.getProductKey());
     IoTDeviceBO ioTDeviceBO = new IoTDeviceBO();
     BeanUtil.copyProperties(ioTDevice, ioTDeviceBO);
     // 查询网关产品信息
     if (StrUtil.isNotBlank(ioTDeviceBO.getGwProductKey())) {
       IoTDevice parentDevice =
-          iIotDeviceService.selectDeviceByDeviceId(ioTDevice.getGwProductKey());
+          iIotDeviceService.selectIoTDevice(
+              ioTDeviceBO.getGwProductKey(), ioTDevice.getExtDeviceId());
       if (ObjectUtil.isNotNull(parentDevice)) {
-        ioTDeviceBO.setParentName(
+        ioTDeviceBO.setGwDeviceInfo(
             parentDevice.getDeviceId() + "(" + parentDevice.getDeviceName() + ")");
       }
     }

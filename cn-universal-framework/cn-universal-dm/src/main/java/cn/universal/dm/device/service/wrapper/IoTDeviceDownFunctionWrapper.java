@@ -59,12 +59,12 @@ public class IoTDeviceDownFunctionWrapper implements IoTDownWrapper {
     if (function.startsWith("set") && ObjectUtil.isNotEmpty(data)) {
       // TODO: 判断物模型属性是否有可读写的
 
-      doShadow(product, ioTDevice, data);
+      doShadow(ioTDevice, data);
     }
     return null;
   }
 
-  private void doShadow(IoTProduct product, IoTDevice ioTDevice, JSONObject data) {
+  private void doShadow(IoTDevice ioTDevice, JSONObject data) {
     IoTDeviceShadow ioTDeviceShadow =
         IoTDeviceShadow.builder()
             .deviceId(ioTDevice.getDeviceId())
@@ -77,10 +77,11 @@ public class IoTDeviceDownFunctionWrapper implements IoTDownWrapper {
         stringRedisTemplate
             .opsForValue()
             .setIfAbsent("doCreateShadow:" + ioTDevice.getIotId(), "1", 10, TimeUnit.MINUTES);
-    if (ObjectUtil.isNull(ioTDeviceShadow) && Boolean.TRUE.equals(flag)) {
+    if (ObjectUtil.isNull(ioTDeviceShadow) && flag) {
       ioTDeviceShadow =
           IoTDeviceShadow.builder()
               .iotId(ioTDevice.getIotId())
+              .productKey(ioTDevice.getProductKey())
               .extDeviceId(ioTDevice.getExtDeviceId())
               .deviceId(ioTDevice.getDeviceId())
               .activeTime(new Date())

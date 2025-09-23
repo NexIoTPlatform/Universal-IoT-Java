@@ -329,7 +329,7 @@ public class NetworkController extends BaseController {
   }
 
   /** 查询绑定指定星纵网关的设备 */
-  @GetMapping("/milesight/list")
+  @GetMapping("/xz/gateway/list")
   public TableDataInfo queryMileSightList(NetworkBO bo) {
     startPage();
     // 设置用户权限过滤
@@ -339,7 +339,7 @@ public class NetworkController extends BaseController {
   }
 
   /** 新增设备 */
-  @PostMapping("/milesight/add")
+  @PostMapping("/xz/gateway/add")
   @Log(title = "新增设备", businessType = BusinessType.INSERT)
   public R add(@RequestBody IoTDeviceBO devInstancebo) {
     // 设置创建用户
@@ -356,7 +356,7 @@ public class NetworkController extends BaseController {
   }
 
   /** 删除设备 */
-  @DeleteMapping("/milesight/{ids}")
+  @DeleteMapping("/xz/gateway/{ids}")
   @Log(title = "删除设备", businessType = BusinessType.DELETE)
   public R remove(@PathVariable String[] ids) {
     // 校验用户权限
@@ -385,7 +385,6 @@ public class NetworkController extends BaseController {
   public R reloadTcpClient(@PathVariable("applicationId") String applicationId) {
     // 校验用户权限 - 需要根据applicationId获取相关的信息进行权限校验
     // 这里可能需要额外的业务逻辑来实现权限校验
-    iNetworkService.reloadTcpClient(applicationId);
     return R.ok();
   }
 

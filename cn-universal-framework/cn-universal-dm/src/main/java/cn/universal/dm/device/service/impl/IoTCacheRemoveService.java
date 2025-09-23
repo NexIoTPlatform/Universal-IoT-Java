@@ -43,6 +43,7 @@ public class IoTCacheRemoveService {
         "iot_dev_shadow_bo",
         "iot_dev_action",
         "iot_dev_product_list",
+        "selectDevProductV4List",
         "selectDevCount"
       },
       allEntries = true)

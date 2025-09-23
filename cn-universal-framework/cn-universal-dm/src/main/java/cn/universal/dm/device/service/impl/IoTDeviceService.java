@@ -43,35 +43,33 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-
+/**
+ * 设备和产品鉴权
+ *
+ * @version 1.0 @Author Aleo
+ * @since 2025/8/12 16:10
+ */
 @Component
 @Slf4j
 public class IoTDeviceService {
 
-  @Resource
-  private SupportMapAreasMapper supportMapAreasMapper;
-  @Resource
-  private IoTDeviceMapper ioTDeviceMapper;
+  @Resource private SupportMapAreasMapper supportMapAreasMapper;
+  @Resource private IoTDeviceMapper ioTDeviceMapper;
 
-  @Resource
-  private IoTDeviceTagsMapper ioTDeviceTagsMapper;
+  @Resource private IoTDeviceTagsMapper ioTDeviceTagsMapper;
 
-  @Resource
-  private IoTDeviceShadowMapper ioTDeviceShadowMapper;
+  @Resource private IoTDeviceShadowMapper ioTDeviceShadowMapper;
 
-  @Resource
-  private IoTDeviceSubscribeMapper ioTDeviceSubscribeMapper;
-  @Resource
-  private IoTUserApplicationMapper iotUserApplicationMapper;
-  @Resource
-  private IoTDeviceFenceRelMapper ioTDeviceFenceRelMapper;
+  @Resource private IoTDeviceSubscribeMapper ioTDeviceSubscribeMapper;
+  @Resource private IoTUserApplicationMapper iotUserApplicationMapper;
+  @Resource private IoTDeviceFenceRelMapper ioTDeviceFenceRelMapper;
 
-  @Resource
-  private IoTCacheRemoveService iotCacheRemoveService;
+  @Resource private IoTCacheRemoveService iotCacheRemoveService;
 
   public Page<IoTDeviceVO> apiDeviceList(IoTAPIQuery iotAPIQuery) {
     Page<IoTDeviceVO> page = PageHelper.startPage(iotAPIQuery.getPage(), iotAPIQuery.getSize());
@@ -79,12 +77,21 @@ public class IoTDeviceService {
     return page;
   }
 
-  /**
-   * 设备绑定应用 对外API
-   */
+  /** 设备绑定应用 对外API */
+  @CacheEvict(
+      cacheNames = {
+          "iot_dev_instance_bo",
+          "iot_dev_metadata_bo",
+          "iot_dev_shadow_bo",
+          "iot_dev_action",
+          "selectDevCount",
+          "iot_dev_product_list",
+          "iot_product_device"
+      },
+      allEntries = true)
   public int apiAppBind(String appid, String iotId) {
-    IoTUserApplication iotUserApplication = iotUserApplicationMapper.selectIotUserApplicationByAppId(
-        appid);
+    IoTUserApplication iotUserApplication =
+        iotUserApplicationMapper.selectIotUserApplicationByAppId(appid);
     if (iotUserApplication == null) {
       throw new IoTException("应用不存在");
     }
@@ -92,9 +99,18 @@ public class IoTDeviceService {
     return i;
   }
 
-  /**
-   * 设备解绑应用 对外API
-   */
+  /** 设备解绑应用 对外API */
+  @CacheEvict(
+      cacheNames = {
+          "iot_dev_instance_bo",
+          "iot_dev_metadata_bo",
+          "iot_dev_shadow_bo",
+          "iot_dev_action",
+          "selectDevCount",
+          "iot_dev_product_list",
+          "iot_product_device"
+      },
+      allEntries = true)
   public int apiAppUnBind(String iotId) {
     if (StrUtil.isBlank(iotId)) {
       throw new IoTException("设备编号不能为空");
@@ -102,16 +118,17 @@ public class IoTDeviceService {
     return ioTDeviceMapper.apiUnBindApp(iotId);
   }
 
-  /**
-   * 更新设备信息
-   */
+  /** 更新设备信息 */
   public Map<String, Object> apiUpdateDevInfo(IoTAPIQuery iotAPIQuery) {
-    IoTDevice instance = IoTDevice.builder().creatorId(iotAPIQuery.getIotUnionId())
-        .iotId(iotAPIQuery.getIotId()).build();
+    IoTDevice instance =
+        IoTDevice.builder()
+            .creatorId(iotAPIQuery.getIotUnionId())
+            .iotId(iotAPIQuery.getIotId())
+            .build();
     instance = ioTDeviceMapper.selectOne(instance);
     if (instance == null) {
-      throw new IoTException(IoTErrorCode.DEV_NOT_FIND.getName(),
-          IoTErrorCode.DEV_NOT_FIND.getCode());
+      throw new IoTException(
+          IoTErrorCode.DEV_NOT_FIND.getName(), IoTErrorCode.DEV_NOT_FIND.getCode());
     }
     if (StrUtil.isNotBlank(iotAPIQuery.getDeviceName())) {
       instance.setDeviceName(iotAPIQuery.getDeviceName());
@@ -119,18 +136,18 @@ public class IoTDeviceService {
     if (StrUtil.isNotBlank(iotAPIQuery.getDetail())) {
       instance.setDetail(iotAPIQuery.getDetail());
     }
-    if (StrUtil.isNotBlank(iotAPIQuery.getLatitude()) && StrUtil.isNotBlank(
-        iotAPIQuery.getLongitude())) {
+    if (StrUtil.isNotBlank(iotAPIQuery.getLatitude())
+        && StrUtil.isNotBlank(iotAPIQuery.getLongitude())) {
 
       instance.setCoordinate(
           StrUtil.join(",", iotAPIQuery.getLongitude(), iotAPIQuery.getLatitude()));
 
       // 更新设备所属经纬度
-      SupportMapAreas supportMapAreas = supportMapAreasMapper.selectMapAreas(
-          iotAPIQuery.getLongitude(), iotAPIQuery.getLatitude());
+      SupportMapAreas supportMapAreas =
+          supportMapAreasMapper.selectMapAreas(
+              iotAPIQuery.getLongitude(), iotAPIQuery.getLatitude());
       if (supportMapAreas == null) {
-        log.info("查询区域id为空,lot={},lat={}", iotAPIQuery.getLongitude(),
-            iotAPIQuery.getLatitude());
+        log.info("查询区域id为空,lot={},lat={}", iotAPIQuery.getLongitude(), iotAPIQuery.getLatitude());
       } else {
         instance.setAreasId(supportMapAreas.getId());
       }
@@ -144,20 +161,31 @@ public class IoTDeviceService {
     return result;
   }
 
-  @Cacheable(cacheNames = "selectDevCount", unless = "#result == null", keyGenerator = "redisKeyGenerate")
+  @Cacheable(
+      cacheNames = "selectDevCount",
+      unless = "#result == null",
+      keyGenerator = "redisKeyGenerate")
   public boolean selectDevCount(IoTAPIQuery iotAPIQuery) {
     if (iotAPIQuery == null) {
       throw new IoTException("参数不能为空");
     }
-    IoTDevice instance = IoTDevice.builder().creatorId(iotAPIQuery.getIotUnionId())
-        .deviceId(iotAPIQuery.getDeviceId()).application(iotAPIQuery.getApplicationId())
-        .productKey(iotAPIQuery.getProductKey()).iotId(iotAPIQuery.getIotId()).build();
+    IoTDevice instance =
+        IoTDevice.builder()
+            .creatorId(iotAPIQuery.getIotUnionId())
+            .deviceId(iotAPIQuery.getDeviceId())
+            .application(iotAPIQuery.getApplicationId())
+            .productKey(iotAPIQuery.getProductKey())
+            .iotId(iotAPIQuery.getIotId())
+            .build();
 
     int count = ioTDeviceMapper.selectCount(instance);
     return count > 0;
   }
 
-  @Cacheable(cacheNames = "iot_dev_action", unless = "#result == null", keyGenerator = "redisKeyGenerate")
+  @Cacheable(
+      cacheNames = "iot_dev_action",
+      unless = "#result == null",
+      keyGenerator = "redisKeyGenerate")
   public IoTDeviceDTO lifeCycleDevInstance(IoTDeviceQuery query) {
     if (query == null || query.emptyParams()) {
       log.warn("no query condition");
@@ -177,19 +205,24 @@ public class IoTDeviceService {
    *
    * <p>productKey 产品唯一编号
    */
-  @Cacheable(cacheNames = "iot_dev_instance_bo", unless = "#result == null", keyGenerator = "redisKeyGenerate")
+  @Cacheable(
+      cacheNames = "iot_dev_instance_bo",
+      unless = "#result == null",
+      keyGenerator = "redisKeyGenerate")
   public IoTDeviceDTO selectDevInstanceBO(Map<String, Object> map) {
     if (map == null || map.isEmpty()) {
       throw new IoTException("deviceId can not be null");
     }
     IoTDeviceDTO ioTDeviceDTO = ioTDeviceMapper.selectIoTDeviceBO(map);
-    if (ioTDeviceDTO != null) {
-    }
+    if (ioTDeviceDTO != null) {}
 
     return ioTDeviceDTO;
   }
 
-  @MultiLevelCacheable(cacheNames = "apiIoTDeviceVOInfo", unless = "#result == null", keyGenerator = "redisKeyGenerate")
+  @MultiLevelCacheable(
+      cacheNames = "apiIoTDeviceVOInfo",
+      unless = "#result == null",
+      keyGenerator = "redisKeyGenerate")
   public IoTDeviceVO apiIoTDeviceVOInfo(IoTAPIQuery query) {
     IoTDeviceVO ioTDeviceVO = ioTDeviceMapper.apiDeviceInfo(query);
     return ioTDeviceVO;
@@ -221,8 +254,10 @@ public class IoTDeviceService {
    *
    * <p>productKey 产品唯一编号
    */
-  @Cacheable(cacheNames = "iot_dev_instance_bo", unless = "#result == null", key =
-      "'selectDevInstanceBO" + ":'+#productKey+#deviceId")
+  @Cacheable(
+      cacheNames = "iot_dev_instance_bo",
+      unless = "#result == null",
+      key = "'selectDevInstanceBO" + ":'+#productKey+#deviceId")
   public IoTDeviceDTO selectDevInstanceBO(String productKey, String deviceId) {
     if (StrUtil.isEmpty(productKey) || StrUtil.isEmpty(deviceId)) {
       throw new IoTException("productKey or deviceId can not be null");
@@ -237,7 +272,10 @@ public class IoTDeviceService {
     return null;
   }
 
-  @Cacheable(cacheNames = "iot_dev_instance_bo", unless = "#result == null", key = "''+#productKey+#deviceId")
+  @Cacheable(
+      cacheNames = "iot_dev_instance_bo",
+      unless = "#result == null",
+      key = "''+#productKey+#deviceId")
   public IoTDevice selectDevInstance(String productKey, String deviceId) {
     if (StrUtil.isBlank(productKey) || StrUtil.isBlank(deviceId)) {
       return null;
@@ -267,8 +305,9 @@ public class IoTDeviceService {
     if (StrUtil.isBlank(iotId)) {
       throw new IoTException("iotId can not be null");
     }
-    IoTDeviceDTO ioTDeviceDTO = ioTDeviceMapper.selectIoTDeviceBO(
-        BeanUtil.beanToMap(IoTAPIQuery.builder().iotId(iotId).build()));
+    IoTDeviceDTO ioTDeviceDTO =
+        ioTDeviceMapper.selectIoTDeviceBO(
+            BeanUtil.beanToMap(IoTAPIQuery.builder().iotId(iotId).build()));
     return ioTDeviceDTO;
   }
 
@@ -278,9 +317,7 @@ public class IoTDeviceService {
     return metadataBO;
   }
 
-  /**
-   * 根据 extDeviceId 删除设备信息
-   */
+  /** 根据 extDeviceId 删除设备信息 */
   @Transactional
   public int delDevInstance(String iotId) {
     if (StrUtil.isBlank(iotId)) {
@@ -290,11 +327,16 @@ public class IoTDeviceService {
     int dev = ioTDeviceMapper.delete(IoTDevice.builder().iotId(iotId).build());
     int tags = ioTDeviceTagsMapper.delete(IoTDeviceTags.builder().iotId(iotId).build());
     int sha = ioTDeviceShadowMapper.delete(IoTDeviceShadow.builder().iotId(iotId).build());
-    int subscribe = ioTDeviceSubscribeMapper.delete(
-        IoTDeviceSubscribe.builder().iotId(iotId).build());
+    int subscribe =
+        ioTDeviceSubscribeMapper.delete(IoTDeviceSubscribe.builder().iotId(iotId).build());
     int fence = ioTDeviceFenceRelMapper.deleteFenceInstance(iotId);
-    log.info("删除设备 tag={},platform={},shadow={},subscribe={},fence={}", tags, dev, sha,
-        subscribe, fence);
+    log.info(
+        "删除设备 tag={},platform={},shadow={},subscribe={},fence={}",
+        tags,
+        dev,
+        sha,
+        subscribe,
+        fence);
     iotCacheRemoveService.removeDevProtocolCache();
     return dev;
   }
@@ -302,13 +344,19 @@ public class IoTDeviceService {
   public void addDevHistory(String iotId) {
     IoTDevice ioTDevice = ioTDeviceMapper.selectOne(IoTDevice.builder().iotId(iotId).build());
     if (ioTDevice != null && ioTDevice.getRegistryTime() != null) {
-      IoTDeviceHistoryBO ioTDeviceHistoryBO = IoTDeviceHistoryBO.builder()
-          .deviceId(ioTDevice.getDeviceId()).deviceName(ioTDevice.getDeviceName())
-          .productKey(ioTDevice.getProductKey())
-          .firstOnlineTime(ioTDevice.getRegistryTime().longValue())
-          .creater(ioTDevice.getCreatorId()).createTime(ioTDevice.getCreateTime())
-          .deleteTime(System.currentTimeMillis()).coordinate(ioTDevice.getCoordinate()).build();
-//      ioTDeviceMapper.insertDevInstanceHistory(ioTDeviceHistoryBO);
+      IoTDeviceHistoryBO ioTDeviceHistoryBO =
+          IoTDeviceHistoryBO.builder()
+              .deviceId(ioTDevice.getDeviceId())
+              .deviceName(ioTDevice.getDeviceName())
+              .productKey(ioTDevice.getProductKey())
+              .firstOnlineTime(ioTDevice.getRegistryTime().longValue())
+              .creater(ioTDevice.getCreatorId())
+              .createTime(ioTDevice.getCreateTime())
+              .deleteTime(System.currentTimeMillis())
+              .coordinate(ioTDevice.getCoordinate())
+              .build();
+      //      ioTDeviceMapper.insertDevInstanceHistory(ioTDeviceHistoryBO);
     }
   }
+
 }

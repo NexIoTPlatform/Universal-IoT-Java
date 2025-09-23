@@ -67,4 +67,15 @@ public interface IIoTUserApplicationService {
   int deleteIotUserApplicationById(String appUniqueId);
 
   List<IoTUserApplicationVO> selectApplicationList(IoTUserApplication application, IoTUser iotUser);
+
+  boolean enableOrDisablePushCfg(String appUniqueId, String pushType, boolean isEnable);
+
+  /**
+   * 重置应用密钥并同步更新MQTT配置
+   *
+   * @param appUniqueId 应用唯一标识
+   * @param unionId 用户唯一标识
+   * @return 是否成功
+   */
+  boolean resetAppSecretAndSyncMqtt(String appUniqueId, String unionId);
 }

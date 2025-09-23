@@ -178,7 +178,9 @@ public interface IIoTProductService {
 
   Map<String, Integer> countDevNumberByProductKey(String unionId);
 
-  AjaxResult<IoTProduct> selectDevProductByKey(String key);
+  AjaxResult<IoTProduct> selectIoTProductByKey(String key);
+
+  AjaxResult<List<IoTProduct>> selectGatewaySubProductsByKey(String gwProductKey);
 
   int updateDevProductOtherConfig(String otherConfig);
 

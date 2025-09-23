@@ -38,6 +38,7 @@ import cn.universal.persistence.mapper.IoTDeviceMapper;
 import cn.universal.persistence.mapper.IoTUserMapper;
 import jakarta.annotation.Resource;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -444,14 +445,12 @@ public class IoTDeviceActionAfterService extends IoTUPPushAdapter<BaseUPRequest>
             .deviceId(instanceBO.getDeviceId())
             .deviceName(instanceBO.getDeviceName())
             .productKey(instanceBO.getProductKey())
-            // .extDeviceId(instanceBO.getExtDeviceId())
             .messageType(MessageType.FUNCTIONS.name())
             .iotId(instanceBO.getIotId())
-            .createId(instanceBO.getUserUnionId())
-            .createTime(DateUtil.currentSeconds())
+            .createTime(LocalDateTime.now())
             .commandStatus(0)
             // 使用此字段作为校验标识
-            .commandId(StrUtil.length(commandId) > 10 ? StrUtil.sub(commandId, 0, 10) : commandId)
+            .commandId(commandId)
             .build();
     return ioTDeviceLog;
   }

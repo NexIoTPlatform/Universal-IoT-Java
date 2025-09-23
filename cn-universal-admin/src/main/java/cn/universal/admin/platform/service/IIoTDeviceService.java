@@ -27,6 +27,7 @@ import cn.universal.persistence.entity.vo.IoTDeviceModelVO;
 import cn.universal.persistence.entity.vo.IoTDeviceVO;
 import com.github.pagehelper.Page;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 设备Service接口
@@ -147,9 +148,15 @@ public interface IIoTDeviceService {
 
   List<GatewayDeviceVo> selectGwIotDevices(IoTGwDeviceBO bo);
 
-  IoTDevice selectDeviceByDeviceId(String deviceId);
+  IoTDevice selectIoTDevice(String productKey, String deviceId);
 
   List<IoTDevice> selectDevInstanceListWithTags(IoTDeviceBO ioTDeviceBO, IoTUser iotUser);
 
   List<IoTProduct> selectProductListInBatchFunction(Long applicationId, IoTUser iotUser);
+
+  /** 新：按第三方平台过滤设备列表（不影响旧接口） */
+  List<IoTDevice> selectDevInstanceListByPlatform(
+      IoTDevice ioTDevice, IoTUser iotUser, String thirdPlatform);
+
+
 }

@@ -45,7 +45,6 @@ import cn.universal.persistence.mapper.IoTDeviceProtocolMapper;
 import cn.universal.persistence.mapper.IoTDeviceShadowMapper;
 import cn.universal.persistence.mapper.IoTDeviceTagsMapper;
 import cn.universal.persistence.mapper.IoTProductMapper;
-import cn.universal.persistence.query.IoTDeviceQuery;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import jakarta.annotation.Resource;
@@ -149,6 +148,13 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
         ioTDevice, iotUser.isAdmin() ? null : iotUser.getUnionId());
   }
 
+  @Override
+  public List<IoTDevice> selectDevInstanceListByPlatform(
+      IoTDevice ioTDevice, IoTUser iotUser, String thirdPlatform) {
+    return ioTDeviceMapper.selectDevInstanceListByPlatform(
+        ioTDevice, thirdPlatform, iotUser.isAdmin() ? null : iotUser.getUnionId());
+  }
+
   /**
    * 查询设备列表
    *
@@ -229,8 +235,8 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
   }
 
   @Override
-  public IoTDevice selectDeviceByDeviceId(String deviceId) {
-    return ioTDeviceMapper.getOneByDeviceId(IoTDeviceQuery.builder().deviceId(deviceId).build());
+  public IoTDevice selectIoTDevice(String productKey, String deviceId) {
+    return ioTDeviceMapper.selectIoTDevice(productKey, deviceId);
   }
 
   @Override
@@ -270,11 +276,12 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
         if (ioTDeviceBO.getOtherParams().containsKey("deviceKey")) {
           ioTDeviceBO.setSecretKey(ioTDeviceBO.getOtherParams().get("deviceKey").toString());
         }
+
         if (cn.universal.common.utils.StringUtils.isEmpty(ioTDeviceBO.getLatitude())) {
-          ioTDeviceBO.setLatitude("30.4484801");
+          ioTDeviceBO.setLatitude("44.61081");
         }
         if (cn.universal.common.utils.StringUtils.isEmpty(ioTDeviceBO.getLongitude())) {
-          ioTDeviceBO.setLongitude("120.2922654");
+          ioTDeviceBO.setLongitude("80.990372");
         }
         if (StrUtil.isNotBlank(deviceId)) {
           ioTDeviceBO.setGwProductKey(deviceId);
@@ -333,6 +340,17 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
   }
 
   @Override
+  @CacheEvict(
+      cacheNames = {
+        "iot_dev_instance_bo",
+        "iot_dev_metadata_bo",
+        "iot_dev_shadow_bo",
+        "iot_dev_action",
+        "selectDevCount",
+        "iot_dev_product_list",
+        "iot_product_device"
+      },
+      allEntries = true)
   public int bindApp(String ids, String appUniqueId) {
     String[] a = ids.split(",");
     return ioTDeviceMapper.bindApp(a, appUniqueId);
@@ -362,7 +380,7 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
     downRequest.set("detail", devInstancebo.getDetail());
     // 网关产品ProductKey
     downRequest.set("gwProductKey", devInstancebo.getGwProductKey());
-    downRequest.set("gwDeviceId", devInstancebo.getExtDeviceId());
+    downRequest.set("gwDeviceId", devInstancebo.getGwDeviceId());
     downRequest.set("extDeviceId", devInstancebo.getExtDeviceId());
     JSONObject ob = new JSONObject();
     // 设备实例名称
@@ -506,9 +524,7 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
   public R iotFunctionsDown(String productKey, String downRequest) {
     JSONObject jsonObject = JSONUtil.parseObj(downRequest);
     String deviceId = jsonObject.getStr("deviceId");
-    IoTDevice ioTDeviceBo =
-        ioTDeviceMapper.getOneByDeviceId(
-            IoTDeviceQuery.builder().deviceId(deviceId).productKey(productKey).build());
+    IoTDevice ioTDeviceBo = ioTDeviceMapper.selectIoTDevice(productKey, deviceId);
     if (ioTDeviceBo == null) {
       return R.error("设备不存在");
     }
