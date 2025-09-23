@@ -32,22 +32,16 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class OAuth2ClientDetails implements Serializable {
 
-  /**
-   * 客户端标识
-   */
+  /** 客户端标识 */
   @Id
   @Column(name = "client_id")
   private String clientId;
 
-  /**
-   * 资源标识
-   */
+  /** 资源标识 */
   @Column(name = "resource_ids")
   private String resourceIds;
 
-  /**
-   * 客户端秘钥
-   */
+  /** 客户端秘钥 */
   @Column(name = "client_secret")
   private String clientSecret;
 
@@ -60,50 +54,34 @@ public class OAuth2ClientDetails implements Serializable {
   @Column(name = "Authorized_grant_types")
   private String AuthorizedGrantTypes;
 
-  /**
-   * 授权成功后回调URL
-   */
+  /** 授权成功后回调URL */
   @Column(name = "web_server_redirect_uri")
   private String webServerRedirectUri;
 
   private String Authorities;
 
-  /**
-   * 访问令牌的有效时间
-   */
+  /** 访问令牌的有效时间 */
   @Column(name = "access_token_validity")
   private Integer accessTokenValidity;
 
-  /**
-   * 刷新令牌的有效时间
-   */
+  /** 刷新令牌的有效时间 */
   @Column(name = "refresh_token_validity")
   private Integer refreshTokenValidity;
 
-  /**
-   * 额外的信息，备用
-   */
+  /** 额外的信息，备用 */
   @Column(name = "additional_information")
   private String additionalInformation;
 
-  /**
-   * 自动批准标识：0代表不显示授权页面 1显示授权页面
-   */
+  /** 自动批准标识：0代表不显示授权页面 1显示授权页面 */
   private String autoapprove;
 
-  /**
-   * 用户名
-   */
+  /** 用户名 */
   private String username;
 
-  /**
-   * 密码
-   */
+  /** 密码 */
   private String password;
 
-  /**
-   * 唯一标识
-   */
+  /** 唯一标识 */
   @Column(name = "iot_union_id")
   private String iotUnionId;
 
@@ -182,7 +160,7 @@ public class OAuth2ClientDetails implements Serializable {
    * client_credentials：客户端模式
    *
    * @return Authorized_grant_types - 授权类型 Authorization_code：授权码模式 refresh_token：刷新token
-   * password：密码模式 implicit：隐私授权模式 client_credentials：客户端模式
+   *     password：密码模式 implicit：隐私授权模式 client_credentials：客户端模式
    */
   public String getAuthorizedGrantTypes() {
     return AuthorizedGrantTypes;
@@ -193,7 +171,7 @@ public class OAuth2ClientDetails implements Serializable {
    * client_credentials：客户端模式
    *
    * @param AuthorizedGrantTypes 授权类型 Authorization_code：授权码模式 refresh_token：刷新token password：密码模式
-   *                             implicit：隐私授权模式 client_credentials：客户端模式
+   *     implicit：隐私授权模式 client_credentials：客户端模式
    */
   public void setAuthorizedGrantTypes(String AuthorizedGrantTypes) {
     this.AuthorizedGrantTypes = AuthorizedGrantTypes;

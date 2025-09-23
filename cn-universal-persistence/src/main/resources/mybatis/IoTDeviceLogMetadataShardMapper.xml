@@ -17,7 +17,7 @@
     <result column="ext1" jdbcType="VARCHAR" property="ext1"/>
     <result column="ext2" jdbcType="VARCHAR" property="ext2"/>
     <result column="ext3" jdbcType="VARCHAR" property="ext3"/>
-    <result column="create_time" jdbcType="INTEGER" property="createTime"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
     <result column="content" jdbcType="LONGVARCHAR" property="content"/>
   </resultMap>
 

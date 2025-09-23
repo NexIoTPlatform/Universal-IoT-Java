@@ -48,9 +48,6 @@ public class IoTDeviceFunctionTaskBO {
   private Boolean chooseAll;
   private List<String> extParam;
 
-  /**
-   * 请求参数
-   */
-  @Transient
-  private Map<String, Object> params = new HashMap<>();
+  /** 请求参数 */
+  @Transient private Map<String, Object> params = new HashMap<>();
 }

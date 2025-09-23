@@ -13,6 +13,8 @@
 package cn.universal.mqtt.protocol.third;
 
 import cn.hutool.core.util.StrUtil;
+import cn.universal.cache.annotation.MultiLevelCacheable;
+import cn.universal.cache.strategy.CacheStrategy;
 import cn.universal.common.enums.NetworkType;
 import cn.universal.mqtt.protocol.entity.MQTTProductConfig;
 import cn.universal.mqtt.protocol.system.SysMQTTStatusProvider;
@@ -85,13 +87,12 @@ public class ThirdMQTTConfigService implements ThirdMQTTConfigChecker {
   }
 
   @Override
-  //  @MultiLevelCacheable(
-  //      cacheNames = "supportMQTTNetwork",
-  //      key = "#productKey + ':' + #networkUnionId",
-  //      l1Expire = 300,
-  //      l2Expire = 3600,
-  //      strategy = CacheStrategy.WRITE_THROUGH
-  //  )
+  @MultiLevelCacheable(
+      cacheNames = "supportMQTTNetwork",
+      key = "#productKey + ':' + #networkUnionId",
+      l1Expire = 360,
+      l2Expire = 720,
+      strategy = CacheStrategy.WRITE_THROUGH)
   public boolean supportMQTTNetwork(String productKey, String networkUnionId) {
     String db = ioTProductMapper.selectNetworkUnionId(productKey);
     if (StrUtil.isBlank(networkUnionId)

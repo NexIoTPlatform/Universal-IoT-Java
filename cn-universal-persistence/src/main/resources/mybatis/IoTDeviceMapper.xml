@@ -138,6 +138,36 @@
     limit 1
   </select>
 
+  <!-- 新：支持 thirdPlatform 过滤的设备列表 -->
+  <select id="selectDevInstanceListByPlatform" parameterType="map" resultMap="BaseResultMap">
+    SELECT
+    d.id,
+    d.device_id,
+    d.ext_device_id,
+    d.gw_product_key,
+    d.product_name,
+    d.product_key,
+    d.device_name,
+    d.`instance`,
+    d.application,
+    d.`state`,
+    d.online_time,
+    d.configuration,
+    d.detail,
+    p.device_node deviceNode
+    FROM
+    iot_device d LEFT JOIN iot_product p on p.product_key = d.product_key
+    <where>
+      <if test="ioTDevice.iotId != null  and ioTDevice.iotId != ''">and d.iot_id like concat('%', #{ioTDevice.iotId}, '%')</if>
+      <if test="ioTDevice.deviceId != null  and ioTDevice.deviceId != ''">and d.device_id like concat('%', #{ioTDevice.deviceId}, '%')</if>
+      <if test="ioTDevice.deviceName != null  and ioTDevice.deviceName != ''">and d.device_name like concat('%', #{ioTDevice.deviceName}, '%')</if>
+      <if test="ioTDevice.state != null ">and d.`state` = #{ioTDevice.state}</if>
+      <if test="unionId != null and unionId != ''">and d.creator_id=#{unionId}</if>
+      <if test="thirdPlatform != null and thirdPlatform != ''">and p.third_platform = #{thirdPlatform}</if>
+    </where>
+    ORDER BY d.create_time DESC
+  </select>
+
   <!-- 根据设备信息，分页 -->
   <select id="selectDevInstanceBOV2List" resultMap="ioTDeviceDTO">
     SELECT
@@ -718,6 +748,12 @@
     </where>
     limit 1
   </select>
+  <select id="selectIoTDevice" resultType="cn.universal.persistence.entity.IoTDevice">
+    select *
+    from iot_device
+    where product_key = #{productKey}
+      AND device_id = #{deviceId} limit 1
+  </select>
   <select id="getModelByProductKey"
     resultType="cn.universal.persistence.entity.vo.IoTDeviceModelVO">
     select *
@@ -938,6 +974,7 @@
     where JSON_EXTRACT(configuration, concat('$.', 'gatewayEUI')) = #{bo.unionId}
     ORDER BY create_time DESC
   </select>
+
   <select id="getGatewayDeviceList"
     resultType="cn.universal.persistence.entity.vo.GatewayDeviceVo">
     select device_id, device_name, product_key, iot_id

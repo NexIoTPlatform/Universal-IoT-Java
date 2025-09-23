@@ -19,6 +19,9 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.domain.R;
 import cn.universal.core.service.IoTDownlFactory;
+import cn.universal.manager.notice.model.NoticeSendRequest;
+import cn.universal.manager.notice.service.NoticeService;
+import cn.universal.manager.notice.service.channel.NoticeSendResult;
 import cn.universal.persistence.entity.IoTDevice;
 import cn.universal.persistence.entity.IoTDeviceTags;
 import cn.universal.persistence.entity.IoTProduct;
@@ -48,6 +51,7 @@ public class SenceIoTDeviceDownService {
 
   @Resource private IoTDeviceMapper ioTDeviceMapper;
   @Resource private IoTProductMapper ioTProductMapper;
+  @Resource private NoticeService noticeService;
 
   public RunStatus matchSuccess(List<ExeRunContext> exeRunContexts) {
     if (CollectionUtil.isEmpty(exeRunContexts)) {
@@ -102,6 +106,46 @@ public class SenceIoTDeviceDownService {
           log.error("场景联动指令下发失败，设备编号:{}", exec.getDeviceId());
         }
         runContexts.add(exeRunContextBuilder.build());
+      } else if (TriggerBO.ExecTriggerType.notice.name().equals(exec.getTrigger())) {
+        exeRunContextBuilder.target(exec.getNoticeTemplateId());
+        exeRunContextBuilder.targetName(exec.getNoticeTemplateName());
+        // 组装通知参数
+        NoticeSendRequest req = new NoticeSendRequest();
+        if (exec.getNoticeTemplateId() != null) {
+          req.setTemplateId(Long.valueOf(exec.getNoticeTemplateId()));
+        }
+        // 组装params
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("sceneName", sceneLinkage.getSceneName());
+        params.put("sceneId", sceneLinkage.getId());
+        params.put("execTime", LocalDateTime.now().toString());
+        params.put("trigger", sceneLinkage.getTriggerCondition());
+        params.put("action", exec);
+        params.putAll(message);
+        req.setParams(params);
+        try {
+          NoticeSendResult rs = noticeService.sendR(req);
+          log.info("notice推送结果={}", JSONUtil.toJsonStr(rs));
+          if (rs != null && rs.isSuccess()) {
+            exeRunContextBuilder.success(true);
+            exeRunContextBuilder.result(
+                Map.of(
+                    "receivers",
+                    rs.getReceivers() == null ? "" : rs.getReceivers(),
+                    "content",
+                    rs.getContent() == null ? "" : rs.getContent()));
+          } else {
+            exeRunContextBuilder.success(false);
+            exeRunContextBuilder.result(rs != null ? rs.getErrorMessage() : "");
+          }
+          log.info(
+              "场景联动触发通知成功, 场景id:{}, 模板id:{}", sceneLinkage.getId(), exec.getNoticeTemplateId());
+        } catch (Exception e) {
+          log.error(
+              "场景联动触发通知失败, 场景id:{}, 模板id:{}", sceneLinkage.getId(), exec.getNoticeTemplateId(), e);
+          exeRunContextBuilder.success(false);
+        }
+        runContexts.add(exeRunContextBuilder.build());
       }
     }
     return runContexts;
@@ -110,11 +154,11 @@ public class SenceIoTDeviceDownService {
   // 拼装功能下行指令
   private String getDownRequest(TriggerBO o, String unionId) {
     JSONObject downRequest = new JSONObject();
+    // 此处楼等，参数没有带productKey
     IoTDevice ioTDevice =
         ioTDeviceMapper.getOneByDeviceId(
             IoTDeviceQuery.builder().deviceId(o.getDeviceId()).build());
     if (ioTDevice == null) {
-      // 因设备被删除，场景联动的配置未修改
       return null;
     }
     String productKey = ioTDevice.getProductKey();
@@ -143,12 +187,10 @@ public class SenceIoTDeviceDownService {
     String deviceId = jsonObject.getStr("deviceId");
     String productKey = jsonObject.getStr("productKey");
     String appUnionId = jsonObject.getStr("appUnionId");
-    IoTDevice ioTDeviceBo =
-        ioTDeviceMapper.getOneByDeviceId(
-            IoTDeviceQuery.builder().productKey(productKey).deviceId(deviceId).build());
+    IoTDevice ioTDeviceBo = ioTDeviceMapper.selectIoTDevice(productKey, deviceId);
     if (!ioTDeviceBo.getCreatorId().equals(appUnionId)) {
-      log.error("用户{}尝试访问不属于自己的设备，设备ID：{}", appUnionId, deviceId);
-      return DownResult.builder().success(false).downResult("您没有权限操作此设备。").build();
+      log.error("数据不属于你，用户{}，设备ID：{}", appUnionId, deviceId);
+      return DownResult.builder().success(false).downResult("无权限操作设备。").build();
     }
     IoTProduct ioTProduct = ioTProductMapper.getProductByProductKey(productKey);
     IoTDeviceTags devTag = new IoTDeviceTags();

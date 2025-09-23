@@ -242,57 +242,45 @@
     a.transport_protocol,
     a.photo_url,
     a.create_time,
-    a.state
+    a.state,
+    COALESCE(d.dev_num, 0) as dev_num
     FROM
     iot_product a
+    LEFT JOIN (
+      SELECT 
+        di.product_key,
+        COUNT(di.id) as dev_num
+      FROM iot_device di
+      <where>
+        <if test="creatorId != null and creatorId != ''">
+          di.creator_id = #{creatorId}
+        </if>
+      </where>
+      GROUP BY di.product_key
+    ) d ON a.product_key = d.product_key
     <where>
-      1=1
-      <if test="productId != null  and productId != ''">and a.product_id = #{productId}</if>
-      <if test="productKey != null  and productKey != ''">and a.product_key like concat('%',
-        #{productKey}, '%')
-      </if>
-      <if test="thirdPlatform != null  and thirdPlatform != ''">and a.third_platform like
-        concat('%',
-        #{thirdPlatform}, '%')
-      </if>
-      <if test="networkUnionId != null  and networkUnionId != ''">and a.network_union_id =
-        #{networkUnionId}
-      </if>
-      <if test="deviceNode != null  and deviceNode != ''">and a.device_node = #{deviceNode}</if>
-      <if test="gwProductKey != null  and gwProductKey != ''">and a.gw_product_key =
-        #{gwProductKey}
-      </if>
-      <if test="classifiedId != null  and classifiedId != ''">and a.classified_id = #{classifiedId}
-      </if>
-      <if test="classifiedName != null  and classifiedName != ''">and a.classified_name like
-        concat('%', #{classifiedName}, '%')
-      </if>
-      <if test="companyNo != null  and companyNo != ''">and a.company_no like
-        concat('%', #{companyNo}, '%')
-      </if>
-      <if test="messageProtocol != null  and messageProtocol != ''">and a.message_protocol =
-        #{messageProtocol}
-      </if>
-      <if test="name != null  and name != ''">and (a.`name` like concat('%', #{name}, '%') or
-        a.product_key LIKE
-        concat( '%', #{name}, '%' ))
-      </if>
-      <if test="self==true">and a.creator_id = #{creatorId}</if>
-      <if test="describe != null  and describe != ''">and a.`describe` = #{describe}</if>
-      <if test="storePolicy != null  and storePolicy != ''">and a.store_policy = #{storePolicy}</if>
-      <if test="transportProtocol != null  and transportProtocol != ''">and a.transport_protocol
-        like
-        concat('%', #{transportProtocol}, '%')
-      </if>
-      <if test="`state` != null  and `state` != ''">and a.`state` = #{state}</if>
+      <if test="productId != null  and productId != ''">a.product_id = #{productId}</if>
+      <if test="productKey != null  and productKey != ''">AND a.product_key LIKE CONCAT('%', #{productKey}, '%')</if>
+      <if test="thirdPlatform != null  and thirdPlatform != ''">AND a.third_platform LIKE CONCAT('%', #{thirdPlatform}, '%')</if>
+      <if test="networkUnionId != null  and networkUnionId != ''">AND a.network_union_id = #{networkUnionId}</if>
+      <if test="deviceNode != null  and deviceNode != ''">AND a.device_node = #{deviceNode}</if>
+      <if test="gwProductKey != null  and gwProductKey != ''">AND a.gw_product_key = #{gwProductKey}</if>
+      <if test="classifiedId != null  and classifiedId != ''">AND a.classified_id = #{classifiedId}</if>
+      <if test="classifiedName != null  and classifiedName != ''">AND a.classified_name LIKE CONCAT('%', #{classifiedName}, '%')</if>
+      <if test="companyNo != null  and companyNo != ''">AND a.company_no LIKE CONCAT('%', #{companyNo}, '%')</if>
+      <if test="messageProtocol != null  and messageProtocol != ''">AND a.message_protocol = #{messageProtocol}</if>
+      <if test="name != null  and name != ''">AND (a.`name` LIKE CONCAT('%', #{name}, '%') OR a.product_key LIKE CONCAT('%', #{name}, '%'))</if>
+      <if test="self==true">AND a.creator_id = #{creatorId}</if>
+      <if test="describe != null  and describe != ''">AND a.`describe` = #{describe}</if>
+      <if test="storePolicy != null  and storePolicy != ''">AND a.store_policy = #{storePolicy}</if>
+      <if test="transportProtocol != null  and transportProtocol != ''">AND a.transport_protocol LIKE CONCAT('%', #{transportProtocol}, '%')</if>
+      <if test="`state` != null  and `state` != ''">AND a.`state` = #{state}</if>
       <if test="tags !=null">
-        and
-        <foreach collection="tags" item="tag" close=")" open="(" separator=" and ">
-          find_in_set(#{tag},a.tags)
+        AND <foreach collection="tags" item="tag" open="(" close=")" separator=" AND ">
+          FIND_IN_SET(#{tag}, a.tags)
         </foreach>
       </if>
     </where>
-    GROUP BY a.id
     ORDER BY a.id DESC
   </select>
 
@@ -567,7 +555,7 @@
     from iot_product
     where device_node = 'GATEWAY_SUB_DEVICE'
       and state = 0
-      and configuration like concat('%', #{productKey}, '%')
+      and gw_product_key = #{productKey}
   </select>
   <select id="selectNetworkUnionId" resultType="String">
     select network_union_id
@@ -609,5 +597,19 @@
     FROM iot_product
     WHERE network_union_id = #{networkUnionId}
       AND is_deleted = 0 LIMIT 1
+  </select>
+  <select id="selectMqttProductsUseNetwork"
+    resultType="cn.universal.persistence.entity.bo.IoTProductBO">
+    SELECT product_key, `name`, `device_node`, `third_platform`,`photo_url`,company_no
+    FROM iot_product
+    WHERE network_union_id = #{networkUnionId}
+      AND is_deleted = 0
+  </select>
+  <select id="selectTcpProductsUseNetwork"
+    resultType="cn.universal.persistence.entity.bo.IoTProductBO">
+    SELECT product_key, `name`, `device_node`, `third_platform`,`photo_url`,company_no
+    FROM iot_product
+    WHERE product_key = #{product_key}
+      AND is_deleted = 0 limit 1
   </select>
 </mapper>

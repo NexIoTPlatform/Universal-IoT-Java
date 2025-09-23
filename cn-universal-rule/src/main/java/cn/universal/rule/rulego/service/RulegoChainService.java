@@ -35,17 +35,15 @@ import org.springframework.transaction.annotation.Transactional;
  * rulego规则链服务
  *
  * @author Aleo
- * @since 2025/09/01
+ * @since 2025/01/15
  */
 @Service
 @Slf4j
 public class RulegoChainService {
 
-  @Resource
-  private RulegoChainMapper rulegoChainMapper;
+  @Resource private RulegoChainMapper rulegoChainMapper;
 
-  @Resource
-  private RulegoApiClient rulegoApiClient;
+  @Resource private RulegoApiClient rulegoApiClient;
 
   /**
    * 查询规则链列表
@@ -60,7 +58,7 @@ public class RulegoChainService {
   /**
    * 根据ID查询规则链详情
    *
-   * @param id        规则链ID
+   * @param id 规则链ID
    * @param creatorId 创建人ID
    * @return 规则链详情
    */
@@ -105,8 +103,8 @@ public class RulegoChainService {
     saveRequest.setDescription(bo.getDescription());
 
     try {
-      RulegoApiResponse<RulegoSuccessResponse> response = rulegoApiClient.saveChainInfo(
-          saveRequest);
+      RulegoApiResponse<RulegoSuccessResponse> response =
+          rulegoApiClient.saveChainInfo(saveRequest);
       if (response != null && !response.getSuccess()) {
         throw new IoTException("保存规则链基础信息失败: " + response.getMessage());
       }
@@ -169,7 +167,7 @@ public class RulegoChainService {
   /**
    * 删除规则链
    *
-   * @param id        规则链ID
+   * @param id 规则链ID
    * @param creatorId 创建人ID
    * @return 是否成功
    */
@@ -182,8 +180,8 @@ public class RulegoChainService {
 
     // 调用rulego API删除规则链
     try {
-      RulegoApiResponse<RulegoSuccessResponse> response = rulegoApiClient.deleteChain(
-          rulegoChain.getRulegoId());
+      RulegoApiResponse<RulegoSuccessResponse> response =
+          rulegoApiClient.deleteChain(rulegoChain.getRulegoId());
       if (response != null && !response.getSuccess()) {
         log.warn("调用rulego API删除规则链失败: {}", response.getMessage());
       }
@@ -204,7 +202,7 @@ public class RulegoChainService {
   /**
    * 部署规则链
    *
-   * @param id        规则链ID
+   * @param id 规则链ID
    * @param creatorId 创建人ID
    * @return 是否成功
    */
@@ -217,8 +215,8 @@ public class RulegoChainService {
 
     // 调用rulego API部署规则链
     try {
-      RulegoApiResponse<RulegoSuccessResponse> response = rulegoApiClient.deployChain(
-          rulegoChain.getRulegoId());
+      RulegoApiResponse<RulegoSuccessResponse> response =
+          rulegoApiClient.deployChain(rulegoChain.getRulegoId());
       if (response != null && !response.getSuccess()) {
         throw new IoTException("部署规则链失败: " + response.getMessage());
       }
@@ -240,7 +238,7 @@ public class RulegoChainService {
   /**
    * 停止规则链
    *
-   * @param id        规则链ID
+   * @param id 规则链ID
    * @param creatorId 创建人ID
    * @return 是否成功
    */
@@ -253,8 +251,8 @@ public class RulegoChainService {
 
     // 调用rulego API停止规则链
     try {
-      RulegoApiResponse<RulegoSuccessResponse> response = rulegoApiClient.stopChain(
-          rulegoChain.getRulegoId());
+      RulegoApiResponse<RulegoSuccessResponse> response =
+          rulegoApiClient.stopChain(rulegoChain.getRulegoId());
       if (response != null && !response.getSuccess()) {
         throw new IoTException("停止规则链失败: " + response.getMessage());
       }
@@ -285,8 +283,7 @@ public class RulegoChainService {
       // 调用rulego API获取规则链详情
       RulegoApiResponse<RulegoChainInfo> response = rulegoApiClient.getChainDetail(rulegoId);
       if (response == null || !response.getSuccess() || response.getData() == null) {
-        throw new IoTException(
-            "规则链详情为空: " + (response != null ? response.getMessage() : "响应为空"));
+        throw new IoTException("规则链详情为空: " + (response != null ? response.getMessage() : "响应为空"));
       }
 
       RulegoChainInfo chainInfo = response.getData();

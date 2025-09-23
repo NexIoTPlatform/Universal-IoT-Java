@@ -32,76 +32,52 @@ public class IoTDeviceGroup implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 分组ID，非自增
-   */
+  /** 分组ID，非自增 */
   @Id
   @KeySql(genId = SQenGenId.class)
   private Long id;
 
-  /**
-   * 分组名称
-   */
+  /** 分组名称 */
   @Column(name = "group_name")
   private String groupName;
 
-  /**
-   * 分组标识
-   */
+  /** 分组标识 */
   @Column(name = "group_code")
   private String groupCode;
 
-  /**
-   * 群组描述
-   */
+  /** 群组描述 */
   @Column(name = "group_describe")
   private String groupDescribe;
 
-  /**
-   * 父id
-   */
+  /** 父id */
   @Column(name = "parent_id")
   private Long parentId;
 
-  /**
-   * 是否有子分组
-   */
+  /** 是否有子分组 */
   @Column(name = "has_child")
   private Integer hasChild;
 
-  /**
-   * 分组级别
-   */
+  /** 分组级别 */
   @Column(name = "group_level")
   private Integer groupLevel;
 
-  /**
-   * 激活设备数
-   */
+  /** 激活设备数 */
   @Column(name = "relat_dev_count")
   private Integer relatDevCount;
 
-  /**
-   * 关联设备树
-   */
+  /** 关联设备树 */
   @Column(name = "active_dev_count")
   private Integer activeDevCount;
 
-  /**
-   * 创建人
-   */
+  /** 创建人 */
   @Column(name = "creator_id")
   private String creatorId;
 
-  /**
-   * 实例编号
-   */
+  /** 实例编号 */
   @Column(name = "instance")
   private String instance;
 
-  /**
-   * 标签
-   */
+  /** 标签 */
   @Column(name = "tag")
   private String tag;
 }

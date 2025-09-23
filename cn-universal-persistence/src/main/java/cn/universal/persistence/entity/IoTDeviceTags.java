@@ -28,18 +28,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class IoTDeviceTags implements Serializable {
 
-  @Id
-  private Long id;
+  @Id private Long id;
 
-  /**
-   * 设备deviceId
-   */
+  /** 设备deviceId */
   @Column(name = "device_id")
   private String deviceId;
 
-  /**
-   * 产品ID或者设备唯一标识
-   */
+  /** 产品ID或者设备唯一标识 */
   @Column(name = "product_key")
   private String productKey;
 

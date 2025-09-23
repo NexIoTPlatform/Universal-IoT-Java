@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
  * rulego规则链响应
  *
  * @author Aleo
- * @since 2025/09/01
+ * @since 2025/01/15
  */
 @Data
 @AllArgsConstructor

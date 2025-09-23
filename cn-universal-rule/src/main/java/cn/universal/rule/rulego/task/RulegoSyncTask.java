@@ -27,7 +27,7 @@ import tk.mybatis.mapper.entity.Example;
  * rulego规则链同步任务
  *
  * @author Aleo
- * @since 2025/09/01
+ * @since 2025/01/15
  */
 @Component
 @Slf4j

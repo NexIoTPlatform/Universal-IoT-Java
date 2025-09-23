@@ -25,41 +25,27 @@ public class IoTDeviceVO {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 对外设备唯一标识符
-   */
+  /** 对外设备唯一标识符 */
   private String iotId;
 
   private String gwProductKey;
 
-  /**
-   * 设备自身序号
-   */
+  /** 设备自身序号 */
   private String deviceId;
 
-  /**
-   * 派生元数据,有的设备的属性，功能，事件可能会动态的添加
-   */
+  /** 派生元数据,有的设备的属性，功能，事件可能会动态的添加 */
   private String metadata;
 
-  /**
-   * 产品key
-   */
+  /** 产品key */
   private String productKey;
 
-  /**
-   * 设备名称
-   */
+  /** 设备名称 */
   private String productName;
 
-  /**
-   * 设备实例名称
-   */
+  /** 设备实例名称 */
   private String deviceName;
 
-  /**
-   * 别名
-   */
+  /** 别名 */
   private String nickName;
 
   private String latlng;

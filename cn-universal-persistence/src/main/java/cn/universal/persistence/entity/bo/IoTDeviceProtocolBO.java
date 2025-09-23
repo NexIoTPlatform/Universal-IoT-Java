@@ -31,8 +31,7 @@ public class IoTDeviceProtocolBO implements Serializable {
   private String name;
   private String description;
   private Byte state;
-  @Id
-  private String id;
+  @Id private String id;
   private String type;
   private String configuration;
   private String fileName;

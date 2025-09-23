@@ -28,9 +28,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-/**
- * 菜单权限表 sys_menu @Author ruoyi
- */
+/** 菜单权限表 sys_menu @Author ruoyi */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,15 +39,10 @@ public class SysMenu implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 菜单ID
-   */
-  @Id
-  private Long menuId;
+  /** 菜单ID */
+  @Id private Long menuId;
 
-  /**
-   * 菜单名称
-   */
+  /** 菜单名称 */
   @Column(name = "menu_name")
   private String menuName;
 
@@ -57,106 +50,68 @@ public class SysMenu implements Serializable {
   //  @Column(name = "parent_name")
   //  private String parentName;
 
-  /**
-   * 父菜单ID
-   */
+  /** 父菜单ID */
   @Column(name = "parent_id")
   private Long parentId;
 
-  /**
-   * 显示顺序
-   */
+  /** 显示顺序 */
   @Column(name = "order_num")
   private String orderNum;
 
-  /**
-   * 路由地址
-   */
+  /** 路由地址 */
   private String path;
 
-  /**
-   * 组件路径
-   */
+  /** 组件路径 */
   private String component;
 
-  /**
-   * 是否为外链（0是 1否）
-   */
+  /** 是否为外链（0是 1否） */
   @Column(name = "is_frame")
   private String isFrame;
 
-  /**
-   * 是否缓存（0缓存 1不缓存）
-   */
+  /** 是否缓存（0缓存 1不缓存） */
   @Column(name = "is_cache")
   private String isCache;
 
-  /**
-   * 类型（M目录 C菜单 F按钮）
-   */
+  /** 类型（M目录 C菜单 F按钮） */
   @Column(name = "menu_type")
   private String menuType;
 
-  /**
-   * 显示状态（0显示 1隐藏）
-   */
+  /** 显示状态（0显示 1隐藏） */
   private String visible;
 
-  /**
-   * 菜单状态（0显示 1隐藏）
-   */
+  /** 菜单状态（0显示 1隐藏） */
   private String status;
 
-  /**
-   * 权限字符串
-   */
+  /** 权限字符串 */
   private String perms;
 
-  /**
-   * 菜单图标
-   */
+  /** 菜单图标 */
   private String icon;
 
-  /**
-   * 创建者
-   */
+  /** 创建者 */
   @Column(name = "create_by")
   private String createBy;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Column(name = "create_time")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
 
-  /**
-   * 更新者
-   */
+  /** 更新者 */
   @Column(name = "update_by")
   private String updateBy;
 
-  /**
-   * 更新时间
-   */
+  /** 更新时间 */
   @Column(name = "update_time")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date updateTime;
 
-  /**
-   * 备注
-   */
+  /** 备注 */
   private String remark;
 
-  /**
-   * 请求参数
-   */
-  @Builder.Default
-  private Map<String, Object> params = new HashMap<>();
+  /** 请求参数 */
+  @Builder.Default private Map<String, Object> params = new HashMap<>();
 
-  /**
-   * 子菜单
-   */
-  @Builder.Default
-  private List<SysMenu> children = new ArrayList<SysMenu>();
+  /** 子菜单 */
+  @Builder.Default private List<SysMenu> children = new ArrayList<SysMenu>();
 }

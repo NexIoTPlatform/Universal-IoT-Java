@@ -72,9 +72,6 @@
       <if test="status!=null and status!=''">
         and status =#{status}
       </if>
-      <!--      <if test="parentName!=null and parentName!=''">-->
-      <!--        and parent_name like '%${parentName}%'-->
-      <!--      </if>-->
       <if test="parentId!=null and parentId!=''">
         and parent_id =#{parentId}
       </if>

@@ -30,43 +30,31 @@ public class IoTDeviceModelVO {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 设备型号
-   */
+  /** 设备型号 */
   @Excel(name = "设备型号")
   @Schema(description = "设备型号")
   private String deviceModel;
 
-  /**
-   * 型号名称
-   */
+  /** 型号名称 */
   @Excel(name = "型号名称")
   @Schema(description = "型号名称")
   private String deviceModelName;
 
-  /**
-   * 设备图标
-   */
+  /** 设备图标 */
   @Schema(description = "设备图标")
   private String icon;
 
-  /**
-   * 网络协议
-   */
+  /** 网络协议 */
   @Excel(name = "网络协议")
   @Schema(description = "网络协议")
   private String protocol;
 
-  /**
-   * 产品编号
-   */
+  /** 产品编号 */
   @Excel(name = "产品编号")
   @Schema(description = "产品编号")
   private String productKey;
 
-  /**
-   * 页面配置
-   */
+  /** 页面配置 */
   @Excel(name = "页面配置")
   @Schema(description = "页面配置")
   private Map<String, Object> pageCtrl;

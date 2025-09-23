@@ -22,43 +22,27 @@ public class IoTDeviceProperties implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 属性标识
-   */
+  /** 属性标识 */
   private String id;
 
-  /**
-   * 属性名称
-   */
+  /** 属性名称 */
   private String name;
 
-  /**
-   * 数据类型
-   */
+  /** 数据类型 */
   private String type;
 
-  /**
-   * 属性值来源
-   */
+  /** 属性值来源 */
   private String source;
 
-  /**
-   * 单位
-   */
+  /** 单位 */
   private String unit;
 
-  /**
-   * 枚举键值
-   */
+  /** 枚举键值 */
   private String elements;
 
-  /**
-   * 描述
-   */
+  /** 描述 */
   private String description;
 
-  /**
-   * 读写
-   */
+  /** 读写 */
   private String mode;
 }

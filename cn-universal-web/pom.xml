@@ -168,6 +168,7 @@
       <artifactId>cn-universal-mqtt-protocol</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>cn.universal.iot</groupId>
       <artifactId>cn-universal-http-protocol</artifactId>
@@ -462,6 +463,15 @@
         <activeByDefault>true</activeByDefault>
       </activation>
     </profile>
+    <profile>
+      <id>prod</id>
+      <properties>
+        <profileActive>prod</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
     <!-- 外网测试环境-->
     <profile>
       <id>test</id>
@@ -481,6 +491,23 @@
         <activeByDefault>false</activeByDefault>
       </activation>
     </profile>
-
+    <profile>
+      <id>test2</id>
+      <properties>
+        <profileActive>test2</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>huo</id>
+      <properties>
+        <profileActive>huo</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
   </profiles>
 </project>

@@ -10,6 +10,4 @@ package cn.universal.plugins.protocolapi.extend;
  * @Wechat: outlookFil
  *
  *
- */ public interface IdeMagicFunction {
-
-}
+ */ public interface IdeMagicFunction {}

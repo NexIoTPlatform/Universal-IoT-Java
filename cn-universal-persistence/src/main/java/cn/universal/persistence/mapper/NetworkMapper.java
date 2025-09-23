@@ -141,4 +141,12 @@ public interface NetworkMapper extends BaseMapper<Network> {
    */
   int selectTcpNetworkByPortCount(
       @Param("port") Integer port, @Param("excludeId") Integer excludeId);
+
+  /**
+   * 根据唯一标识查询网络组件
+   *
+   * @param unionId 唯一标识
+   * @return 网络组件列表
+   */
+  List<Network> selectByUnionId(@Param("unionId") String unionId);
 }

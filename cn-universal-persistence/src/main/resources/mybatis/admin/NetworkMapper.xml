@@ -241,4 +241,10 @@
     </if>
   </select>
 
+  <!-- 根据唯一标识查询网络组件 -->
+  <select id="selectByUnionId" resultMap="NetworkResult">
+    <include refid="selectNetworkVo"/>
+    WHERE n.union_id = #{unionId}
+  </select>
+
 </mapper> 

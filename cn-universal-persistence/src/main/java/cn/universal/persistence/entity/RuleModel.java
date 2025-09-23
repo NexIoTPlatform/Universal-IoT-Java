@@ -39,75 +39,55 @@ public class RuleModel implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  /**
-   * 主键ID
-   */
+  /** 主键ID */
   @Id
   @KeySql(genId = SQenGenId.class)
   @Schema(description = "主键ID")
   private Long id;
 
-  /**
-   * 规则名称
-   */
+  /** 规则名称 */
   @Schema(description = "规则名称")
   @Column(name = "rule_name")
   private String ruleName;
 
-  /**
-   * 数据级别
-   */
+  /** 数据级别 */
   @Schema(description = "数据级别")
   @Column(name = "data_level")
   private String dataLevel;
 
-  /**
-   * 描述
-   */
+  /** 描述 */
   @Schema(description = "描述")
   @Column(name = "description")
   private String description;
 
-  /**
-   * 状态
-   */
+  /** 状态 */
   @Schema(description = "状态")
   @Column(name = "status")
   private String status;
 
   ;
 
-  /**
-   * 产品KEY
-   */
+  /** 产品KEY */
   @Schema(description = "产品KEY")
   @Column(name = "product_key")
   private String productKey;
 
-  /**
-   * 规则配置
-   */
+  /** 规则配置 */
   @Schema(description = "规则配置")
   @Column(name = "config")
   private String config;
 
-  /**
-   * 创建人
-   */
+  /** 创建人 */
   @Schema(description = "创建人")
   @Column(name = "creator_id")
   private String creatorId;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Schema(description = "创建时间")
   @Column(name = "create_time")
   private Date createTime;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Schema(description = "创建时间")
   @Column(name = "update_time")
   private Date updateTime;

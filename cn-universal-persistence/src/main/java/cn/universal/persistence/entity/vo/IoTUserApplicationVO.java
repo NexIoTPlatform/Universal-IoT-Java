@@ -40,57 +40,41 @@ public class IoTUserApplicationVO implements Serializable {
   @Excel(name = "用户唯一标识")
   private String unionId;
 
-  /**
-   * 调用凭证APPID
-   */
+  /** 调用凭证APPID */
   @Column(name = "app_id")
   @Excel(name = "调用凭证APPID")
   private String appId;
 
-  /**
-   * MQ上行主题，英文逗号分隔
-   */
+  /** MQ上行主题，英文逗号分隔 */
   @Column(name = "up_topic")
   @Excel(name = "MQ上行主题")
   private String upTopic;
 
-  /**
-   * MQ下行主题，英文逗号分隔
-   */
+  /** MQ下行主题，英文逗号分隔 */
   @Column(name = "down_topic")
   @Excel(name = "MQ下行主题")
   private String downTopic;
 
-  /**
-   * 调用密钥
-   */
+  /** 调用密钥 */
   @Column(name = "app_secret")
   @Excel(name = "调用密钥")
   private String appSecret;
 
-  /**
-   * 授权结束时间
-   */
+  /** 授权结束时间 */
   @Column(name = "valid_end_date")
   @Excel(name = "授权结束时间")
   private Date validEndDate;
 
-  /**
-   * 授权范围
-   */
+  /** 授权范围 */
   @Excel(name = "授权范围")
   private String scope;
 
-  /**
-   * 0-正常，1-停用
-   */
+  /** 0-正常，1-停用 */
   @Column(name = "app_status")
   @Excel(name = "应用状态 0-正常，1-停用")
   private Integer appStatus;
 
-  /**
-   * 0-正常，1-删除
-   */
+  /** 0-正常，1-删除 */
   @Excel(name = "是否删除 0正常 1删除")
   private Integer deleted;
 

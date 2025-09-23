@@ -28,36 +28,23 @@ import lombok.NoArgsConstructor;
 public class SupportMapAreas implements Serializable {
 
   private static final long serialVersionUID = 1L;
-  @Id
-  private String id;
+  @Id private String id;
 
-  /**
-   * 父id
-   */
+  /** 父id */
   private String pid;
 
-  /**
-   * 地址
-   */
+  /** 地址 */
   private String name;
 
-  /**
-   * 详细地址
-   */
+  /** 详细地址 */
   private String fullName;
 
-  /**
-   * 深度
-   */
+  /** 深度 */
   private String deep;
 
-  /**
-   * 核心点坐标
-   */
+  /** 核心点坐标 */
   private String location;
 
-  /**
-   * 范围坐标
-   */
+  /** 范围坐标 */
   private String polygon;
 }
