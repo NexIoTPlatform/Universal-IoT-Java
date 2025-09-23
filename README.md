@@ -251,7 +251,7 @@ cd cn-universal-web & ./bin/restart.sh
 
 有任何问题加入QQ群
 
-| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.jpg) |
+| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.png) |
 
 ## 🤝 贡献指南
 
@@ -331,8 +331,6 @@ cd cn-universal-web & ./bin/restart.sh
 ### 🔒 开源和商业
 
 开源版本暂不包含 **TCP**、**天翼物联ctaiot** 模块。可自行二次开发扩展，商用授权需获取授权。
-
-### 🙏 致谢
 
 感谢以下开源项目和技术平台：
 
