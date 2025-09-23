@@ -53,8 +53,9 @@ public class IoTDeviceAutoInsertIntercept implements IoTDownWrapper {
   public R beforeDownAction(IoTProduct product, Object data, DownRequest downRequest) {
     // 产品为空或者没有开启自动注册直接略过
     if (ObjectUtil.isEmpty(product)
-        || !JSONUtil.parseObj(product.getConfiguration())
-            .getBool(IoTConstant.ALLOW_INSERT, false)) {
+        || (JSONUtil.isTypeJSON(product.getConfiguration())
+            && !JSONUtil.parseObj(product.getConfiguration())
+                .getBool(IoTConstant.ALLOW_INSERT, false))) {
       return null;
     }
     R r = null;

@@ -16,22 +16,15 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.crypto.digest.DigestUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTConstant.DeviceNode;
 import cn.universal.common.constant.IoTConstant.MessageType;
-import cn.universal.common.utils.AESOperator;
 import cn.universal.core.message.UPRequest;
 import cn.universal.core.metadata.AbstractEventMetadata;
 import cn.universal.core.metadata.AbstractFunctionMetadata;
 import cn.universal.core.metadata.DeviceMetadata;
-import cn.universal.core.protocol.jar.ProtocolCodecJar;
-import cn.universal.core.protocol.jscrtipt.ProtocolCodecJscript;
-import cn.universal.core.protocol.magic.ProtocolCodecMagic;
-import cn.universal.core.protocol.support.ProtocolCodecSupport;
-import cn.universal.core.protocol.support.ProtocolSupportDefinition;
 import cn.universal.core.service.ICodecService;
 import cn.universal.dm.device.service.action.IoTDeviceActionAfterService;
 import cn.universal.dm.device.service.impl.IoTDeviceService;
@@ -94,23 +87,53 @@ public abstract class AbstratIoTService {
   protected IoTProduct getProduct(String productKey) {
     return iotProductDeviceService.getProduct(productKey);
   }
+
+  protected JSONObject getProductConfiguration(String productKey) {
+    return iotProductDeviceService.getProductConfiguration(productKey);
+  }
+
+  /**
+   * 安全解析产品配置JSON
+   * 
+   * <p>处理以下情况：
+   * <ul>
+   *   <li>配置为null</li>
+   *   <li>配置为空字符串</li>
+   *   <li>配置不是有效的JSON格式</li>
+   * </ul>
+   * 
+   * @param product 产品信息
+   * @return 解析后的JSONObject，如果解析失败返回空的JSONObject
+   */
+  protected JSONObject parseProductConfigurationSafely(IoTProduct product) {
+    if (product == null) {
+      log.warn("产品信息为空，返回空配置");
+      return new JSONObject();
+    }
+    
+    String configuration = product.getConfiguration();
+    if (StrUtil.isBlank(configuration)) {
+      log.debug("产品配置为空，返回空配置: productKey={}", product.getProductKey());
+      return new JSONObject();
+    }
+    
+    try {
+      JSONObject config = JSONUtil.parseObj(configuration);
+      log.debug("产品配置解析成功: productKey={}", product.getProductKey());
+      return config;
+    } catch (Exception e) {
+      log.error("产品配置解析失败，返回空配置: productKey={}, configuration={}", 
+                product.getProductKey(), configuration, e);
+      return new JSONObject();
+    }
+  }
+
   protected IoTDeviceDTO getIoTDeviceDTO(IoTDeviceQuery query) {
     IoTDeviceDTO instanceBO = iotDeviceService.lifeCycleDevInstance(query);
     if (instanceBO == null) {
       return null;
     }
     return instanceBO;
-  }
-  /**
-   * 查询产品是否配置了离线周期阈值
-   *
-   * <p>用于判断产品是否需要监控设备离线状态
-   *
-   * @param productKey 产品唯一标识
-   * @return true表示配置了离线周期，false表示未配置
-   */
-  protected boolean offlineThreshold(String productKey) {
-    return iotProductDeviceService.offlineThreshold(productKey);
   }
 
   /**
@@ -186,30 +209,6 @@ public abstract class AbstratIoTService {
   }
 
   /**
-   * 查询产品的协议解码定义
-   *
-   * <p>获取产品配置的协议解码规则，用于消息的编解码处理
-   *
-   * @param productKey 产品唯一标识
-   * @return 协议支持定义，包含解码规则和配置
-   */
-  protected ProtocolSupportDefinition selectProtocolDef(String productKey) {
-    return iotProductDeviceService.selectProtocolDef(productKey);
-  }
-
-  /**
-   * 查询产品的协议解码定义(不带超长脚本)
-   *
-   * <p>获取产品配置的协议解码规则，用于消息的编解码处理
-   *
-   * @param productKey 产品唯一标识
-   * @return 协议支持定义，包含解码规则和配置
-   */
-  protected ProtocolSupportDefinition selectProtocolDefNoScript(String productKey) {
-    return iotProductDeviceService.selectProtocolDefNoScript(productKey);
-  }
-
-  /**
    * 保存设备上行日志和影子数据
    *
    * <p>批量处理设备上行请求，包括： - 保存设备数据日志到数据库 - 更新设备影子状态 - 过滤调试模式的消息
@@ -231,73 +230,8 @@ public abstract class AbstratIoTService {
     }
   }
 
-  /**
-   * 获取编解码插件提供者
-   *
-   * <p>根据支持类型获取对应的协议编解码实现，支持： - jar: Java插件模式 - jscript: JavaScript脚本模式 - magic: 魔法字节模式
-   *
-   * @param supportType 支持类型
-   * @return 协议编解码支持实例，如果类型不支持返回null
-   */
-  protected ProtocolCodecSupport getProtocolCodecProvider(String supportType) {
-    if (supportType == null) {
-      return null;
-    }
-    if (supportType.equalsIgnoreCase("jar")) {
-      return ProtocolCodecJar.getInstance();
-    } else if (supportType.equalsIgnoreCase("jscript")) {
-      return ProtocolCodecJscript.getInstance();
-    } else if (supportType.equalsIgnoreCase("magic")) {
-      return ProtocolCodecMagic.getInstance();
-    }
-    return null;
-  }
-
-  /**
-   * 透传上层应用原始报文AES加密
-   *
-   * <p>使用设备唯一标识作为密钥对原始报文进行AES加密 密钥生成规则：使用iotId的MD5值作为密钥
-   *
-   * @param payload 原始报文内容
-   * @param iotId 设备唯一标识
-   * @return 加密后的报文
-   */
-  protected String playloadEncode(String payload, String iotId) {
-    return AESOperator.getInstance()
-        .encrypt(payload, DigestUtil.md5Hex16(iotId), DigestUtil.md5Hex(iotId));
-  }
-
-  /**
-   * AES解密
-   *
-   * <p>使用设备唯一标识作为密钥对加密报文进行AES解密 密钥生成规则：使用iotId的MD5值作为密钥
-   *
-   * @param payload 加密的报文内容
-   * @param iotId 设备唯一标识
-   * @return 解密后的原始报文
-   */
-  protected String playloadDecode(String payload, String iotId) {
-    return AESOperator.getInstance()
-        .decrypt(payload, DigestUtil.md5Hex16(iotId), DigestUtil.md5Hex(iotId));
-  }
-
-  /**
-   * 根据设备序列号查询设备信息
-   *
-   * <p>通过设备序列号获取设备的完整信息，包括设备状态、配置等
-   *
-   * @param deviceId 设备序列号
-   * @return 设备实例信息
-   */
-  public IoTDeviceDTO getIotDeviceByDeviceIdLimitOne(String deviceId) {
-    IoTDeviceDTO devInstance =
-        iotDeviceService.lifeCycleDevInstance(IoTDeviceQuery.builder().deviceId(deviceId).build());
-    return devInstance;
-  }
-
   protected <R> List<R> decode(
       String productKey, String payload, Object context, Class<R> elementType) {
-    // 使用新的统一编解码服务
     return codecService.decode(productKey, payload, context, elementType);
   }
 
@@ -307,6 +241,14 @@ public abstract class AbstratIoTService {
 
   protected List<UPRequest> decode(String productKey, String payload) {
     return decode(productKey, payload, null, UPRequest.class);
+  }
+
+  protected String encode(String productKey, String payload, Object context) {
+    return codecService.encode(productKey, payload, context);
+  }
+
+  protected String encode(String productKey, String payload) {
+    return encode(productKey, payload, null);
   }
 
   protected void buildCodecNotNullBean(

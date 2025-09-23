@@ -41,10 +41,13 @@ import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
+ * 设备影子处理
+ *
  * @version 1.0 @Author Aleo
  * @since 2025/9/17
  */
@@ -67,13 +70,127 @@ public class IoTDeviceShadowService {
   // 注入优化版服务
   @Resource private IoTDeviceShadowServiceOptimized ioTDeviceShadowServiceOptimized;
 
-  public IoTDeviceShadow getDeviceShadow(String iotId) {
-    return ioTDeviceShadowMapper.getDeviceShadow(iotId);
+  @Value("${shadow.cache.enabled:true}")
+  private boolean shadowCacheEnabled;
+
+  @Value("${shadow.cache.key-prefix:shadow}")
+  private String shadowKeyPrefix;
+
+  @Value("${shadow.cache.ttl-seconds:604800}") // 7 days
+  private long shadowCacheTtlSeconds;
+
+  @Value("${shadow.flush.zset-key:shadow:flush}")
+  private String shadowFlushZsetKey;
+
+  @Value("${shadow.flush.base-interval-ms:7200000}") // 24h
+  private long flushBaseIntervalMs;
+
+  @Value("${shadow.flush.jitter-rate:0.2}") // ±20%
+  private double flushJitterRate;
+
+  // 强制刷盘配置 - 使用默认值，不增加环境配置
+  private static final long MAX_DELAY_MS = 86400000L; // 24小时最大延迟
+  private static final long MIN_INTERVAL_MS = 3600000L; // 最小间隔：1小时
+  private static final int VERSION_THRESHOLD = 10; // 版本号阈值：10
+  private static final long FORCE_FLUSH_DELAY_MS = 30000L; // 强制刷盘延迟：30秒（确保能被5分钟扫描间隔捕获）
+
+  private String buildShadowKey(String iotId) {
+    return shadowKeyPrefix + ":" + iotId;
+  }
+
+  private Long calcNextFlushAtMs(String iotId) {
+    long now = System.currentTimeMillis();
+
+    // 获取当前已设置的刷盘时间
+    Double currentScore = stringRedisTemplate.opsForZSet().score(shadowFlushZsetKey, iotId);
+
+    if (currentScore != null) {
+      long currentFlushTime = currentScore.longValue();
+      long timeSinceLastFlush = now - (currentFlushTime - flushBaseIntervalMs);
+
+      // 1. 最大延迟时间检查
+      if (timeSinceLastFlush > MAX_DELAY_MS) {
+        log.info("[ShadowFlush] 最大延迟强制刷盘: iotId={}, 延迟时间={}ms", iotId, timeSinceLastFlush);
+        return now + FORCE_FLUSH_DELAY_MS;
+      }
+
+      // 2. 最小间隔检查
+      if (timeSinceLastFlush >= MIN_INTERVAL_MS) {
+        log.info("[ShadowFlush] 最小间隔强制刷盘: iotId={}, 间隔时间={}ms", iotId, timeSinceLastFlush);
+        return now + FORCE_FLUSH_DELAY_MS;
+      }
+
+      // 3. 版本号检查
+      if (checkVersionThreshold(iotId)) {
+        log.info("[ShadowFlush] 版本号强制刷盘: iotId={}", iotId);
+        return now + FORCE_FLUSH_DELAY_MS;
+      }
+
+      // 如果当前刷盘时间还没到，保持原时间
+      if (currentFlushTime > now) {
+        return currentFlushTime;
+      }
+    }
+
+    // 正常计算新的刷盘时间
+    double jitter = (Math.random() * 2 * flushJitterRate) - flushJitterRate;
+    long offset = (long) (flushBaseIntervalMs * (1 + jitter));
+    return now + Math.max(0L, offset);
+  }
+
+  private Shadow readShadowFromCache(String iotId) {
+    if (!shadowCacheEnabled) {
+      return null;
+    }
+    final String json = buildAndGetFromRedis(iotId);
+    if (json == null) return null;
+    try {
+      return JSONUtil.toBean(json, Shadow.class);
+    } catch (Exception e) {
+      log.warn("[Shadow][Cache] parse error iotId={}, err={}", iotId, e.getMessage());
+      return null;
+    }
+  }
+
+  private String buildAndGetFromRedis(String iotId) {
+    String key = buildShadowKey(iotId);
+    String json = stringRedisTemplate.opsForValue().get(key);
+    if (StrUtil.isBlank(json)) {
+      return null;
+    }
+    return json;
+  }
+
+  private void writeShadowToCache(String iotId, Shadow shadow) {
+    if (!shadowCacheEnabled || shadow == null) {
+      return;
+    }
+    String key = buildShadowKey(iotId);
+    stringRedisTemplate
+        .opsForValue()
+        .set(key, JSONUtil.toJsonStr(shadow), shadowCacheTtlSeconds, TimeUnit.SECONDS);
+  }
+
+  private void markShadowDirtyForFlush(String iotId) {
+    if (!shadowCacheEnabled) {
+      return;
+    }
+    try {
+      Long nextAt = calcNextFlushAtMs(iotId);
+      stringRedisTemplate.opsForZSet().add(shadowFlushZsetKey, iotId, nextAt.doubleValue());
+    } catch (Exception e) {
+      log.warn("[Shadow][Flush] mark dirty failed iotId={}, err={}", iotId, e.getMessage());
+    }
   }
 
   public JSONObject getDeviceShadowObj(String productKey, String deviceId) {
     if (StrUtil.isBlank(productKey) || StrUtil.isBlank(deviceId)) {
       return null;
+    }
+    String s = buildAndGetFromRedis(productKey + deviceId);
+    // 缓存拿到，直接返回缓存的
+    if (StrUtil.isNotBlank(s)) {
+      return JSONUtil.parseObj(s);
     }
     String shadowMetadata = ioTDeviceShadowMapper.getShadowMetadata(productKey, deviceId);
     if (StrUtil.isBlank(shadowMetadata)) {
@@ -82,20 +199,34 @@ public class IoTDeviceShadowService {
     return JSONUtil.parseObj(shadowMetadata);
   }
 
-  //  @Cacheable(cacheNames = "iot_dev_shadow_bo", key = "''+#iotId", unless = "#result==null")
+  /** 格式化的属性 */
   public List<IoTDevicePropertiesBO> getDevState(String iotId) {
     List<IoTDevicePropertiesBO> result = new ArrayList<>();
-    IoTDeviceShadow ioTDeviceShadow =
-        ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
-    if (ioTDeviceShadow == null) {
-      //      throw new IoTException("设备=[" + iotId + "]影子不存在,清检查");
-      log.warn("设备=[" + iotId + "]影子不存在,清检查");
-      return result;
-    }
-    Shadow shadow = JSONUtil.toBean(ioTDeviceShadow.getMetadata(), Shadow.class);
 
-    JSONObject properties = shadow.getState().getReported();
-    JSONObject desireProperties = shadow.getState().getDesired();
+    // Cache-first
+    Shadow cached = readShadowFromCache(iotId);
+    Shadow shadow = null;
+    IoTDeviceShadow ioTDeviceShadow = null;
+    if (cached != null) {
+      shadow = cached;
+    } else {
+      ioTDeviceShadow =
+          ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
+      if (ioTDeviceShadow == null) {
+        log.warn("设备=[{}]影子不存在,清检查", iotId);
+        return result;
+      }
+      shadow = JSONUtil.toBean(ioTDeviceShadow.getMetadata(), Shadow.class);
+      // backfill cache
+      writeShadowToCache(iotId, shadow);
+    }
+    JSONObject properties =
+        shadow.getState() != null ? shadow.getState().getReported() : new JSONObject();
+    JSONObject desireProperties =
+        shadow.getState() != null ? shadow.getState().getDesired() : new JSONObject();
+    Shadow finalShadow = shadow;
+    JSONObject finalProperties = properties;
+    JSONObject finalDesireProperties = desireProperties;
     Map<String, Object> map = new HashMap<>();
     map.put("iotId", iotId);
     IoTDeviceDTO ioTDeviceDTO = ioTDeviceMapper.selectIoTDeviceBO(map);
@@ -106,24 +237,32 @@ public class IoTDeviceShadowService {
     }
     LogStorePolicyDTO storePolicyDTO =
         iotProductDeviceService.getProductLogStorePolicy(ioTDeviceDTO.getProductKey());
-    // 过滤没有上报过的属性
     propertyMetadataList.stream()
-        .filter(s -> properties.get(s.getId()) != null)
+        .filter(s -> finalProperties.get(s.getId()) != null)
         .forEach(
             s -> {
-              Object obj = properties.get(s.getId());
+              Object obj = finalProperties.get(s.getId());
               IoTDevicePropertiesBO entity = new IoTDevicePropertiesBO();
-              entity.setDesireValue(desireProperties.get(s.getId()));
+              Long ts =
+                  finalShadow.getMetadata() != null
+                          && finalShadow.getMetadata().getReported() != null
+                          && finalShadow.getMetadata().getReported().getJSONObject(s.getId())
+                              != null
+                      ? finalShadow
+                          .getMetadata()
+                          .getReported()
+                          .getJSONObject(s.getId())
+                          .getLong("timestamp")
+                      : DateUtil.currentSeconds();
+              entity.setDesireValue(finalDesireProperties.get(s.getId()));
               entity.withValue(s.getValueType(), obj);
               entity.setPropertyName(s.getName());
               entity.setIotId(iotId);
               entity.setDeviceId(ioTDeviceDTO.getDeviceId());
-              entity.setTimestamp(
-                  shadow.getMetadata().getReported().getJSONObject(s.getId()).getLong("timestamp"));
+              entity.setTimestamp(ts);
               entity.setProperty(s.getId());
               entity.setStoragePolicy(storePolicyDTO.getProperties().containsKey(s.getId()));
-              // 期望值
-              if (desireProperties.get(s.getId()) != null) {
+              if (finalDesireProperties.get(s.getId()) != null) {
                 entity.setCustomized(IoTConstant.DEVICE_SHADOW_DESIRED_PROPERTY);
               }
               result.add(entity);
@@ -132,26 +271,26 @@ public class IoTDeviceShadowService {
     return result;
   }
 
-  /** 数据为空也返回结果 */
+  /** 数据为空也返回结果 - cache first */
   public List<IoTDevicePropertiesBO> getDevStateWithNullResult(String iotId) {
     List<IoTDevicePropertiesBO> result = new ArrayList<>();
-    IoTDeviceShadow ioTDeviceShadow =
-        ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
-    Shadow shadow = null;
-    JSONObject properties = null;
-    JSONObject desireProperties = null;
-
-    if (ioTDeviceShadow == null) {
-      //      throw new IoTException("设备=[" + iotId + "]影子不存在,清检查");
-      log.warn("设备=[" + iotId + "]影子不存在,清检查");
-      shadow = Shadow.builder().build();
-      properties = new JSONObject();
-      desireProperties = new JSONObject();
-    } else {
-      shadow = JSONUtil.toBean(ioTDeviceShadow.getMetadata(), Shadow.class);
-      properties = shadow.getState().getReported();
-      desireProperties = shadow.getState().getDesired();
+    Shadow shadow = readShadowFromCache(iotId);
+    if (shadow == null) {
+      IoTDeviceShadow ioTDeviceShadow =
+          ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
+      if (ioTDeviceShadow != null && StrUtil.isNotBlank(ioTDeviceShadow.getMetadata())) {
+        shadow = JSONUtil.toBean(ioTDeviceShadow.getMetadata(), Shadow.class);
+        writeShadowToCache(iotId, shadow);
+      } else {
+        shadow = Shadow.builder().build();
+      }
     }
+
+    JSONObject properties =
+        shadow.getState() != null ? shadow.getState().getReported() : new JSONObject();
+    JSONObject desireProperties =
+        shadow.getState() != null ? shadow.getState().getDesired() : new JSONObject();
+
     Map<String, Object> map = new HashMap<>();
     map.put("iotId", iotId);
     IoTDeviceDTO ioTDeviceDTO = ioTDeviceMapper.selectIoTDeviceBO(map);
@@ -163,7 +302,6 @@ public class IoTDeviceShadowService {
     if (CollectionUtil.isEmpty(propertyMetadataList)) {
       return result;
     }
-    // 过滤没有上报过的属性
     Shadow finalShadow = shadow;
     JSONObject finalProperties = properties;
     JSONObject finalDesireProperties = desireProperties;
@@ -171,25 +309,26 @@ public class IoTDeviceShadowService {
         s -> {
           Object obj = finalProperties.get(s.getId());
           IoTDevicePropertiesBO entity = new IoTDevicePropertiesBO();
-          long times = 0;
           if (obj != null) {
             entity.withValue(s.getValueType(), obj);
             entity.setTimestamp(
-                finalShadow
-                    .getMetadata()
-                    .getReported()
-                    .getJSONObject(s.getId())
-                    .getLong("timestamp"));
+                finalShadow.getMetadata() != null
+                        && finalShadow.getMetadata().getReported() != null
+                        && finalShadow.getMetadata().getReported().getJSONObject(s.getId()) != null
+                    ? finalShadow
+                        .getMetadata()
+                        .getReported()
+                        .getJSONObject(s.getId())
+                        .getLong("timestamp")
+                    : DateUtil.currentSeconds());
           } else {
             entity.withValue(s.getValueType(), null);
-            entity.setTimestamp(System.currentTimeMillis());
+            entity.setTimestamp(DateUtil.currentSeconds());
           }
-          entity.withValue(s.getValueType(), obj);
           entity.setPropertyName(s.getName());
           entity.setIotId(iotId);
           entity.setDeviceId(ioTDeviceDTO.getDeviceId());
           entity.setProperty(s.getId());
-          // 期望值
           if (finalDesireProperties.get(s.getId()) != null) {
             entity.setDesireValue(finalDesireProperties.get(s.getId()));
             entity.setCustomized(IoTConstant.DEVICE_SHADOW_DESIRED_PROPERTY);
@@ -292,7 +431,7 @@ public class IoTDeviceShadowService {
       ioTDeviceShadow.setMetadata(JSONUtil.toJsonStr(shadow));
       ioTDeviceShadowMapper.insertSelective(ioTDeviceShadow);
       // 代理调用内部方法，清除缓存
-      iotCacheRemoveService.removeDevInstanceBOCache();
+      //      iotCacheRemoveService.removeDevInstanceBOCache();
     } else {
       // 更新最后通信时间
       IoTDeviceShadow ioTDeviceShadow =
@@ -398,7 +537,6 @@ public class IoTDeviceShadowService {
           metadata.getReported() != null ? metadata.getReported() : new JSONObject();
       JSONObject metadataDesired =
           metadata.getReported() != null ? metadata.getDesired() : new JSONObject();
-      Timestamp timestamp = new Timestamp(DateUtil.currentSeconds());
 
       data.forEach(
           (key, value) -> {
@@ -407,12 +545,12 @@ public class IoTDeviceShadowService {
               // 删除当前reply回复的期望
               stateDesired.remove(key);
               metadataDesired.remove(key);
-              metadataReported.set(key, timestamp);
+              metadataReported.set(key, new Timestamp(DateUtil.currentSeconds()));
             }
             // 回复内有数据时以回复为准
             if (!"".equals(value)) {
               stateReported.set(key, value);
-              metadataReported.set(key, timestamp);
+              metadataReported.set(key, new Timestamp(DateUtil.currentSeconds()));
             }
           });
       state.setReported(stateReported);
@@ -441,20 +579,71 @@ public class IoTDeviceShadowService {
 
   /** 优化的设备影子处理方法 - 直接调用优化类 */
   public void doShadow(UPRequest upRequest, IoTDeviceDTO ioTDeviceDTO) {
+    if (shadowCacheEnabled) {
+      doShadowCache(upRequest, ioTDeviceDTO);
+      return;
+    }
     doShadowOriginal(upRequest, ioTDeviceDTO);
-    //    try {
-    //      // 直接调用优化类的doShadow方法
-    //      if (ioTDeviceShadowServiceOptimized != null) {
-    //        ioTDeviceShadowServiceOptimized.doShadow(upRequest, ioTDeviceDTO);
-    //      } else {
-    //        log.warn("优化版服务未注入，使用原方法");
-    //        doShadowOriginal(upRequest, ioTDeviceDTO);
-    //      }
-    //    } catch (Exception e) {
-    //      log.error("优化方法处理失败，降级到原方法: iotId={}, error={}", upRequest.getIotId(), e.getMessage(),
-    // e);
-    //      // 降级处理：使用原来的同步方式
-    //      doShadowOriginal(upRequest, ioTDeviceDTO);
-    //    }
+  }
+
+  /** 新增：仅缓存与标记刷盘的影子处理，不改动原有 doShadowOriginal */
+  public void doShadowCache(UPRequest upRequest, IoTDeviceDTO ioTDeviceDTO) {
+    if (!shadowCacheEnabled) {
+      // 回退到原始逻辑
+      doShadowOriginal(upRequest, ioTDeviceDTO);
+      return;
+    }
+    String iotId = ioTDeviceDTO.getIotId();
+    Shadow shadow = readShadowFromCache(iotId);
+    if (shadow == null) {
+      // fallback DB
+      IoTDeviceShadow fromDb =
+          ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
+      if (fromDb != null && StrUtil.isNotBlank(fromDb.getMetadata())) {
+        shadow = JSONUtil.toBean(fromDb.getMetadata(), Shadow.class);
+      } else {
+        shadow = Shadow.builder().timestamp(DateUtil.currentSeconds()).version(1L).build();
+      }
+    }
+    // 合并期望/上报并自增版本
+    doDesired(shadow, ioTDeviceDTO, upRequest);
+    // 写缓存
+    writeShadowToCache(iotId, shadow);
+    // 标记刷盘
+    markShadowDirtyForFlush(iotId);
+    // 清除相关业务缓存
+    //    iotCacheRemoveService.removeDevInstanceBOCache();
+  }
+
+  /** 检查版本号是否超过阈值，需要强制刷盘 */
+  private boolean checkVersionThreshold(String iotId) {
+    try {
+      String cacheJson = stringRedisTemplate.opsForValue().get(buildShadowKey(iotId));
+      if (StrUtil.isBlank(cacheJson)) {
+        return false;
+      }
+
+      JSONObject shadow = JSONUtil.parseObj(cacheJson);
+      Long currentVersion = shadow.getLong("version", 1L);
+
+      IoTDeviceShadow dbShadow =
+          ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
+      if (dbShadow != null && StrUtil.isNotBlank(dbShadow.getMetadata())) {
+        // 数据库记录存在：正常比较
+        JSONObject dbShadowObj = JSONUtil.parseObj(dbShadow.getMetadata());
+        Long dbVersion = dbShadowObj.getLong("version", 1L);
+
+        return currentVersion != null
+            && dbVersion != null
+            && (currentVersion - dbVersion) >= VERSION_THRESHOLD;
+      } else {
+        // 数据库记录不存在：立即触发刷盘（创建记录）
+        log.info("[ShadowFlush] 数据库记录不存在，立即刷盘: iotId={}, currentVersion={}", iotId, currentVersion);
+        return true;
+      }
+    } catch (Exception e) {
+      log.warn("[ShadowFlush] 版本号检查失败: iotId={}, error={}", iotId, e.getMessage());
+    }
+    return false;
   }
 }

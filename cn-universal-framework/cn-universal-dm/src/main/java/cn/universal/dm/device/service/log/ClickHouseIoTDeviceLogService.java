@@ -239,7 +239,7 @@ public class ClickHouseIoTDeviceLogService extends AbstractIoTDeviceLogService {
     }
     if (MapUtil.isNotEmpty(logQuery.getParams())
         && ObjectUtil.isNotNull(logQuery.getParams().get("endCreateTime"))) {
-      builder1.append(" AND create_time <= " + logQuery.getParams().get("beginCreateTime"));
+      builder1.append(" AND create_time <= " + logQuery.getParams().get("endCreateTime"));
     }
     builder1.append(" ORDER BY create_time DESC ");
     try {

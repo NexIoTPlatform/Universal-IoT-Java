@@ -12,7 +12,6 @@
 
 package cn.universal.dm.device.service.log;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
@@ -21,10 +20,10 @@ import cn.hutool.json.JSONUtil;
 import cn.universal.common.constant.IoTConstant.MessageType;
 import cn.universal.core.message.UPRequest;
 import cn.universal.core.metadata.DeviceMetadata;
+import cn.universal.dm.device.constant.DeviceManagerConstant;
 import cn.universal.dm.device.service.impl.IoTProductDeviceService;
 import cn.universal.persistence.base.BaseUPRequest;
 import cn.universal.persistence.dto.IoTDeviceDTO;
-import cn.universal.persistence.dto.LogStorePolicyDTO;
 import cn.universal.persistence.entity.IoTDeviceEvents;
 import cn.universal.persistence.entity.IoTDeviceLog;
 import cn.universal.persistence.entity.IoTDeviceLogMetadata;
@@ -32,6 +31,7 @@ import cn.universal.persistence.entity.IoTDeviceLogMetadata.IoTDeviceLogMetadata
 import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.mapper.IoTProductMapper;
 import jakarta.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +56,7 @@ public abstract class AbstractIoTDeviceLogService implements IIoTDeviceLogServic
   IoTDeviceLogMetadataBuilder builder(UPRequest up) {
     final IoTDeviceLogMetadataBuilder ioTDeviceLogMetadataBuilder =
         IoTDeviceLogMetadata.builder()
-            .createTime(Integer.parseInt(DateUtil.currentSeconds() + ""))
+            .createTime(LocalDateTime.now())
             .deviceId(up.getDeviceId())
             .deviceName(StrUtil.sub(up.getDeviceName(), 0, 30))
             .ext1(JSONUtil.toJsonStr(up.getData()))
@@ -71,20 +71,20 @@ public abstract class AbstractIoTDeviceLogService implements IIoTDeviceLogServic
         IoTDeviceLog.builder()
             .content(peopertiesOrEventData(upRequest))
             .deviceId(ioTDeviceDTO.getDeviceId())
-            // .extDeviceId(ioTDeviceDTO.getExtDeviceId())
             .iotId(ioTDeviceDTO.getIotId())
             .productKey(ioTDeviceDTO.getProductKey())
             .messageType(upRequest.getMessageType().name())
             .event(functionOrEvent(upRequest))
             .commandId(upRequest.getCommandId())
             .commandStatus(upRequest.getCommandStatus())
-            .createTime(
-                upRequest.getTime() == null
-                    ? System.currentTimeMillis() / 1000
-                    : upRequest.getTime() / 1000)
+            .createTime(LocalDateTime.now())
             .deviceName(StrUtil.sub(ioTDeviceDTO.getDeviceName(), 0, 30))
-            .point(ioTDeviceDTO.getCoordinate())
             .build();
+    if (upRequest.getProperties() != null
+        && upRequest.getProperties().containsKey(DeviceManagerConstant.COORDINATE)) {
+      log.setPoint(ioTDeviceDTO.getCoordinate());
+    }
+
     return log;
   }
 
@@ -123,7 +123,6 @@ public abstract class AbstractIoTDeviceLogService implements IIoTDeviceLogServic
     List<IoTDeviceEvents> ioTDeviceEventsList = new ArrayList<>();
     JSONArray properties = metadata.getJSONArray("events");
     if (properties != null) {
-      LogStorePolicyDTO storePolicy = iotProductDeviceService.getProductLogStorePolicy(productKey);
       for (Object object : properties) {
         JSONObject jsonObject = JSONUtil.parseObj(object);
         JSONObject expands = JSONUtil.parseObj(jsonObject.getStr("expands"));
