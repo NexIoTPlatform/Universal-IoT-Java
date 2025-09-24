@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.parsing.ast.statement;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -27,10 +15,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/** 异步调用 */
+/**
+ * 异步调用
+ */
 public class AsyncCall extends Expression {
 
-  /** 默认线程池大小(CPU核心数 * 2) */
+  /**
+   * 默认线程池大小(CPU核心数 * 2)
+   */
   private static ThreadPoolExecutor threadPoolExecutor =
       setThreadPoolExecutorSize(Runtime.getRuntime().availableProcessors() * 2);
 

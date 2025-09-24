@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.reflection;
 
 import cn.universal.core.engine.convert.BooleanImplicitConvert;
@@ -333,7 +321,9 @@ public class JavaReflection {
     return foundInvoker;
   }
 
-  /** Returns the method best matching the given signature, including type coercion, or null. */
+  /**
+   * Returns the method best matching the given signature, including type coercion, or null.
+   */
   public static JavaInvoker<Method> findInvoker(
       Class<?> cls, String name, Class<?>[] parameterTypes) {
     List<JavaInvoker<Method>> methodList = new ArrayList<>();
@@ -357,7 +347,9 @@ public class JavaReflection {
     return findInvoker(cls, name, new Class<?>[0]);
   }
 
-  /** 是否可以自动装修拆箱 */
+  /**
+   * 是否可以自动装修拆箱
+   */
   public static boolean isPrimitiveAssignableFrom(Class<?> from, Class<?> to) {
     if ((from == Boolean.class || from == boolean.class)
         && (to == boolean.class || to == Boolean.class)) {
@@ -386,7 +378,9 @@ public class JavaReflection {
         && (to == char.class || to == Character.class);
   }
 
-  /** 获取String类型的参数描述 */
+  /**
+   * 获取String类型的参数描述
+   */
   public static String[] getStringTypes(Object[] objects) {
     String[] parameterTypes = new String[objects == null ? 0 : objects.length];
     if (objects != null) {
@@ -398,7 +392,9 @@ public class JavaReflection {
     return parameterTypes;
   }
 
-  /** 是否可以自动隐式转换 https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html */
+  /**
+   * 是否可以自动隐式转换 https://docs.oracle.com/javase/specs/jls/se7/html/jls-5.html
+   */
   private static boolean isCoercible(Class<?> from, Class<?> to) {
     if (from == Integer.class || from == int.class) {
       return to == float.class
@@ -472,7 +468,7 @@ public class JavaReflection {
   /**
    * 获取内部类
    *
-   * @param obj 目标对象，可以是实例，可以是Class
+   * @param obj  目标对象，可以是实例，可以是Class
    * @param name 内部类名称
    */
   public static Object getInnerClass(Object obj, String name) {
@@ -490,7 +486,7 @@ public class JavaReflection {
   /**
    * 获取字段
    *
-   * @param obj 目标对象可以是实例，可以是Class
+   * @param obj  目标对象可以是实例，可以是Class
    * @param name 字段名称
    * @return
    */
@@ -539,7 +535,9 @@ public class JavaReflection {
     return field;
   }
 
-  /** 注册隐式转换器 */
+  /**
+   * 注册隐式转换器
+   */
   public static void registerImplicitConvert(ClassImplicitConvert classImplicitConvert) {
     CONVERTS.add(classImplicitConvert);
   }
@@ -547,7 +545,7 @@ public class JavaReflection {
   /**
    * 注册扩展方法
    *
-   * @param target 目标类
+   * @param target          目标类
    * @param extensionObject 实现类
    */
   public static void registerMethodExtension(Class<?> target, Object extensionObject) {
@@ -738,10 +736,16 @@ public class JavaReflection {
     return findMethodInvoker(methodList, getParameterTypes(null, arguments));
   }
 
-  /** NULL值 */
-  public static final class Null {}
+  /**
+   * NULL值
+   */
+  public static final class Null {
 
-  /** 方法签名 */
+  }
+
+  /**
+   * 方法签名
+   */
   private static class MethodSignature {
 
     private final String name;

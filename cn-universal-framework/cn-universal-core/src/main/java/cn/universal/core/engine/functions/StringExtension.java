@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -18,11 +6,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** String 扩展 */
+/**
+ * String 扩展
+ */
 public class StringExtension {
 
   @Comment("校验文本是否符合正则")
-  public boolean match(String source, @Comment(name = "pattern", value = "正则表达式") Pattern pattern) {
+  public boolean match(String source,
+      @Comment(name = "pattern", value = "正则表达式") Pattern pattern) {
     return pattern.matcher(source).find();
   }
 

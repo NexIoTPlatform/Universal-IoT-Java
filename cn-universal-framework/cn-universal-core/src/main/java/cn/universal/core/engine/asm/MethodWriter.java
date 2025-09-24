@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -17,11 +5,13 @@ package cn.universal.core.engine.asm;
  * Java Virtual Machine Specification (JVMS). @Author Eric Bruneton @Author Eugene Kuleshov
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.6">JVMS
- *     4.6</a>
+ * 4.6</a>
  */
 final class MethodWriter extends MethodVisitor {
 
-  /** Indicates that nothing must be computed. */
+  /**
+   * Indicates that nothing must be computed.
+   */
   static final int COMPUTE_NOTHING = 0;
 
   /**
@@ -52,7 +42,9 @@ final class MethodWriter extends MethodVisitor {
    */
   static final int COMPUTE_ALL_FRAMES = 4;
 
-  /** Indicates that {@link #STACK_SIZE_DELTA} is not applicable (not constant or never used). */
+  /**
+   * Indicates that {@link #STACK_SIZE_DELTA} is not applicable (not constant or never used).
+   */
   private static final int NA = 0;
 
   /**
@@ -62,211 +54,213 @@ final class MethodWriter extends MethodVisitor {
    * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html">JVMS 6</a>
    */
   private static final int[] STACK_SIZE_DELTA = {
-    0, // nop = 0 (0x0)
-    1, // aconst_null = 1 (0x1)
-    1, // iconst_m1 = 2 (0x2)
-    1, // iconst_0 = 3 (0x3)
-    1, // iconst_1 = 4 (0x4)
-    1, // iconst_2 = 5 (0x5)
-    1, // iconst_3 = 6 (0x6)
-    1, // iconst_4 = 7 (0x7)
-    1, // iconst_5 = 8 (0x8)
-    2, // lconst_0 = 9 (0x9)
-    2, // lconst_1 = 10 (0xa)
-    1, // fconst_0 = 11 (0xb)
-    1, // fconst_1 = 12 (0xc)
-    1, // fconst_2 = 13 (0xd)
-    2, // dconst_0 = 14 (0xe)
-    2, // dconst_1 = 15 (0xf)
-    1, // bipush = 16 (0x10)
-    1, // sipush = 17 (0x11)
-    1, // ldc = 18 (0x12)
-    NA, // ldc_w = 19 (0x13)
-    NA, // ldc2_w = 20 (0x14)
-    1, // iload = 21 (0x15)
-    2, // lload = 22 (0x16)
-    1, // fload = 23 (0x17)
-    2, // dload = 24 (0x18)
-    1, // aload = 25 (0x19)
-    NA, // iload_0 = 26 (0x1a)
-    NA, // iload_1 = 27 (0x1b)
-    NA, // iload_2 = 28 (0x1c)
-    NA, // iload_3 = 29 (0x1d)
-    NA, // lload_0 = 30 (0x1e)
-    NA, // lload_1 = 31 (0x1f)
-    NA, // lload_2 = 32 (0x20)
-    NA, // lload_3 = 33 (0x21)
-    NA, // fload_0 = 34 (0x22)
-    NA, // fload_1 = 35 (0x23)
-    NA, // fload_2 = 36 (0x24)
-    NA, // fload_3 = 37 (0x25)
-    NA, // dload_0 = 38 (0x26)
-    NA, // dload_1 = 39 (0x27)
-    NA, // dload_2 = 40 (0x28)
-    NA, // dload_3 = 41 (0x29)
-    NA, // aload_0 = 42 (0x2a)
-    NA, // aload_1 = 43 (0x2b)
-    NA, // aload_2 = 44 (0x2c)
-    NA, // aload_3 = 45 (0x2d)
-    -1, // iaload = 46 (0x2e)
-    0, // laload = 47 (0x2f)
-    -1, // faload = 48 (0x30)
-    0, // daload = 49 (0x31)
-    -1, // aaload = 50 (0x32)
-    -1, // baload = 51 (0x33)
-    -1, // caload = 52 (0x34)
-    -1, // saload = 53 (0x35)
-    -1, // istore = 54 (0x36)
-    -2, // lstore = 55 (0x37)
-    -1, // fstore = 56 (0x38)
-    -2, // dstore = 57 (0x39)
-    -1, // astore = 58 (0x3a)
-    NA, // istore_0 = 59 (0x3b)
-    NA, // istore_1 = 60 (0x3c)
-    NA, // istore_2 = 61 (0x3d)
-    NA, // istore_3 = 62 (0x3e)
-    NA, // lstore_0 = 63 (0x3f)
-    NA, // lstore_1 = 64 (0x40)
-    NA, // lstore_2 = 65 (0x41)
-    NA, // lstore_3 = 66 (0x42)
-    NA, // fstore_0 = 67 (0x43)
-    NA, // fstore_1 = 68 (0x44)
-    NA, // fstore_2 = 69 (0x45)
-    NA, // fstore_3 = 70 (0x46)
-    NA, // dstore_0 = 71 (0x47)
-    NA, // dstore_1 = 72 (0x48)
-    NA, // dstore_2 = 73 (0x49)
-    NA, // dstore_3 = 74 (0x4a)
-    NA, // astore_0 = 75 (0x4b)
-    NA, // astore_1 = 76 (0x4c)
-    NA, // astore_2 = 77 (0x4d)
-    NA, // astore_3 = 78 (0x4e)
-    -3, // iastore = 79 (0x4f)
-    -4, // lastore = 80 (0x50)
-    -3, // fastore = 81 (0x51)
-    -4, // dastore = 82 (0x52)
-    -3, // aastore = 83 (0x53)
-    -3, // bastore = 84 (0x54)
-    -3, // castore = 85 (0x55)
-    -3, // sastore = 86 (0x56)
-    -1, // pop = 87 (0x57)
-    -2, // pop2 = 88 (0x58)
-    1, // dup = 89 (0x59)
-    1, // dup_x1 = 90 (0x5a)
-    1, // dup_x2 = 91 (0x5b)
-    2, // dup2 = 92 (0x5c)
-    2, // dup2_x1 = 93 (0x5d)
-    2, // dup2_x2 = 94 (0x5e)
-    0, // swap = 95 (0x5f)
-    -1, // iadd = 96 (0x60)
-    -2, // ladd = 97 (0x61)
-    -1, // fadd = 98 (0x62)
-    -2, // dadd = 99 (0x63)
-    -1, // isub = 100 (0x64)
-    -2, // lsub = 101 (0x65)
-    -1, // fsub = 102 (0x66)
-    -2, // dsub = 103 (0x67)
-    -1, // imul = 104 (0x68)
-    -2, // lmul = 105 (0x69)
-    -1, // fmul = 106 (0x6a)
-    -2, // dmul = 107 (0x6b)
-    -1, // idiv = 108 (0x6c)
-    -2, // ldiv = 109 (0x6d)
-    -1, // fdiv = 110 (0x6e)
-    -2, // ddiv = 111 (0x6f)
-    -1, // irem = 112 (0x70)
-    -2, // lrem = 113 (0x71)
-    -1, // frem = 114 (0x72)
-    -2, // drem = 115 (0x73)
-    0, // ineg = 116 (0x74)
-    0, // lneg = 117 (0x75)
-    0, // fneg = 118 (0x76)
-    0, // dneg = 119 (0x77)
-    -1, // ishl = 120 (0x78)
-    -1, // lshl = 121 (0x79)
-    -1, // ishr = 122 (0x7a)
-    -1, // lshr = 123 (0x7b)
-    -1, // iushr = 124 (0x7c)
-    -1, // lushr = 125 (0x7d)
-    -1, // iand = 126 (0x7e)
-    -2, // land = 127 (0x7f)
-    -1, // ior = 128 (0x80)
-    -2, // lor = 129 (0x81)
-    -1, // ixor = 130 (0x82)
-    -2, // lxor = 131 (0x83)
-    0, // iinc = 132 (0x84)
-    1, // i2l = 133 (0x85)
-    0, // i2f = 134 (0x86)
-    1, // i2d = 135 (0x87)
-    -1, // l2i = 136 (0x88)
-    -1, // l2f = 137 (0x89)
-    0, // l2d = 138 (0x8a)
-    0, // f2i = 139 (0x8b)
-    1, // f2l = 140 (0x8c)
-    1, // f2d = 141 (0x8d)
-    -1, // d2i = 142 (0x8e)
-    0, // d2l = 143 (0x8f)
-    -1, // d2f = 144 (0x90)
-    0, // i2b = 145 (0x91)
-    0, // i2c = 146 (0x92)
-    0, // i2s = 147 (0x93)
-    -3, // lcmp = 148 (0x94)
-    -1, // fcmpl = 149 (0x95)
-    -1, // fcmpg = 150 (0x96)
-    -3, // dcmpl = 151 (0x97)
-    -3, // dcmpg = 152 (0x98)
-    -1, // ifeq = 153 (0x99)
-    -1, // ifne = 154 (0x9a)
-    -1, // iflt = 155 (0x9b)
-    -1, // ifge = 156 (0x9c)
-    -1, // ifgt = 157 (0x9d)
-    -1, // ifle = 158 (0x9e)
-    -2, // if_icmpeq = 159 (0x9f)
-    -2, // if_icmpne = 160 (0xa0)
-    -2, // if_icmplt = 161 (0xa1)
-    -2, // if_icmpge = 162 (0xa2)
-    -2, // if_icmpgt = 163 (0xa3)
-    -2, // if_icmple = 164 (0xa4)
-    -2, // if_acmpeq = 165 (0xa5)
-    -2, // if_acmpne = 166 (0xa6)
-    0, // goto = 167 (0xa7)
-    1, // jsr = 168 (0xa8)
-    0, // ret = 169 (0xa9)
-    -1, // tableswitch = 170 (0xaa)
-    -1, // lookupswitch = 171 (0xab)
-    -1, // ireturn = 172 (0xac)
-    -2, // lreturn = 173 (0xad)
-    -1, // freturn = 174 (0xae)
-    -2, // dreturn = 175 (0xaf)
-    -1, // areturn = 176 (0xb0)
-    0, // return = 177 (0xb1)
-    NA, // getstatic = 178 (0xb2)
-    NA, // putstatic = 179 (0xb3)
-    NA, // getfield = 180 (0xb4)
-    NA, // putfield = 181 (0xb5)
-    NA, // invokevirtual = 182 (0xb6)
-    NA, // invokespecial = 183 (0xb7)
-    NA, // invokestatic = 184 (0xb8)
-    NA, // invokeinterface = 185 (0xb9)
-    NA, // invokedynamic = 186 (0xba)
-    1, // new = 187 (0xbb)
-    0, // newarray = 188 (0xbc)
-    0, // anewarray = 189 (0xbd)
-    0, // arraylength = 190 (0xbe)
-    NA, // athrow = 191 (0xbf)
-    0, // checkcast = 192 (0xc0)
-    0, // instanceof = 193 (0xc1)
-    -1, // monitorenter = 194 (0xc2)
-    -1, // monitorexit = 195 (0xc3)
-    NA, // wide = 196 (0xc4)
-    NA, // multianewarray = 197 (0xc5)
-    -1, // ifnull = 198 (0xc6)
-    -1, // ifnonnull = 199 (0xc7)
-    NA, // goto_w = 200 (0xc8)
-    NA // jsr_w = 201 (0xc9)
+      0, // nop = 0 (0x0)
+      1, // aconst_null = 1 (0x1)
+      1, // iconst_m1 = 2 (0x2)
+      1, // iconst_0 = 3 (0x3)
+      1, // iconst_1 = 4 (0x4)
+      1, // iconst_2 = 5 (0x5)
+      1, // iconst_3 = 6 (0x6)
+      1, // iconst_4 = 7 (0x7)
+      1, // iconst_5 = 8 (0x8)
+      2, // lconst_0 = 9 (0x9)
+      2, // lconst_1 = 10 (0xa)
+      1, // fconst_0 = 11 (0xb)
+      1, // fconst_1 = 12 (0xc)
+      1, // fconst_2 = 13 (0xd)
+      2, // dconst_0 = 14 (0xe)
+      2, // dconst_1 = 15 (0xf)
+      1, // bipush = 16 (0x10)
+      1, // sipush = 17 (0x11)
+      1, // ldc = 18 (0x12)
+      NA, // ldc_w = 19 (0x13)
+      NA, // ldc2_w = 20 (0x14)
+      1, // iload = 21 (0x15)
+      2, // lload = 22 (0x16)
+      1, // fload = 23 (0x17)
+      2, // dload = 24 (0x18)
+      1, // aload = 25 (0x19)
+      NA, // iload_0 = 26 (0x1a)
+      NA, // iload_1 = 27 (0x1b)
+      NA, // iload_2 = 28 (0x1c)
+      NA, // iload_3 = 29 (0x1d)
+      NA, // lload_0 = 30 (0x1e)
+      NA, // lload_1 = 31 (0x1f)
+      NA, // lload_2 = 32 (0x20)
+      NA, // lload_3 = 33 (0x21)
+      NA, // fload_0 = 34 (0x22)
+      NA, // fload_1 = 35 (0x23)
+      NA, // fload_2 = 36 (0x24)
+      NA, // fload_3 = 37 (0x25)
+      NA, // dload_0 = 38 (0x26)
+      NA, // dload_1 = 39 (0x27)
+      NA, // dload_2 = 40 (0x28)
+      NA, // dload_3 = 41 (0x29)
+      NA, // aload_0 = 42 (0x2a)
+      NA, // aload_1 = 43 (0x2b)
+      NA, // aload_2 = 44 (0x2c)
+      NA, // aload_3 = 45 (0x2d)
+      -1, // iaload = 46 (0x2e)
+      0, // laload = 47 (0x2f)
+      -1, // faload = 48 (0x30)
+      0, // daload = 49 (0x31)
+      -1, // aaload = 50 (0x32)
+      -1, // baload = 51 (0x33)
+      -1, // caload = 52 (0x34)
+      -1, // saload = 53 (0x35)
+      -1, // istore = 54 (0x36)
+      -2, // lstore = 55 (0x37)
+      -1, // fstore = 56 (0x38)
+      -2, // dstore = 57 (0x39)
+      -1, // astore = 58 (0x3a)
+      NA, // istore_0 = 59 (0x3b)
+      NA, // istore_1 = 60 (0x3c)
+      NA, // istore_2 = 61 (0x3d)
+      NA, // istore_3 = 62 (0x3e)
+      NA, // lstore_0 = 63 (0x3f)
+      NA, // lstore_1 = 64 (0x40)
+      NA, // lstore_2 = 65 (0x41)
+      NA, // lstore_3 = 66 (0x42)
+      NA, // fstore_0 = 67 (0x43)
+      NA, // fstore_1 = 68 (0x44)
+      NA, // fstore_2 = 69 (0x45)
+      NA, // fstore_3 = 70 (0x46)
+      NA, // dstore_0 = 71 (0x47)
+      NA, // dstore_1 = 72 (0x48)
+      NA, // dstore_2 = 73 (0x49)
+      NA, // dstore_3 = 74 (0x4a)
+      NA, // astore_0 = 75 (0x4b)
+      NA, // astore_1 = 76 (0x4c)
+      NA, // astore_2 = 77 (0x4d)
+      NA, // astore_3 = 78 (0x4e)
+      -3, // iastore = 79 (0x4f)
+      -4, // lastore = 80 (0x50)
+      -3, // fastore = 81 (0x51)
+      -4, // dastore = 82 (0x52)
+      -3, // aastore = 83 (0x53)
+      -3, // bastore = 84 (0x54)
+      -3, // castore = 85 (0x55)
+      -3, // sastore = 86 (0x56)
+      -1, // pop = 87 (0x57)
+      -2, // pop2 = 88 (0x58)
+      1, // dup = 89 (0x59)
+      1, // dup_x1 = 90 (0x5a)
+      1, // dup_x2 = 91 (0x5b)
+      2, // dup2 = 92 (0x5c)
+      2, // dup2_x1 = 93 (0x5d)
+      2, // dup2_x2 = 94 (0x5e)
+      0, // swap = 95 (0x5f)
+      -1, // iadd = 96 (0x60)
+      -2, // ladd = 97 (0x61)
+      -1, // fadd = 98 (0x62)
+      -2, // dadd = 99 (0x63)
+      -1, // isub = 100 (0x64)
+      -2, // lsub = 101 (0x65)
+      -1, // fsub = 102 (0x66)
+      -2, // dsub = 103 (0x67)
+      -1, // imul = 104 (0x68)
+      -2, // lmul = 105 (0x69)
+      -1, // fmul = 106 (0x6a)
+      -2, // dmul = 107 (0x6b)
+      -1, // idiv = 108 (0x6c)
+      -2, // ldiv = 109 (0x6d)
+      -1, // fdiv = 110 (0x6e)
+      -2, // ddiv = 111 (0x6f)
+      -1, // irem = 112 (0x70)
+      -2, // lrem = 113 (0x71)
+      -1, // frem = 114 (0x72)
+      -2, // drem = 115 (0x73)
+      0, // ineg = 116 (0x74)
+      0, // lneg = 117 (0x75)
+      0, // fneg = 118 (0x76)
+      0, // dneg = 119 (0x77)
+      -1, // ishl = 120 (0x78)
+      -1, // lshl = 121 (0x79)
+      -1, // ishr = 122 (0x7a)
+      -1, // lshr = 123 (0x7b)
+      -1, // iushr = 124 (0x7c)
+      -1, // lushr = 125 (0x7d)
+      -1, // iand = 126 (0x7e)
+      -2, // land = 127 (0x7f)
+      -1, // ior = 128 (0x80)
+      -2, // lor = 129 (0x81)
+      -1, // ixor = 130 (0x82)
+      -2, // lxor = 131 (0x83)
+      0, // iinc = 132 (0x84)
+      1, // i2l = 133 (0x85)
+      0, // i2f = 134 (0x86)
+      1, // i2d = 135 (0x87)
+      -1, // l2i = 136 (0x88)
+      -1, // l2f = 137 (0x89)
+      0, // l2d = 138 (0x8a)
+      0, // f2i = 139 (0x8b)
+      1, // f2l = 140 (0x8c)
+      1, // f2d = 141 (0x8d)
+      -1, // d2i = 142 (0x8e)
+      0, // d2l = 143 (0x8f)
+      -1, // d2f = 144 (0x90)
+      0, // i2b = 145 (0x91)
+      0, // i2c = 146 (0x92)
+      0, // i2s = 147 (0x93)
+      -3, // lcmp = 148 (0x94)
+      -1, // fcmpl = 149 (0x95)
+      -1, // fcmpg = 150 (0x96)
+      -3, // dcmpl = 151 (0x97)
+      -3, // dcmpg = 152 (0x98)
+      -1, // ifeq = 153 (0x99)
+      -1, // ifne = 154 (0x9a)
+      -1, // iflt = 155 (0x9b)
+      -1, // ifge = 156 (0x9c)
+      -1, // ifgt = 157 (0x9d)
+      -1, // ifle = 158 (0x9e)
+      -2, // if_icmpeq = 159 (0x9f)
+      -2, // if_icmpne = 160 (0xa0)
+      -2, // if_icmplt = 161 (0xa1)
+      -2, // if_icmpge = 162 (0xa2)
+      -2, // if_icmpgt = 163 (0xa3)
+      -2, // if_icmple = 164 (0xa4)
+      -2, // if_acmpeq = 165 (0xa5)
+      -2, // if_acmpne = 166 (0xa6)
+      0, // goto = 167 (0xa7)
+      1, // jsr = 168 (0xa8)
+      0, // ret = 169 (0xa9)
+      -1, // tableswitch = 170 (0xaa)
+      -1, // lookupswitch = 171 (0xab)
+      -1, // ireturn = 172 (0xac)
+      -2, // lreturn = 173 (0xad)
+      -1, // freturn = 174 (0xae)
+      -2, // dreturn = 175 (0xaf)
+      -1, // areturn = 176 (0xb0)
+      0, // return = 177 (0xb1)
+      NA, // getstatic = 178 (0xb2)
+      NA, // putstatic = 179 (0xb3)
+      NA, // getfield = 180 (0xb4)
+      NA, // putfield = 181 (0xb5)
+      NA, // invokevirtual = 182 (0xb6)
+      NA, // invokespecial = 183 (0xb7)
+      NA, // invokestatic = 184 (0xb8)
+      NA, // invokeinterface = 185 (0xb9)
+      NA, // invokedynamic = 186 (0xba)
+      1, // new = 187 (0xbb)
+      0, // newarray = 188 (0xbc)
+      0, // anewarray = 189 (0xbd)
+      0, // arraylength = 190 (0xbe)
+      NA, // athrow = 191 (0xbf)
+      0, // checkcast = 192 (0xc0)
+      0, // instanceof = 193 (0xc1)
+      -1, // monitorenter = 194 (0xc2)
+      -1, // monitorexit = 195 (0xc3)
+      NA, // wide = 196 (0xc4)
+      NA, // multianewarray = 197 (0xc5)
+      -1, // ifnull = 198 (0xc6)
+      -1, // ifnonnull = 199 (0xc7)
+      NA, // goto_w = 200 (0xc8)
+      NA // jsr_w = 201 (0xc9)
   };
 
-  /** Where the constants used in this MethodWriter must be stored. */
+  /**
+   * Where the constants used in this MethodWriter must be stored.
+   */
   private final SymbolTable symbolTable;
 
   // Note: fields are ordered as in the method_info structure, and those related to attributes are
@@ -279,27 +273,41 @@ final class MethodWriter extends MethodVisitor {
    */
   private final int accessFlags;
 
-  /** The name_index field of the method_info JVMS structure. */
+  /**
+   * The name_index field of the method_info JVMS structure.
+   */
   private final int nameIndex;
 
-  /** The name of this method. */
+  /**
+   * The name of this method.
+   */
   private final String name;
 
-  /** The descriptor_index field of the method_info JVMS structure. */
+  /**
+   * The descriptor_index field of the method_info JVMS structure.
+   */
   private final int descriptorIndex;
 
-  /** The descriptor of this method. */
+  /**
+   * The descriptor of this method.
+   */
   private final String descriptor;
 
   // Code attribute fields and sub attributes:
 
-  /** The max_stack field of the Code attribute. */
+  /**
+   * The max_stack field of the Code attribute.
+   */
   private int maxStack;
 
-  /** The max_locals field of the Code attribute. */
+  /**
+   * The max_locals field of the Code attribute.
+   */
   private int maxLocals;
 
-  /** The 'code' field of the Code attribute. */
+  /**
+   * The 'code' field of the Code attribute.
+   */
   private final ByteVector code = new ByteVector();
 
   /**
@@ -316,13 +324,19 @@ final class MethodWriter extends MethodVisitor {
    */
   private Handler lastHandler;
 
-  /** The line_number_table_length field of the LineNumberTable code attribute. */
+  /**
+   * The line_number_table_length field of the LineNumberTable code attribute.
+   */
   private int lineNumberTableLength;
 
-  /** The line_number_table array of the LineNumberTable code attribute, or {@literal null}. */
+  /**
+   * The line_number_table array of the LineNumberTable code attribute, or {@literal null}.
+   */
   private ByteVector lineNumberTable;
 
-  /** The local_variable_table_length field of the LocalVariableTable code attribute. */
+  /**
+   * The local_variable_table_length field of the LocalVariableTable code attribute.
+   */
   private int localVariableTableLength;
 
   /**
@@ -330,19 +344,25 @@ final class MethodWriter extends MethodVisitor {
    */
   private ByteVector localVariableTable;
 
-  /** The local_variable_type_table_length field of the LocalVariableTypeTable code attribute. */
+  /**
+   * The local_variable_type_table_length field of the LocalVariableTypeTable code attribute.
+   */
   private int localVariableTypeTableLength;
 
   /**
-   * The local_variable_type_table array of the LocalVariableTypeTable code attribute, or {@literal
-   * null}.
+   * The local_variable_type_table array of the LocalVariableTypeTable code attribute, or
+   * {@literal null}.
    */
   private ByteVector localVariableTypeTable;
 
-  /** The number_of_entries field of the StackMapTable code attribute. */
+  /**
+   * The number_of_entries field of the StackMapTable code attribute.
+   */
   private int stackMapTableNumberOfEntries;
 
-  /** The 'entries' array of the StackMapTable code attribute. */
+  /**
+   * The 'entries' array of the StackMapTable code attribute.
+   */
   private ByteVector stackMapTableEntries;
 
   /**
@@ -362,21 +382,27 @@ final class MethodWriter extends MethodVisitor {
    * {@link Attribute#nextAttribute} field. May be {@literal null}.
    *
    * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
-   * #putMethodInfo} method writes the attributes in the order defined by this list, i.e. in the
-   * reverse order specified by the user.
+   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The
+   * {@link #putMethodInfo} method writes the attributes in the order defined by this list, i.e. in
+   * the reverse order specified by the user.
    */
   private Attribute firstCodeAttribute;
 
   // Other method_info attributes:
 
-  /** The number_of_exceptions field of the Exceptions attribute. */
+  /**
+   * The number_of_exceptions field of the Exceptions attribute.
+   */
   private final int numberOfExceptions;
 
-  /** The exception_index_table array of the Exceptions attribute, or {@literal null}. */
+  /**
+   * The exception_index_table array of the Exceptions attribute, or {@literal null}.
+   */
   private final int[] exceptionIndexTable;
 
-  /** The signature_index field of the Signature attribute. */
+  /**
+   * The signature_index field of the Signature attribute.
+   */
   private final int signatureIndex;
 
   /**
@@ -391,7 +417,9 @@ final class MethodWriter extends MethodVisitor {
    */
   private AnnotationWriter lastRuntimeInvisibleAnnotation;
 
-  /** The number of method parameters that can have runtime visible annotations, or 0. */
+  /**
+   * The number of method parameters that can have runtime visible annotations, or 0.
+   */
   private int visibleAnnotableParameterCount;
 
   /**
@@ -401,7 +429,9 @@ final class MethodWriter extends MethodVisitor {
    */
   private AnnotationWriter[] lastRuntimeVisibleParameterAnnotations;
 
-  /** The number of method parameters that can have runtime visible annotations, or 0. */
+  /**
+   * The number of method parameters that can have runtime visible annotations, or 0.
+   */
   private int invisibleAnnotableParameterCount;
 
   /**
@@ -423,23 +453,29 @@ final class MethodWriter extends MethodVisitor {
    */
   private AnnotationWriter lastRuntimeInvisibleTypeAnnotation;
 
-  /** The default_value field of the AnnotationDefault attribute, or {@literal null}. */
+  /**
+   * The default_value field of the AnnotationDefault attribute, or {@literal null}.
+   */
   private ByteVector defaultValue;
 
-  /** The parameters_count field of the MethodParameters attribute. */
+  /**
+   * The parameters_count field of the MethodParameters attribute.
+   */
   private int parametersCount;
 
-  /** The 'parameters' array of the MethodParameters attribute, or {@literal null}. */
+  /**
+   * The 'parameters' array of the MethodParameters attribute, or {@literal null}.
+   */
   private ByteVector parameters;
 
   /**
-   * The first non standard attribute of this method. The next ones can be accessed with the {@link
-   * Attribute#nextAttribute} field. May be {@literal null}.
+   * The first non standard attribute of this method. The next ones can be accessed with the
+   * {@link Attribute#nextAttribute} field. May be {@literal null}.
    *
    * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
-   * #putMethodInfo} method writes the attributes in the order defined by this list, i.e. in the
-   * reverse order specified by the user.
+   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The
+   * {@link #putMethodInfo} method writes the attributes in the order defined by this list, i.e. in
+   * the reverse order specified by the user.
    */
   private Attribute firstAttribute;
 
@@ -448,8 +484,9 @@ final class MethodWriter extends MethodVisitor {
   // -----------------------------------------------------------------------------------------------
 
   /**
-   * Indicates what must be computed. Must be one of {@link #COMPUTE_ALL_FRAMES}, {@link
-   * #COMPUTE_INSERTED_FRAMES}, {@link #COMPUTE_MAX_STACK_AND_LOCAL} or {@link #COMPUTE_NOTHING}.
+   * Indicates what must be computed. Must be one of {@link #COMPUTE_ALL_FRAMES},
+   * {@link #COMPUTE_INSERTED_FRAMES}, {@link #COMPUTE_MAX_STACK_AND_LOCAL} or
+   * {@link #COMPUTE_NOTHING}.
    */
   private final int compute;
 
@@ -466,24 +503,25 @@ final class MethodWriter extends MethodVisitor {
   private Label lastBasicBlock;
 
   /**
-   * The current basic block, i.e. the basic block of the last visited instruction. When {@link
-   * #compute} is equal to {@link #COMPUTE_MAX_STACK_AND_LOCAL} or {@link #COMPUTE_ALL_FRAMES}, this
-   * field is {@literal null} for unreachable code. When {@link #compute} is equal to {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES} or {@link #COMPUTE_INSERTED_FRAMES}, this field stays
-   * unchanged throughout the whole method (i.e. the whole code is seen as a single basic block;
-   * indeed, the existing frames are sufficient by hypothesis to compute any intermediate frame -
-   * and the maximum stack size as well - without using any control flow graph).
+   * The current basic block, i.e. the basic block of the last visited instruction. When
+   * {@link #compute} is equal to {@link #COMPUTE_MAX_STACK_AND_LOCAL} or
+   * {@link #COMPUTE_ALL_FRAMES}, this field is {@literal null} for unreachable code. When
+   * {@link #compute} is equal to {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES} or
+   * {@link #COMPUTE_INSERTED_FRAMES}, this field stays unchanged throughout the whole method (i.e.
+   * the whole code is seen as a single basic block; indeed, the existing frames are sufficient by
+   * hypothesis to compute any intermediate frame - and the maximum stack size as well - without
+   * using any control flow graph).
    */
   private Label currentBasicBlock;
 
   /**
    * The relative stack size after the last visited instruction. This size is relative to the
    * beginning of {@link #currentBasicBlock}, i.e. the true stack size after the last visited
-   * instruction is equal to the {@link Label#inputStackSize} of the current basic block plus {@link
-   * #relativeStackSize}. When {@link #compute} is equal to {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link #currentBasicBlock} is always the start of
-   * the method, so this relative size is also equal to the absolute stack size after the last
-   * visited instruction.
+   * instruction is equal to the {@link Label#inputStackSize} of the current basic block plus
+   * {@link #relativeStackSize}. When {@link #compute} is equal to
+   * {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link #currentBasicBlock} is always the
+   * start of the method, so this relative size is also equal to the absolute stack size after the
+   * last visited instruction.
    */
   private int relativeStackSize;
 
@@ -491,17 +529,21 @@ final class MethodWriter extends MethodVisitor {
    * The maximum relative stack size after the last visited instruction. This size is relative to
    * the beginning of {@link #currentBasicBlock}, i.e. the true maximum stack size after the last
    * visited instruction is equal to the {@link Label#inputStackSize} of the current basic block
-   * plus {@link #maxRelativeStackSize}.When {@link #compute} is equal to {@link
-   * #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link #currentBasicBlock} is always the start of
-   * the method, so this relative size is also equal to the absolute maximum stack size after the
-   * last visited instruction.
+   * plus {@link #maxRelativeStackSize}.When {@link #compute} is equal to
+   * {@link #COMPUTE_MAX_STACK_AND_LOCAL_FROM_FRAMES}, {@link #currentBasicBlock} is always the
+   * start of the method, so this relative size is also equal to the absolute maximum stack size
+   * after the last visited instruction.
    */
   private int maxRelativeStackSize;
 
-  /** The number of local variables in the last visited stack map frame. */
+  /**
+   * The number of local variables in the last visited stack map frame.
+   */
   private int currentLocals;
 
-  /** The bytecode offset of the last frame that was written in {@link #stackMapTableEntries}. */
+  /**
+   * The bytecode offset of the last frame that was written in {@link #stackMapTableEntries}.
+   */
   private int previousFrameOffset;
 
   /**
@@ -516,19 +558,24 @@ final class MethodWriter extends MethodVisitor {
    * the number of stack elements. The local variables start at index 3 and are followed by the
    * operand stack elements. In summary frame[0] = offset, frame[1] = numLocal, frame[2] = numStack.
    * Local variables and operand stack entries contain abstract types, as defined in {@link Frame},
-   * but restricted to {@link Frame#CONSTANT_KIND}, {@link Frame#REFERENCE_KIND} or {@link
-   * Frame#UNINITIALIZED_KIND} abstract types. Long and double types use only one array entry.
+   * but restricted to {@link Frame#CONSTANT_KIND}, {@link Frame#REFERENCE_KIND} or
+   * {@link Frame#UNINITIALIZED_KIND} abstract types. Long and double types use only one array
+   * entry.
    */
   private int[] currentFrame;
 
-  /** Whether this method contains subroutines. */
+  /**
+   * Whether this method contains subroutines.
+   */
   private boolean hasSubroutines;
 
   // -----------------------------------------------------------------------------------------------
   // Other miscellaneous status fields
   // -----------------------------------------------------------------------------------------------
 
-  /** Whether the bytecode of this method contains ASM specific instructions. */
+  /**
+   * Whether the bytecode of this method contains ASM specific instructions.
+   */
   private boolean hasAsmInstructions;
 
   /**
@@ -560,12 +607,12 @@ final class MethodWriter extends MethodVisitor {
    * Constructs a new {@link MethodWriter}.
    *
    * @param symbolTable where the constants used in this AnnotationWriter must be stored.
-   * @param access the method's access flags (see {@link Opcodes}).
-   * @param name the method's name.
-   * @param descriptor the method's descriptor (see {@link Type}).
-   * @param signature the method's signature. May be {@literal null}.
-   * @param exceptions the internal names of the method's exceptions. May be {@literal null}.
-   * @param compute indicates what must be computed (see #compute).
+   * @param access      the method's access flags (see {@link Opcodes}).
+   * @param name        the method's name.
+   * @param descriptor  the method's descriptor (see {@link Type}).
+   * @param signature   the method's signature. May be {@literal null}.
+   * @param exceptions  the internal names of the method's exceptions. May be {@literal null}.
+   * @param compute     indicates what must be computed (see #compute).
    */
   MethodWriter(
       final SymbolTable symbolTable,
@@ -1267,8 +1314,8 @@ final class MethodWriter extends MethodVisitor {
         constantSymbol.tag == Symbol.CONSTANT_LONG_TAG
             || constantSymbol.tag == Symbol.CONSTANT_DOUBLE_TAG
             || (constantSymbol.tag == Symbol.CONSTANT_DYNAMIC_TAG
-                && ((firstDescriptorChar = constantSymbol.value.charAt(0)) == 'J'
-                    || firstDescriptorChar == 'D'));
+            && ((firstDescriptorChar = constantSymbol.value.charAt(0)) == 'J'
+            || firstDescriptorChar == 'D'));
     if (isLongOrDouble) {
       code.put12(Constants.LDC2_W, constantIndex);
     } else if (constantIndex >= 256) {
@@ -1538,7 +1585,9 @@ final class MethodWriter extends MethodVisitor {
     }
   }
 
-  /** Computes all the stack map frames of the method, from scratch. */
+  /**
+   * Computes all the stack map frames of the method, from scratch.
+   */
   private void computeAllFrames() {
     // Complete the control flow graph with exception handler blocks.
     Handler handler = firstHandler;
@@ -1640,7 +1689,9 @@ final class MethodWriter extends MethodVisitor {
     this.maxStack = maxStackSize;
   }
 
-  /** Computes the maximum stack size of the method. */
+  /**
+   * Computes the maximum stack size of the method.
+   */
   private void computeMaxStackAndLocal() {
     // Complete the control flow graph with exception handler blocks.
     Handler handler = firstHandler;
@@ -1759,7 +1810,7 @@ final class MethodWriter extends MethodVisitor {
   /**
    * Adds a successor to {@link #currentBasicBlock} in the control flow graph.
    *
-   * @param info information about the control flow edge to be added.
+   * @param info      information about the control flow edge to be added.
    * @param successor the successor block to be added to the current basic block.
    */
   private void addSuccessorToCurrentBasicBlock(final int info, final Label successor) {
@@ -1795,7 +1846,7 @@ final class MethodWriter extends MethodVisitor {
   /**
    * Starts the visit of a new stack map frame, stored in {@link #currentFrame}.
    *
-   * @param offset the bytecode offset of the instruction to which the frame corresponds.
+   * @param offset   the bytecode offset of the instruction to which the frame corresponds.
    * @param numLocal the number of local variables in the frame.
    * @param numStack the number of stack elements in the frame.
    * @return the index of the next element to be written in this frame.
@@ -1814,7 +1865,7 @@ final class MethodWriter extends MethodVisitor {
   /**
    * Sets an abstract type in {@link #currentFrame}.
    *
-   * @param frameIndex the index of the element to be set in {@link #currentFrame}.
+   * @param frameIndex   the index of the element to be set in {@link #currentFrame}.
    * @param abstractType an abstract type.
    */
   void visitAbstractType(final int frameIndex, final int abstractType) {
@@ -1838,7 +1889,9 @@ final class MethodWriter extends MethodVisitor {
     currentFrame = null;
   }
 
-  /** Compresses and writes {@link #currentFrame} in a new StackMapTable entry. */
+  /**
+   * Compresses and writes {@link #currentFrame} in a new StackMapTable entry.
+   */
   private void putFrame() {
     final int numLocal = currentFrame[1];
     final int numStack = currentFrame[2];
@@ -1936,7 +1989,7 @@ final class MethodWriter extends MethodVisitor {
    * JVMS verification_type_info format used in StackMapTable attributes.
    *
    * @param start index of the first type in {@link #currentFrame} to write.
-   * @param end index of last type in {@link #currentFrame} to write (exclusive).
+   * @param end   index of last type in {@link #currentFrame} to write (exclusive).
    */
   private void putAbstractTypes(final int start, final int end) {
     for (int i = start; i < end; ++i) {
@@ -1948,11 +2001,12 @@ final class MethodWriter extends MethodVisitor {
    * Puts the given public API frame element type in {@link #stackMapTableEntries} , using the JVMS
    * verification_type_info format used in StackMapTable attributes.
    *
-   * @param type a frame element type described using the same format as in {@link
-   *     MethodVisitor#visitFrame}, i.e. either {@link Opcodes#TOP}, {@link Opcodes#INTEGER}, {@link
-   *     Opcodes#FLOAT}, {@link Opcodes#LONG}, {@link Opcodes#DOUBLE}, {@link Opcodes#NULL}, or
-   *     {@link Opcodes#UNINITIALIZED_THIS}, or the internal name of a class, or a Label designating
-   *     a NEW instruction (for uninitialized types).
+   * @param type a frame element type described using the same format as in
+   *             {@link MethodVisitor#visitFrame}, i.e. either {@link Opcodes#TOP},
+   *             {@link Opcodes#INTEGER}, {@link Opcodes#FLOAT}, {@link Opcodes#LONG},
+   *             {@link Opcodes#DOUBLE}, {@link Opcodes#NULL}, or
+   *             {@link Opcodes#UNINITIALIZED_THIS}, or the internal name of a class, or a Label
+   *             designating a NEW instruction (for uninitialized types).
    */
   private void putFrameType(final Object type) {
     if (type instanceof Integer) {
@@ -1980,20 +2034,23 @@ final class MethodWriter extends MethodVisitor {
    * constructor arguments (at most a Signature, an Exception, a Deprecated and a Synthetic
    * attribute) are the same as the corresponding attributes in the given method.
    *
-   * @param source the source ClassReader from which the attributes of this method might be copied.
-   * @param hasSyntheticAttribute whether the method_info JVMS structure from which the attributes
-   *     of this method might be copied contains a Synthetic attribute.
+   * @param source                 the source ClassReader from which the attributes of this method
+   *                               might be copied.
+   * @param hasSyntheticAttribute  whether the method_info JVMS structure from which the attributes
+   *                               of this method might be copied contains a Synthetic attribute.
    * @param hasDeprecatedAttribute whether the method_info JVMS structure from which the attributes
-   *     of this method might be copied contains a Deprecated attribute.
-   * @param descriptorIndex the descriptor_index field of the method_info JVMS structure from which
-   *     the attributes of this method might be copied.
-   * @param signatureIndex the constant pool index contained in the Signature attribute of the
-   *     method_info JVMS structure from which the attributes of this method might be copied, or 0.
-   * @param exceptionsOffset the offset in 'source.b' of the Exceptions attribute of the method_info
-   *     JVMS structure from which the attributes of this method might be copied, or 0.
+   *                               of this method might be copied contains a Deprecated attribute.
+   * @param descriptorIndex        the descriptor_index field of the method_info JVMS structure from
+   *                               which the attributes of this method might be copied.
+   * @param signatureIndex         the constant pool index contained in the Signature attribute of
+   *                               the method_info JVMS structure from which the attributes of this
+   *                               method might be copied, or 0.
+   * @param exceptionsOffset       the offset in 'source.b' of the Exceptions attribute of the
+   *                               method_info JVMS structure from which the attributes of this
+   *                               method might be copied, or 0.
    * @return whether the attributes of this method can be copied from the attributes of the
-   *     method_info JVMS structure in 'source.b', between 'methodInfoOffset' and 'methodInfoOffset'
-   *     + 'methodInfoLength'.
+   * method_info JVMS structure in 'source.b', between 'methodInfoOffset' and 'methodInfoOffset' +
+   * 'methodInfoLength'.
    */
   boolean canCopyMethodAttributes(
       final ClassReader source,
@@ -2036,9 +2093,9 @@ final class MethodWriter extends MethodVisitor {
    * Sets the source from which the attributes of this method will be copied.
    *
    * @param methodInfoOffset the offset in 'symbolTable.getSource()' of the method_info JVMS
-   *     structure from which the attributes of this method will be copied.
+   *                         structure from which the attributes of this method will be copied.
    * @param methodInfoLength the length in 'symbolTable.getSource()' of the method_info JVMS
-   *     structure from which the attributes of this method will be copied.
+   *                         structure from which the attributes of this method will be copied.
    */
   void setMethodAttributesSource(final int methodInfoOffset, final int methodInfoLength) {
     // Don't copy the attributes yet, instead store their location in the source class reader so

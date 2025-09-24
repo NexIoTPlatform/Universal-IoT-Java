@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -33,10 +21,14 @@ public class Label {
    */
   static final int FLAG_JUMP_TARGET = 2;
 
-  /** A flag indicating that the bytecode offset of a label is known. */
+  /**
+   * A flag indicating that the bytecode offset of a label is known.
+   */
   static final int FLAG_RESOLVED = 4;
 
-  /** A flag indicating that a label corresponds to a reachable basic block. */
+  /**
+   * A flag indicating that a label corresponds to a reachable basic block.
+   */
   static final int FLAG_REACHABLE = 8;
 
   /**
@@ -61,7 +53,9 @@ public class Label {
    */
   static final int FLAG_SUBROUTINE_START = 32;
 
-  /** A flag indicating that the basic block corresponding to a label is the end of a subroutine. */
+  /**
+   * A flag indicating that the basic block corresponding to a label is the end of a subroutine.
+   */
   static final int FLAG_SUBROUTINE_END = 64;
 
   /**
@@ -121,9 +115,9 @@ public class Label {
 
   /**
    * The type and status of this label or its corresponding basic block. Must be zero or more of
-   * {@link #FLAG_DEBUG_ONLY}, {@link #FLAG_JUMP_TARGET}, {@link #FLAG_RESOLVED}, {@link
-   * #FLAG_REACHABLE}, {@link #FLAG_SUBROUTINE_CALLER}, {@link #FLAG_SUBROUTINE_START}, {@link
-   * #FLAG_SUBROUTINE_END}.
+   * {@link #FLAG_DEBUG_ONLY}, {@link #FLAG_JUMP_TARGET}, {@link #FLAG_RESOLVED},
+   * {@link #FLAG_REACHABLE}, {@link #FLAG_SUBROUTINE_CALLER}, {@link #FLAG_SUBROUTINE_START},
+   * {@link #FLAG_SUBROUTINE_END}.
    */
   short flags;
 
@@ -210,8 +204,8 @@ public class Label {
 
   /**
    * The maximum height reached by the output stack, relatively to the top of the input stack, in
-   * the basic block corresponding to this label. This maximum is always positive or {@literal
-   * null}.
+   * the basic block corresponding to this label. This maximum is always positive or
+   * {@literal null}.
    */
   short outputStackMax;
 
@@ -226,17 +220,17 @@ public class Label {
 
   /**
    * The input and output stack map frames of the basic block corresponding to this label. This
-   * field is only used when the {@link MethodWriter#COMPUTE_ALL_FRAMES} or {@link
-   * MethodWriter#COMPUTE_INSERTED_FRAMES} option is used.
+   * field is only used when the {@link MethodWriter#COMPUTE_ALL_FRAMES} or
+   * {@link MethodWriter#COMPUTE_INSERTED_FRAMES} option is used.
    */
   Frame frame;
 
   /**
    * The successor of this label, in the order they are visited in {@link MethodVisitor#visitLabel}.
-   * This linked list does not include labels used for debug info only. If the {@link
-   * MethodWriter#COMPUTE_ALL_FRAMES} or {@link MethodWriter#COMPUTE_INSERTED_FRAMES} option is used
-   * then it does not contain either successive labels that denote the same bytecode offset (in this
-   * case only the first label appears in this list).
+   * This linked list does not include labels used for debug info only. If the
+   * {@link MethodWriter#COMPUTE_ALL_FRAMES} or {@link MethodWriter#COMPUTE_INSERTED_FRAMES} option
+   * is used then it does not contain either successive labels that denote the same bytecode offset
+   * (in this case only the first label appears in this list).
    */
   Label nextBasicBlock;
 
@@ -268,7 +262,9 @@ public class Label {
   // Constructor and accessors
   // -----------------------------------------------------------------------------------------------
 
-  /** Constructs a new label. */
+  /**
+   * Constructs a new label.
+   */
   public Label() {
     // Nothing to do.
   }
@@ -298,8 +294,8 @@ public class Label {
    * is used.</i>
    *
    * @return the label itself if {@link #frame} is null, otherwise the Label's frame owner. This
-   *     corresponds to the "canonical" label instance described above thanks to the way the label
-   *     frame is set in {@link MethodWriter#visitLabel}.
+   * corresponds to the "canonical" label instance described above thanks to the way the label frame
+   * is set in {@link MethodWriter#visitLabel}.
    */
   final Label getCanonicalInstance() {
     return frame == null ? this : frame.owner;
@@ -334,7 +330,7 @@ public class Label {
   /**
    * Makes the given visitor visit this label and its source line numbers, if applicable.
    *
-   * @param methodVisitor a method visitor.
+   * @param methodVisitor    a method visitor.
    * @param visitLineNumbers whether to visit of the label's source line numbers, if any.
    */
   final void accept(final MethodVisitor methodVisitor, final boolean visitLineNumbers) {
@@ -359,10 +355,12 @@ public class Label {
    * computed and written directly. Otherwise, a null relative offset is written and a new forward
    * reference is declared for this label.
    *
-   * @param code the bytecode of the method. This is where the reference is appended.
+   * @param code                     the bytecode of the method. This is where the reference is
+   *                                 appended.
    * @param sourceInsnBytecodeOffset the bytecode offset of the instruction that contains the
-   *     reference to be appended.
-   * @param wideReference whether the reference must be stored in 4 bytes (instead of 2 bytes).
+   *                                 reference to be appended.
+   * @param wideReference            whether the reference must be stored in 4 bytes (instead of 2
+   *                                 bytes).
    */
   final void put(
       final ByteVector code, final int sourceInsnBytecodeOffset, final boolean wideReference) {
@@ -389,11 +387,11 @@ public class Label {
    * bytecode offset of the reference can be, and must be, computed and stored directly.
    *
    * @param sourceInsnBytecodeOffset the bytecode offset of the instruction that contains the
-   *     reference stored at referenceHandle.
-   * @param referenceType either {@link #FORWARD_REFERENCE_TYPE_SHORT} or {@link
-   *     #FORWARD_REFERENCE_TYPE_WIDE}.
-   * @param referenceHandle the offset in the bytecode where the forward reference value must be
-   *     stored.
+   *                                 reference stored at referenceHandle.
+   * @param referenceType            either {@link #FORWARD_REFERENCE_TYPE_SHORT} or
+   *                                 {@link #FORWARD_REFERENCE_TYPE_WIDE}.
+   * @param referenceHandle          the offset in the bytecode where the forward reference value
+   *                                 must be stored.
    */
   private void addForwardReference(
       final int sourceInsnBytecodeOffset, final int referenceType, final int referenceHandle) {
@@ -417,13 +415,13 @@ public class Label {
    * the method, i.e. when its bytecode offset becomes known. This method fills in the blanks that
    * where left in the bytecode by each forward reference previously added to this label.
    *
-   * @param code the bytecode of the method.
+   * @param code           the bytecode of the method.
    * @param bytecodeOffset the bytecode offset of this label.
    * @return {@literal true} if a blank that was left for this label was too small to store the
-   *     offset. In such a case the corresponding jump instruction is replaced with an equivalent
-   *     ASM specific instruction using an unsigned two bytes offset. These ASM specific
-   *     instructions are later replaced with standard bytecode instructions with wider offsets (4
-   *     bytes instead of 2), in ClassReader.
+   * offset. In such a case the corresponding jump instruction is replaced with an equivalent ASM
+   * specific instruction using an unsigned two bytes offset. These ASM specific instructions are
+   * later replaced with standard bytecode instructions with wider offsets (4 bytes instead of 2),
+   * in ClassReader.
    */
   final boolean resolve(final byte[] code, final int bytecodeOffset) {
     this.flags |= FLAG_RESOLVED;
@@ -479,7 +477,7 @@ public class Label {
    * {@link #nextListElement}.
    *
    * @param subroutineId the id of the subroutine starting with the basic block corresponding to
-   *     this label.
+   *                     this label.
    */
   final void markSubroutine(final short subroutineId) {
     // Data flow algorithm: put this basic block in a list of blocks to process (which are blocks
@@ -514,7 +512,8 @@ public class Label {
    * {@link #nextListElement}.
    *
    * @param subroutineCaller a basic block that ends with a jsr to the basic block corresponding to
-   *     this label. This label is supposed to correspond to the start of a subroutine.
+   *                         this label. This label is supposed to correspond to the start of a
+   *                         subroutine.
    */
   final void addSubroutineRetSuccessors(final Label subroutineCaller) {
     // Data flow algorithm: put this basic block in a list blocks to process (which are blocks
@@ -567,7 +566,7 @@ public class Label {
    * blocks to process, and returns the new list.
    *
    * @param listOfLabelsToProcess a list of basic blocks to process, linked together with their
-   *     {@link #nextListElement} field.
+   *                              {@link #nextListElement} field.
    * @return the new list of blocks to process.
    */
   private Label pushSuccessors(final Label listOfLabelsToProcess) {

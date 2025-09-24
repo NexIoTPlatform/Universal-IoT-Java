@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -24,14 +12,14 @@ package cn.universal.core.engine.asm;
 final class Edge {
 
   /**
-   * A control flow graph edge corresponding to a jump or ret instruction. Only used with {@link
-   * ClassWriter#COMPUTE_FRAMES}.
+   * A control flow graph edge corresponding to a jump or ret instruction. Only used with
+   * {@link ClassWriter#COMPUTE_FRAMES}.
    */
   static final int JUMP = 0;
 
   /**
-   * A control flow graph edge corresponding to an exception handler. Only used with {@link
-   * ClassWriter#COMPUTE_MAXS}.
+   * A control flow graph edge corresponding to an exception handler. Only used with
+   * {@link ClassWriter#COMPUTE_MAXS}.
    */
   static final int EXCEPTION = 0x7FFFFFFF;
 
@@ -52,7 +40,9 @@ final class Edge {
    */
   final int info;
 
-  /** The successor block of this control flow graph edge. */
+  /**
+   * The successor block of this control flow graph edge.
+   */
   final Label successor;
 
   /**
@@ -63,9 +53,9 @@ final class Edge {
   /**
    * Constructs a new Edge.
    *
-   * @param info see {@link #info}.
+   * @param info      see {@link #info}.
    * @param successor see {@link #successor}.
-   * @param nextEdge see {@link #nextEdge}.
+   * @param nextEdge  see {@link #nextEdge}.
    */
   Edge(final int info, final Label successor, final Edge nextEdge) {
     this.info = info;

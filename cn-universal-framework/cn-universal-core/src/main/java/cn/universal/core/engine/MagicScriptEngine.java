@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.ScriptClass.ScriptAttribute;
@@ -157,7 +145,7 @@ public class MagicScriptEngine extends AbstractScriptEngine implements ScriptEng
               String methodName = method.getName();
               if (method.getParameters().isEmpty()
                   && ((methodName.startsWith("get") && methodName.length() > 3)
-                      || (methodName.startsWith("is") && methodName.length() > 2))) {
+                  || (methodName.startsWith("is") && methodName.length() > 2))) {
                 String attributeName = method.getName().substring(3);
                 attributeName =
                     attributeName.substring(0, 1).toLowerCase() + attributeName.substring(1);

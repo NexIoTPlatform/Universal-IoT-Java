@@ -1,27 +1,15 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
  * A visitor to visit a record component. The methods of this class must be called in the following
- * order: ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )* {@code
- * visitEnd}. @Author Remi Forax @Author Eric Bruneton
+ * order: ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )*
+ * {@code visitEnd}. @Author Remi Forax @Author Eric Bruneton
  */
 public abstract class RecordComponentVisitor {
 
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of {@link
-   * Opcodes#ASM8} or {@link Opcodes#ASM9}.
+   * The ASM API version implemented by this visitor. The value of this field must be one of
+   * {@link Opcodes#ASM8} or {@link Opcodes#ASM9}.
    */
   protected final int api;
 
@@ -34,7 +22,7 @@ public abstract class RecordComponentVisitor {
    * Constructs a new {@link RecordComponentVisitor}.
    *
    * @param api the ASM API version implemented by this visitor. Must be one of {@link Opcodes#ASM8}
-   *     or {@link Opcodes#ASM9}.
+   *            or {@link Opcodes#ASM9}.
    */
   public RecordComponentVisitor(final int api) {
     this(api, null);
@@ -43,9 +31,10 @@ public abstract class RecordComponentVisitor {
   /**
    * Constructs a new {@link RecordComponentVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be {@link Opcodes#ASM8}.
+   * @param api                    the ASM API version implemented by this visitor. Must be
+   *                               {@link Opcodes#ASM8}.
    * @param recordComponentVisitor the record component visitor to which this visitor must delegate
-   *     method calls. May be null.
+   *                               method calls. May be null.
    */
   public RecordComponentVisitor(
       final int api, final RecordComponentVisitor recordComponentVisitor) {
@@ -78,9 +67,9 @@ public abstract class RecordComponentVisitor {
    * Visits an annotation of the record component.
    *
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible    {@literal true} if the annotation is visible at runtime.
    * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-   *     interested in visiting this annotation.
+   * interested in visiting this annotation.
    */
   public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (delegate != null) {
@@ -92,17 +81,17 @@ public abstract class RecordComponentVisitor {
   /**
    * Visits an annotation on a type in the record component signature.
    *
-   * @param typeRef a reference to the annotated type. The sort of this type reference must be
-   *     {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link
-   *     TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}. See
-   *     {@link TypeReference}.
-   * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-   *     'typeRef' as a whole.
+   * @param typeRef    a reference to the annotated type. The sort of this type reference must be
+   *                   {@link TypeReference#CLASS_TYPE_PARAMETER},
+   *                   {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND} or
+   *                   {@link TypeReference#CLASS_EXTENDS}. See {@link TypeReference}.
+   * @param typePath   the path to the annotated type argument, wildcard bound, array element type,
+   *                   or static inner type within 'typeRef'. May be {@literal null} if the
+   *                   annotation targets 'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible    {@literal true} if the annotation is visible at runtime.
    * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-   *     interested in visiting this annotation.
+   * interested in visiting this annotation.
    */
   public AnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {

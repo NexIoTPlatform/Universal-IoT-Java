@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -17,13 +5,15 @@ package cn.universal.core.engine.asm;
  * Specification (JVMS). @Author Eric Bruneton @Author Eugene Kuleshov
  *
  * @see <a href= "https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7">JVMS
- *     4.7</a>
+ * 4.7</a>
  * @see <a href= "https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.3">JVMS
- *     4.7.3</a>
+ * 4.7.3</a>
  */
 public class Attribute {
 
-  /** The type of this attribute, also called its name in the JVMS. */
+  /**
+   * The type of this attribute, also called its name in the JVMS.
+   */
   public final String type;
 
   /**
@@ -54,7 +44,8 @@ public class Attribute {
    * attribute content is read as an opaque byte array, and written back as is. This can lead to
    * invalid attributes, if the content actually contains constant pool references, labels, or other
    * symbolic references that need to be updated when there are changes to the constant pool, the
-   * method bytecode, etc. The default implementation of this method always returns {@literal true}.
+   * method bytecode, etc. The default implementation of this method always returns
+   * {@literal true}.
    *
    * @return {@literal true} if this type of attribute is unknown.
    */
@@ -75,7 +66,7 @@ public class Attribute {
    * Returns the labels corresponding to this attribute.
    *
    * @return the labels corresponding to this attribute, or {@literal null} if this attribute is not
-   *     a Code attribute that contains labels.
+   * a Code attribute that contains labels.
    */
   protected Label[] getLabels() {
     return new Label[0];
@@ -86,19 +77,21 @@ public class Attribute {
    * of type {@link #type}, corresponding to the 'length' bytes starting at 'offset', in the given
    * ClassReader.
    *
-   * @param classReader the class that contains the attribute to be read.
-   * @param offset index of the first byte of the attribute's content in {@link ClassReader}. The 6
-   *     attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param length the length of the attribute's content (excluding the 6 attribute header bytes).
-   * @param charBuffer the buffer to be used to call the ClassReader methods requiring a
-   *     'charBuffer' parameter.
+   * @param classReader         the class that contains the attribute to be read.
+   * @param offset              index of the first byte of the attribute's content in
+   *                            {@link ClassReader}. The 6 attribute header bytes
+   *                            (attribute_name_index and attribute_length) are not taken into
+   *                            account here.
+   * @param length              the length of the attribute's content (excluding the 6 attribute
+   *                            header bytes).
+   * @param charBuffer          the buffer to be used to call the ClassReader methods requiring a
+   *                            'charBuffer' parameter.
    * @param codeAttributeOffset index of the first byte of content of the enclosing Code attribute
-   *     in {@link ClassReader}, or -1 if the attribute to be read is not a Code attribute. The 6
-   *     attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param labels the labels of the method's code, or {@literal null} if the attribute to be read
-   *     is not a Code attribute.
+   *                            in {@link ClassReader}, or -1 if the attribute to be read is not a
+   *                            Code attribute. The 6 attribute header bytes (attribute_name_index
+   *                            and attribute_length) are not taken into account here.
+   * @param labels              the labels of the method's code, or {@literal null} if the attribute
+   *                            to be read is not a Code attribute.
    * @return a <i>new</i> {@link Attribute} object corresponding to the specified bytes.
    */
   protected Attribute read(
@@ -120,17 +113,18 @@ public class Attribute {
    * ByteVector.
    *
    * @param classWriter the class to which this attribute must be added. This parameter can be used
-   *     to add the items that corresponds to this attribute to the constant pool of this class.
-   * @param code the bytecode of the method corresponding to this Code attribute, or {@literal null}
-   *     if this attribute is not a Code attribute. Corresponds to the 'code' field of the Code
-   *     attribute.
-   * @param codeLength the length of the bytecode of the method corresponding to this code
-   *     attribute, or 0 if this attribute is not a Code attribute. Corresponds to the 'code_length'
-   *     field of the Code attribute.
-   * @param maxStack the maximum stack size of the method corresponding to this Code attribute, or
-   *     -1 if this attribute is not a Code attribute.
-   * @param maxLocals the maximum number of local variables of the method corresponding to this code
-   *     attribute, or -1 if this attribute is not a Code attribute.
+   *                    to add the items that corresponds to this attribute to the constant pool of
+   *                    this class.
+   * @param code        the bytecode of the method corresponding to this Code attribute, or
+   *                    {@literal null} if this attribute is not a Code attribute. Corresponds to
+   *                    the 'code' field of the Code attribute.
+   * @param codeLength  the length of the bytecode of the method corresponding to this code
+   *                    attribute, or 0 if this attribute is not a Code attribute. Corresponds to
+   *                    the 'code_length' field of the Code attribute.
+   * @param maxStack    the maximum stack size of the method corresponding to this Code attribute,
+   *                    or -1 if this attribute is not a Code attribute.
+   * @param maxLocals   the maximum number of local variables of the method corresponding to this
+   *                    code attribute, or -1 if this attribute is not a Code attribute.
    * @return the byte array form of this attribute.
    */
   protected ByteVector write(
@@ -164,7 +158,7 @@ public class Attribute {
    *
    * @param symbolTable where the constants used in the attributes must be stored.
    * @return the size of all the attributes in this attribute list. This size includes the size of
-   *     the attribute headers.
+   * the attribute headers.
    */
   final int computeAttributesSize(final SymbolTable symbolTable) {
     final byte[] code = null;
@@ -180,18 +174,18 @@ public class Attribute {
    * attribute_length) per attribute. Also adds the attribute type names to the constant pool.
    *
    * @param symbolTable where the constants used in the attributes must be stored.
-   * @param code the bytecode of the method corresponding to these Code attributes, or {@literal
-   *     null} if they are not Code attributes. Corresponds to the 'code' field of the Code
-   *     attribute.
-   * @param codeLength the length of the bytecode of the method corresponding to these code
-   *     attributes, or 0 if they are not Code attributes. Corresponds to the 'code_length' field of
-   *     the Code attribute.
-   * @param maxStack the maximum stack size of the method corresponding to these Code attributes, or
-   *     -1 if they are not Code attributes.
-   * @param maxLocals the maximum number of local variables of the method corresponding to these
-   *     Code attributes, or -1 if they are not Code attribute.
+   * @param code        the bytecode of the method corresponding to these Code attributes, or
+   *                    {@literal null} if they are not Code attributes. Corresponds to the 'code'
+   *                    field of the Code attribute.
+   * @param codeLength  the length of the bytecode of the method corresponding to these code
+   *                    attributes, or 0 if they are not Code attributes. Corresponds to the
+   *                    'code_length' field of the Code attribute.
+   * @param maxStack    the maximum stack size of the method corresponding to these Code attributes,
+   *                    or -1 if they are not Code attributes.
+   * @param maxLocals   the maximum number of local variables of the method corresponding to these
+   *                    Code attributes, or -1 if they are not Code attribute.
    * @return the size of all the attributes in this attribute list. This size includes the size of
-   *     the attribute headers.
+   * the attribute headers.
    */
   final int computeAttributesSize(
       final SymbolTable symbolTable,
@@ -216,11 +210,11 @@ public class Attribute {
    * (attribute_name_index and attribute_length) per attribute. Also adds the attribute type names
    * to the constant pool.
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param accessFlags some field, method or class access flags.
+   * @param symbolTable    where the constants used in the attributes must be stored.
+   * @param accessFlags    some field, method or class access flags.
    * @param signatureIndex the constant pool index of a field, method of class signature.
    * @return the size of all the attributes in bytes. This size includes the size of the attribute
-   *     headers.
+   * headers.
    */
   static int computeAttributesSize(
       final SymbolTable symbolTable, final int accessFlags, final int signatureIndex) {
@@ -252,7 +246,7 @@ public class Attribute {
    * attribute.
    *
    * @param symbolTable where the constants used in the attributes must be stored.
-   * @param output where the attributes must be written.
+   * @param output      where the attributes must be written.
    */
   final void putAttributes(final SymbolTable symbolTable, final ByteVector output) {
     final byte[] code = null;
@@ -268,17 +262,17 @@ public class Attribute {
    * attribute.
    *
    * @param symbolTable where the constants used in the attributes must be stored.
-   * @param code the bytecode of the method corresponding to these Code attributes, or {@literal
-   *     null} if they are not Code attributes. Corresponds to the 'code' field of the Code
-   *     attribute.
-   * @param codeLength the length of the bytecode of the method corresponding to these code
-   *     attributes, or 0 if they are not Code attributes. Corresponds to the 'code_length' field of
-   *     the Code attribute.
-   * @param maxStack the maximum stack size of the method corresponding to these Code attributes, or
-   *     -1 if they are not Code attributes.
-   * @param maxLocals the maximum number of local variables of the method corresponding to these
-   *     Code attributes, or -1 if they are not Code attribute.
-   * @param output where the attributes must be written.
+   * @param code        the bytecode of the method corresponding to these Code attributes, or
+   *                    {@literal null} if they are not Code attributes. Corresponds to the 'code'
+   *                    field of the Code attribute.
+   * @param codeLength  the length of the bytecode of the method corresponding to these code
+   *                    attributes, or 0 if they are not Code attributes. Corresponds to the
+   *                    'code_length' field of the Code attribute.
+   * @param maxStack    the maximum stack size of the method corresponding to these Code attributes,
+   *                    or -1 if they are not Code attributes.
+   * @param maxLocals   the maximum number of local variables of the method corresponding to these
+   *                    Code attributes, or -1 if they are not Code attribute.
+   * @param output      where the attributes must be written.
    */
   final void putAttributes(
       final SymbolTable symbolTable,
@@ -304,10 +298,10 @@ public class Attribute {
    * signature, in the given byte vector. This includes the 6 header bytes (attribute_name_index and
    * attribute_length) per attribute.
    *
-   * @param symbolTable where the constants used in the attributes must be stored.
-   * @param accessFlags some field, method or class access flags.
+   * @param symbolTable    where the constants used in the attributes must be stored.
+   * @param accessFlags    some field, method or class access flags.
    * @param signatureIndex the constant pool index of a field, method of class signature.
-   * @param output where the attributes must be written.
+   * @param output         where the attributes must be written.
    */
   static void putAttributes(
       final SymbolTable symbolTable,
@@ -330,7 +324,9 @@ public class Attribute {
     }
   }
 
-  /** A set of attribute prototypes (attributes with the same type are considered equal). */
+  /**
+   * A set of attribute prototypes (attributes with the same type are considered equal).
+   */
   static final class Set {
 
     private static final int SIZE_INCREMENT = 6;

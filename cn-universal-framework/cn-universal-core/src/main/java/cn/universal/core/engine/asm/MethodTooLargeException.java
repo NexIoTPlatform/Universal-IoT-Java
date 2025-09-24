@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -28,10 +16,10 @@ public final class MethodTooLargeException extends IndexOutOfBoundsException {
   /**
    * Constructs a new {@link MethodTooLargeException}.
    *
-   * @param className the internal name of the owner class.
+   * @param className  the internal name of the owner class.
    * @param methodName the name of the method.
    * @param descriptor the descriptor of the method.
-   * @param codeSize the size of the method's Code attribute, in bytes.
+   * @param codeSize   the size of the method's Code attribute, in bytes.
    */
   public MethodTooLargeException(
       final String className,

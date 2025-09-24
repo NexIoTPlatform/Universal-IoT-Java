@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.parsing.ast.binary;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -20,7 +8,9 @@ import cn.universal.core.engine.parsing.ast.Expression;
 import cn.universal.core.engine.parsing.ast.VariableSetter;
 import cn.universal.core.engine.parsing.ast.statement.VariableAccess;
 
-/** = 操作 */
+/**
+ * = 操作
+ */
 public class AssigmentOperation extends BinaryOperation {
 
   public AssigmentOperation(Expression leftOperand, Span span, Expression rightOperand) {

@@ -1,26 +1,17 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-/** Number类型扩展 */
+/**
+ * Number类型扩展
+ */
 public class NumberExtension {
 
   @Comment("四舍五入保留N位小数")
-  public static double round(Number number, @Comment(name = "num", value = "规定小数的位数") int num) {
+  public static double round(Number number,
+      @Comment(name = "num", value = "规定小数的位数") int num) {
     return new BigDecimal("" + number.doubleValue())
         .setScale(num, RoundingMode.HALF_UP)
         .doubleValue();
@@ -47,7 +38,8 @@ public class NumberExtension {
   }
 
   @Comment("转为百分比")
-  public static String asPercent(Number number, @Comment(name = "num", value = "规定小数的位数") int num) {
+  public static String asPercent(Number number,
+      @Comment(name = "num", value = "规定小数的位数") int num) {
     return new BigDecimal(number.doubleValue() * 100).setScale(num, RoundingMode.HALF_UP).toString()
         + "%";
   }

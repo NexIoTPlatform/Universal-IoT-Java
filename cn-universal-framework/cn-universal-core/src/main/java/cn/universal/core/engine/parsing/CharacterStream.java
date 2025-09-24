@@ -1,18 +1,8 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.parsing;
 
-/** 对字符串进行封装，提供匹配、跳过方法，方便词法解析。 */
+/**
+ * 对字符串进行封装，提供匹配、跳过方法，方便词法解析。
+ */
 public class CharacterStream {
 
   private final String source;
@@ -49,23 +39,29 @@ public class CharacterStream {
    * 截取字符串
    *
    * @param startIndex 开始位置
-   * @param endIndex 结束位置
+   * @param endIndex   结束位置
    */
   public String substring(int startIndex, int endIndex) {
     return this.source.substring(startIndex, endIndex);
   }
 
-  /** 是否有下一个字符 */
+  /**
+   * 是否有下一个字符
+   */
   public boolean hasMore() {
     return index < end;
   }
 
-  /** 根据开始位置、结束位置返回Span */
+  /**
+   * 根据开始位置、结束位置返回Span
+   */
   public Span getSpan(int start, int end) {
     return new Span(this.source, start, end);
   }
 
-  /** 返回下一个字符 */
+  /**
+   * 返回下一个字符
+   */
   public char consume() {
     if (!hasMore()) {
       throw new RuntimeException("No more characters in stream.");
@@ -73,7 +69,9 @@ public class CharacterStream {
     return source.charAt(index++);
   }
 
-  /** 返回是否是以给定的字符串开头 */
+  /**
+   * 返回是否是以给定的字符串开头
+   */
   public boolean match(String needle, boolean consume) {
     int needleLength = needle.length();
     if (needleLength + index > end) {
@@ -108,7 +106,9 @@ public class CharacterStream {
     return false;
   }
 
-  /** 返回是否是数字 */
+  /**
+   * 返回是否是数字
+   */
   public boolean matchDigit(boolean consume) {
     if (index >= end) {
       return false;
@@ -123,7 +123,9 @@ public class CharacterStream {
     return false;
   }
 
-  /** 返回是否以标识符开头 */
+  /**
+   * 返回是否以标识符开头
+   */
   public boolean matchIdentifierStart(boolean consume) {
     if (index >= end) {
       return false;
@@ -157,7 +159,9 @@ public class CharacterStream {
     return false;
   }
 
-  /** 跳过一行 */
+  /**
+   * 跳过一行
+   */
   public void skipLine() {
     while (index < end) {
       if (source.charAt(index++) == '\n') {
@@ -166,7 +170,9 @@ public class CharacterStream {
     }
   }
 
-  /** 直到给定的字符串之前全部跳过 */
+  /**
+   * 直到给定的字符串之前全部跳过
+   */
   public boolean skipUntil(String chars) {
     while (index < end) {
       boolean matched = true;
@@ -184,7 +190,9 @@ public class CharacterStream {
     return false;
   }
 
-  /** 跳过空白字符 */
+  /**
+   * 跳过空白字符
+   */
   public void skipWhiteSpace() {
     while (index < end) {
       char c = source.charAt(index);
@@ -196,17 +204,23 @@ public class CharacterStream {
     }
   }
 
-  /** 记录当前位置为Span的开始位置 */
+  /**
+   * 记录当前位置为Span的开始位置
+   */
   public void startSpan() {
     spanStart = index;
   }
 
-  /** 根据当前位置返回Span */
+  /**
+   * 根据当前位置返回Span
+   */
   public Span endSpan() {
     return new Span(source, spanStart, index);
   }
 
-  /** 根据当前位置 - offset 返回 Span */
+  /**
+   * 根据当前位置 - offset 返回 Span
+   */
   public Span endSpan(int offset) {
     return new Span(source, spanStart, index + offset);
   }
@@ -215,12 +229,16 @@ public class CharacterStream {
     return new Span(source, start, end);
   }
 
-  /** 返回当前位置 */
+  /**
+   * 返回当前位置
+   */
   public int getPosition() {
     return index;
   }
 
-  /** 重置当前位置 */
+  /**
+   * 重置当前位置
+   */
   public void reset(int position) {
     index = position;
   }

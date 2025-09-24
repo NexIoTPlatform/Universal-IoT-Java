@@ -1,43 +1,43 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
-/** Information about a class being parsed in a {@link ClassReader}. @Author Eric Bruneton */
+/**
+ * Information about a class being parsed in a {@link ClassReader}. @Author Eric Bruneton
+ */
 final class Context {
 
-  /** The prototypes of the attributes that must be parsed in this class. */
+  /**
+   * The prototypes of the attributes that must be parsed in this class.
+   */
   Attribute[] attributePrototypes;
 
   /**
-   * The options used to parse this class. One or more of {@link ClassReader#SKIP_CODE}, {@link
-   * ClassReader#SKIP_DEBUG}, {@link ClassReader#SKIP_FRAMES}, {@link ClassReader#EXPAND_FRAMES} or
-   * {@link ClassReader#EXPAND_ASM_INSNS}.
+   * The options used to parse this class. One or more of {@link ClassReader#SKIP_CODE},
+   * {@link ClassReader#SKIP_DEBUG}, {@link ClassReader#SKIP_FRAMES},
+   * {@link ClassReader#EXPAND_FRAMES} or {@link ClassReader#EXPAND_ASM_INSNS}.
    */
   int parsingOptions;
 
-  /** The buffer used to read strings in the constant pool. */
+  /**
+   * The buffer used to read strings in the constant pool.
+   */
   char[] charBuffer;
 
   // Information about the current method, i.e. the one read in the current (or latest) call
   // to {@link ClassReader#readMethod()}.
 
-  /** The access flags of the current method. */
+  /**
+   * The access flags of the current method.
+   */
   int currentMethodAccessFlags;
 
-  /** The name of the current method. */
+  /**
+   * The name of the current method.
+   */
   String currentMethodName;
 
-  /** The descriptor of the current method. */
+  /**
+   * The descriptor of the current method.
+   */
   String currentMethodDescriptor;
 
   /**
@@ -55,29 +55,39 @@ final class Context {
    */
   int currentTypeAnnotationTarget;
 
-  /** The target_path of the current type annotation target. */
+  /**
+   * The target_path of the current type annotation target.
+   */
   TypePath currentTypeAnnotationTargetPath;
 
-  /** The start of each local variable range in the current local variable annotation. */
+  /**
+   * The start of each local variable range in the current local variable annotation.
+   */
   Label[] currentLocalVariableAnnotationRangeStarts;
 
-  /** The end of each local variable range in the current local variable annotation. */
+  /**
+   * The end of each local variable range in the current local variable annotation.
+   */
   Label[] currentLocalVariableAnnotationRangeEnds;
 
   /**
-   * The local variable index of each local variable range in the current local variable annotation.
+   * The local variable index of each local variable range in the current local variable
+   * annotation.
    */
   int[] currentLocalVariableAnnotationRangeIndices;
 
   // Information about the current stack map frame, i.e. the one read in the current (or latest)
   // call to {@link ClassReader#readFrame()}.
 
-  /** The bytecode offset of the current stack map frame. */
+  /**
+   * The bytecode offset of the current stack map frame.
+   */
   int currentFrameOffset;
 
   /**
-   * The type of the current stack map frame. One of {@link Opcodes#F_FULL}, {@link
-   * Opcodes#F_APPEND}, {@link Opcodes#F_CHOP}, {@link Opcodes#F_SAME} or {@link Opcodes#F_SAME1}.
+   * The type of the current stack map frame. One of {@link Opcodes#F_FULL},
+   * {@link Opcodes#F_APPEND}, {@link Opcodes#F_CHOP}, {@link Opcodes#F_SAME} or
+   * {@link Opcodes#F_SAME1}.
    */
   int currentFrameType;
 
@@ -96,9 +106,10 @@ final class Context {
 
   /**
    * The types of the local variables in the current stack map frame. Each type is represented with
-   * a single array element (even long and double), using the format described in {@link
-   * MethodVisitor#visitFrame}. Depending on {@link #currentFrameType}, this contains the types of
-   * all the local variables, or only those of the additional ones (compared to the previous frame).
+   * a single array element (even long and double), using the format described in
+   * {@link MethodVisitor#visitFrame}. Depending on {@link #currentFrameType}, this contains the
+   * types of all the local variables, or only those of the additional ones (compared to the
+   * previous frame).
    */
   Object[] currentFrameLocalTypes;
 
@@ -110,8 +121,8 @@ final class Context {
 
   /**
    * The types of the stack elements in the current stack map frame. Each type is represented with a
-   * single array element (even long and double), using the format described in {@link
-   * MethodVisitor#visitFrame}.
+   * single array element (even long and double), using the format described in
+   * {@link MethodVisitor#visitFrame}.
    */
   Object[] currentFrameStackTypes;
 }

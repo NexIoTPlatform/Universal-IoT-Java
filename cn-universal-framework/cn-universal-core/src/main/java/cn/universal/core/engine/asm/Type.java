@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 import java.lang.reflect.Constructor;
@@ -21,74 +9,120 @@ import java.lang.reflect.Method;
  */
 public final class Type {
 
-  /** The sort of the {@code void} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code void} type. See {@link #getSort}.
+   */
   public static final int VOID = 0;
 
-  /** The sort of the {@code boolean} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code boolean} type. See {@link #getSort}.
+   */
   public static final int BOOLEAN = 1;
 
-  /** The sort of the {@code char} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code char} type. See {@link #getSort}.
+   */
   public static final int CHAR = 2;
 
-  /** The sort of the {@code byte} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code byte} type. See {@link #getSort}.
+   */
   public static final int BYTE = 3;
 
-  /** The sort of the {@code short} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code short} type. See {@link #getSort}.
+   */
   public static final int SHORT = 4;
 
-  /** The sort of the {@code int} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code int} type. See {@link #getSort}.
+   */
   public static final int INT = 5;
 
-  /** The sort of the {@code float} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code float} type. See {@link #getSort}.
+   */
   public static final int FLOAT = 6;
 
-  /** The sort of the {@code long} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code long} type. See {@link #getSort}.
+   */
   public static final int LONG = 7;
 
-  /** The sort of the {@code double} type. See {@link #getSort}. */
+  /**
+   * The sort of the {@code double} type. See {@link #getSort}.
+   */
   public static final int DOUBLE = 8;
 
-  /** The sort of array reference types. See {@link #getSort}. */
+  /**
+   * The sort of array reference types. See {@link #getSort}.
+   */
   public static final int ARRAY = 9;
 
-  /** The sort of object reference types. See {@link #getSort}. */
+  /**
+   * The sort of object reference types. See {@link #getSort}.
+   */
   public static final int OBJECT = 10;
 
-  /** The sort of method types. See {@link #getSort}. */
+  /**
+   * The sort of method types. See {@link #getSort}.
+   */
   public static final int METHOD = 11;
 
-  /** The (private) sort of object reference types represented with an internal name. */
+  /**
+   * The (private) sort of object reference types represented with an internal name.
+   */
   private static final int INTERNAL = 12;
 
-  /** The descriptors of the primitive types. */
+  /**
+   * The descriptors of the primitive types.
+   */
   private static final String PRIMITIVE_DESCRIPTORS = "VZCBSIFJD";
 
-  /** The {@code void} type. */
+  /**
+   * The {@code void} type.
+   */
   public static final Type VOID_TYPE = new Type(VOID, PRIMITIVE_DESCRIPTORS, VOID, VOID + 1);
 
-  /** The {@code boolean} type. */
+  /**
+   * The {@code boolean} type.
+   */
   public static final Type BOOLEAN_TYPE =
       new Type(BOOLEAN, PRIMITIVE_DESCRIPTORS, BOOLEAN, BOOLEAN + 1);
 
-  /** The {@code char} type. */
+  /**
+   * The {@code char} type.
+   */
   public static final Type CHAR_TYPE = new Type(CHAR, PRIMITIVE_DESCRIPTORS, CHAR, CHAR + 1);
 
-  /** The {@code byte} type. */
+  /**
+   * The {@code byte} type.
+   */
   public static final Type BYTE_TYPE = new Type(BYTE, PRIMITIVE_DESCRIPTORS, BYTE, BYTE + 1);
 
-  /** The {@code short} type. */
+  /**
+   * The {@code short} type.
+   */
   public static final Type SHORT_TYPE = new Type(SHORT, PRIMITIVE_DESCRIPTORS, SHORT, SHORT + 1);
 
-  /** The {@code int} type. */
+  /**
+   * The {@code int} type.
+   */
   public static final Type INT_TYPE = new Type(INT, PRIMITIVE_DESCRIPTORS, INT, INT + 1);
 
-  /** The {@code float} type. */
+  /**
+   * The {@code float} type.
+   */
   public static final Type FLOAT_TYPE = new Type(FLOAT, PRIMITIVE_DESCRIPTORS, FLOAT, FLOAT + 1);
 
-  /** The {@code long} type. */
+  /**
+   * The {@code long} type.
+   */
   public static final Type LONG_TYPE = new Type(LONG, PRIMITIVE_DESCRIPTORS, LONG, LONG + 1);
 
-  /** The {@code double} type. */
+  /**
+   * The {@code double} type.
+   */
   public static final Type DOUBLE_TYPE =
       new Type(DOUBLE, PRIMITIVE_DESCRIPTORS, DOUBLE, DOUBLE + 1);
 
@@ -109,34 +143,34 @@ public final class Type {
    * cases.
    *
    * <p>For {@link #OBJECT} types, this field also contains the descriptor: the characters in
-   * [{@link #valueBegin},{@link #valueEnd}) contain the internal name, and those in [{@link
-   * #valueBegin} - 1, {@link #valueEnd} + 1) contain the descriptor.
+   * [{@link #valueBegin},{@link #valueEnd}) contain the internal name, and those in
+   * [{@link #valueBegin} - 1, {@link #valueEnd} + 1) contain the descriptor.
    */
   private final String valueBuffer;
 
   /**
-   * The beginning index, inclusive, of the value of this Java field or method type in {@link
-   * #valueBuffer}. This value is an internal name for {@link #OBJECT} and {@link #INTERNAL} types,
-   * and a field or method descriptor in the other cases.
+   * The beginning index, inclusive, of the value of this Java field or method type in
+   * {@link #valueBuffer}. This value is an internal name for {@link #OBJECT} and {@link #INTERNAL}
+   * types, and a field or method descriptor in the other cases.
    */
   private final int valueBegin;
 
   /**
-   * The end index, exclusive, of the value of this Java field or method type in {@link
-   * #valueBuffer}. This value is an internal name for {@link #OBJECT} and {@link #INTERNAL} types,
-   * and a field or method descriptor in the other cases.
+   * The end index, exclusive, of the value of this Java field or method type in
+   * {@link #valueBuffer}. This value is an internal name for {@link #OBJECT} and {@link #INTERNAL}
+   * types, and a field or method descriptor in the other cases.
    */
   private final int valueEnd;
 
   /**
    * Constructs a reference type.
    *
-   * @param sort the sort of this type, see {@link #sort}.
+   * @param sort        the sort of this type, see {@link #sort}.
    * @param valueBuffer a buffer containing the value of this field or method type.
-   * @param valueBegin the beginning index, inclusive, of the value of this field or method type in
-   *     valueBuffer.
-   * @param valueEnd the end index, exclusive, of the value of this field or method type in
-   *     valueBuffer.
+   * @param valueBegin  the beginning index, inclusive, of the value of this field or method type in
+   *                    valueBuffer.
+   * @param valueEnd    the end index, exclusive, of the value of this field or method type in
+   *                    valueBuffer.
    */
   private Type(final int sort, final String valueBuffer, final int valueBegin, final int valueEnd) {
     this.sort = sort;
@@ -249,7 +283,7 @@ public final class Type {
   /**
    * Returns the method {@link Type} corresponding to the given argument and return types.
    *
-   * @param returnType the return type of the method.
+   * @param returnType    the return type of the method.
    * @param argumentTypes the argument types of the method.
    * @return the method {@link Type} corresponding to the given argument and return types.
    */
@@ -273,7 +307,7 @@ public final class Type {
    *
    * @param methodDescriptor a method descriptor.
    * @return the {@link Type} values corresponding to the argument types of the given method
-   *     descriptor.
+   * descriptor.
    */
   public static Type[] getArgumentTypes(final String methodDescriptor) {
     // First step: compute the number of argument types in methodDescriptor.
@@ -388,10 +422,10 @@ public final class Type {
    * Returns the {@link Type} corresponding to the given field or method descriptor.
    *
    * @param descriptorBuffer a buffer containing the field or method descriptor.
-   * @param descriptorBegin the beginning index, inclusive, of the field or method descriptor in
-   *     descriptorBuffer.
-   * @param descriptorEnd the end index, exclusive, of the field or method descriptor in
-   *     descriptorBuffer.
+   * @param descriptorBegin  the beginning index, inclusive, of the field or method descriptor in
+   *                         descriptorBuffer.
+   * @param descriptorEnd    the end index, exclusive, of the field or method descriptor in
+   *                         descriptorBuffer.
    * @return the {@link Type} corresponding to the given type descriptor.
    */
   private static Type getTypeInternal(
@@ -538,7 +572,7 @@ public final class Type {
   /**
    * Returns the descriptor corresponding to the given argument and return types.
    *
-   * @param returnType the return type of the method.
+   * @param returnType    the return type of the method.
    * @param argumentTypes the argument types of the method.
    * @return the descriptor corresponding to the given argument and return types.
    */
@@ -589,7 +623,7 @@ public final class Type {
   /**
    * Appends the descriptor of the given class to the given string builder.
    *
-   * @param clazz the class whose descriptor must be computed.
+   * @param clazz         the class whose descriptor must be computed.
    * @param stringBuilder the string builder to which the descriptor must be appended.
    */
   private static void appendDescriptor(final Class<?> clazz, final StringBuilder stringBuilder) {
@@ -634,9 +668,9 @@ public final class Type {
   /**
    * Returns the sort of this type.
    *
-   * @return {@link #VOID}, {@link #BOOLEAN}, {@link #CHAR}, {@link #BYTE}, {@link #SHORT}, {@link
-   *     #INT}, {@link #FLOAT}, {@link #LONG}, {@link #DOUBLE}, {@link #ARRAY}, {@link #OBJECT} or
-   *     {@link #METHOD}.
+   * @return {@link #VOID}, {@link #BOOLEAN}, {@link #CHAR}, {@link #BYTE}, {@link #SHORT},
+   * {@link #INT}, {@link #FLOAT}, {@link #LONG}, {@link #DOUBLE}, {@link #ARRAY}, {@link #OBJECT}
+   * or {@link #METHOD}.
    */
   public int getSort() {
     return sort == INTERNAL ? OBJECT : sort;
@@ -660,7 +694,7 @@ public final class Type {
    * Returns the size of values of this type. This method must not be used for method types.
    *
    * @return the size of values of this type, i.e., 2 for {@code long} and {@code double}, 0 for
-   *     {@code void} and 1 otherwise.
+   * {@code void} and 1 otherwise.
    */
   public int getSize() {
     switch (sort) {
@@ -689,9 +723,9 @@ public final class Type {
    * should only be used for method types.
    *
    * @return the size of the arguments of the method (plus one for the implicit this argument),
-   *     argumentsSize, and the size of its return value, returnSize, packed into a single int i =
-   *     {@code (argumentsSize &lt;&lt; 2) | returnSize} (argumentsSize is therefore equal to {@code
-   *     i &gt;&gt; 2}, and returnSize to {@code i &amp; 0x03}).
+   * argumentsSize, and the size of its return value, returnSize, packed into a single int i =
+   * {@code (argumentsSize &lt;&lt; 2) | returnSize} (argumentsSize is therefore equal to
+   * {@code i &gt;&gt; 2}, and returnSize to {@code i &amp; 0x03}).
    */
   public int getArgumentsAndReturnSizes() {
     return getArgumentsAndReturnSizes(getDescriptor());
@@ -702,9 +736,9 @@ public final class Type {
    *
    * @param methodDescriptor a method descriptor.
    * @return the size of the arguments of the method (plus one for the implicit this argument),
-   *     argumentsSize, and the size of its return value, returnSize, packed into a single int i =
-   *     {@code (argumentsSize &lt;&lt; 2) | returnSize} (argumentsSize is therefore equal to {@code
-   *     i &gt;&gt; 2}, and returnSize to {@code i &amp; 0x03}).
+   * argumentsSize, and the size of its return value, returnSize, packed into a single int i =
+   * {@code (argumentsSize &lt;&lt; 2) | returnSize} (argumentsSize is therefore equal to
+   * {@code i &gt;&gt; 2}, and returnSize to {@code i &amp; 0x03}).
    */
   public static int getArgumentsAndReturnSizes(final String methodDescriptor) {
     int argumentsSize = 1;
@@ -743,11 +777,11 @@ public final class Type {
    * method types.
    *
    * @param opcode a JVM instruction opcode. This opcode must be one of ILOAD, ISTORE, IALOAD,
-   *     IASTORE, IADD, ISUB, IMUL, IDIV, IREM, INEG, ISHL, ISHR, IUSHR, IAND, IOR, IXOR and
-   *     IRETURN.
+   *               IASTORE, IADD, ISUB, IMUL, IDIV, IREM, INEG, ISHL, ISHR, IUSHR, IAND, IOR, IXOR
+   *               and IRETURN.
    * @return an opcode that is similar to the given opcode, but adapted to this {@link Type}. For
-   *     example, if this type is {@code float} and {@code opcode} is IRETURN, this method returns
-   *     FRETURN.
+   * example, if this type is {@code float} and {@code opcode} is IRETURN, this method returns
+   * FRETURN.
    */
   public int getOpcode(final int opcode) {
     if (opcode == Opcodes.IALOAD || opcode == Opcodes.IASTORE) {
