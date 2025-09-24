@@ -195,7 +195,7 @@ cd cn-universal-web & ./bin/restart.sh
 
 #### ⚡ DL/T64电表系列
 
-1. **【【开源】手把手实战：DL/T64电表TCP直连接入】**
+1. **【NexIoT开源】手把手实战：DL/T64电表TCP直连接入】**
     - 📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
     - 📝 内容：TCP协议解析、设备直连配置、数据解析
 
