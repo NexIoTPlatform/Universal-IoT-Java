@@ -157,9 +157,9 @@ cd cn-universal-web & ./bin/restart.sh
 
 ## 📈 正在推进
 
-- **🔄 小程序开发**：正在定制UI，具备指令控制、属性、告警查看，轻量化
-- **🔄 扩展推送**：MQTT / RocketMQ / DB / Kafka
+- **🔄 小程序开发**：付费图鸟定制UI，具备指令控制、属性、告警查看，轻量化、多管理员
 - **🔄 其他**：也可以提一些意见
+
 
 ## 💡 最佳实践
 
@@ -199,9 +199,14 @@ cd cn-universal-web & ./bin/restart.sh
     - 📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
     - 📝 内容：TCP协议解析、设备直连配置、数据解析
 
-2. **【【开源】手把手实战：产品创建与SNI解读】**
+2. **【NexIoT开源】手把手实战：产品创建与SNI解读】**
     - 📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
     - 📝 内容：产品创建流程、SNI设备标识解析、协议调试
+
+3. **【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
+    - 📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：数据流介绍、调试IDE的编写和调试、645电表的编写
+
 
 
 ### 🎯 更多教程
@@ -251,7 +256,7 @@ cd cn-universal-web & ./bin/restart.sh
 
 有任何问题加入QQ群
 
-| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.png) |
+| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![公众号](/__MACOSX/shot/gongzhonghao.jpg) |
 
 ## 🤝 贡献指南
 
@@ -330,7 +335,9 @@ cd cn-universal-web & ./bin/restart.sh
 
 ### 🔒 开源和商业
 
-开源版本暂不包含 **TCP**、**天翼物联ctaiot** 模块。可自行二次开发扩展，商用授权需获取授权。
+开源版本暂不包含 **TCP**、**天翼物联ctaiot** 模块。可自行二次开发扩展，商业用途需赞助项目，获得授权。
+
+### 🙏 致谢
 
 感谢以下开源项目和技术平台：
 
