@@ -30,16 +30,7 @@ public class IoTDeviceActionBeforeService implements IoTDeviceLifeCycle {
 
   @Override
   public void create(String productKey, String deviceId, DownRequest downRequest) {
-    //    if (downRequest.getAppUnionId() != null) {
-    //      IoTUser iotUser = IoTUser.builder().unionId(downRequest.getAppUnionId()).build();
-    //      IoTUser iotUser1 = iotUserMapper.selectOne(iotUser);
-    //      if (iotUser1.getLicenseTotalAmount() == null) {
-    //        throw new IoTException("设备接入数已用完");
-    //      }
-    //      if (iotUser1.getLicense() <= 0) {
-    //        throw new IoTException("设备接入数已用完");
-    //      }
-    //    }
+    //TODO 这里可以限制用户接入数量
   }
 
   @Override
