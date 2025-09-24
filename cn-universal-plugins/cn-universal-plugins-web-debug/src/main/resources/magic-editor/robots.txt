@@ -9,6 +9,7 @@ Allow: /components/
 
 # 网站地图位置
 Sitemap: https://yourdomain.com/sitemap.xml
-# 后面补充sitemap
+# 后面补充sitemap，搜索引擎
+
 # 爬取延迟
 Crawl-delay: 1
