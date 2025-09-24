@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -7,7 +5,9 @@ import cn.universal.core.engine.compile.MagicScriptCompiler;
 import cn.universal.core.engine.parsing.Span;
 import cn.universal.core.engine.parsing.ast.Literal;
 
-/** byte常量 */
+/**
+ * byte常量
+ */
 public class ByteLiteral extends Literal {
 
   private byte value;

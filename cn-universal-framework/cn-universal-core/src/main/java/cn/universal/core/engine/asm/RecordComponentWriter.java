@@ -1,19 +1,23 @@
-
-
 package cn.universal.core.engine.asm;
 
 final class RecordComponentWriter extends RecordComponentVisitor {
 
-  /** Where the constants used in this RecordComponentWriter must be stored. */
+  /**
+   * Where the constants used in this RecordComponentWriter must be stored.
+   */
   private final SymbolTable symbolTable;
 
   // Note: fields are ordered as in the record_component_info structure, and those related to
   // attributes are ordered as in Section 4.7 of the JVMS.
 
-  /** The name_index field of the Record attribute. */
+  /**
+   * The name_index field of the Record attribute.
+   */
   private final int nameIndex;
 
-  /** The descriptor_index field of the the Record attribute. */
+  /**
+   * The descriptor_index field of the the Record attribute.
+   */
   private final int descriptorIndex;
 
   /**
@@ -61,9 +65,9 @@ final class RecordComponentWriter extends RecordComponentVisitor {
    * Constructs a new {@link RecordComponentWriter}.
    *
    * @param symbolTable where the constants used in this RecordComponentWriter must be stored.
-   * @param name the record component name.
-   * @param descriptor the record component descriptor (see {@link Type}).
-   * @param signature the record component signature. May be {@literal null}.
+   * @param name        the record component name.
+   * @param descriptor  the record component descriptor (see {@link Type}).
+   * @param signature   the record component signature. May be {@literal null}.
    */
   RecordComponentWriter(
       final SymbolTable symbolTable,

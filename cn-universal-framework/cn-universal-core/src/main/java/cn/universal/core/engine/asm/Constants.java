@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 import java.io.DataInputStream;
@@ -154,7 +152,8 @@ final class Constants {
   static final int ASM_IFNONNULL = Opcodes.IFNONNULL + ASM_IFNULL_OPCODE_DELTA;
   static final int ASM_GOTO_W = 220;
 
-  private Constants() {}
+  private Constants() {
+  }
 
   static void checkAsmExperimental(final Object caller) {
     Class<?> callerClass = caller.getClass();
@@ -171,9 +170,9 @@ final class Constants {
     String member = "(Annotation|Class|Field|Method|Module|RecordComponent|Signature)";
     return internalName.contains("Test$")
         || Pattern.matches(
-            "org/objectweb/asm/util/Trace" + member + "Visitor(\\$.*)?", internalName)
+        "org/objectweb/asm/util/Trace" + member + "Visitor(\\$.*)?", internalName)
         || Pattern.matches(
-            "org/objectweb/asm/util/Check" + member + "Adapter(\\$.*)?", internalName);
+        "org/objectweb/asm/util/Check" + member + "Adapter(\\$.*)?", internalName);
   }
 
   static void checkIsPreview(final InputStream classInputStream) {

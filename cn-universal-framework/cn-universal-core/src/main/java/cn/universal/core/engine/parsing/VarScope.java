@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing;
 
 import java.util.ArrayList;
@@ -12,7 +10,8 @@ public class VarScope extends ArrayList<VarIndex> {
     this.parent = parent;
   }
 
-  public VarScope() {}
+  public VarScope() {
+  }
 
   public VarScope push() {
     return new VarScope(this);

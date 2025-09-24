@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions.linq;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -9,7 +7,9 @@ import cn.universal.core.engine.functions.TemporalAccessorExtension;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
-/** Linq中的函数 */
+/**
+ * Linq中的函数
+ */
 public class LinqFunctions {
 
   @Function

@@ -1,10 +1,9 @@
-
-
 package cn.universal.core.engine.exception;
 
 public class MagicScriptRuntimeException extends RuntimeException {
 
-  public MagicScriptRuntimeException() {}
+  public MagicScriptRuntimeException() {
+  }
 
   public MagicScriptRuntimeException(String message) {
     super(message);

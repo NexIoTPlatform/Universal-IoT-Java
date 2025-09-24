@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions;
 
 import java.util.Collections;

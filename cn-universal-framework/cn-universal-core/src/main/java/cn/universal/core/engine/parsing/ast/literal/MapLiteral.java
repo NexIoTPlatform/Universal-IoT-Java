@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -10,7 +8,9 @@ import cn.universal.core.engine.parsing.ast.statement.Spread;
 import java.util.List;
 import java.util.Objects;
 
-/** map常量 */
+/**
+ * map常量
+ */
 public class MapLiteral extends Literal {
 
   private final List<Expression> keys;

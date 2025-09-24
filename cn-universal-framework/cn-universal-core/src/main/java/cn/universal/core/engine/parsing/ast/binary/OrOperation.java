@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.binary;
 
 import cn.universal.core.engine.asm.Label;
@@ -9,7 +7,9 @@ import cn.universal.core.engine.parsing.ast.BinaryOperation;
 import cn.universal.core.engine.parsing.ast.Expression;
 import cn.universal.core.engine.runtime.handle.OperatorHandle;
 
-/** || 操作 */
+/**
+ * || 操作
+ */
 public class OrOperation extends BinaryOperation {
 
   public OrOperation(Expression leftOperand, Span span, Expression rightOperand) {

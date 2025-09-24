@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -12,7 +10,9 @@ import cn.universal.core.engine.runtime.handle.BitHandle;
 import cn.universal.core.engine.runtime.handle.OperatorHandle;
 import java.util.function.Supplier;
 
-/** 一元操作符 */
+/**
+ * 一元操作符
+ */
 public class UnaryOperation extends Expression {
 
   private final UnaryOperator operator;
@@ -110,22 +110,34 @@ public class UnaryOperation extends Expression {
   }
 
   public enum UnaryOperator {
-    /** ! */
+    /**
+     * !
+     */
     Not,
 
-    /** - */
+    /**
+     * -
+     */
     Negate,
 
-    /** + */
+    /**
+     * +
+     */
     Positive,
 
-    /** ++ */
+    /**
+     * ++
+     */
     PlusPlus,
 
-    /** -- */
+    /**
+     * --
+     */
     MinusMinus,
 
-    /** ~ */
+    /**
+     * ~
+     */
     BitNot;
 
     public static UnaryOperator getOperator(Token op) {

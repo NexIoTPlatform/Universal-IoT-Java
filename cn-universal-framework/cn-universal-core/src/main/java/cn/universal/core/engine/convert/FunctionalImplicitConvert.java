@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.convert;
 
 import cn.universal.core.engine.runtime.Variables;
@@ -8,7 +6,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.function.Function;
 
-/** 脚本内部lambda到Java函数式的转换 */
+/**
+ * 脚本内部lambda到Java函数式的转换
+ */
 public class FunctionalImplicitConvert implements ClassImplicitConvert {
 
   private final ClassLoader classLoader = FunctionalImplicitConvert.class.getClassLoader();
@@ -33,7 +33,7 @@ public class FunctionalImplicitConvert implements ClassImplicitConvert {
               if (aClass.isArray() && aClass.getComponentType() == Object.class) {
                 param = (Object[]) args;
               } else {
-                param = new Object[] {args};
+                param = new Object[]{args};
               }
             }
             return function.apply(variables, param);
@@ -41,7 +41,7 @@ public class FunctionalImplicitConvert implements ClassImplicitConvert {
     }
     return Proxy.newProxyInstance(
         classLoader,
-        new Class[] {target},
+        new Class[]{target},
         (proxy, method, args) -> {
           if (Modifier.isAbstract(method.getModifiers())) {
             return function.apply(variables, args);

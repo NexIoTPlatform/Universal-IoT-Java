@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.compile;
 
 public class MagicScriptCompileException extends RuntimeException {

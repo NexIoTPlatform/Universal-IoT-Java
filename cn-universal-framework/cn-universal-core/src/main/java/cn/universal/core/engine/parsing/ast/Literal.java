@@ -1,11 +1,11 @@
-
-
 package cn.universal.core.engine.parsing.ast;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
 import cn.universal.core.engine.parsing.Span;
 
-/** 常量 */
+/**
+ * 常量
+ */
 public abstract class Literal extends Expression {
 
   protected Object value = null;

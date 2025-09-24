@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -30,7 +28,8 @@ public interface Opcodes {
    *
    * @deprecated This API is experimental.
    */
-  @Deprecated int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
+  @Deprecated
+  int ASM10_EXPERIMENTAL = 1 << 24 | 10 << 16 | 0 << 8;
 
   /*
    * Internal flags used to redirect calls to deprecated methods. For instance, if a visitOldStuff
@@ -332,10 +331,14 @@ public interface Opcodes {
 
   // ASM specific stack map frame types, used in {@link ClassVisitor#visitFrame}.
 
-  /** An expanded frame. See {@link ClassReader#EXPAND_FRAMES}. */
+  /**
+   * An expanded frame. See {@link ClassReader#EXPAND_FRAMES}.
+   */
   int F_NEW = -1;
 
-  /** A compressed frame with complete frame data. */
+  /**
+   * A compressed frame with complete frame data.
+   */
   int F_FULL = 0;
 
   /**

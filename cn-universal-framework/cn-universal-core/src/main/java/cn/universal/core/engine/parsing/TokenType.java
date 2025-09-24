@@ -1,10 +1,10 @@
-
-
 package cn.universal.core.engine.parsing;
 
 import java.util.Arrays;
 
-/** Token类型 */
+/**
+ * Token类型
+ */
 public enum TokenType {
   // @off
   Spread("...", "..."),

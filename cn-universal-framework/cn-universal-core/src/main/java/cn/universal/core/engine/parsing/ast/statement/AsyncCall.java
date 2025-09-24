@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.statement;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -17,10 +15,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/** 异步调用 */
+/**
+ * 异步调用
+ */
 public class AsyncCall extends Expression {
 
-  /** 默认线程池大小(CPU核心数 * 2) */
+  /**
+   * 默认线程池大小(CPU核心数 * 2)
+   */
   private static ThreadPoolExecutor threadPoolExecutor =
       setThreadPoolExecutorSize(Runtime.getRuntime().availableProcessors() * 2);
 

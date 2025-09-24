@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.runtime.linq;
 
 public class OrderValue {

@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.statement;
 
 import cn.universal.core.engine.asm.Label;

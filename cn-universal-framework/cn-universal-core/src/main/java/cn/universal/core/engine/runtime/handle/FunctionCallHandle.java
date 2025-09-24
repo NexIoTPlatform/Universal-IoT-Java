@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.runtime.handle;
 
 import static java.lang.invoke.MethodType.methodType;
@@ -185,7 +183,8 @@ public class FunctionCallHandle {
       return method.invoke0(target, runtimeContext, args);
     }
     throw new NoSuchMethodException(
-        String.format("找不到函数%s(%s)", name, String.join(",", JavaReflection.getStringTypes(args))));
+        String.format("找不到函数%s(%s)", name,
+            String.join(",", JavaReflection.getStringTypes(args))));
   }
 
   public static Object invoke_method(
@@ -219,7 +218,7 @@ public class FunctionCallHandle {
       MethodInvoker invoker =
           new MethodInvoker(
               DynamicMethod.class.getDeclaredMethod("execute", String.class, List.class));
-      Object[] newArgumentValues = new Object[] {name, Arrays.asList(args)};
+      Object[] newArgumentValues = new Object[]{name, Arrays.asList(args)};
       return invoker.invoke0(target, runtimeContext, newArgumentValues);
     }
     try {
@@ -305,7 +304,8 @@ public class FunctionCallHandle {
     }
     throw new MagicScriptRuntimeException(
         String.format(
-            "在%s中找不到属性%s或者方法get%s、方法is%s,内部类%s", target, name, methodName, methodName, name));
+            "在%s中找不到属性%s或者方法get%s、方法is%s,内部类%s", target, name, methodName,
+            methodName, name));
   }
 
   public static Object call_async(
@@ -439,9 +439,10 @@ public class FunctionCallHandle {
         JavaInvoker<Method> invoker = JavaReflection.getMethod(target, "set" + methodName, value);
         if (invoker == null) {
           throw new MagicScriptRuntimeException(
-              String.format("在%s中找不到属性%s或者方法set%s", target.getClass(), name, methodName));
+              String.format("在%s中找不到属性%s或者方法set%s", target.getClass(), name,
+                  methodName));
         }
-        invoker.invoke0(target, runtimeContext, new Object[] {value});
+        invoker.invoke0(target, runtimeContext, new Object[]{value});
       }
     }
     return value;

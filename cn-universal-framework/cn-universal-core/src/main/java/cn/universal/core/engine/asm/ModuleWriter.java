@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -8,63 +6,97 @@ package cn.universal.core.engine.asm;
  * Remi Forax @Author Eric Bruneton
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.25">JVMS
- *     4.7.25</a>
+ * 4.7.25</a>
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.26">JVMS
- *     4.7.26</a>
+ * 4.7.26</a>
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.27">JVMS
- *     4.7.27</a>
+ * 4.7.27</a>
  */
 final class ModuleWriter extends ModuleVisitor {
 
-  /** Where the constants used in this AnnotationWriter must be stored. */
+  /**
+   * Where the constants used in this AnnotationWriter must be stored.
+   */
   private final SymbolTable symbolTable;
 
-  /** The module_name_index field of the JVMS Module attribute. */
+  /**
+   * The module_name_index field of the JVMS Module attribute.
+   */
   private final int moduleNameIndex;
 
-  /** The module_flags field of the JVMS Module attribute. */
+  /**
+   * The module_flags field of the JVMS Module attribute.
+   */
   private final int moduleFlags;
 
-  /** The module_version_index field of the JVMS Module attribute. */
+  /**
+   * The module_version_index field of the JVMS Module attribute.
+   */
   private final int moduleVersionIndex;
 
-  /** The requires_count field of the JVMS Module attribute. */
+  /**
+   * The requires_count field of the JVMS Module attribute.
+   */
   private int requiresCount;
 
-  /** The binary content of the 'requires' array of the JVMS Module attribute. */
+  /**
+   * The binary content of the 'requires' array of the JVMS Module attribute.
+   */
   private final ByteVector requires;
 
-  /** The exports_count field of the JVMS Module attribute. */
+  /**
+   * The exports_count field of the JVMS Module attribute.
+   */
   private int exportsCount;
 
-  /** The binary content of the 'exports' array of the JVMS Module attribute. */
+  /**
+   * The binary content of the 'exports' array of the JVMS Module attribute.
+   */
   private final ByteVector exports;
 
-  /** The opens_count field of the JVMS Module attribute. */
+  /**
+   * The opens_count field of the JVMS Module attribute.
+   */
   private int opensCount;
 
-  /** The binary content of the 'opens' array of the JVMS Module attribute. */
+  /**
+   * The binary content of the 'opens' array of the JVMS Module attribute.
+   */
   private final ByteVector opens;
 
-  /** The uses_count field of the JVMS Module attribute. */
+  /**
+   * The uses_count field of the JVMS Module attribute.
+   */
   private int usesCount;
 
-  /** The binary content of the 'uses_index' array of the JVMS Module attribute. */
+  /**
+   * The binary content of the 'uses_index' array of the JVMS Module attribute.
+   */
   private final ByteVector usesIndex;
 
-  /** The provides_count field of the JVMS Module attribute. */
+  /**
+   * The provides_count field of the JVMS Module attribute.
+   */
   private int providesCount;
 
-  /** The binary content of the 'provides' array of the JVMS Module attribute. */
+  /**
+   * The binary content of the 'provides' array of the JVMS Module attribute.
+   */
   private final ByteVector provides;
 
-  /** The provides_count field of the JVMS ModulePackages attribute. */
+  /**
+   * The provides_count field of the JVMS ModulePackages attribute.
+   */
   private int packageCount;
 
-  /** The binary content of the 'package_index' array of the JVMS ModulePackages attribute. */
+  /**
+   * The binary content of the 'package_index' array of the JVMS ModulePackages attribute.
+   */
   private final ByteVector packageIndex;
 
-  /** The main_class_index field of the JVMS ModuleMainClass attribute, or 0. */
+  /**
+   * The main_class_index field of the JVMS ModuleMainClass attribute, or 0.
+   */
   private int mainClassIndex;
 
   ModuleWriter(final SymbolTable symbolTable, final int name, final int access, final int version) {

@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.convert;
 
 import cn.universal.core.engine.functions.MapExtension;
@@ -10,7 +8,9 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 
-/** Map到Bean的隐式转换 */
+/**
+ * Map到Bean的隐式转换
+ */
 public class MapImplicitConvert implements ClassImplicitConvert {
 
   @Override

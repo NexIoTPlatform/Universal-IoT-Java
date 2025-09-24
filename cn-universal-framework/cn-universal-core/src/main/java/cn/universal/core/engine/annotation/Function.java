@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.annotation;
 
 import java.lang.annotation.Documented;
@@ -8,8 +6,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/** 标识是个函数 */
+/**
+ * 标识是个函数
+ */
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface Function {}
+public @interface Function {
+
+}

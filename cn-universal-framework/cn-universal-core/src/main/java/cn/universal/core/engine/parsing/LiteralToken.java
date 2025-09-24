@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing;
 
 public class LiteralToken extends Token {

@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.binary;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -8,7 +6,9 @@ import cn.universal.core.engine.parsing.Span;
 import cn.universal.core.engine.parsing.ast.BinaryOperation;
 import cn.universal.core.engine.parsing.ast.Expression;
 
-/** instanceof */
+/**
+ * instanceof
+ */
 public class InstanceofOperation extends BinaryOperation {
 
   public InstanceofOperation(Expression leftOperand, Span span, Expression rightOperand) {

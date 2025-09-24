@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -12,7 +10,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-/** String 常量 */
+/**
+ * String 常量
+ */
 public class StringLiteral extends Literal {
 
   private final Token token;

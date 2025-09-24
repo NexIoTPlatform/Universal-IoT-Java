@@ -1,12 +1,12 @@
-
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
 import cn.universal.core.engine.annotation.Function;
 import java.util.UUID;
 
-/** 脚本能力扩展 */
+/**
+ * 脚本能力扩展
+ */
 public class MagicScriptFunctions {
 
   @Comment("生成uuid字符串，不包含`-`")

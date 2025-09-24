@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.constant;
 
 import java.util.Set;
@@ -8,7 +6,6 @@ import java.util.stream.Stream;
 
 /**
  * @Author Aleo
- *
  * @version 1.0
  * @since 2023/5/19
  */

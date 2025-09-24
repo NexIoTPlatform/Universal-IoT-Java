@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm.signature;
 
 import cn.universal.core.engine.asm.Opcodes;
@@ -24,26 +22,33 @@ import cn.universal.core.engine.asm.Opcodes;
  */
 public abstract class SignatureVisitor {
 
-  /** Wildcard for an "extends" type argument. */
+  /**
+   * Wildcard for an "extends" type argument.
+   */
   public static final char EXTENDS = '+';
 
-  /** Wildcard for a "super" type argument. */
+  /**
+   * Wildcard for a "super" type argument.
+   */
   public static final char SUPER = '-';
 
-  /** Wildcard for a normal type argument. */
+  /**
+   * Wildcard for a normal type argument.
+   */
   public static final char INSTANCEOF = '=';
 
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of {@link
-   * Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * The ASM API version implemented by this visitor. The value of this field must be one of
+   * {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   protected final int api;
 
   /**
    * Constructs a new {@link SignatureVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * @param api the ASM API version implemented by this visitor. Must be one of
+   *            {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or
+   *            {@link Opcodes#ASM7}.
    */
   public SignatureVisitor(final int api) {
     if (api != Opcodes.ASM9
@@ -63,7 +68,8 @@ public abstract class SignatureVisitor {
    *
    * @param name the name of the formal parameter.
    */
-  public void visitFormalTypeParameter(final String name) {}
+  public void visitFormalTypeParameter(final String name) {
+  }
 
   /**
    * Visits the class bound of the last visited formal type parameter.
@@ -133,14 +139,16 @@ public abstract class SignatureVisitor {
    *
    * @param descriptor the descriptor of the primitive type, or 'V' for {@code void} .
    */
-  public void visitBaseType(final char descriptor) {}
+  public void visitBaseType(final char descriptor) {
+  }
 
   /**
    * Visits a signature corresponding to a type variable.
    *
    * @param name the name of the type variable.
    */
-  public void visitTypeVariable(final String name) {}
+  public void visitTypeVariable(final String name) {
+  }
 
   /**
    * Visits a signature corresponding to an array type.
@@ -156,17 +164,22 @@ public abstract class SignatureVisitor {
    *
    * @param name the internal name of the class or processer.
    */
-  public void visitClassType(final String name) {}
+  public void visitClassType(final String name) {
+  }
 
   /**
    * Visits an inner class.
    *
    * @param name the local name of the inner class in its enclosing class.
    */
-  public void visitInnerClassType(final String name) {}
+  public void visitInnerClassType(final String name) {
+  }
 
-  /** Visits an unbounded type argument of the last visited class or inner class type. */
-  public void visitTypeArgument() {}
+  /**
+   * Visits an unbounded type argument of the last visited class or inner class type.
+   */
+  public void visitTypeArgument() {
+  }
 
   /**
    * Visits a type argument of the last visited class or inner class type.
@@ -178,6 +191,9 @@ public abstract class SignatureVisitor {
     return this;
   }
 
-  /** Ends the visit of a signature corresponding to a class or processer type. */
-  public void visitEnd() {}
+  /**
+   * Ends the visit of a signature corresponding to a class or processer type.
+   */
+  public void visitEnd() {
+  }
 }

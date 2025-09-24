@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -8,7 +6,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-/** Date扩展 */
+/**
+ * Date扩展
+ */
 public class DateExtension {
 
   private static final ZoneId SYSTEM_ZONE_ID = ZoneId.systemDefault();

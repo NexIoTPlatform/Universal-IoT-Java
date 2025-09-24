@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.runtime.Variables;
@@ -51,7 +49,7 @@ public class MagicScriptDebugContext extends MagicScriptContext {
       int startRow, int startCol, int endRow, int endCol, Variables variables)
       throws InterruptedException {
     if (stepInto || breakpoints.contains(startRow)) {
-      this.line = new int[] {startRow, startCol, endRow, endCol};
+      this.line = new int[]{startRow, startCol, endRow, endCol};
       consumer.offer(this.id);
       Map<String, Object> varMap = new LinkedHashMap<>(getRootVariables());
       varMap.putAll(variables.getVariables(this));

@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.binary;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -10,7 +8,9 @@ import cn.universal.core.engine.parsing.ast.Expression;
 import cn.universal.core.engine.parsing.ast.VariableSetter;
 import cn.universal.core.engine.parsing.ast.statement.VariableAccess;
 
-/** = 操作 */
+/**
+ * = 操作
+ */
 public class AssigmentOperation extends BinaryOperation {
 
   public AssigmentOperation(Expression leftOperand, Span span, Expression rightOperand) {

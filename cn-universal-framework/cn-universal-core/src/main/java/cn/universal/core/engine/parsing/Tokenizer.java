@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -107,17 +105,20 @@ public class Tokenizer {
     if (stream.match("```", true)) {
       stream.startSpan();
       if (stream.matchIdentifierStart(true)) {
-        while (stream.matchIdentifierPart(true)) {}
+        while (stream.matchIdentifierPart(true)) {
+        }
         Span language = stream.endSpan();
         tokens.add(new Token(TokenType.Language, language));
         stream.startSpan();
         if (!stream.skipUntil("```")) {
-          MagicScriptError.error("```需要以```结尾", stream.endSpan(), new StringLiteralException());
+          MagicScriptError.error("```需要以```结尾", stream.endSpan(),
+              new StringLiteralException());
         }
         tokens.add(new Token(TokenType.Language, stream.endSpan(-3)));
         return true;
       } else {
-        MagicScriptError.error("```后需要标识语言类型", stream.endSpan(), new StringLiteralException());
+        MagicScriptError.error("```后需要标识语言类型", stream.endSpan(),
+            new StringLiteralException());
       }
     }
     return false;
@@ -152,7 +153,8 @@ public class Tokenizer {
         stream.consume();
       }
       if (!matchedEndQuote) {
-        MagicScriptError.error("模板字符串没有结束符`", stream.endSpan(), new StringLiteralException());
+        MagicScriptError.error("模板字符串没有结束符`", stream.endSpan(),
+            new StringLiteralException());
       }
       Span stringSpan = stream.endSpan(begin, stream.getPosition());
       int end = stream.getPosition() - 1;
@@ -169,7 +171,8 @@ public class Tokenizer {
   private static boolean tokenizerIdentifier(CharacterStream stream, List<Token> tokens) {
     if (stream.matchIdentifierStart(true)) {
       stream.startSpan();
-      while (stream.matchIdentifierPart(true)) {}
+      while (stream.matchIdentifierPart(true)) {
+      }
       Span identifierSpan = stream.endSpan();
       identifierSpan = stream.getSpan(identifierSpan.getStart() - 1, identifierSpan.getEnd());
       if ("true".equals(identifierSpan.getText()) || "false".equals(identifierSpan.getText())) {
@@ -218,7 +221,8 @@ public class Tokenizer {
       if (stream.matchAny(true, "x", "X")) { // 0x 16进制
         while (stream.matchDigit(true)
             || stream.matchAny(
-                true, "A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f", "_")) {}
+            true, "A", "B", "C", "D", "E", "F", "a", "b", "c", "d", "e", "f", "_")) {
+        }
         if (stream.matchAny(true, "L", "l")) {
           Span span = stream.endSpan();
           String text = span.getText();
@@ -232,7 +236,8 @@ public class Tokenizer {
         tokens.add(autoNumberType(stream.endSpan(), 16));
         return true;
       } else if (stream.matchAny(true, "b", "B")) { // 二进制
-        while (stream.matchAny(true, "0", "1", "_")) {}
+        while (stream.matchAny(true, "0", "1", "_")) {
+        }
         if (stream.matchAny(true, "L", "l")) {
           Span span = stream.endSpan();
           String text = span.getText();
@@ -251,10 +256,12 @@ public class Tokenizer {
     if (stream.matchDigit(false)) {
       TokenType type = TokenType.IntegerLiteral;
       stream.startSpan();
-      while (stream.matchDigit(true) || stream.match("_", true)) {}
+      while (stream.matchDigit(true) || stream.match("_", true)) {
+      }
       if (stream.match(TokenType.Period.getLiteral(), true)) {
         type = TokenType.DoubleLiteral;
-        while (stream.matchDigit(true) || stream.match("_", true)) {}
+        while (stream.matchDigit(true) || stream.match("_", true)) {
+        }
       }
       if (stream.matchAny(true, "b", "B")) {
         if (type == TokenType.DoubleLiteral) {
@@ -322,7 +329,8 @@ public class Tokenizer {
       }
       if (!matchedEndQuote) {
         MagicScriptError.error(
-            "字符串没有结束符" + tokenType.getError(), stream.endSpan(), new StringLiteralException());
+            "字符串没有结束符" + tokenType.getError(), stream.endSpan(),
+            new StringLiteralException());
       }
       Span stringSpan = stream.endSpan();
       stringSpan =

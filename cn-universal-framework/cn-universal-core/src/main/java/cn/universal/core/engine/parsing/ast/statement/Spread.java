@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.statement;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -7,7 +5,9 @@ import cn.universal.core.engine.parsing.Span;
 import cn.universal.core.engine.parsing.ast.Expression;
 import cn.universal.core.engine.runtime.SpreadValue;
 
-/** 展开语法 Spread syntax (...) */
+/**
+ * 展开语法 Spread syntax (...)
+ */
 public class Spread extends Expression {
 
   private final Expression target;

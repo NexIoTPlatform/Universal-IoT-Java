@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -7,7 +5,9 @@ import cn.universal.core.engine.compile.MagicScriptCompiler;
 import cn.universal.core.engine.parsing.Span;
 import cn.universal.core.engine.parsing.ast.Literal;
 
-/** int常量 */
+/**
+ * int常量
+ */
 public class IntegerLiteral extends Literal {
 
   public IntegerLiteral(Span literal) {

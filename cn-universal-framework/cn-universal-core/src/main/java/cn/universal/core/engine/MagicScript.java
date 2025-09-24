@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.compile.CompileCache;
@@ -35,18 +33,26 @@ public class MagicScript extends CompiledScript {
 
   public static final String DEBUG_MARK = "!# DEBUG\r\n";
 
-  /** 所有语句 */
+  /**
+   * 所有语句
+   */
   private final List<Node> nodes;
 
   private final ScriptEngine scriptEngine;
 
-  /** 存放所有变量定义 */
+  /**
+   * 存放所有变量定义
+   */
   private final Set<VarIndex> varIndices;
 
-  /** 编译后的类 */
+  /**
+   * 编译后的类
+   */
   private MagicScriptVariableAccessRuntime accessRuntime;
 
-  /** 构造函数 */
+  /**
+   * 构造函数
+   */
   private Constructor<MagicScriptRuntime> constructor;
 
   private final boolean debug;
@@ -69,12 +75,16 @@ public class MagicScript extends CompiledScript {
     compileCache = new CompileCache(capacity);
   }
 
-  /** 创建MagicScript */
+  /**
+   * 创建MagicScript
+   */
   public static MagicScript create(String source, ScriptEngine scriptEngine) {
     return create(false, source, scriptEngine);
   }
 
-  /** 创建MagicScript */
+  /**
+   * 创建MagicScript
+   */
   public static MagicScript create(boolean expression, String source, ScriptEngine scriptEngine) {
     if (compileCache == null) {
       compileCache = new CompileCache(500);
@@ -115,7 +125,9 @@ public class MagicScript extends CompiledScript {
     return null;
   }
 
-  /** 编译 */
+  /**
+   * 编译
+   */
   public MagicScriptRuntime compile() throws MagicScriptCompileException {
     if (this.accessRuntime != null) {
       return this.accessRuntime;

@@ -1,31 +1,32 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
  * A visitor to visit a Java class. The methods of this class must be called in the following order:
- * {@code visit} [ {@code visitSource} ] [ {@code visitModule} ][ {@code visitNestHost} ][ {@code
- * visitOuterClass} ] ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code
- * visitAttribute} )* ( {@code visitNestMember} | [ {@code * visitPermittedSubclass} ] | {@code
- * visitInnerClass} | {@code visitRecordComponent} | {@code visitField} | {@code visitMethod} )*
- * {@code visitEnd}. @Author Eric Bruneton
+ * {@code visit} [ {@code visitSource} ] [ {@code visitModule} ][ {@code visitNestHost} ][
+ * {@code visitOuterClass} ] ( {@code visitAnnotation} | {@code visitTypeAnnotation} |
+ * {@code visitAttribute} )* ( {@code visitNestMember} | [ {@code * visitPermittedSubclass} ] |
+ * {@code visitInnerClass} | {@code visitRecordComponent} | {@code visitField} | {@code visitMethod}
+ * )* {@code visitEnd}. @Author Eric Bruneton
  */
 public abstract class ClassVisitor {
 
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of {@link
-   * Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * The ASM API version implemented by this visitor. The value of this field must be one of
+   * {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
    */
   protected final int api;
 
-  /** The class visitor to which this visitor must delegate method calls. May be {@literal null}. */
+  /**
+   * The class visitor to which this visitor must delegate method calls. May be {@literal null}.
+   */
   protected ClassVisitor cv;
 
   /**
    * Constructs a new {@link ClassVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or {@link Opcodes#ASM7}.
+   * @param api the ASM API version implemented by this visitor. Must be one of
+   *            {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6} or
+   *            {@link Opcodes#ASM7}.
    */
   public ClassVisitor(final int api) {
     this(api, null);
@@ -34,11 +35,11 @@ public abstract class ClassVisitor {
   /**
    * Constructs a new {@link ClassVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6}, {@link Opcodes#ASM7}, {@link
-   *     Opcodes#ASM8} or {@link Opcodes#ASM9}.
+   * @param api          the ASM API version implemented by this visitor. Must be one of
+   *                     {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6},
+   *                     {@link Opcodes#ASM7}, {@link Opcodes#ASM8} or {@link Opcodes#ASM9}.
    * @param classVisitor the class visitor to which this visitor must delegate method calls. May be
-   *     null.
+   *                     null.
    */
   public ClassVisitor(final int api, final ClassVisitor classVisitor) {
     if (api != Opcodes.ASM9
@@ -60,19 +61,19 @@ public abstract class ClassVisitor {
   /**
    * Visits the header of the class.
    *
-   * @param version the class version. The minor version is stored in the 16 most significant bits,
-   *     and the major version in the 16 least significant bits.
-   * @param access the class's access flags (see {@link Opcodes}). This parameter also indicates if
-   *     the class is deprecated {@link Opcodes#ACC_DEPRECATED} or a record {@link
-   *     Opcodes#ACC_RECORD}.
-   * @param name the internal name of the class (see {@link Type#getInternalName()}).
-   * @param signature the signature of this class. May be {@literal null} if the class is not a
-   *     generic one, and does not extend or implement generic classes or interfaces.
-   * @param superName the internal of name of the super class (see {@link Type#getInternalName()}).
-   *     For interfaces, the super class is {@link Object}. May be {@literal null}, but only for the
-   *     {@link Object} class.
-   * @param interfaces the internal names of the class's interfaces (see {@link
-   *     Type#getInternalName()}). May be {@literal null}.
+   * @param version    the class version. The minor version is stored in the 16 most significant
+   *                   bits, and the major version in the 16 least significant bits.
+   * @param access     the class's access flags (see {@link Opcodes}). This parameter also indicates
+   *                   if the class is deprecated {@link Opcodes#ACC_DEPRECATED} or a record
+   *                   {@link Opcodes#ACC_RECORD}.
+   * @param name       the internal name of the class (see {@link Type#getInternalName()}).
+   * @param signature  the signature of this class. May be {@literal null} if the class is not a
+   *                   generic one, and does not extend or implement generic classes or interfaces.
+   * @param superName  the internal of name of the super class (see {@link Type#getInternalName()}).
+   *                   For interfaces, the super class is {@link Object}. May be {@literal null},
+   *                   but only for the {@link Object} class.
+   * @param interfaces the internal names of the class's interfaces (see
+   *                   {@link Type#getInternalName()}). May be {@literal null}.
    */
   public void visit(
       final int version,
@@ -92,10 +93,10 @@ public abstract class ClassVisitor {
   /**
    * Visits the source of the class.
    *
-   * @param source the name of the source file from which the class was compiled. May be {@literal
-   *     null}.
-   * @param debug additional debug information to compute the correspondence between source and
-   *     compiled elements of the class. May be {@literal null}.
+   * @param source the name of the source file from which the class was compiled. May be
+   *               {@literal null}.
+   * @param debug  additional debug information to compute the correspondence between source and
+   *               compiled elements of the class. May be {@literal null}.
    */
   public void visitSource(final String source, final String debug) {
     if (cv != null) {
@@ -106,12 +107,12 @@ public abstract class ClassVisitor {
   /**
    * Visit the module corresponding to the class.
    *
-   * @param name the fully qualified name (using dots) of the module.
-   * @param access the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and {@code
-   *     ACC_MANDATED}.
+   * @param name    the fully qualified name (using dots) of the module.
+   * @param access  the module access flags, among {@code ACC_OPEN}, {@code ACC_SYNTHETIC} and
+   *                {@code ACC_MANDATED}.
    * @param version the module version, or {@literal null}.
    * @return a visitor to visit the module values, or {@literal null} if this visitor is not
-   *     interested in visiting this module.
+   * interested in visiting this module.
    */
   public ModuleVisitor visitModule(final String name, final int access, final String version) {
     if (api < Opcodes.ASM6) {
@@ -146,11 +147,11 @@ public abstract class ClassVisitor {
    * Visits the enclosing class of the class. This method must be called only if the class has an
    * enclosing class.
    *
-   * @param owner internal name of the enclosing class of the class.
-   * @param name the name of the method that contains the class, or {@literal null} if the class is
-   *     not enclosed in a method of its enclosing class.
+   * @param owner      internal name of the enclosing class of the class.
+   * @param name       the name of the method that contains the class, or {@literal null} if the
+   *                   class is not enclosed in a method of its enclosing class.
    * @param descriptor the descriptor of the method that contains the class, or {@literal null} if
-   *     the class is not enclosed in a method of its enclosing class.
+   *                   the class is not enclosed in a method of its enclosing class.
    */
   public void visitOuterClass(final String owner, final String name, final String descriptor) {
     if (cv != null) {
@@ -162,9 +163,9 @@ public abstract class ClassVisitor {
    * Visits an annotation of the class.
    *
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible    {@literal true} if the annotation is visible at runtime.
    * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-   *     interested in visiting this annotation.
+   * interested in visiting this annotation.
    */
   public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (cv != null) {
@@ -176,17 +177,17 @@ public abstract class ClassVisitor {
   /**
    * Visits an annotation on a type in the class signature.
    *
-   * @param typeRef a reference to the annotated type. The sort of this type reference must be
-   *     {@link TypeReference#CLASS_TYPE_PARAMETER}, {@link
-   *     TypeReference#CLASS_TYPE_PARAMETER_BOUND} or {@link TypeReference#CLASS_EXTENDS}. See
-   *     {@link TypeReference}.
-   * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-   *     'typeRef' as a whole.
+   * @param typeRef    a reference to the annotated type. The sort of this type reference must be
+   *                   {@link TypeReference#CLASS_TYPE_PARAMETER},
+   *                   {@link TypeReference#CLASS_TYPE_PARAMETER_BOUND} or
+   *                   {@link TypeReference#CLASS_EXTENDS}. See {@link TypeReference}.
+   * @param typePath   the path to the annotated type argument, wildcard bound, array element type,
+   *                   or static inner type within 'typeRef'. May be {@literal null} if the
+   *                   annotation targets 'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible    {@literal true} if the annotation is visible at runtime.
    * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-   *     interested in visiting this annotation.
+   * interested in visiting this annotation.
    */
   public AnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {
@@ -247,13 +248,14 @@ public abstract class ClassVisitor {
    * Visits information about an inner class. This inner class is not necessarily a member of the
    * class being visited.
    *
-   * @param name the internal name of an inner class (see {@link Type#getInternalName()}).
-   * @param outerName the internal name of the class to which the inner class belongs (see {@link
-   *     Type#getInternalName()}). May be {@literal null} for not member classes.
+   * @param name      the internal name of an inner class (see {@link Type#getInternalName()}).
+   * @param outerName the internal name of the class to which the inner class belongs (see
+   *                  {@link Type#getInternalName()}). May be {@literal null} for not member
+   *                  classes.
    * @param innerName the (simple) name of the inner class inside its enclosing class. May be
-   *     {@literal null} for anonymous inner classes.
-   * @param access the access flags of the inner class as originally declared in the enclosing
-   *     class.
+   *                  {@literal null} for anonymous inner classes.
+   * @param access    the access flags of the inner class as originally declared in the enclosing
+   *                  class.
    */
   public void visitInnerClass(
       final String name, final String outerName, final String innerName, final int access) {
@@ -265,12 +267,12 @@ public abstract class ClassVisitor {
   /**
    * Visits a record component of the class.
    *
-   * @param name the record component name.
+   * @param name       the record component name.
    * @param descriptor the record component descriptor (see {@link Type}).
-   * @param signature the record component signature. May be {@literal null} if the record component
-   *     type does not use generic types.
+   * @param signature  the record component signature. May be {@literal null} if the record
+   *                   component type does not use generic types.
    * @return a visitor to visit this record component annotations and attributes, or {@literal null}
-   *     if this class visitor is not interested in visiting these annotations and attributes.
+   * if this class visitor is not interested in visiting these annotations and attributes.
    */
   public RecordComponentVisitor visitRecordComponent(
       final String name, final String descriptor, final String signature) {
@@ -286,20 +288,21 @@ public abstract class ClassVisitor {
   /**
    * Visits a field of the class.
    *
-   * @param access the field's access flags (see {@link Opcodes}). This parameter also indicates if
-   *     the field is synthetic and/or deprecated.
-   * @param name the field's name.
+   * @param access     the field's access flags (see {@link Opcodes}). This parameter also indicates
+   *                   if the field is synthetic and/or deprecated.
+   * @param name       the field's name.
    * @param descriptor the field's descriptor (see {@link Type}).
-   * @param signature the field's signature. May be {@literal null} if the field's type does not use
-   *     generic types.
-   * @param value the field's initial value. This parameter, which may be {@literal null} if the
-   *     field does not have an initial value, must be an {@link Integer}, a {@link Float}, a {@link
-   *     Long}, a {@link Double} or a {@link String} (for {@code int}, {@code float}, {@code long}
-   *     or {@code String} fields respectively). <i>This parameter is only used for static
-   *     fields</i>. Its value is ignored for non static fields, which must be initialized through
-   *     bytecode instructions in constructors or methods.
+   * @param signature  the field's signature. May be {@literal null} if the field's type does not
+   *                   use generic types.
+   * @param value      the field's initial value. This parameter, which may be {@literal null} if
+   *                   the field does not have an initial value, must be an {@link Integer}, a
+   *                   {@link Float}, a {@link Long}, a {@link Double} or a {@link String} (for
+   *                   {@code int}, {@code float}, {@code long} or {@code String} fields
+   *                   respectively). <i>This parameter is only used for static fields</i>. Its
+   *                   value is ignored for non static fields, which must be initialized through
+   *                   bytecode instructions in constructors or methods.
    * @return a visitor to visit field annotations and attributes, or {@literal null} if this class
-   *     visitor is not interested in visiting these annotations and attributes.
+   * visitor is not interested in visiting these annotations and attributes.
    */
   public FieldVisitor visitField(
       final int access,
@@ -318,16 +321,16 @@ public abstract class ClassVisitor {
    * instance (or {@literal null}) each time it is called, i.e., it should not return a previously
    * returned visitor.
    *
-   * @param access the method's access flags (see {@link Opcodes}). This parameter also indicates if
-   *     the method is synthetic and/or deprecated.
-   * @param name the method's name.
+   * @param access     the method's access flags (see {@link Opcodes}). This parameter also
+   *                   indicates if the method is synthetic and/or deprecated.
+   * @param name       the method's name.
    * @param descriptor the method's descriptor (see {@link Type}).
-   * @param signature the method's signature. May be {@literal null} if the method parameters,
-   *     return type and exceptions do not use generic types.
-   * @param exceptions the internal names of the method's exception classes (see {@link
-   *     Type#getInternalName()}). May be {@literal null}.
+   * @param signature  the method's signature. May be {@literal null} if the method parameters,
+   *                   return type and exceptions do not use generic types.
+   * @param exceptions the internal names of the method's exception classes (see
+   *                   {@link Type#getInternalName()}). May be {@literal null}.
    * @return an object to visit the byte code of the method, or {@literal null} if this class
-   *     visitor is not interested in visiting the code of this method.
+   * visitor is not interested in visiting the code of this method.
    */
   public MethodVisitor visitMethod(
       final int access,

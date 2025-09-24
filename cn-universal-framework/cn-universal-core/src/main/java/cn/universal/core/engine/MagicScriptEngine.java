@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.ScriptClass.ScriptAttribute;
@@ -147,7 +145,7 @@ public class MagicScriptEngine extends AbstractScriptEngine implements ScriptEng
               String methodName = method.getName();
               if (method.getParameters().isEmpty()
                   && ((methodName.startsWith("get") && methodName.length() > 3)
-                      || (methodName.startsWith("is") && methodName.length() > 2))) {
+                  || (methodName.startsWith("is") && methodName.length() > 2))) {
                 String attributeName = method.getName().substring(3);
                 attributeName =
                     attributeName.substring(0, 1).toLowerCase() + attributeName.substring(1);

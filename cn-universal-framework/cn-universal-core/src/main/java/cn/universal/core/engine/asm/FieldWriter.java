@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -7,11 +5,13 @@ package cn.universal.core.engine.asm;
  * Java Virtual Machine Specification (JVMS). @Author Eric Bruneton
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.5">JVMS
- *     4.5</a>
+ * 4.5</a>
  */
 final class FieldWriter extends FieldVisitor {
 
-  /** Where the constants used in this FieldWriter must be stored. */
+  /**
+   * Where the constants used in this FieldWriter must be stored.
+   */
   private final SymbolTable symbolTable;
 
   // Note: fields are ordered as in the field_info structure, and those related to attributes are
@@ -24,10 +24,14 @@ final class FieldWriter extends FieldVisitor {
    */
   private final int accessFlags;
 
-  /** The name_index field of the field_info JVMS structure. */
+  /**
+   * The name_index field of the field_info JVMS structure.
+   */
   private final int nameIndex;
 
-  /** The descriptor_index field of the field_info JVMS structure. */
+  /**
+   * The descriptor_index field of the field_info JVMS structure.
+   */
   private final int descriptorIndex;
 
   /**
@@ -67,13 +71,13 @@ final class FieldWriter extends FieldVisitor {
   private AnnotationWriter lastRuntimeInvisibleTypeAnnotation;
 
   /**
-   * The first non standard attribute of this field. The next ones can be accessed with the {@link
-   * Attribute#nextAttribute} field. May be {@literal null}.
+   * The first non standard attribute of this field. The next ones can be accessed with the
+   * {@link Attribute#nextAttribute} field. May be {@literal null}.
    *
    * <p><b>WARNING</b>: this list stores the attributes in the <i>reverse</i> order of their visit.
-   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The {@link
-   * #putFieldInfo} method writes the attributes in the order defined by this list, i.e. in the
-   * reverse order specified by the user.
+   * firstAttribute is actually the last attribute visited in {@link #visitAttribute}. The
+   * {@link #putFieldInfo} method writes the attributes in the order defined by this list, i.e. in
+   * the reverse order specified by the user.
    */
   private Attribute firstAttribute;
 
@@ -84,11 +88,11 @@ final class FieldWriter extends FieldVisitor {
   /**
    * Constructs a new {@link FieldWriter}.
    *
-   * @param symbolTable where the constants used in this FieldWriter must be stored.
-   * @param access the field's access flags (see {@link Opcodes}).
-   * @param name the field's name.
-   * @param descriptor the field's descriptor (see {@link Type}).
-   * @param signature the field's signature. May be {@literal null}.
+   * @param symbolTable   where the constants used in this FieldWriter must be stored.
+   * @param access        the field's access flags (see {@link Opcodes}).
+   * @param name          the field's name.
+   * @param descriptor    the field's descriptor (see {@link Type}).
+   * @param signature     the field's signature. May be {@literal null}.
    * @param constantValue the field's constant value. May be {@literal null}.
    */
   FieldWriter(

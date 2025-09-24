@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -9,7 +7,9 @@ import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
 
-/** boolean常量 */
+/**
+ * boolean常量
+ */
 public class BooleanLiteral extends Literal {
 
   public BooleanLiteral(Span literal) {

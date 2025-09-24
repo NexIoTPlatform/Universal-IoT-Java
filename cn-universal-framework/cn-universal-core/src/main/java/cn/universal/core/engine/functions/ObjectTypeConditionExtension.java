@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -9,19 +7,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-/** 类型判断 */
+/**
+ * 类型判断
+ */
 public class ObjectTypeConditionExtension {
 
-  /** 判断是否是目标类型 */
+  /**
+   * 判断是否是目标类型
+   */
   @Comment("判断对象是否为指定类型的对象")
-  public static boolean is(Object target, @Comment(name = "clazz", value = "目标类型") Class<?> clazz) {
+  public static boolean is(Object target,
+      @Comment(name = "clazz", value = "目标类型") Class<?> clazz) {
     if (target == null || clazz == null) {
       return false;
     }
     return clazz.isAssignableFrom(target.getClass());
   }
 
-  /** 判断是否是数组 */
+  /**
+   * 判断是否是数组
+   */
   @Comment("判断对象是否是数组")
   public static boolean isArray(Object target) {
     if (target instanceof Class) {
@@ -30,7 +35,9 @@ public class ObjectTypeConditionExtension {
     return target.getClass().isArray();
   }
 
-  /** 判断是否是集合 */
+  /**
+   * 判断是否是集合
+   */
   @Comment("判断对象是否是集合")
   public static boolean isCollection(Object target) {
     if (target instanceof Class) {
@@ -39,7 +46,9 @@ public class ObjectTypeConditionExtension {
     return Collection.class.isAssignableFrom(target.getClass());
   }
 
-  /** 判断是否是Map */
+  /**
+   * 判断是否是Map
+   */
   @Comment("判断对象是否是Map")
   public static boolean isMap(Object target) {
     if (target instanceof Class) {
@@ -48,14 +57,16 @@ public class ObjectTypeConditionExtension {
     return Map.class.isAssignableFrom(target.getClass());
   }
 
-  /** 判断是否是目标类型 */
+  /**
+   * 判断是否是目标类型
+   */
   @Comment("判断对象是否为指定类型的对象，type为null时 返回false，支持类名缩写")
   public boolean is(
       Object target,
       @Comment(
-              name = "type",
-              value = "类名或全类名或string、int、double、float、long、byte、short、bigdecimal、boolean")
-          String type) {
+          name = "type",
+          value = "类名或全类名或string、int、double、float、long、byte、short、bigdecimal、boolean")
+      String type) {
     if (type == null) {
       return false;
     }
@@ -95,61 +106,81 @@ public class ObjectTypeConditionExtension {
     return "decimal".equalsIgnoreCase(type) && clazz == BigDecimal.class;
   }
 
-  /** 判断是否是String */
+  /**
+   * 判断是否是String
+   */
   @Comment("判断对象是否是String类型")
   public boolean isString(Object target) {
     return is(target, String.class);
   }
 
-  /** 判断是否是int */
+  /**
+   * 判断是否是int
+   */
   @Comment("判断对象是否是int类型")
   public boolean isInt(Object target) {
     return is(target, Integer.class);
   }
 
-  /** 判断是否是double */
+  /**
+   * 判断是否是double
+   */
   @Comment("判断对象是否是double类型")
   public boolean isDouble(Object target) {
     return is(target, Double.class);
   }
 
-  /** 判断是否是long */
+  /**
+   * 判断是否是long
+   */
   @Comment("判断对象是否是long类型")
   public boolean isLong(Object target) {
     return is(target, Long.class);
   }
 
-  /** 判断是否是byte */
+  /**
+   * 判断是否是byte
+   */
   @Comment("判断对象是否是byte类型")
   public boolean isByte(Object target) {
     return is(target, Byte.class);
   }
 
-  /** 判断是否是short */
+  /**
+   * 判断是否是short
+   */
   @Comment("判断对象是否是short类型")
   public boolean isShort(Object target) {
     return is(target, Short.class);
   }
 
-  /** 判断是否是boolean */
+  /**
+   * 判断是否是boolean
+   */
   @Comment("判断对象是否是boolean类型")
   public boolean isBoolean(Object target) {
     return is(target, Boolean.class);
   }
 
-  /** 判断是否是BigDecimal */
+  /**
+   * 判断是否是BigDecimal
+   */
   @Comment("判断对象是否是BigDecimal类型")
   public boolean isDecimal(Object target) {
     return is(target, BigDecimal.class);
   }
 
-  /** 判断是否是Date */
+  /**
+   * 判断是否是Date
+   */
   @Comment("判断对象是否是Date类型")
   public boolean isDate(Object target) {
     return is(target, Date.class);
   }
 
-  /** 判断是否是List */
+  /**
+   * 判断是否是List
+   */
   @Comment("判断对象是否是List")
   public boolean isList(Object target) {
     if (target instanceof Class) {

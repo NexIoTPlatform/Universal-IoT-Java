@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -43,9 +41,9 @@ public class MapExtension {
   public static List<?> asList(
       Map<?, ?> source,
       @Comment(name = "mapping", value = "映射函数，如:(key,value,source)=>{'k' : key,'v' : value}")
-          Function<Object[], Object> mapping) {
+      Function<Object[], Object> mapping) {
     List<Object> result = new ArrayList<>();
-    source.forEach((key, value) -> result.add(mapping.apply(new Object[] {key, value, source})));
+    source.forEach((key, value) -> result.add(mapping.apply(new Object[]{key, value, source})));
     return result;
   }
 
@@ -77,8 +75,8 @@ public class MapExtension {
   public Map<?, ?> each(
       Map<?, ?> source,
       @Comment(name = "function", value = "循环函数，如:(key,value,source)=>map['xx'] = key;")
-          Function<Object[], Object> function) {
-    source.forEach((key, value) -> function.apply(new Object[] {key, value, source}));
+      Function<Object[], Object> function) {
+    source.forEach((key, value) -> function.apply(new Object[]{key, value, source}));
     return source;
   }
 
@@ -126,12 +124,12 @@ public class MapExtension {
       Map<?, ?> source,
       @Comment(name = "separator", value = "key与value之间的连接符，如=") String separator,
       @Comment(name = "mapping", value = "转换方法，如：(key,value)=>key + '=' + value || ''")
-          Function<Object[], Object> mapping) {
+      Function<Object[], Object> mapping) {
     Set<? extends Map.Entry<?, ?>> entries = source.entrySet();
     StringBuilder builder = new StringBuilder();
     for (Map.Entry<?, ?> entry : entries) {
       builder.append(
-          Objects.toString(mapping.apply(new Object[] {entry.getKey(), entry.getValue()}), ""));
+          Objects.toString(mapping.apply(new Object[]{entry.getKey(), entry.getValue()}), ""));
       builder.append(separator);
     }
     if (entries.size() > 0) {
@@ -165,7 +163,7 @@ public class MapExtension {
   public Map<?, ?> sort(
       Map<?, ?> source,
       @Comment(name = "comparator", value = "比较器，如:(k1,k2,v1,v2)=>k1.compareTo(k2);")
-          Function<Object[], Object> comparator) {
+      Function<Object[], Object> comparator) {
     Set<?> keys = source.keySet();
     Map<Object, Object> sortedMap = new LinkedHashMap<>();
     keys.stream()
@@ -173,7 +171,7 @@ public class MapExtension {
             (Comparator<Object>)
                 (o1, o2) ->
                     ObjectConvertExtension.asInt(
-                        comparator.apply(new Object[] {o1, o2, source.get(o1), source.get(o2)}), 0))
+                        comparator.apply(new Object[]{o1, o2, source.get(o1), source.get(o2)}), 0))
         .forEach(
             key -> {
               sortedMap.put(key, source.get(key));
@@ -204,7 +202,7 @@ public class MapExtension {
     Map<String, Object> result = new LinkedHashMap<>();
     Set<Map.Entry<String, Object>> entries = source.entrySet();
     for (Map.Entry<String, Object> entry : entries) {
-      result.put(functional.apply(new Object[] {entry.getKey()}), entry.getValue());
+      result.put(functional.apply(new Object[]{entry.getKey()}), entry.getValue());
     }
     return result;
   }

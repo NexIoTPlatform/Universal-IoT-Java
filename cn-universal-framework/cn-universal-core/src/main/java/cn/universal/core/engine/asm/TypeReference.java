@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -11,14 +9,14 @@ package cn.universal.core.engine.asm;
 public class TypeReference {
 
   /**
-   * The sort of type references that target a type parameter of a generic class. See {@link
-   * #getSort}.
+   * The sort of type references that target a type parameter of a generic class. See
+   * {@link #getSort}.
    */
   public static final int CLASS_TYPE_PARAMETER = 0x00;
 
   /**
-   * The sort of type references that target a type parameter of a generic method. See {@link
-   * #getSort}.
+   * The sort of type references that target a type parameter of a generic method. See
+   * {@link #getSort}.
    */
   public static final int METHOD_TYPE_PARAMETER = 0x01;
 
@@ -40,10 +38,14 @@ public class TypeReference {
    */
   public static final int METHOD_TYPE_PARAMETER_BOUND = 0x12;
 
-  /** The sort of type references that target the type of a field. See {@link #getSort}. */
+  /**
+   * The sort of type references that target the type of a field. See {@link #getSort}.
+   */
   public static final int FIELD = 0x13;
 
-  /** The sort of type references that target the return type of a method. See {@link #getSort}. */
+  /**
+   * The sort of type references that target the return type of a method. See {@link #getSort}.
+   */
   public static final int METHOD_RETURN = 0x14;
 
   /**
@@ -52,8 +54,8 @@ public class TypeReference {
   public static final int METHOD_RECEIVER = 0x15;
 
   /**
-   * The sort of type references that target the type of a formal parameter of a method. See {@link
-   * #getSort}.
+   * The sort of type references that target the type of a formal parameter of a method. See
+   * {@link #getSort}.
    */
   public static final int METHOD_FORMAL_PARAMETER = 0x16;
 
@@ -64,14 +66,14 @@ public class TypeReference {
   public static final int THROWS = 0x17;
 
   /**
-   * The sort of type references that target the type of a local variable in a method. See {@link
-   * #getSort}.
+   * The sort of type references that target the type of a local variable in a method. See
+   * {@link #getSort}.
    */
   public static final int LOCAL_VARIABLE = 0x40;
 
   /**
-   * The sort of type references that target the type of a resource variable in a method. See {@link
-   * #getSort}.
+   * The sort of type references that target the type of a resource variable in a method. See
+   * {@link #getSort}.
    */
   public static final int RESOURCE_VARIABLE = 0x41;
 
@@ -100,8 +102,8 @@ public class TypeReference {
   public static final int CONSTRUCTOR_REFERENCE = 0x45;
 
   /**
-   * The sort of type references that target the receiver type of a method reference. See {@link
-   * #getSort}.
+   * The sort of type references that target the receiver type of a method reference. See
+   * {@link #getSort}.
    */
   public static final int METHOD_REFERENCE = 0x46;
 
@@ -142,17 +144,18 @@ public class TypeReference {
    * specific method {@link MethodVisitor#visitLocalVariableAnnotation}). Thus, both structures can
    * be stored in an int.
    *
-   * <p>This int field stores target_type (called the TypeReference 'sort' in the public API of this
+   * <p>This int field stores target_type (called the TypeReference 'sort' in the public API of
+   * this
    * class) in its most significant byte, followed by the target_info fields. Depending on
    * target_type, 1, 2 or even 3 least significant bytes of this field are unused. target_info
    * fields which reference bytecode offsets are set to 0 (these offsets are ignored in ClassReader,
    * and recomputed in MethodWriter).
    *
    * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20">JVMS
-   *     4.7.20</a>
+   * 4.7.20</a>
    * @see <a
-   *     href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS
-   *     4.7.20.1</a>
+   * href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.20.1">JVMS
+   * 4.7.20.1</a>
    */
   private final int targetTypeAndInfo;
 
@@ -160,7 +163,7 @@ public class TypeReference {
    * Constructs a new TypeReference.
    *
    * @param typeRef the int encoded value of the type reference, as received in a visit method
-   *     related to type annotations, such as {@link ClassVisitor#visitTypeAnnotation}.
+   *                related to type annotations, such as {@link ClassVisitor#visitTypeAnnotation}.
    */
   public TypeReference(final int typeRef) {
     this.targetTypeAndInfo = typeRef;
@@ -169,9 +172,9 @@ public class TypeReference {
   /**
    * Returns a type reference of the given sort.
    *
-   * @param sort one of {@link #FIELD}, {@link #METHOD_RETURN}, {@link #METHOD_RECEIVER}, {@link
-   *     #LOCAL_VARIABLE}, {@link #RESOURCE_VARIABLE}, {@link #INSTANCEOF}, {@link #NEW}, {@link
-   *     #CONSTRUCTOR_REFERENCE}, or {@link #METHOD_REFERENCE}.
+   * @param sort one of {@link #FIELD}, {@link #METHOD_RETURN}, {@link #METHOD_RECEIVER},
+   *             {@link #LOCAL_VARIABLE}, {@link #RESOURCE_VARIABLE}, {@link #INSTANCEOF},
+   *             {@link #NEW}, {@link #CONSTRUCTOR_REFERENCE}, or {@link #METHOD_REFERENCE}.
    * @return a type reference of the given sort.
    */
   public static TypeReference newTypeReference(final int sort) {
@@ -181,7 +184,7 @@ public class TypeReference {
   /**
    * Returns a reference to a type parameter of a generic class or method.
    *
-   * @param sort one of {@link #CLASS_TYPE_PARAMETER} or {@link #METHOD_TYPE_PARAMETER}.
+   * @param sort       one of {@link #CLASS_TYPE_PARAMETER} or {@link #METHOD_TYPE_PARAMETER}.
    * @param paramIndex the type parameter index.
    * @return a reference to the given generic class or method type parameter.
    */
@@ -192,7 +195,7 @@ public class TypeReference {
   /**
    * Returns a reference to a type parameter bound of a generic class or method.
    *
-   * @param sort one of {@link #CLASS_TYPE_PARAMETER} or {@link #METHOD_TYPE_PARAMETER}.
+   * @param sort       one of {@link #CLASS_TYPE_PARAMETER} or {@link #METHOD_TYPE_PARAMETER}.
    * @param paramIndex the type parameter index.
    * @param boundIndex the type bound index within the above type parameters.
    * @return a reference to the given generic class or method type parameter bound.
@@ -207,7 +210,7 @@ public class TypeReference {
    * class.
    *
    * @param itfIndex the index of an processer in the 'implements' clause of a class, or -1 to
-   *     reference the super class of the class.
+   *                 reference the super class of the class.
    * @return a reference to the given super type of a class.
    */
   public static TypeReference newSuperTypeReference(final int itfIndex) {
@@ -238,7 +241,7 @@ public class TypeReference {
    * Returns a reference to the type of the exception declared in a 'catch' clause of a method.
    *
    * @param tryCatchBlockIndex the index of a try catch block (using the order in which they are
-   *     visited with visitTryCatchBlock).
+   *                           visited with visitTryCatchBlock).
    * @return a reference to the type of the given exception.
    */
   public static TypeReference newTryCatchReference(final int tryCatchBlockIndex) {
@@ -249,9 +252,10 @@ public class TypeReference {
    * Returns a reference to the type of a type argument in a constructor or method call or
    * reference.
    *
-   * @param sort one of {@link #CAST}, {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link
-   *     #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link
-   *     #METHOD_REFERENCE_TYPE_ARGUMENT}.
+   * @param sort     one of {@link #CAST}, {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT},
+   *                 {@link #METHOD_INVOCATION_TYPE_ARGUMENT},
+   *                 {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or
+   *                 {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
    * @param argIndex the type argument index.
    * @return a reference to the type of the given type argument.
    */
@@ -262,14 +266,15 @@ public class TypeReference {
   /**
    * Returns the sort of this type reference.
    *
-   * @return one of {@link #CLASS_TYPE_PARAMETER}, {@link #METHOD_TYPE_PARAMETER}, {@link
-   *     #CLASS_EXTENDS}, {@link #CLASS_TYPE_PARAMETER_BOUND}, {@link #METHOD_TYPE_PARAMETER_BOUND},
-   *     {@link #FIELD}, {@link #METHOD_RETURN}, {@link #METHOD_RECEIVER}, {@link
-   *     #METHOD_FORMAL_PARAMETER}, {@link #THROWS}, {@link #LOCAL_VARIABLE}, {@link
-   *     #RESOURCE_VARIABLE}, {@link #EXCEPTION_PARAMETER}, {@link #INSTANCEOF}, {@link #NEW},
-   *     {@link #CONSTRUCTOR_REFERENCE}, {@link #METHOD_REFERENCE}, {@link #CAST}, {@link
-   *     #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link
-   *     #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
+   * @return one of {@link #CLASS_TYPE_PARAMETER}, {@link #METHOD_TYPE_PARAMETER},
+   * {@link #CLASS_EXTENDS}, {@link #CLASS_TYPE_PARAMETER_BOUND},
+   * {@link #METHOD_TYPE_PARAMETER_BOUND}, {@link #FIELD}, {@link #METHOD_RETURN},
+   * {@link #METHOD_RECEIVER}, {@link #METHOD_FORMAL_PARAMETER}, {@link #THROWS},
+   * {@link #LOCAL_VARIABLE}, {@link #RESOURCE_VARIABLE}, {@link #EXCEPTION_PARAMETER},
+   * {@link #INSTANCEOF}, {@link #NEW}, {@link #CONSTRUCTOR_REFERENCE}, {@link #METHOD_REFERENCE},
+   * {@link #CAST}, {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT},
+   * {@link #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or
+   * {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
    */
   public int getSort() {
     return targetTypeAndInfo >>> 24;
@@ -277,9 +282,9 @@ public class TypeReference {
 
   /**
    * Returns the index of the type parameter referenced by this type reference. This method must
-   * only be used for type references whose sort is {@link #CLASS_TYPE_PARAMETER}, {@link
-   * #METHOD_TYPE_PARAMETER}, {@link #CLASS_TYPE_PARAMETER_BOUND} or {@link
-   * #METHOD_TYPE_PARAMETER_BOUND}.
+   * only be used for type references whose sort is {@link #CLASS_TYPE_PARAMETER},
+   * {@link #METHOD_TYPE_PARAMETER}, {@link #CLASS_TYPE_PARAMETER_BOUND} or
+   * {@link #METHOD_TYPE_PARAMETER_BOUND}.
    *
    * @return a type parameter index.
    */
@@ -288,10 +293,10 @@ public class TypeReference {
   }
 
   /**
-   * Returns the index of the type parameter bound, within the type parameter {@link
-   * #getTypeParameterIndex}, referenced by this type reference. This method must only be used for
-   * type references whose sort is {@link #CLASS_TYPE_PARAMETER_BOUND} or {@link
-   * #METHOD_TYPE_PARAMETER_BOUND}.
+   * Returns the index of the type parameter bound, within the type parameter
+   * {@link #getTypeParameterIndex}, referenced by this type reference. This method must only be
+   * used for type references whose sort is {@link #CLASS_TYPE_PARAMETER_BOUND} or
+   * {@link #METHOD_TYPE_PARAMETER_BOUND}.
    *
    * @return a type parameter bound index.
    */
@@ -304,7 +309,7 @@ public class TypeReference {
    * This method must only be used for type references whose sort is {@link #CLASS_EXTENDS}.
    *
    * @return the index of an processer in the 'implements' clause of a class, or -1 if this type
-   *     reference references the type of the super class.
+   * reference references the type of the super class.
    */
   public int getSuperTypeIndex() {
     return (short) ((targetTypeAndInfo & 0x00FFFF00) >> 8);
@@ -322,8 +327,8 @@ public class TypeReference {
 
   /**
    * Returns the index of the exception, in a 'throws' clause of a method, whose type is referenced
-   * by this type reference. This method must only be used for type references whose sort is {@link
-   * #THROWS}.
+   * by this type reference. This method must only be used for type references whose sort is
+   * {@link #THROWS}.
    *
    * @return the index of an exception in the 'throws' clause of a method.
    */
@@ -344,9 +349,9 @@ public class TypeReference {
 
   /**
    * Returns the index of the type argument referenced by this type reference. This method must only
-   * be used for type references whose sort is {@link #CAST}, {@link
-   * #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link #METHOD_INVOCATION_TYPE_ARGUMENT}, {@link
-   * #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
+   * be used for type references whose sort is {@link #CAST},
+   * {@link #CONSTRUCTOR_INVOCATION_TYPE_ARGUMENT}, {@link #METHOD_INVOCATION_TYPE_ARGUMENT},
+   * {@link #CONSTRUCTOR_REFERENCE_TYPE_ARGUMENT}, or {@link #METHOD_REFERENCE_TYPE_ARGUMENT}.
    *
    * @return a type parameter index.
    */
@@ -367,9 +372,10 @@ public class TypeReference {
   /**
    * Puts the given target_type and target_info JVMS structures into the given ByteVector.
    *
-   * @param targetTypeAndInfo a target_type and a target_info structures encoded as in {@link
-   *     #targetTypeAndInfo}. LOCAL_VARIABLE and RESOURCE_VARIABLE target types are not supported.
-   * @param output where the type reference must be put.
+   * @param targetTypeAndInfo a target_type and a target_info structures encoded as in
+   *                          {@link #targetTypeAndInfo}. LOCAL_VARIABLE and RESOURCE_VARIABLE
+   *                          target types are not supported.
+   * @param output            where the type reference must be put.
    */
   static void putTarget(final int targetTypeAndInfo, final ByteVector output) {
     switch (targetTypeAndInfo >>> 24) {

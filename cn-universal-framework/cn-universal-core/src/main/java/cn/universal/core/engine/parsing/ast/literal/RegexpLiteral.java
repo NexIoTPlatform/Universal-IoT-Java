@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -8,7 +6,9 @@ import cn.universal.core.engine.parsing.Span;
 import cn.universal.core.engine.parsing.ast.Literal;
 import java.util.regex.Pattern;
 
-/** 正则常量 */
+/**
+ * 正则常量
+ */
 public class RegexpLiteral extends Literal {
 
   private int flag;

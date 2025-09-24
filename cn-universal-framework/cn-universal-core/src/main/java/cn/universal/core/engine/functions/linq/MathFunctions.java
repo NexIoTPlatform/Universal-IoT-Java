@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions.linq;
 
 import cn.universal.core.engine.annotation.Comment;

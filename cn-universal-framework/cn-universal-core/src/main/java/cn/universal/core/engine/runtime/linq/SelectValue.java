@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.runtime.linq;
 
 import cn.universal.core.engine.parsing.ast.BinaryOperation;

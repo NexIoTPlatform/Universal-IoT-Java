@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.statement;
 
 import cn.universal.core.engine.asm.Label;
@@ -10,7 +8,9 @@ import cn.universal.core.engine.parsing.ast.Node;
 import cn.universal.core.engine.runtime.handle.OperatorHandle;
 import java.util.List;
 
-/** assert expr : expr[,expr][,expr][,expr] */
+/**
+ * assert expr : expr[,expr][,expr][,expr]
+ */
 public class Assert extends Node {
 
   private final Expression condition;

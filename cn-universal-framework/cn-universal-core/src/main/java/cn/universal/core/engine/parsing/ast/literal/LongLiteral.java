@@ -1,12 +1,12 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
 import cn.universal.core.engine.parsing.Span;
 import cn.universal.core.engine.parsing.ast.Literal;
 
-/** long 常量 */
+/**
+ * long 常量
+ */
 public class LongLiteral extends Literal {
 
   public LongLiteral(Span literal) {

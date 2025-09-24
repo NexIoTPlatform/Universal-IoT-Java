@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.exception.MagicExitException;
@@ -10,7 +8,9 @@ import cn.universal.core.engine.runtime.MagicScriptRuntime;
 import java.util.ArrayList;
 import java.util.List;
 
-/** All errors reported by the library go through the static functions of this class. */
+/**
+ * All errors reported by the library go through the static functions of this class.
+ */
 public class MagicScriptError {
 
   /**

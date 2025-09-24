@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.compile;
 
 import cn.universal.core.engine.MagicScript;

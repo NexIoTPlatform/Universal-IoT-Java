@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.linq;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -33,7 +31,7 @@ public class LinqExpression extends Expression {
                   compiler
                       .compile(
                           expression instanceof MemberAccess
-                                  && ((MemberAccess) expression).isWhole()
+                              && ((MemberAccess) expression).isWhole()
                               ? ((MemberAccess) expression).getObject()
                               : expression)
                       .insn(ARETURN));

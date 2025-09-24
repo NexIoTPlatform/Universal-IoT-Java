@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.functions.linq;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -11,7 +9,9 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.function.BinaryOperator;
 
-/** 聚合函数 */
+/**
+ * 聚合函数
+ */
 public class AggregationFunctions {
 
   @Function

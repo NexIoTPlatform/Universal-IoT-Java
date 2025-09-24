@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.convert;
 
 import cn.universal.core.engine.functions.StreamExtension;
@@ -11,7 +9,9 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 
-/** 集合、数组隐式转换 */
+/**
+ * 集合、数组隐式转换
+ */
 public class CollectionImplicitConvert implements ClassImplicitConvert {
 
   private Class<?> fromClazz;
@@ -21,13 +21,13 @@ public class CollectionImplicitConvert implements ClassImplicitConvert {
   @Override
   public boolean support(Class<?> from, Class<?> to) {
     if ((from.isArray()
-            || Collection.class.isAssignableFrom(from)
-            || Iterator.class.isAssignableFrom(from)
-            || Enumeration.class.isAssignableFrom(from))
+        || Collection.class.isAssignableFrom(from)
+        || Iterator.class.isAssignableFrom(from)
+        || Enumeration.class.isAssignableFrom(from))
         && (to.isArray()
-            || Collection.class.isAssignableFrom(to)
-            || Iterator.class.isAssignableFrom(to)
-            || Enumeration.class.isAssignableFrom(to))) {
+        || Collection.class.isAssignableFrom(to)
+        || Iterator.class.isAssignableFrom(to)
+        || Enumeration.class.isAssignableFrom(to))) {
       return (fromClazz = getGenericType(from)) != null
           && !JavaReflection.isPrimitiveAssignableFrom(fromClazz, fromClazz)
           && (toClazz = getGenericType(to)) != null

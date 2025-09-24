@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.runtime.lang;
 
 import java.util.Iterator;

@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.linq;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;

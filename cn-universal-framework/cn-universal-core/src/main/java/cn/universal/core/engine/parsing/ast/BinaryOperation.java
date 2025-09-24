@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast;
 
 import cn.universal.core.engine.MagicScriptError;
@@ -48,7 +46,8 @@ public abstract class BinaryOperation extends Expression {
     if (operator.getType().isModifiable()
         && left instanceof VariableAccess
         && ((VariableAccess) left).getVarIndex().isReadonly()) {
-      MagicScriptError.error("const定义的变量不能被修改", new Span(left.getSpan(), right.getSpan()));
+      MagicScriptError.error("const定义的变量不能被修改",
+          new Span(left.getSpan(), right.getSpan()));
     }
     Expression expression = null;
     Span span = new Span(left.getSpan(), right.getSpan());
@@ -169,7 +168,9 @@ public abstract class BinaryOperation extends Expression {
     return expression;
   }
 
-  /** 比较两个值 1 左边大 0 相等 -1 右边大 -2 无法比较 */
+  /**
+   * 比较两个值 1 左边大 0 相等 -1 右边大 -2 无法比较
+   */
   public static int compare(Object left, Object right) {
     if (left == null && right == null) {
       return -2;

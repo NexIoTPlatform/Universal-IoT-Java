@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -8,13 +6,19 @@ package cn.universal.core.engine.asm;
  */
 public class ByteVector {
 
-  /** The content of this vector. Only the first {@link #length} bytes contain real data. */
+  /**
+   * The content of this vector. Only the first {@link #length} bytes contain real data.
+   */
   byte[] data;
 
-  /** The actual number of bytes in this vector. */
+  /**
+   * The actual number of bytes in this vector.
+   */
   int length;
 
-  /** Constructs a new {@link ByteVector} with a default initial capacity. */
+  /**
+   * Constructs a new {@link ByteVector} with a default initial capacity.
+   */
   public ByteVector() {
     data = new byte[64];
   }
@@ -95,7 +99,7 @@ public class ByteVector {
    * Puts a byte and a short into this byte vector. The byte vector is automatically enlarged if
    * necessary.
    *
-   * @param byteValue a byte.
+   * @param byteValue  a byte.
    * @param shortValue a short.
    * @return this byte vector.
    */
@@ -159,7 +163,7 @@ public class ByteVector {
    * Puts one byte and two shorts into this byte vector. The byte vector is automatically enlarged
    * if necessary.
    *
-   * @param byteValue a byte.
+   * @param byteValue   a byte.
    * @param shortValue1 a short.
    * @param shortValue2 another short.
    * @return this byte vector.
@@ -247,11 +251,11 @@ public class ByteVector {
    * necessary. The string length is encoded in two bytes before the encoded characters, if there is
    * space for that (i.e. if this.length - offset - 2 &gt;= 0).
    *
-   * @param stringValue the String to encode.
-   * @param offset the index of the first character to encode. The previous characters are supposed
-   *     to have already been encoded, using only one byte per character.
+   * @param stringValue   the String to encode.
+   * @param offset        the index of the first character to encode. The previous characters are
+   *                      supposed to have already been encoded, using only one byte per character.
    * @param maxByteLength the maximum byte length of the encoded string, including the already
-   *     encoded characters.
+   *                      encoded characters.
    * @return this byte vector.
    */
   final ByteVector encodeUtf8(final String stringValue, final int offset, final int maxByteLength) {
@@ -302,9 +306,9 @@ public class ByteVector {
    * necessary.
    *
    * @param byteArrayValue an array of bytes. May be {@literal null} to put {@code byteLength} null
-   *     bytes into this byte vector.
-   * @param byteOffset index of the first byte of byteArrayValue that must be copied.
-   * @param byteLength number of bytes of byteArrayValue that must be copied.
+   *                       bytes into this byte vector.
+   * @param byteOffset     index of the first byte of byteArrayValue that must be copied.
+   * @param byteLength     number of bytes of byteArrayValue that must be copied.
    * @return this byte vector.
    */
   public ByteVector putByteArray(

@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.runtime.handle;
 
 import static java.lang.invoke.MethodHandles.catchException;
@@ -1275,7 +1273,8 @@ public class OperatorHandle {
   private static Object reject(Object a, Object b, String symbol) throws IllegalArgumentException {
     throw new IllegalArgumentException(
         String.format(
-            "操作符 `%s` 不支持 (%s,%s) 类型", symbol, a.getClass().getName(), b.getClass().getName()));
+            "操作符 `%s` 不支持 (%s,%s) 类型", symbol, a.getClass().getName(),
+            b.getClass().getName()));
   }
 
   public static Object map_or_array_access(int[] target, Number key) {

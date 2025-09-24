@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.statement;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -37,7 +35,9 @@ public class LambdaFunction extends Expression {
     return parameters;
   }
 
-  /** 访问lambda方法 */
+  /**
+   * 访问lambda方法
+   */
   private void compileMethod(MagicScriptCompiler compiler) {
     compiler.load0().lambda(methodName);
   }

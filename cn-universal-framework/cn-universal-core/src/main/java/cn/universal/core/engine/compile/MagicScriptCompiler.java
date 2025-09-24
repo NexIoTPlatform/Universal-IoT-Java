@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.compile;
 
 import cn.universal.core.engine.MagicScriptContext;
@@ -36,7 +34,9 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 
-/** 脚本编译器 */
+/**
+ * 脚本编译器
+ */
 public class MagicScriptCompiler implements Opcodes {
 
   private static final AtomicLong COUNTER = new AtomicLong(1);
@@ -45,16 +45,24 @@ public class MagicScriptCompiler implements Opcodes {
 
   private final Long id = COUNTER.getAndIncrement();
 
-  /** < <= == === != !=== >= > 等操作符处理器 */
+  /**
+   * < <= == === != !=== >= > 等操作符处理器
+   */
   private static final Handle OPERATOR_HANDLE = makeHandle(OperatorHandle.class);
 
-  /** << >> >>> & ^ | 运算 */
+  /**
+   * << >> >>> & ^ | 运算
+   */
   private static final Handle BIT_HANDLE = makeHandle(BitHandle.class);
 
-  /** 方法调用、lambda调用、函数调用处理器 */
+  /**
+   * 方法调用、lambda调用、函数调用处理器
+   */
   private static final Handle FUNCTION_HANDLE = makeHandle(FunctionCallHandle.class);
 
-  /** + - * / % 处理器 */
+  /**
+   * + - * / % 处理器
+   */
   private static final Handle ARITHMETIC_HANDLE = makeHandle(ArithmeticHandle.class);
 
   private final Stack<MethodVisitor> methodVisitors = new Stack<>();
@@ -67,9 +75,11 @@ public class MagicScriptCompiler implements Opcodes {
 
   private final Set<VarIndex> varIndices;
 
-  /** -1 ~ 5的int值 */
+  /**
+   * -1 ~ 5的int值
+   */
   private static final int[] ICONST = {
-    ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5
+      ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5
   };
 
   private final List<Span> spans = new ArrayList<>();
@@ -115,7 +125,7 @@ public class MagicScriptCompiler implements Opcodes {
   /**
    * 创建方法
    *
-   * @param access 访问属性
+   * @param access     访问属性
    * @param methodName 方法名
    * @param descriptor 方法描述
    */
@@ -133,34 +143,46 @@ public class MagicScriptCompiler implements Opcodes {
     return tempIndex++;
   }
 
-  /** 获取lambda函数下标 */
+  /**
+   * 获取lambda函数下标
+   */
   public int getFunctionIndex() {
     return ++functionIndex;
   }
 
-  /** 标识continue和break位置 */
+  /**
+   * 标识continue和break位置
+   */
   public MagicScriptCompiler markLabel(Label start, Label end) {
-    labelStack.push(new Label[] {start, end});
+    labelStack.push(new Label[]{start, end});
     return this;
   }
 
-  /** 消除标记 */
+  /**
+   * 消除标记
+   */
   public MagicScriptCompiler exitLabel() {
     labelStack.pop();
     return this;
   }
 
-  /** 跳转到continue位置 */
+  /**
+   * 跳转到continue位置
+   */
   public MagicScriptCompiler start() {
     return jump(GOTO, labelStack.peek()[0]);
   }
 
-  /** 跳转到break位置 */
+  /**
+   * 跳转到break位置
+   */
   public MagicScriptCompiler end() {
     return jump(GOTO, labelStack.peek()[1]);
   }
 
-  /** 访问AST节点 */
+  /**
+   * 访问AST节点
+   */
   public MagicScriptCompiler visit(Node node) {
     // 对于赋值语句的特殊处理
     if (node instanceof AssigmentOperation) {
@@ -173,7 +195,9 @@ public class MagicScriptCompiler implements Opcodes {
     return compile(node, false);
   }
 
-  /** 编译AST节点 */
+  /**
+   * 编译AST节点
+   */
   public MagicScriptCompiler compile(Node node) {
     return compile(node, false);
   }
@@ -217,7 +241,7 @@ public class MagicScriptCompiler implements Opcodes {
    * 编译AST节点
    *
    * @param node AST节点
-   * @param pop 是否需要弹出栈顶
+   * @param pop  是否需要弹出栈顶
    */
   public MagicScriptCompiler compile(Node node, boolean pop) {
     if (node == null) {
@@ -269,44 +293,58 @@ public class MagicScriptCompiler implements Opcodes {
     return this;
   }
 
-  /** 访问 */
+  /**
+   * 访问
+   */
   public MagicScriptCompiler visit(List<? extends Node> nodes) {
     nodes.forEach(this::visit);
     return this;
   }
 
-  /** 编译 */
+  /**
+   * 编译
+   */
   public MagicScriptCompiler compile(List<? extends Node> nodes) {
     nodes.forEach(it -> compile(it, true));
     return this;
   }
 
-  /** 加载this */
+  /**
+   * 加载this
+   */
   public MagicScriptCompiler load0() {
     self().visitVarInsn(ALOAD, 0);
     return this;
   }
 
-  /** 加载context */
+  /**
+   * 加载context
+   */
   public MagicScriptCompiler load1() {
     self().visitVarInsn(ALOAD, 1);
     return this;
   }
 
-  /** 加载context */
+  /**
+   * 加载context
+   */
   public void newArrayList() {
     this.typeInsn(NEW, ArrayList.class)
         .insn(DUP)
         .invoke(INVOKESPECIAL, ArrayList.class, "<init>", void.class);
   }
 
-  /** 加载Variables */
+  /**
+   * 加载Variables
+   */
   public MagicScriptCompiler load2() {
     self().visitVarInsn(ALOAD, 2);
     return this;
   }
 
-  /** 加载3号变量，一般指异常(临时变量) */
+  /**
+   * 加载3号变量，一般指异常(临时变量)
+   */
   public MagicScriptCompiler load3() {
     self().visitVarInsn(ALOAD, 3);
     return this;
@@ -317,14 +355,18 @@ public class MagicScriptCompiler implements Opcodes {
     return this;
   }
 
-  /** 加载变量 */
+  /**
+   * 加载变量
+   */
   public MagicScriptCompiler load(int index) {
     return load2()
         .visitInt(index)
         .invoke(INVOKEVIRTUAL, Variables.class, "getValue", Object.class, int.class);
   }
 
-  /** 加载变量 */
+  /**
+   * 加载变量
+   */
   public MagicScriptCompiler load(VarIndex varIndex) {
     return load(varIndex.getIndex());
   }
@@ -357,13 +399,17 @@ public class MagicScriptCompiler implements Opcodes {
     return this;
   }
 
-  /** 跳转 */
+  /**
+   * 跳转
+   */
   public MagicScriptCompiler jump(int opcode, Label label) {
     self().visitJumpInsn(opcode, label);
     return this;
   }
 
-  /** 移除变量 */
+  /**
+   * 移除变量
+   */
   public MagicScriptCompiler remove(VarIndex varIndex) {
     if (varIndex == null) {
       return this;
@@ -371,7 +417,9 @@ public class MagicScriptCompiler implements Opcodes {
     return remove(varIndex.getName());
   }
 
-  /** 移除变量 */
+  /**
+   * 移除变量
+   */
   public MagicScriptCompiler remove(String name) {
     List<String> varList = vars.peek();
     int index = varList.indexOf(name);
@@ -381,41 +429,55 @@ public class MagicScriptCompiler implements Opcodes {
     return this;
   }
 
-  /** 配合pre_store使用，保存至数组中 */
+  /**
+   * 配合pre_store使用，保存至数组中
+   */
   public MagicScriptCompiler store() {
     return invoke(INVOKEVIRTUAL, Variables.class, "setValue", void.class, int.class, Object.class);
   }
 
-  /** 配合pre_store使用，保存至数组中 */
+  /**
+   * 配合pre_store使用，保存至数组中
+   */
   public MagicScriptCompiler store(VarIndex varIndex) {
     return varIndex.isScoped() ? scopeStore() : store();
   }
 
-  /** 配合pre_store使用，保存至数组中 */
+  /**
+   * 配合pre_store使用，保存至数组中
+   */
   public MagicScriptCompiler scopeStore() {
     return invoke(
         INVOKEVIRTUAL, Variables.class, "setScopeValue", void.class, int.class, Object.class);
   }
 
-  /** 保存变量 */
+  /**
+   * 保存变量
+   */
   public MagicScriptCompiler store(int index) {
     self().visitVarInsn(ASTORE, index);
     return this;
   }
 
-  /** 保存变量 */
+  /**
+   * 保存变量
+   */
   public MagicScriptCompiler frame(
       int type, int numLocal, Object[] local, int numStack, Object[] stack) {
     self().visitFrame(type, numLocal, local, numStack, stack);
     return this;
   }
 
-  /** 写变量前的准备 */
+  /**
+   * 写变量前的准备
+   */
   public MagicScriptCompiler pre_store(int index) {
     return load2().visitInt(index);
   }
 
-  /** 写变量前的准备 */
+  /**
+   * 写变量前的准备
+   */
   public MagicScriptCompiler pre_store(VarIndex varIndex) {
     return pre_store(varIndex.getIndex());
   }
@@ -507,7 +569,7 @@ public class MagicScriptCompiler implements Opcodes {
    * invokedynamic调用
    *
    * @param methodName 方法名
-   * @param arguments 参数个数
+   * @param arguments  参数个数
    */
   public MagicScriptCompiler call(String methodName, int arguments) {
     self()
@@ -534,12 +596,16 @@ public class MagicScriptCompiler implements Opcodes {
     return this;
   }
 
-  /** 将int值装箱 */
+  /**
+   * 将int值装箱
+   */
   public MagicScriptCompiler asInteger() {
     return invoke(INVOKESTATIC, Integer.class, "valueOf", Integer.class, int.class);
   }
 
-  /** 将boolean值装箱 */
+  /**
+   * 将boolean值装箱
+   */
   public MagicScriptCompiler asBoolean() {
     return invoke(INVOKESTATIC, Boolean.class, "valueOf", Boolean.class, boolean.class);
   }
@@ -547,10 +613,10 @@ public class MagicScriptCompiler implements Opcodes {
   /**
    * 调用方法
    *
-   * @param opcode 调用类型
-   * @param target 目标类
-   * @param method 方法名
-   * @param returnType 返回值类型
+   * @param opcode        调用类型
+   * @param target        目标类
+   * @param method        方法名
+   * @param returnType    返回值类型
    * @param argumentTypes 参数类型
    */
   public MagicScriptCompiler invoke(
@@ -561,11 +627,11 @@ public class MagicScriptCompiler implements Opcodes {
   /**
    * 调用方法
    *
-   * @param opcode 调用类型
-   * @param target 目标类
-   * @param method 方法名
-   * @param isInterface 是否是接口
-   * @param returnType 返回值类型
+   * @param opcode        调用类型
+   * @param target        目标类
+   * @param method        方法名
+   * @param isInterface   是否是接口
+   * @param returnType    返回值类型
    * @param argumentTypes 参数类型
    */
   public MagicScriptCompiler invoke(
@@ -599,7 +665,9 @@ public class MagicScriptCompiler implements Opcodes {
     self().visitIntInsn(opcode, operand);
   }
 
-  /** 编译数组 */
+  /**
+   * 编译数组
+   */
   public MagicScriptCompiler newArray(List<Expression> values) {
     int size = values.size();
     visitInt(size).typeInsn(ANEWARRAY, Object.class);
@@ -609,7 +677,9 @@ public class MagicScriptCompiler implements Opcodes {
     return this;
   }
 
-  /** 编译int值 */
+  /**
+   * 编译int值
+   */
   public MagicScriptCompiler visitInt(int value) {
     if (value >= -1 && value <= 5) {
       insn(ICONST[value + 1]);
@@ -746,7 +816,9 @@ public class MagicScriptCompiler implements Opcodes {
     return classWriter.toByteArray();
   }
 
-  /** 获取类名 */
+  /**
+   * 获取类名
+   */
   public String getClassName() {
     return "MagicScript_" + id;
   }

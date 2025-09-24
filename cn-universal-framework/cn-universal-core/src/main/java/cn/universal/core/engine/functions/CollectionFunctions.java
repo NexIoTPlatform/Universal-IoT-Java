@@ -1,12 +1,12 @@
-
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
 import cn.universal.core.engine.annotation.Function;
 import java.util.Iterator;
 
-/** 集合相关函数 */
+/**
+ * 集合相关函数
+ */
 public class CollectionFunctions {
 
   @Function

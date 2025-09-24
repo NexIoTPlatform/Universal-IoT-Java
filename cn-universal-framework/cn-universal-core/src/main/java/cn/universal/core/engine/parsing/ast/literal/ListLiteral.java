@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.parsing.ast.literal;
 
 import cn.universal.core.engine.compile.MagicScriptCompiler;
@@ -9,7 +7,9 @@ import cn.universal.core.engine.parsing.ast.Literal;
 import cn.universal.core.engine.parsing.ast.statement.Spread;
 import java.util.List;
 
-/** List常量 */
+/**
+ * List常量
+ */
 public class ListLiteral extends Literal {
 
   public final List<Expression> values;

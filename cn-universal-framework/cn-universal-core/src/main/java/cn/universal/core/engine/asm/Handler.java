@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.asm;
 
 /**
@@ -9,7 +7,7 @@ package cn.universal.core.engine.asm;
  * exception_table array. @Author Eric Bruneton
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.3">JVMS
- *     4.7.3</a>
+ * 4.7.3</a>
  */
 final class Handler {
 
@@ -43,18 +41,20 @@ final class Handler {
    */
   final String catchTypeDescriptor;
 
-  /** The next exception handler. */
+  /**
+   * The next exception handler.
+   */
   Handler nextHandler;
 
   /**
    * Constructs a new Handler.
    *
-   * @param startPc the start_pc field of this JVMS exception_table entry.
-   * @param endPc the end_pc field of this JVMS exception_table entry.
-   * @param handlerPc the handler_pc field of this JVMS exception_table entry.
-   * @param catchType The catch_type field of this JVMS exception_table entry.
+   * @param startPc             the start_pc field of this JVMS exception_table entry.
+   * @param endPc               the end_pc field of this JVMS exception_table entry.
+   * @param handlerPc           the handler_pc field of this JVMS exception_table entry.
+   * @param catchType           The catch_type field of this JVMS exception_table entry.
    * @param catchTypeDescriptor The internal name of the type of exceptions handled by this handler,
-   *     or {@literal null} to catch any exceptions.
+   *                            or {@literal null} to catch any exceptions.
    */
   Handler(
       final Label startPc,
@@ -74,7 +74,7 @@ final class Handler {
    *
    * @param handler an existing Handler.
    * @param startPc the start_pc field of this JVMS exception_table entry.
-   * @param endPc the end_pc field of this JVMS exception_table entry.
+   * @param endPc   the end_pc field of this JVMS exception_table entry.
    */
   Handler(final Handler handler, final Label startPc, final Label endPc) {
     this(startPc, endPc, handler.handlerPc, handler.catchType, handler.catchTypeDescriptor);
@@ -86,8 +86,8 @@ final class Handler {
    * element.
    *
    * @param firstHandler the beginning of a Handler list. May be {@literal null}.
-   * @param start the start of the range to be removed.
-   * @param end the end of the range to be removed. Maybe {@literal null}.
+   * @param start        the start of the range to be removed.
+   * @param end          the end of the range to be removed. Maybe {@literal null}.
    * @return the exception handler list with the start-end range removed.
    */
   static Handler removeRange(final Handler firstHandler, final Label start, final Label end) {
@@ -155,7 +155,8 @@ final class Handler {
    * element. <i>This includes the exception_table_length field.</i>
    *
    * @param firstHandler the beginning of a Handler list. May be {@literal null}.
-   * @param output where the exception_table_length and exception_table structures must be put.
+   * @param output       where the exception_table_length and exception_table structures must be
+   *                     put.
    */
   static void putExceptionTable(final Handler firstHandler, final ByteVector output) {
     output.putShort(getExceptionTableLength(firstHandler));

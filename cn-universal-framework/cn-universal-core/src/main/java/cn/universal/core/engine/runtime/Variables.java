@@ -1,5 +1,3 @@
-
-
 package cn.universal.core.engine.runtime;
 
 import cn.universal.core.engine.MagicScriptContext;
