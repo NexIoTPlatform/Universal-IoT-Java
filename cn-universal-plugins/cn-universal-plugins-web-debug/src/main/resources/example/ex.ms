@@ -138,7 +138,7 @@ var decode = payload => {
 
     return result;
 };
-
+//https://nexiotplatform.github.io/universal-iot-docs/iot/tcp/debug.html
 // 本地调试示例（模拟设备报文解析）
 // 1. 测试预解码（设备首次注册报文）
 // return preDecode("787801000A01020304050607080D0A");
