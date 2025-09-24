@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.runtime.Variables;
@@ -61,7 +49,7 @@ public class MagicScriptDebugContext extends MagicScriptContext {
       int startRow, int startCol, int endRow, int endCol, Variables variables)
       throws InterruptedException {
     if (stepInto || breakpoints.contains(startRow)) {
-      this.line = new int[] {startRow, startCol, endRow, endCol};
+      this.line = new int[]{startRow, startCol, endRow, endCol};
       consumer.offer(this.id);
       Map<String, Object> varMap = new LinkedHashMap<>(getRootVariables());
       varMap.putAll(variables.getVariables(this));

@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 import java.io.ByteArrayOutputStream;
@@ -35,9 +23,9 @@ public class ClassReader {
   /**
    * A flag to skip the SourceFile, SourceDebugExtension, LocalVariableTable,
    * LocalVariableTypeTable, LineNumberTable and MethodParameters attributes. If this flag is set
-   * these attributes are neither parsed nor visited (i.e. {@link ClassVisitor#visitSource}, {@link
-   * MethodVisitor#visitLocalVariable}, {@link MethodVisitor#visitLineNumber} and {@link
-   * MethodVisitor#visitParameter} are not called).
+   * these attributes are neither parsed nor visited (i.e. {@link ClassVisitor#visitSource},
+   * {@link MethodVisitor#visitLocalVariable}, {@link MethodVisitor#visitLineNumber} and
+   * {@link MethodVisitor#visitParameter} are not called).
    */
   public static final int SKIP_DEBUG = 2;
 
@@ -71,23 +59,29 @@ public class ClassReader {
    */
   static final int EXPAND_ASM_INSNS = 256;
 
-  /** The maximum size of array to allocate. */
+  /**
+   * The maximum size of array to allocate.
+   */
   private static final int MAX_BUFFER_SIZE = 1024 * 1024;
 
-  /** The size of the temporary byte array used to read class input streams chunk by chunk. */
+  /**
+   * The size of the temporary byte array used to read class input streams chunk by chunk.
+   */
   private static final int INPUT_STREAM_DATA_CHUNK_SIZE = 4096;
 
   /**
    * A byte array containing the JVMS ClassFile structure to be parsed.
    *
    * @deprecated Use {@link #readByte(int)} and the other read methods instead. This field will
-   *     eventually be deleted.
+   * eventually be deleted.
    */
   @Deprecated
   // DontCheck(MemberName): can't be renamed (for backward binary compatibility).
   public final byte[] b;
 
-  /** The offset in bytes of the ClassFile's access_flags field. */
+  /**
+   * The offset in bytes of the ClassFile's access_flags field.
+   */
   public final int header;
 
   /**
@@ -126,7 +120,7 @@ public class ClassReader {
    * (in the BootstrapMethods attribute).
    *
    * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.23">JVMS
-   *     4.7.23</a>
+   * 4.7.23</a>
    */
   private final int[] bootstrapMethodOffsets;
 
@@ -167,8 +161,9 @@ public class ClassReader {
    * Constructs a new {@link ClassReader} object. <i>This internal constructor must not be exposed
    * as a public API</i>.
    *
-   * @param classFileBuffer a byte array containing the JVMS ClassFile structure to be read.
-   * @param classFileOffset the offset in byteBuffer of the first byte of the ClassFile to be read.
+   * @param classFileBuffer   a byte array containing the JVMS ClassFile structure to be read.
+   * @param classFileOffset   the offset in byteBuffer of the first byte of the ClassFile to be
+   *                          read.
    * @param checkClassVersion whether to check the class version or not.
    */
   ClassReader(
@@ -262,8 +257,8 @@ public class ClassReader {
    * Constructs a new {@link ClassReader} object.
    *
    * @param inputStream an input stream of the JVMS ClassFile structure to be read. This input
-   *     stream must contain nothing more than the ClassFile structure itself. It is read from its
-   *     current position to its end.
+   *                    stream must contain nothing more than the ClassFile structure itself. It is
+   *                    read from its current position to its end.
    * @throws IOException if a problem occurs during reading.
    */
   public ClassReader(final InputStream inputStream) throws IOException {
@@ -274,7 +269,8 @@ public class ClassReader {
    * Constructs a new {@link ClassReader} object.
    *
    * @param className the fully qualified name of the class to be read. The ClassFile structure is
-   *     retrieved with the current class loader's {@link ClassLoader#getSystemResourceAsStream}.
+   *                  retrieved with the current class loader's
+   *                  {@link ClassLoader#getSystemResourceAsStream}.
    * @throws IOException if an exception occurs during reading.
    */
   public ClassReader(final String className) throws IOException {
@@ -287,7 +283,7 @@ public class ClassReader {
    * Reads the given input stream and returns its content as a byte array.
    *
    * @param inputStream an input stream.
-   * @param close true to close the input stream after reading.
+   * @param close       true to close the input stream after reading.
    * @return the content of the given input stream.
    * @throws IOException if a problem occurs during reading.
    */
@@ -373,7 +369,7 @@ public class ClassReader {
    * Returns the internal names of the implemented interfaces (see {@link Type#getInternalName()}).
    *
    * @return the internal names of the directly implemented interfaces. Inherited implemented
-   *     interfaces are not returned.
+   * interfaces are not returned.
    * @see ClassVisitor#visit(int, int, String, String, String, String[])
    */
   public String[] getInterfaces() {
@@ -399,9 +395,10 @@ public class ClassReader {
    * Makes the given visitor visit the JVMS ClassFile structure passed to the constructor of this
    * {@link ClassReader}.
    *
-   * @param classVisitor the visitor that must visit this class.
-   * @param parsingOptions the options to use to parse this class. One or more of {@link
-   *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
+   * @param classVisitor   the visitor that must visit this class.
+   * @param parsingOptions the options to use to parse this class. One or more of
+   *                       {@link #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or
+   *                       {@link #EXPAND_FRAMES}.
    */
   public void accept(final ClassVisitor classVisitor, final int parsingOptions) {
     accept(classVisitor, new Attribute[0], parsingOptions);
@@ -411,15 +408,17 @@ public class ClassReader {
    * Makes the given visitor visit the JVMS ClassFile structure passed to the constructor of this
    * {@link ClassReader}.
    *
-   * @param classVisitor the visitor that must visit this class.
+   * @param classVisitor        the visitor that must visit this class.
    * @param attributePrototypes prototypes of the attributes that must be parsed during the visit of
-   *     the class. Any attribute whose type is not equal to the type of one the prototypes will not
-   *     be parsed: its byte array value will be passed unchanged to the ClassWriter. <i>This may
-   *     corrupt it if this value contains references to the constant pool, or has syntactic or
-   *     semantic links with a class element that has been transformed by a class adapter between
-   *     the reader and the writer</i>.
-   * @param parsingOptions the options to use to parse this class. One or more of {@link
-   *     #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or {@link #EXPAND_FRAMES}.
+   *                            the class. Any attribute whose type is not equal to the type of one
+   *                            the prototypes will not be parsed: its byte array value will be
+   *                            passed unchanged to the ClassWriter. <i>This may corrupt it if this
+   *                            value contains references to the constant pool, or has syntactic or
+   *                            semantic links with a class element that has been transformed by a
+   *                            class adapter between the reader and the writer</i>.
+   * @param parsingOptions      the options to use to parse this class. One or more of
+   *                            {@link #SKIP_CODE}, {@link #SKIP_DEBUG}, {@link #SKIP_FRAMES} or
+   *                            {@link #EXPAND_FRAMES}.
    */
   public void accept(
       final ClassVisitor classVisitor,
@@ -738,14 +737,15 @@ public class ClassReader {
   /**
    * Reads the Module, ModulePackages and ModuleMainClass attributes and visit them.
    *
-   * @param classVisitor the current class visitor
-   * @param context information about the class being parsed.
-   * @param moduleOffset the offset of the Module attribute (excluding the attribute_info's
-   *     attribute_name_index and attribute_length fields).
+   * @param classVisitor         the current class visitor
+   * @param context              information about the class being parsed.
+   * @param moduleOffset         the offset of the Module attribute (excluding the attribute_info's
+   *                             attribute_name_index and attribute_length fields).
    * @param modulePackagesOffset the offset of the ModulePackages attribute (excluding the
-   *     attribute_info's attribute_name_index and attribute_length fields), or 0.
-   * @param moduleMainClass the string corresponding to the ModuleMainClass attribute, or {@literal
-   *     null}.
+   *                             attribute_info's attribute_name_index and attribute_length fields),
+   *                             or 0.
+   * @param moduleMainClass      the string corresponding to the ModuleMainClass attribute, or
+   *                             {@literal null}.
    */
   private void readModuleAttributes(
       final ClassVisitor classVisitor,
@@ -865,8 +865,8 @@ public class ClassReader {
   /**
    * Reads a record component and visit it.
    *
-   * @param classVisitor the current class visitor
-   * @param context information about the class being parsed.
+   * @param classVisitor          the current class visitor
+   * @param context               information about the class being parsed.
    * @param recordComponentOffset the offset of the current record component.
    * @return the offset of the first byte following the record component.
    */
@@ -1039,8 +1039,8 @@ public class ClassReader {
   /**
    * Reads a JVMS field_info structure and makes the given visitor visit it.
    *
-   * @param classVisitor the visitor that must visit the field.
-   * @param context information about the class being parsed.
+   * @param classVisitor    the visitor that must visit the field.
+   * @param context         information about the class being parsed.
    * @param fieldInfoOffset the start offset of the field_info structure.
    * @return the offset of the first byte following the field_info structure.
    */
@@ -1223,8 +1223,8 @@ public class ClassReader {
   /**
    * Reads a JVMS method_info structure and makes the given visitor visit it.
    *
-   * @param classVisitor the visitor that must visit the method.
-   * @param context information about the class being parsed.
+   * @param classVisitor     the visitor that must visit the method.
+   * @param context          information about the class being parsed.
    * @param methodInfoOffset the start offset of the method_info structure.
    * @return the offset of the first byte following the method_info structure.
    */
@@ -1507,9 +1507,9 @@ public class ClassReader {
    * Reads a JVMS 'Code' attribute and makes the given visitor visit it.
    *
    * @param methodVisitor the visitor that must visit the Code attribute.
-   * @param context information about the class being parsed.
-   * @param codeOffset the start offset in {@link #classFileBuffer} of the Code attribute, excluding
-   *     its attribute_name_index and attribute_length fields.
+   * @param context       information about the class being parsed.
+   * @param codeOffset    the start offset in {@link #classFileBuffer} of the Code attribute,
+   *                      excluding its attribute_name_index and attribute_length fields.
    */
   private void readCode(
       final MethodVisitor methodVisitor, final Context context, final int codeOffset) {
@@ -1986,7 +1986,7 @@ public class ClassReader {
           if (potentialBytecodeOffset >= 0
               && potentialBytecodeOffset < codeLength
               && (classBuffer[bytecodeStartOffset + potentialBytecodeOffset] & 0xFF)
-                  == Opcodes.NEW) {
+              == Opcodes.NEW) {
             createLabel(potentialBytecodeOffset, labels);
           }
         }
@@ -2040,7 +2040,7 @@ public class ClassReader {
       // Visit the stack map frame for this bytecode offset, if any.
       while (stackMapFrameOffset != 0
           && (context.currentFrameOffset == currentBytecodeOffset
-              || context.currentFrameOffset == -1)) {
+          || context.currentFrameOffset == -1)) {
         // If there is a stack map frame for this offset, make methodVisitor visit it, and read the
         // next stack map frame if there is one.
         if (context.currentFrameOffset != -1) {
@@ -2287,37 +2287,36 @@ public class ClassReader {
         case Constants.ASM_GOTO:
         case Constants.ASM_JSR:
         case Constants.ASM_IFNULL:
-        case Constants.ASM_IFNONNULL:
-          {
-            // A forward jump with an offset > 32767. In this case we automatically replace ASM_GOTO
-            // with GOTO_W, ASM_JSR with JSR_W and ASM_IFxxx <l> with IFNOTxxx <L> GOTO_W <l> L:...,
-            // where IFNOTxxx is the "opposite" opcode of ASMS_IFxxx (e.g. IFNE for ASM_IFEQ) and
-            // where <L> designates the instruction just after the GOTO_W.
-            // First, change the ASM specific opcodes ASM_IFEQ ... ASM_JSR, ASM_IFNULL and
-            // ASM_IFNONNULL to IFEQ ... JSR, IFNULL and IFNONNULL.
-            opcode =
-                opcode < Constants.ASM_IFNULL
-                    ? opcode - Constants.ASM_OPCODE_DELTA
-                    : opcode - Constants.ASM_IFNULL_OPCODE_DELTA;
-            Label target = labels[currentBytecodeOffset + readUnsignedShort(currentOffset + 1)];
-            if (opcode == Opcodes.GOTO || opcode == Opcodes.JSR) {
-              // Replace GOTO with GOTO_W and JSR with JSR_W.
-              methodVisitor.visitJumpInsn(opcode + Constants.WIDE_JUMP_OPCODE_DELTA, target);
-            } else {
-              // Compute the "opposite" of opcode. This can be done by flipping the least
-              // significant bit for IFNULL and IFNONNULL, and similarly for IFEQ ... IF_ACMPEQ
-              // (with a pre and post offset by 1).
-              opcode = opcode < Opcodes.GOTO ? ((opcode + 1) ^ 1) - 1 : opcode ^ 1;
-              Label endif = createLabel(currentBytecodeOffset + 3, labels);
-              methodVisitor.visitJumpInsn(opcode, endif);
-              methodVisitor.visitJumpInsn(Constants.GOTO_W, target);
-              // endif designates the instruction just after GOTO_W, and is visited as part of the
-              // next instruction. Since it is a jump target, we need to insert a frame here.
-              insertFrame = true;
-            }
-            currentOffset += 3;
-            break;
+        case Constants.ASM_IFNONNULL: {
+          // A forward jump with an offset > 32767. In this case we automatically replace ASM_GOTO
+          // with GOTO_W, ASM_JSR with JSR_W and ASM_IFxxx <l> with IFNOTxxx <L> GOTO_W <l> L:...,
+          // where IFNOTxxx is the "opposite" opcode of ASMS_IFxxx (e.g. IFNE for ASM_IFEQ) and
+          // where <L> designates the instruction just after the GOTO_W.
+          // First, change the ASM specific opcodes ASM_IFEQ ... ASM_JSR, ASM_IFNULL and
+          // ASM_IFNONNULL to IFEQ ... JSR, IFNULL and IFNONNULL.
+          opcode =
+              opcode < Constants.ASM_IFNULL
+                  ? opcode - Constants.ASM_OPCODE_DELTA
+                  : opcode - Constants.ASM_IFNULL_OPCODE_DELTA;
+          Label target = labels[currentBytecodeOffset + readUnsignedShort(currentOffset + 1)];
+          if (opcode == Opcodes.GOTO || opcode == Opcodes.JSR) {
+            // Replace GOTO with GOTO_W and JSR with JSR_W.
+            methodVisitor.visitJumpInsn(opcode + Constants.WIDE_JUMP_OPCODE_DELTA, target);
+          } else {
+            // Compute the "opposite" of opcode. This can be done by flipping the least
+            // significant bit for IFNULL and IFNONNULL, and similarly for IFEQ ... IF_ACMPEQ
+            // (with a pre and post offset by 1).
+            opcode = opcode < Opcodes.GOTO ? ((opcode + 1) ^ 1) - 1 : opcode ^ 1;
+            Label endif = createLabel(currentBytecodeOffset + 3, labels);
+            methodVisitor.visitJumpInsn(opcode, endif);
+            methodVisitor.visitJumpInsn(Constants.GOTO_W, target);
+            // endif designates the instruction just after GOTO_W, and is visited as part of the
+            // next instruction. Since it is a jump target, we need to insert a frame here.
+            insertFrame = true;
           }
+          currentOffset += 3;
+          break;
+        }
         case Constants.ASM_GOTO_W:
           // Replace ASM_GOTO_W with GOTO_W.
           methodVisitor.visitJumpInsn(
@@ -2339,41 +2338,39 @@ public class ClassReader {
             currentOffset += 4;
           }
           break;
-        case Opcodes.TABLESWITCH:
-          {
-            // Skip 0 to 3 padding bytes.
-            currentOffset += 4 - (currentBytecodeOffset & 3);
-            // Read the instruction.
-            Label defaultLabel = labels[currentBytecodeOffset + readInt(currentOffset)];
-            int low = readInt(currentOffset + 4);
-            int high = readInt(currentOffset + 8);
-            currentOffset += 12;
-            Label[] table = new Label[high - low + 1];
-            for (int i = 0; i < table.length; ++i) {
-              table[i] = labels[currentBytecodeOffset + readInt(currentOffset)];
-              currentOffset += 4;
-            }
-            methodVisitor.visitTableSwitchInsn(low, high, defaultLabel, table);
-            break;
+        case Opcodes.TABLESWITCH: {
+          // Skip 0 to 3 padding bytes.
+          currentOffset += 4 - (currentBytecodeOffset & 3);
+          // Read the instruction.
+          Label defaultLabel = labels[currentBytecodeOffset + readInt(currentOffset)];
+          int low = readInt(currentOffset + 4);
+          int high = readInt(currentOffset + 8);
+          currentOffset += 12;
+          Label[] table = new Label[high - low + 1];
+          for (int i = 0; i < table.length; ++i) {
+            table[i] = labels[currentBytecodeOffset + readInt(currentOffset)];
+            currentOffset += 4;
           }
-        case Opcodes.LOOKUPSWITCH:
-          {
-            // Skip 0 to 3 padding bytes.
-            currentOffset += 4 - (currentBytecodeOffset & 3);
-            // Read the instruction.
-            Label defaultLabel = labels[currentBytecodeOffset + readInt(currentOffset)];
-            int numPairs = readInt(currentOffset + 4);
+          methodVisitor.visitTableSwitchInsn(low, high, defaultLabel, table);
+          break;
+        }
+        case Opcodes.LOOKUPSWITCH: {
+          // Skip 0 to 3 padding bytes.
+          currentOffset += 4 - (currentBytecodeOffset & 3);
+          // Read the instruction.
+          Label defaultLabel = labels[currentBytecodeOffset + readInt(currentOffset)];
+          int numPairs = readInt(currentOffset + 4);
+          currentOffset += 8;
+          int[] keys = new int[numPairs];
+          Label[] values = new Label[numPairs];
+          for (int i = 0; i < numPairs; ++i) {
+            keys[i] = readInt(currentOffset);
+            values[i] = labels[currentBytecodeOffset + readInt(currentOffset + 4)];
             currentOffset += 8;
-            int[] keys = new int[numPairs];
-            Label[] values = new Label[numPairs];
-            for (int i = 0; i < numPairs; ++i) {
-              keys[i] = readInt(currentOffset);
-              values[i] = labels[currentBytecodeOffset + readInt(currentOffset + 4)];
-              currentOffset += 8;
-            }
-            methodVisitor.visitLookupSwitchInsn(defaultLabel, keys, values);
-            break;
           }
+          methodVisitor.visitLookupSwitchInsn(defaultLabel, keys, values);
+          break;
+        }
         case Opcodes.ILOAD:
         case Opcodes.LLOAD:
         case Opcodes.FLOAD:
@@ -2413,49 +2410,47 @@ public class ClassReader {
         case Opcodes.INVOKEVIRTUAL:
         case Opcodes.INVOKESPECIAL:
         case Opcodes.INVOKESTATIC:
-        case Opcodes.INVOKEINTERFACE:
-          {
-            int cpInfoOffset = cpInfoOffsets[readUnsignedShort(currentOffset + 1)];
-            int nameAndTypeCpInfoOffset = cpInfoOffsets[readUnsignedShort(cpInfoOffset + 2)];
-            String owner = readClass(cpInfoOffset, charBuffer);
-            String name = readUTF8(nameAndTypeCpInfoOffset, charBuffer);
-            String descriptor = readUTF8(nameAndTypeCpInfoOffset + 2, charBuffer);
-            if (opcode < Opcodes.INVOKEVIRTUAL) {
-              methodVisitor.visitFieldInsn(opcode, owner, name, descriptor);
-            } else {
-              boolean isInterface =
-                  classBuffer[cpInfoOffset - 1] == Symbol.CONSTANT_INTERFACE_METHODREF_TAG;
-              methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
-            }
-            if (opcode == Opcodes.INVOKEINTERFACE) {
-              currentOffset += 5;
-            } else {
-              currentOffset += 3;
-            }
-            break;
+        case Opcodes.INVOKEINTERFACE: {
+          int cpInfoOffset = cpInfoOffsets[readUnsignedShort(currentOffset + 1)];
+          int nameAndTypeCpInfoOffset = cpInfoOffsets[readUnsignedShort(cpInfoOffset + 2)];
+          String owner = readClass(cpInfoOffset, charBuffer);
+          String name = readUTF8(nameAndTypeCpInfoOffset, charBuffer);
+          String descriptor = readUTF8(nameAndTypeCpInfoOffset + 2, charBuffer);
+          if (opcode < Opcodes.INVOKEVIRTUAL) {
+            methodVisitor.visitFieldInsn(opcode, owner, name, descriptor);
+          } else {
+            boolean isInterface =
+                classBuffer[cpInfoOffset - 1] == Symbol.CONSTANT_INTERFACE_METHODREF_TAG;
+            methodVisitor.visitMethodInsn(opcode, owner, name, descriptor, isInterface);
           }
-        case Opcodes.INVOKEDYNAMIC:
-          {
-            int cpInfoOffset = cpInfoOffsets[readUnsignedShort(currentOffset + 1)];
-            int nameAndTypeCpInfoOffset = cpInfoOffsets[readUnsignedShort(cpInfoOffset + 2)];
-            String name = readUTF8(nameAndTypeCpInfoOffset, charBuffer);
-            String descriptor = readUTF8(nameAndTypeCpInfoOffset + 2, charBuffer);
-            int bootstrapMethodOffset = bootstrapMethodOffsets[readUnsignedShort(cpInfoOffset)];
-            Handle handle =
-                (Handle) readConst(readUnsignedShort(bootstrapMethodOffset), charBuffer);
-            Object[] bootstrapMethodArguments =
-                new Object[readUnsignedShort(bootstrapMethodOffset + 2)];
-            bootstrapMethodOffset += 4;
-            for (int i = 0; i < bootstrapMethodArguments.length; i++) {
-              bootstrapMethodArguments[i] =
-                  readConst(readUnsignedShort(bootstrapMethodOffset), charBuffer);
-              bootstrapMethodOffset += 2;
-            }
-            methodVisitor.visitInvokeDynamicInsn(
-                name, descriptor, handle, bootstrapMethodArguments);
+          if (opcode == Opcodes.INVOKEINTERFACE) {
             currentOffset += 5;
-            break;
+          } else {
+            currentOffset += 3;
           }
+          break;
+        }
+        case Opcodes.INVOKEDYNAMIC: {
+          int cpInfoOffset = cpInfoOffsets[readUnsignedShort(currentOffset + 1)];
+          int nameAndTypeCpInfoOffset = cpInfoOffsets[readUnsignedShort(cpInfoOffset + 2)];
+          String name = readUTF8(nameAndTypeCpInfoOffset, charBuffer);
+          String descriptor = readUTF8(nameAndTypeCpInfoOffset + 2, charBuffer);
+          int bootstrapMethodOffset = bootstrapMethodOffsets[readUnsignedShort(cpInfoOffset)];
+          Handle handle =
+              (Handle) readConst(readUnsignedShort(bootstrapMethodOffset), charBuffer);
+          Object[] bootstrapMethodArguments =
+              new Object[readUnsignedShort(bootstrapMethodOffset + 2)];
+          bootstrapMethodOffset += 4;
+          for (int i = 0; i < bootstrapMethodArguments.length; i++) {
+            bootstrapMethodArguments[i] =
+                readConst(readUnsignedShort(bootstrapMethodOffset), charBuffer);
+            bootstrapMethodOffset += 2;
+          }
+          methodVisitor.visitInvokeDynamicInsn(
+              name, descriptor, handle, bootstrapMethodArguments);
+          currentOffset += 5;
+          break;
+        }
         case Opcodes.NEW:
         case Opcodes.ANEWARRAY:
         case Opcodes.CHECKCAST:
@@ -2650,9 +2645,9 @@ public class ClassReader {
    * this method creates a label for the given offset if it has not been already created.
    *
    * @param bytecodeOffset a bytecode offset in a method.
-   * @param labels the already created labels, indexed by their offset. If a label already exists
-   *     for bytecodeOffset this method must not create a new one. Otherwise it must store the new
-   *     label in this array.
+   * @param labels         the already created labels, indexed by their offset. If a label already
+   *                       exists for bytecodeOffset this method must not create a new one.
+   *                       Otherwise it must store the new label in this array.
    * @return a non null Label, which must be equal to labels[bytecodeOffset].
    */
   protected Label readLabel(final int bytecodeOffset, final Label[] labels) {
@@ -2664,11 +2659,11 @@ public class ClassReader {
 
   /**
    * Creates a label without the {@link Label#FLAG_DEBUG_ONLY} flag set, for the given bytecode
-   * offset. The label is created with a call to {@link #readLabel} and its {@link
-   * Label#FLAG_DEBUG_ONLY} flag is cleared.
+   * offset. The label is created with a call to {@link #readLabel} and its
+   * {@link Label#FLAG_DEBUG_ONLY} flag is cleared.
    *
    * @param bytecodeOffset a bytecode offset in a method.
-   * @param labels the already created labels, indexed by their offset.
+   * @param labels         the already created labels, indexed by their offset.
    * @return a Label without the {@link Label#FLAG_DEBUG_ONLY} flag set.
    */
   private Label createLabel(final int bytecodeOffset, final Label[] labels) {
@@ -2683,7 +2678,7 @@ public class ClassReader {
    * with a call to {@link #readLabel}.
    *
    * @param bytecodeOffset a bytecode offset in a method.
-   * @param labels the already created labels, indexed by their offset.
+   * @param labels         the already created labels, indexed by their offset.
    */
   private void createDebugLabel(final int bytecodeOffset, final Label[] labels) {
     if (labels[bytecodeOffset] == null) {
@@ -2700,14 +2695,17 @@ public class ClassReader {
    * entry it contains, to find the corresponding labels, and to visit the try catch block
    * annotations.
    *
-   * @param methodVisitor the method visitor to be used to visit the try catch block annotations.
-   * @param context information about the class being parsed.
+   * @param methodVisitor                the method visitor to be used to visit the try catch block
+   *                                     annotations.
+   * @param context                      information about the class being parsed.
    * @param runtimeTypeAnnotationsOffset the start offset of a Runtime[In]VisibleTypeAnnotations
-   *     attribute, excluding the attribute_info's attribute_name_index and attribute_length fields.
-   * @param visible true if the attribute to parse is a RuntimeVisibleTypeAnnotations attribute,
-   *     false it is a RuntimeInvisibleTypeAnnotations attribute.
+   *                                     attribute, excluding the attribute_info's
+   *                                     attribute_name_index and attribute_length fields.
+   * @param visible                      true if the attribute to parse is a
+   *                                     RuntimeVisibleTypeAnnotations attribute, false it is a
+   *                                     RuntimeInvisibleTypeAnnotations attribute.
    * @return the start offset of each entry of the Runtime[In]VisibleTypeAnnotations_attribute's
-   *     'annotations' array field.
+   * 'annotations' array field.
    */
   private int[] readTypeAnnotations(
       final MethodVisitor methodVisitor,
@@ -2807,10 +2805,10 @@ public class ClassReader {
    * -1 if there is no such type_annotation of if it does not have a bytecode offset.
    *
    * @param typeAnnotationOffsets the offset of each 'type_annotation' entry in a
-   *     Runtime[In]VisibleTypeAnnotations attribute, or {@literal null}.
-   * @param typeAnnotationIndex the index a 'type_annotation' entry in typeAnnotationOffsets.
+   *                              Runtime[In]VisibleTypeAnnotations attribute, or {@literal null}.
+   * @param typeAnnotationIndex   the index a 'type_annotation' entry in typeAnnotationOffsets.
    * @return bytecode offset corresponding to the specified JVMS 'type_annotation' structure, or -1
-   *     if there is no such type_annotation of if it does not have a bytecode offset.
+   * if there is no such type_annotation of if it does not have a bytecode offset.
    */
   private int getTypeAnnotationBytecodeOffset(
       final int[] typeAnnotationOffsets, final int typeAnnotationIndex) {
@@ -2827,8 +2825,8 @@ public class ClassReader {
    * and target_path (the result is stored in the given context), and returns the start offset of
    * the rest of the type_annotation structure.
    *
-   * @param context information about the class being parsed. This is where the extracted
-   *     target_type and target_path must be stored.
+   * @param context              information about the class being parsed. This is where the
+   *                             extracted target_type and target_path must be stored.
    * @param typeAnnotationOffset the start offset of a type_annotation structure.
    * @return the start offset of the rest of the type_annotation structure.
    */
@@ -2907,13 +2905,16 @@ public class ClassReader {
   /**
    * Reads a Runtime[In]VisibleParameterAnnotations attribute and makes the given visitor visit it.
    *
-   * @param methodVisitor the visitor that must visit the parameter annotations.
-   * @param context information about the class being parsed.
+   * @param methodVisitor                     the visitor that must visit the parameter
+   *                                          annotations.
+   * @param context                           information about the class being parsed.
    * @param runtimeParameterAnnotationsOffset the start offset of a
-   *     Runtime[In]VisibleParameterAnnotations attribute, excluding the attribute_info's
-   *     attribute_name_index and attribute_length fields.
-   * @param visible true if the attribute to parse is a RuntimeVisibleParameterAnnotations
-   *     attribute, false it is a RuntimeInvisibleParameterAnnotations attribute.
+   *                                          Runtime[In]VisibleParameterAnnotations attribute,
+   *                                          excluding the attribute_info's attribute_name_index
+   *                                          and attribute_length fields.
+   * @param visible                           true if the attribute to parse is a
+   *                                          RuntimeVisibleParameterAnnotations attribute, false it
+   *                                          is a RuntimeInvisibleParameterAnnotations attribute.
    */
   private void readParameterAnnotations(
       final MethodVisitor methodVisitor,
@@ -2948,12 +2949,12 @@ public class ClassReader {
    * annotation's 'element_value'.
    *
    * @param annotationVisitor the visitor that must visit the values.
-   * @param annotationOffset the start offset of an 'annotation' structure (excluding its type_index
-   *     field) or of an 'array_value' structure.
-   * @param named if the annotation values are named or not. This should be true to parse the values
-   *     of a JVMS 'annotation' structure, and false to parse the JVMS 'array_value' of an
-   *     annotation's element_value.
-   * @param charBuffer the buffer used to read strings in the constant pool.
+   * @param annotationOffset  the start offset of an 'annotation' structure (excluding its
+   *                          type_index field) or of an 'array_value' structure.
+   * @param named             if the annotation values are named or not. This should be true to
+   *                          parse the values of a JVMS 'annotation' structure, and false to parse
+   *                          the JVMS 'array_value' of an annotation's element_value.
+   * @param charBuffer        the buffer used to read strings in the constant pool.
    * @return the end offset of the JVMS 'annotation' or 'array_value' structure.
    */
   private int readElementValues(
@@ -2988,11 +2989,12 @@ public class ClassReader {
   /**
    * Reads a JVMS 'element_value' structure and makes the given visitor visit it.
    *
-   * @param annotationVisitor the visitor that must visit the element_value structure.
+   * @param annotationVisitor  the visitor that must visit the element_value structure.
    * @param elementValueOffset the start offset in {@link #classFileBuffer} of the element_value
-   *     structure to be read.
-   * @param elementName the name of the element_value structure to be read, or {@literal null}.
-   * @param charBuffer the buffer used to read strings in the constant pool.
+   *                           structure to be read.
+   * @param elementName        the name of the element_value structure to be read, or
+   *                           {@literal null}.
+   * @param charBuffer         the buffer used to read strings in the constant pool.
    * @return the end offset of the JVMS 'element_value' structure.
    */
   private int readElementValue(
@@ -3242,12 +3244,13 @@ public class ClassReader {
    * field (this is used to parse the legacy StackMap attributes).
    *
    * @param stackMapFrameOffset the start offset in {@link #classFileBuffer} of the
-   *     stack_map_frame_value structure to be read, or the start offset of a full_frame structure
-   *     (excluding its frame_type field).
-   * @param compressed true to read a 'stack_map_frame' structure, false to read a 'full_frame'
-   *     structure without its frame_type field.
-   * @param expand if the stack map frame must be expanded. See {@link #EXPAND_FRAMES}.
-   * @param context where the parsed stack map frame must be stored.
+   *                            stack_map_frame_value structure to be read, or the start offset of a
+   *                            full_frame structure (excluding its frame_type field).
+   * @param compressed          true to read a 'stack_map_frame' structure, false to read a
+   *                            'full_frame' structure without its frame_type field.
+   * @param expand              if the stack map frame must be expanded. See
+   *                            {@link #EXPAND_FRAMES}.
+   * @param context             where the parsed stack map frame must be stored.
    * @return the end offset of the JVMS 'stack_map_frame' or 'full_frame' structure.
    */
   private int readStackMapFrame(
@@ -3340,13 +3343,14 @@ public class ClassReader {
    * array.
    *
    * @param verificationTypeInfoOffset the start offset of the 'verification_type_info' structure to
-   *     read.
-   * @param frame the array where the parsed type must be stored.
-   * @param index the index in 'frame' where the parsed type must be stored.
-   * @param charBuffer the buffer used to read strings in the constant pool.
-   * @param labels the labels of the method currently being parsed, indexed by their offset. If the
-   *     parsed type is an ITEM_Uninitialized, a new label for the corresponding NEW instruction is
-   *     stored in this array if it does not already exist.
+   *                                   read.
+   * @param frame                      the array where the parsed type must be stored.
+   * @param index                      the index in 'frame' where the parsed type must be stored.
+   * @param charBuffer                 the buffer used to read strings in the constant pool.
+   * @param labels                     the labels of the method currently being parsed, indexed by
+   *                                   their offset. If the parsed type is an ITEM_Uninitialized, a
+   *                                   new label for the corresponding NEW instruction is stored in
+   *                                   this array if it does not already exist.
    * @return the end offset of the JVMS 'verification_type_info' structure.
    */
   private int readVerificationTypeInfo(
@@ -3402,7 +3406,7 @@ public class ClassReader {
    * field entry.
    *
    * @return the offset in {@link #classFileBuffer} of the first ClassFile's 'attributes' array
-   *     field entry.
+   * field entry.
    */
   final int getFirstAttributeOffset() {
     // Skip the access_flags, this_class, super_class, and interfaces_count fields (using 2 bytes
@@ -3448,7 +3452,7 @@ public class ClassReader {
    * Reads the BootstrapMethods attribute to compute the offset of each bootstrap method.
    *
    * @param maxStringLength a conservative estimate of the maximum length of the strings contained
-   *     in the constant pool of the class.
+   *                        in the constant pool of the class.
    * @return the offsets of the bootstrap methods.
    */
   private int[] readBootstrapMethodsAttribute(final int maxStringLength) {
@@ -3482,20 +3486,23 @@ public class ClassReader {
    * Reads a non standard JVMS 'attribute' structure in {@link #classFileBuffer}.
    *
    * @param attributePrototypes prototypes of the attributes that must be parsed during the visit of
-   *     the class. Any attribute whose type is not equal to the type of one the prototypes will not
-   *     be parsed: its byte array value will be passed unchanged to the ClassWriter.
-   * @param type the type of the attribute.
-   * @param offset the start offset of the JVMS 'attribute' structure in {@link #classFileBuffer}.
-   *     The 6 attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param length the length of the attribute's content (excluding the 6 attribute header bytes).
-   * @param charBuffer the buffer to be used to read strings in the constant pool.
-   * @param codeAttributeOffset the start offset of the enclosing Code attribute in {@link
-   *     #classFileBuffer}, or -1 if the attribute to be read is not a code attribute. The 6
-   *     attribute header bytes (attribute_name_index and attribute_length) are not taken into
-   *     account here.
-   * @param labels the labels of the method's code, or {@literal null} if the attribute to be read
-   *     is not a code attribute.
+   *                            the class. Any attribute whose type is not equal to the type of one
+   *                            the prototypes will not be parsed: its byte array value will be
+   *                            passed unchanged to the ClassWriter.
+   * @param type                the type of the attribute.
+   * @param offset              the start offset of the JVMS 'attribute' structure in
+   *                            {@link #classFileBuffer}. The 6 attribute header bytes
+   *                            (attribute_name_index and attribute_length) are not taken into
+   *                            account here.
+   * @param length              the length of the attribute's content (excluding the 6 attribute
+   *                            header bytes).
+   * @param charBuffer          the buffer to be used to read strings in the constant pool.
+   * @param codeAttributeOffset the start offset of the enclosing Code attribute in
+   *                            {@link #classFileBuffer}, or -1 if the attribute to be read is not a
+   *                            code attribute. The 6 attribute header bytes (attribute_name_index
+   *                            and attribute_length) are not taken into account here.
+   * @param labels              the labels of the method's code, or {@literal null} if the attribute
+   *                            to be read is not a code attribute.
    * @return the attribute that has been read.
    */
   private Attribute readAttribute(
@@ -3534,9 +3541,9 @@ public class ClassReader {
    * and is normally not needed by class generators or adapters.</i>
    *
    * @param constantPoolEntryIndex the index a constant pool entry in the class's constant pool
-   *     table.
+   *                               table.
    * @return the start offset in this {@link ClassReader} of the corresponding JVMS 'cp_info'
-   *     structure, plus one.
+   * structure, plus one.
    */
   public int getItem(final int constantPoolEntryIndex) {
     return cpInfoOffsets[constantPoolEntryIndex];
@@ -3547,15 +3554,15 @@ public class ClassReader {
    * constant pool table.
    *
    * @return a conservative estimate of the maximum length of the strings contained in the class's
-   *     constant pool table.
+   * constant pool table.
    */
   public int getMaxStringLength() {
     return maxStringLength;
   }
 
   /**
-   * Reads a byte value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * Reads a byte value in this {@link ClassReader}. <i>This method is intended for
+   * {@link Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
    *
    * @param offset the start offset of the value to be read in this {@link ClassReader}.
    * @return the read value.
@@ -3577,8 +3584,8 @@ public class ClassReader {
   }
 
   /**
-   * Reads a signed short value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * Reads a signed short value in this {@link ClassReader}. <i>This method is intended for
+   * {@link Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
    *
    * @param offset the start offset of the value to be read in this {@link ClassReader}.
    * @return the read value.
@@ -3589,8 +3596,8 @@ public class ClassReader {
   }
 
   /**
-   * Reads a signed int value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * Reads a signed int value in this {@link ClassReader}. <i>This method is intended for
+   * {@link Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
    *
    * @param offset the start offset of the value to be read in this {@link ClassReader}.
    * @return the read value.
@@ -3604,8 +3611,8 @@ public class ClassReader {
   }
 
   /**
-   * Reads a signed long value in this {@link ClassReader}. <i>This method is intended for {@link
-   * Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
+   * Reads a signed long value in this {@link ClassReader}. <i>This method is intended for
+   * {@link Attribute} sub classes, and is normally not needed by class generators or adapters.</i>
    *
    * @param offset the start offset of the value to be read in this {@link ClassReader}.
    * @return the read value.
@@ -3621,10 +3628,11 @@ public class ClassReader {
    * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
    * adapters.</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Utf8 entry in the class's constant pool table.
+   * @param offset     the start offset of an unsigned short value in this {@link ClassReader},
+   *                   whose value is the index of a CONSTANT_Utf8 entry in the class's constant
+   *                   pool table.
    * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                   large. It is not automatically resized.
    * @return the String corresponding to the specified CONSTANT_Utf8 entry.
    */
   // DontCheck(AbbreviationAsWordInName): can't be renamed (for backward binary compatibility).
@@ -3640,9 +3648,9 @@ public class ClassReader {
    * Reads a CONSTANT_Utf8 constant pool entry in {@link #classFileBuffer}.
    *
    * @param constantPoolEntryIndex the index of a CONSTANT_Utf8 entry in the class's constant pool
-   *     table.
-   * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                               table.
+   * @param charBuffer             the buffer to be used to read the string. This buffer must be
+   *                               sufficiently large. It is not automatically resized.
    * @return the String corresponding to the specified CONSTANT_Utf8 entry.
    */
   final String readUtf(final int constantPoolEntryIndex, final char[] charBuffer) {
@@ -3658,10 +3666,10 @@ public class ClassReader {
   /**
    * Reads an UTF8 string in {@link #classFileBuffer}.
    *
-   * @param utfOffset the start offset of the UTF8 string to be read.
-   * @param utfLength the length of the UTF8 string to be read.
+   * @param utfOffset  the start offset of the UTF8 string to be read.
+   * @param utfLength  the length of the UTF8 string to be read.
    * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                   large. It is not automatically resized.
    * @return the String corresponding to the specified UTF8 string.
    */
   private String readUtf(final int utfOffset, final int utfLength, final char[] charBuffer) {
@@ -3693,11 +3701,12 @@ public class ClassReader {
    * for {@link Attribute} sub classes, and is normally not needed by class generators or
    * adapters.</i>
    *
-   * @param offset the start offset of an unsigned short value in {@link #classFileBuffer}, whose
-   *     value is the index of a CONSTANT_Class, CONSTANT_String, CONSTANT_MethodType,
-   *     CONSTANT_Module or CONSTANT_Package entry in class's constant pool table.
+   * @param offset     the start offset of an unsigned short value in {@link #classFileBuffer},
+   *                   whose value is the index of a CONSTANT_Class, CONSTANT_String,
+   *                   CONSTANT_MethodType, CONSTANT_Module or CONSTANT_Package entry in class's
+   *                   constant pool table.
    * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                   large. It is not automatically resized.
    * @return the String corresponding to the specified constant pool entry.
    */
   private String readStringish(final int offset, final char[] charBuffer) {
@@ -3711,10 +3720,11 @@ public class ClassReader {
    * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
    * adapters.</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Class entry in class's constant pool table.
+   * @param offset     the start offset of an unsigned short value in this {@link ClassReader},
+   *                   whose value is the index of a CONSTANT_Class entry in class's constant pool
+   *                   table.
    * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                   large. It is not automatically resized.
    * @return the String corresponding to the specified CONSTANT_Class entry.
    */
   public String readClass(final int offset, final char[] charBuffer) {
@@ -3726,10 +3736,11 @@ public class ClassReader {
    * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
    * adapters.</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Module entry in class's constant pool table.
+   * @param offset     the start offset of an unsigned short value in this {@link ClassReader},
+   *                   whose value is the index of a CONSTANT_Module entry in class's constant pool
+   *                   table.
    * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                   large. It is not automatically resized.
    * @return the String corresponding to the specified CONSTANT_Module entry.
    */
   public String readModule(final int offset, final char[] charBuffer) {
@@ -3741,10 +3752,11 @@ public class ClassReader {
    * intended for {@link Attribute} sub classes, and is normally not needed by class generators or
    * adapters.</i>
    *
-   * @param offset the start offset of an unsigned short value in this {@link ClassReader}, whose
-   *     value is the index of a CONSTANT_Package entry in class's constant pool table.
+   * @param offset     the start offset of an unsigned short value in this {@link ClassReader},
+   *                   whose value is the index of a CONSTANT_Package entry in class's constant pool
+   *                   table.
    * @param charBuffer the buffer to be used to read the item. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                   large. It is not automatically resized.
    * @return the String corresponding to the specified CONSTANT_Package entry.
    */
   public String readPackage(final int offset, final char[] charBuffer) {
@@ -3755,9 +3767,9 @@ public class ClassReader {
    * Reads a CONSTANT_Dynamic constant pool entry in {@link #classFileBuffer}.
    *
    * @param constantPoolEntryIndex the index of a CONSTANT_Dynamic entry in the class's constant
-   *     pool table.
-   * @param charBuffer the buffer to be used to read the string. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                               pool table.
+   * @param charBuffer             the buffer to be used to read the string. This buffer must be
+   *                               sufficiently large. It is not automatically resized.
    * @return the ConstantDynamic corresponding to the specified CONSTANT_Dynamic entry.
    */
   private ConstantDynamic readConstantDynamic(
@@ -3788,13 +3800,14 @@ public class ClassReader {
    * adapters.</i>
    *
    * @param constantPoolEntryIndex the index of a CONSTANT_Integer, CONSTANT_Float, CONSTANT_Long,
-   *     CONSTANT_Double, CONSTANT_Class, CONSTANT_String, CONSTANT_MethodType,
-   *     CONSTANT_MethodHandle or CONSTANT_Dynamic entry in the class's constant pool.
-   * @param charBuffer the buffer to be used to read strings. This buffer must be sufficiently
-   *     large. It is not automatically resized.
+   *                               CONSTANT_Double, CONSTANT_Class, CONSTANT_String,
+   *                               CONSTANT_MethodType, CONSTANT_MethodHandle or CONSTANT_Dynamic
+   *                               entry in the class's constant pool.
+   * @param charBuffer             the buffer to be used to read strings. This buffer must be
+   *                               sufficiently large. It is not automatically resized.
    * @return the {@link Integer}, {@link Float}, {@link Long}, {@link Double}, {@link String},
-   *     {@link Type}, {@link Handle} or {@link ConstantDynamic} corresponding to the specified
-   *     constant pool entry.
+   * {@link Type}, {@link Handle} or {@link ConstantDynamic} corresponding to the specified constant
+   * pool entry.
    */
   public Object readConst(final int constantPoolEntryIndex, final char[] charBuffer) {
     int cpInfoOffset = cpInfoOffsets[constantPoolEntryIndex];

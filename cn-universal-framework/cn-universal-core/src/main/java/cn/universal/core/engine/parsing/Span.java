@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.parsing;
 
 import java.util.Objects;
@@ -19,16 +7,24 @@ import java.util.Objects;
  */
 public class Span {
 
-  /** the source string this span refers to */
+  /**
+   * the source string this span refers to
+   */
   private final String source;
 
-  /** Cached String instance to reduce pressure on GC */
+  /**
+   * Cached String instance to reduce pressure on GC
+   */
   private final String cachedText;
 
-  /** start index in source string, starting at 0 */
+  /**
+   * start index in source string, starting at 0
+   */
   private final int start;
 
-  /** end index in source string, exclusive, starting at 0 */
+  /**
+   * end index in source string, exclusive, starting at 0
+   */
   private final int end;
 
   private Line line;
@@ -80,22 +76,30 @@ public class Span {
     this.cachedText = source.substring(this.start, this.end);
   }
 
-  /** Returns the text referenced by this span */
+  /**
+   * Returns the text referenced by this span
+   */
   public String getText() {
     return cachedText;
   }
 
-  /** Returns the index of the first character of this span. */
+  /**
+   * Returns the index of the first character of this span.
+   */
   public int getStart() {
     return start;
   }
 
-  /** Returns the index of the last character of this span plus 1. */
+  /**
+   * Returns the index of the last character of this span plus 1.
+   */
   public int getEnd() {
     return end;
   }
 
-  /** Returns the source string this span references. */
+  /**
+   * Returns the source string this span references.
+   */
   public String getSource() {
     return source;
   }
@@ -187,7 +191,9 @@ public class Span {
     return Objects.hash(source, cachedText, start, end, line);
   }
 
-  /** A line within a Source */
+  /**
+   * A line within a Source
+   */
   public static class Line {
 
     private final String source;

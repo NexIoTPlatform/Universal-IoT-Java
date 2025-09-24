@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.exception.ResourceNotFoundException;
@@ -24,24 +12,36 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** 资源加载器 */
+/**
+ * 资源加载器
+ */
 public class MagicResourceLoader {
 
-  /** 保存自动导入的包路径 */
+  /**
+   * 保存自动导入的包路径
+   */
   private static final Set<String> PACKAGES = new HashSet<>();
 
-  /** 函数加载器 */
+  /**
+   * 函数加载器
+   */
   private static final List<BiFunction<MagicScriptContext, String, Object>> FUNCTION_LOADERS =
       new ArrayList<>();
 
-  /** JSR223 脚本函数加载器 */
+  /**
+   * JSR223 脚本函数加载器
+   */
   private static final List<Function<String, BiFunction<Map<String, Object>, String, Object>>>
       SCRIPT_LANGUAGE_LOADERS = new ArrayList<>();
 
-  /** 保存已注册的模块 */
+  /**
+   * 保存已注册的模块
+   */
   private static final Map<String, Object> MODULES = new ConcurrentHashMap<>();
 
-  /** 默认的类加载器 */
+  /**
+   * 默认的类加载器
+   */
   private static Function<String, Object> classLoader =
       (className) -> {
         try {
@@ -57,7 +57,9 @@ public class MagicResourceLoader {
     addPackage("java.lang.*");
   }
 
-  /** 获取已注册的模块信息，此方法主要用于代码提示 */
+  /**
+   * 获取已注册的模块信息，此方法主要用于代码提示
+   */
   public static Map<String, ScriptClass> getModules() {
     return MODULES.entrySet().stream()
         .collect(
@@ -80,13 +82,17 @@ public class MagicResourceLoader {
                 }));
   }
 
-  /** 添加函数加载器 */
+  /**
+   * 添加函数加载器
+   */
   public static void addFunctionLoader(
       BiFunction<MagicScriptContext, String, Object> functionLoader) {
     FUNCTION_LOADERS.add(functionLoader);
   }
 
-  /** 设置类加载器 */
+  /**
+   * 设置类加载器
+   */
   public static void setClassLoader(Function<String, Object> classLoader) {
     MagicResourceLoader.classLoader = classLoader;
   }
@@ -95,7 +101,7 @@ public class MagicResourceLoader {
    * 添加模块
    *
    * @param moduleName 模块名称
-   * @param target 模块，可以是对象实例，也可以是Class类型的，此时只能使用类中的静态方法
+   * @param target     模块，可以是对象实例，也可以是Class类型的，此时只能使用类中的静态方法
    */
   public static void addModule(String moduleName, Object target) {
     MODULES.put(moduleName, target);
@@ -132,7 +138,9 @@ public class MagicResourceLoader {
     return classLoader.apply(className);
   }
 
-  /** 获取可用的模块列表 */
+  /**
+   * 获取可用的模块列表
+   */
   public static Set<String> getModuleNames() {
     return MODULES.keySet();
   }
@@ -161,7 +169,9 @@ public class MagicResourceLoader {
     return null;
   }
 
-  /** 添加JSR223 脚本函数加载器 */
+  /**
+   * 添加JSR223 脚本函数加载器
+   */
   public static void addScriptLanguageLoader(
       Function<String, BiFunction<Map<String, Object>, String, Object>> loader) {
     SCRIPT_LANGUAGE_LOADERS.add(loader);

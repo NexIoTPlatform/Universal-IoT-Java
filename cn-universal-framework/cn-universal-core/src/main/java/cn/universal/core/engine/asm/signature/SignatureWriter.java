@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm.signature;
 
 import cn.universal.core.engine.asm.Opcodes;
@@ -19,17 +7,23 @@ import cn.universal.core.engine.asm.Opcodes;
  * Specification (JVMS). @Author Thomas Hallgren @Author Eric Bruneton
  *
  * @see <a href="https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-4.html#jvms-4.7.9.1">JVMS
- *     4.7.9.1</a>
+ * 4.7.9.1</a>
  */
 public class SignatureWriter extends SignatureVisitor {
 
-  /** The builder used to construct the visited signature. */
+  /**
+   * The builder used to construct the visited signature.
+   */
   private final StringBuilder stringBuilder = new StringBuilder();
 
-  /** Whether the visited signature contains formal type parameters. */
+  /**
+   * Whether the visited signature contains formal type parameters.
+   */
   private boolean hasFormals;
 
-  /** Whether the visited signature contains method parameter types. */
+  /**
+   * Whether the visited signature contains method parameter types.
+   */
   private boolean hasParameters;
 
   /**
@@ -51,7 +45,9 @@ public class SignatureWriter extends SignatureVisitor {
    */
   private int argumentStack;
 
-  /** Constructs a new {@link SignatureWriter}. */
+  /**
+   * Constructs a new {@link SignatureWriter}.
+   */
   public SignatureWriter() {
     super(/* latest api =*/ Opcodes.ASM9);
   }
@@ -202,7 +198,9 @@ public class SignatureWriter extends SignatureVisitor {
   // Utility methods
   // -----------------------------------------------------------------------------------------------
 
-  /** Ends the formal type parameters section of the signature. */
+  /**
+   * Ends the formal type parameters section of the signature.
+   */
   private void endFormals() {
     if (hasFormals) {
       hasFormals = false;
@@ -210,7 +208,9 @@ public class SignatureWriter extends SignatureVisitor {
     }
   }
 
-  /** Ends the type arguments of a class or inner class type. */
+  /**
+   * Ends the type arguments of a class or inner class type.
+   */
   private void endArguments() {
     // If the top of the stack is 'true', this means that some type arguments have been visited for
     // the type whose visit is now ending. We therefore need to append a '>', and to pop one element

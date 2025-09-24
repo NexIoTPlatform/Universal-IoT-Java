@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.parsing;
 
 import static cn.universal.core.engine.parsing.TokenType.And;
@@ -140,67 +128,69 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-/** 语法解析器 */
+/**
+ * 语法解析器
+ */
 public class Parser {
 
   public static final String ANONYMOUS_VARIABLE = "-anonymous";
   private static final TokenType[][] BINARY_OPERATOR_PRECEDENCE =
-      new TokenType[][] {
-        new TokenType[] {Assignment},
-        new TokenType[] {
-          RShift2Equal,
-          RShiftEqual,
-          LShiftEqual,
-          XorEqual,
-          BitOrEqual,
-          BitAndEqual,
-          PercentEqual,
-          ForwardSlashEqual,
-          AsteriskEqual,
-          MinusEqual,
-          PlusEqual
-        },
-        new TokenType[] {Or, SqlOr},
-        new TokenType[] {And, SqlAnd},
-        new TokenType[] {BitOr},
-        new TokenType[] {Xor},
-        new TokenType[] {BitAnd},
-        new TokenType[] {EqualEqualEqual, Equal, NotEqualEqual, NotEqual, SqlNotEqual},
-        new TokenType[] {Less, LessEqual, Greater, GreaterEqual, InstanceOf},
-        new TokenType[] {Plus, Minus},
-        new TokenType[] {LShift, RShift, Rshift2},
-        new TokenType[] {Asterisk, ForwardSlash, Percentage}
+      new TokenType[][]{
+          new TokenType[]{Assignment},
+          new TokenType[]{
+              RShift2Equal,
+              RShiftEqual,
+              LShiftEqual,
+              XorEqual,
+              BitOrEqual,
+              BitAndEqual,
+              PercentEqual,
+              ForwardSlashEqual,
+              AsteriskEqual,
+              MinusEqual,
+              PlusEqual
+          },
+          new TokenType[]{Or, SqlOr},
+          new TokenType[]{And, SqlAnd},
+          new TokenType[]{BitOr},
+          new TokenType[]{Xor},
+          new TokenType[]{BitAnd},
+          new TokenType[]{EqualEqualEqual, Equal, NotEqualEqual, NotEqual, SqlNotEqual},
+          new TokenType[]{Less, LessEqual, Greater, GreaterEqual, InstanceOf},
+          new TokenType[]{Plus, Minus},
+          new TokenType[]{LShift, RShift, Rshift2},
+          new TokenType[]{Asterisk, ForwardSlash, Percentage}
       };
   private static final TokenType[][] LINQ_BINARY_OPERATOR_PRECEDENCE =
-      new TokenType[][] {
-        new TokenType[] {
-          RShift2Equal,
-          RShiftEqual,
-          LShiftEqual,
-          XorEqual,
-          BitOrEqual,
-          BitAndEqual,
-          PercentEqual,
-          ForwardSlashEqual,
-          AsteriskEqual,
-          MinusEqual,
-          PlusEqual
-        },
-        new TokenType[] {Or, SqlOr},
-        new TokenType[] {And, SqlAnd},
-        new TokenType[] {BitOr},
-        new TokenType[] {Xor},
-        new TokenType[] {BitAnd},
-        new TokenType[] {Assignment, EqualEqualEqual, Equal, NotEqualEqual, NotEqual, SqlNotEqual},
-        new TokenType[] {Less, LessEqual, Greater, GreaterEqual, InstanceOf},
-        new TokenType[] {Plus, Minus},
-        new TokenType[] {LShift, RShift, Rshift2},
-        new TokenType[] {ForwardSlash, Asterisk, Percentage}
+      new TokenType[][]{
+          new TokenType[]{
+              RShift2Equal,
+              RShiftEqual,
+              LShiftEqual,
+              XorEqual,
+              BitOrEqual,
+              BitAndEqual,
+              PercentEqual,
+              ForwardSlashEqual,
+              AsteriskEqual,
+              MinusEqual,
+              PlusEqual
+          },
+          new TokenType[]{Or, SqlOr},
+          new TokenType[]{And, SqlAnd},
+          new TokenType[]{BitOr},
+          new TokenType[]{Xor},
+          new TokenType[]{BitAnd},
+          new TokenType[]{Assignment, EqualEqualEqual, Equal, NotEqualEqual, NotEqual, SqlNotEqual},
+          new TokenType[]{Less, LessEqual, Greater, GreaterEqual, InstanceOf},
+          new TokenType[]{Plus, Minus},
+          new TokenType[]{LShift, RShift, Rshift2},
+          new TokenType[]{ForwardSlash, Asterisk, Percentage}
       };
   private static final TokenType[] UNARY_OPERATORS =
-      new TokenType[] {
-        MinusMinus, PlusPlus, BitNot,
-        Minus, Plus, Not
+      new TokenType[]{
+          MinusMinus, PlusPlus, BitNot,
+          Minus, Plus, Not
       };
   private static final List<String> KEYWORDS =
       Arrays.asList(
@@ -312,7 +302,8 @@ public class Parser {
       }
     }
     // consume semi-colons as statement delimiters
-    while (stream.match(";", true)) {}
+    while (stream.match(";", true)) {
+    }
     return result;
   }
 
@@ -1271,7 +1262,9 @@ public class Parser {
     return target;
   }
 
-  /** Does not consume the closing parentheses. */
+  /**
+   * Does not consume the closing parentheses.
+   */
   private List<Expression> parseArguments() {
     stream.expect(LeftParantheses);
     List<Expression> arguments = new ArrayList<Expression>();

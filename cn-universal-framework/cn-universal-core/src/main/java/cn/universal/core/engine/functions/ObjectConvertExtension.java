@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -18,7 +6,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/** 类型转换 */
+/**
+ * 类型转换
+ */
 public class ObjectConvertExtension {
 
   /**
@@ -43,7 +33,8 @@ public class ObjectConvertExtension {
    */
   @Comment("将对象转为double类型")
   public static double asDouble(
-      Object val, @Comment(name = "defaultValue", value = "转换失败时的默认值") double defaultValue) {
+      Object val,
+      @Comment(name = "defaultValue", value = "转换失败时的默认值") double defaultValue) {
     try {
       return asDecimal(val).doubleValue();
     } catch (Exception e) {
@@ -66,19 +57,25 @@ public class ObjectConvertExtension {
     }
   }
 
-  /** 转String */
+  /**
+   * 转String
+   */
   @Comment("将对象转为String类型")
   public static String asString(Object val) {
     return asString(val, null);
   }
 
-  /** 转Date */
+  /**
+   * 转Date
+   */
   @Comment("将对象转为Date类型，默认字符串格式为yyyy-MM-dd HH:mm:ss")
   public static Date asDate(Object val) {
     return asDate(val, "yyyy-MM-dd HH:mm:ss");
   }
 
-  /** 转BigDecimal */
+  /**
+   * 转BigDecimal
+   */
   @Comment("将对象转为BigDecimal类型")
   public static BigDecimal asDecimal(Object val) {
     if (val instanceof BigDecimal) {
@@ -87,10 +84,13 @@ public class ObjectConvertExtension {
     return new BigDecimal(asString(val));
   }
 
-  /** 转BigDecimal */
+  /**
+   * 转BigDecimal
+   */
   @Comment("将对象转为BigDecimal类型")
   public static BigDecimal asDecimal(
-      Object val, @Comment(name = "defaultVal", value = "转换失败时的默认值") BigDecimal defaultVal) {
+      Object val,
+      @Comment(name = "defaultVal", value = "转换失败时的默认值") BigDecimal defaultVal) {
     if (val instanceof BigDecimal) {
       return (BigDecimal) val;
     }
@@ -101,10 +101,13 @@ public class ObjectConvertExtension {
     }
   }
 
-  /** 转Date */
+  /**
+   * 转Date
+   */
   @Comment("将对象转为Date类型,支持String、10位、13位时间戳")
   public static Date asDate(
-      Object val, @Comment(name = "format", value = "日期格式，如yyyy-MM-dd HH:mm:ss") String format) {
+      Object val,
+      @Comment(name = "format", value = "日期格式，如yyyy-MM-dd HH:mm:ss") String format) {
     if (val == null) {
       return null;
     }
@@ -137,29 +140,38 @@ public class ObjectConvertExtension {
    */
   @Comment("将对象转为String类型")
   public static String asString(
-      Object val, @Comment(name = "defaultValue", value = "转换失败时的默认值") String defaultValue) {
+      Object val,
+      @Comment(name = "defaultValue", value = "转换失败时的默认值") String defaultValue) {
     return val == null ? defaultValue : val.toString();
   }
 
-  /** 转int */
+  /**
+   * 转int
+   */
   @Comment("将值转换为int类型，转换失败时为0")
   public int asInt(Object val) {
     return asInt(val, 0);
   }
 
-  /** 转double */
+  /**
+   * 转double
+   */
   @Comment("将对象转为double类型，转换失败时为0.0")
   public double asDouble(Object val) {
     return asDouble(val, 0.0);
   }
 
-  /** 转long */
+  /**
+   * 转long
+   */
   @Comment("将对象转为long类型，转换失败时为0L")
   public long asLong(Object val) {
     return asLong(val, 0L);
   }
 
-  /** 转byte */
+  /**
+   * 转byte
+   */
   @Comment("将对象转为byte类型，转换失败时默认为0")
   public byte asByte(Object val) {
     return asByte(val, (byte) 0);
@@ -180,7 +192,9 @@ public class ObjectConvertExtension {
     }
   }
 
-  /** 转short */
+  /**
+   * 转short
+   */
   @Comment("将对象转为short类型，转换失败时默认为0")
   public short asShort(Object val) {
     return asShort(val, (short) 0);
@@ -193,7 +207,8 @@ public class ObjectConvertExtension {
    */
   @Comment("将对象转为short类型")
   public short asShort(
-      Object val, @Comment(name = "defaultValue", value = "转换失败时的默认值") short defaultValue) {
+      Object val,
+      @Comment(name = "defaultValue", value = "转换失败时的默认值") short defaultValue) {
     try {
       return asDecimal(val).shortValue();
     } catch (Exception e) {
@@ -201,7 +216,9 @@ public class ObjectConvertExtension {
     }
   }
 
-  /** 转float */
+  /**
+   * 转float
+   */
   @Comment("将对象转为float类型，转换失败默认为0.0f")
   public float asFloat(Object val) {
     return asFloat(val, 0.0f);
@@ -214,7 +231,8 @@ public class ObjectConvertExtension {
    */
   @Comment("将对象转为float类型")
   public float asFloat(
-      Object val, @Comment(name = "defaultValue", value = "转换失败时的默认值") float defaultValue) {
+      Object val,
+      @Comment(name = "defaultValue", value = "转换失败时的默认值") float defaultValue) {
     try {
       return asDecimal(val).floatValue();
     } catch (Exception e) {

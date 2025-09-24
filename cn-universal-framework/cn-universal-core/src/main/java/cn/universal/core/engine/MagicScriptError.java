@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine;
 
 import cn.universal.core.engine.exception.MagicExitException;
@@ -20,7 +8,9 @@ import cn.universal.core.engine.runtime.MagicScriptRuntime;
 import java.util.ArrayList;
 import java.util.List;
 
-/** All errors reported by the library go through the static functions of this class. */
+/**
+ * All errors reported by the library go through the static functions of this class.
+ */
 public class MagicScriptError {
 
   /**

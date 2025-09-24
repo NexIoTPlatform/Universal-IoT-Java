@@ -1,40 +1,30 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
 /**
  * A visitor to visit a Java field. The methods of this class must be called in the following order:
- * ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )* {@code
- * visitEnd}. @Author Eric Bruneton
+ * ( {@code visitAnnotation} | {@code visitTypeAnnotation} | {@code visitAttribute} )*
+ * {@code visitEnd}. @Author Eric Bruneton
  */
 public abstract class FieldVisitor {
 
   /**
-   * The ASM API version implemented by this visitor. The value of this field must be one of {@link
-   * Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6}, {@link Opcodes#ASM7}, {@link
-   * Opcodes#ASM8} or {@link Opcodes#ASM9}.
+   * The ASM API version implemented by this visitor. The value of this field must be one of
+   * {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6}, {@link Opcodes#ASM7},
+   * {@link Opcodes#ASM8} or {@link Opcodes#ASM9}.
    */
   protected final int api;
 
-  /** The field visitor to which this visitor must delegate method calls. May be {@literal null}. */
+  /**
+   * The field visitor to which this visitor must delegate method calls. May be {@literal null}.
+   */
   protected FieldVisitor fv;
 
   /**
    * Constructs a new {@link FieldVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6}, {@link Opcodes#ASM7}, {@link
-   *     Opcodes#ASM8} or {@link Opcodes#ASM9}.
+   * @param api the ASM API version implemented by this visitor. Must be one of
+   *            {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6},
+   *            {@link Opcodes#ASM7}, {@link Opcodes#ASM8} or {@link Opcodes#ASM9}.
    */
   public FieldVisitor(final int api) {
     this(api, null);
@@ -43,11 +33,11 @@ public abstract class FieldVisitor {
   /**
    * Constructs a new {@link FieldVisitor}.
    *
-   * @param api the ASM API version implemented by this visitor. Must be one of {@link
-   *     Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6}, {@link Opcodes#ASM7} or {@link
-   *     Opcodes#ASM8}.
+   * @param api          the ASM API version implemented by this visitor. Must be one of
+   *                     {@link Opcodes#ASM4}, {@link Opcodes#ASM5}, {@link Opcodes#ASM6},
+   *                     {@link Opcodes#ASM7} or {@link Opcodes#ASM8}.
    * @param fieldVisitor the field visitor to which this visitor must delegate method calls. May be
-   *     null.
+   *                     null.
    */
   public FieldVisitor(final int api, final FieldVisitor fieldVisitor) {
     if (api != Opcodes.ASM9
@@ -70,9 +60,9 @@ public abstract class FieldVisitor {
    * Visits an annotation of the field.
    *
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible    {@literal true} if the annotation is visible at runtime.
    * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-   *     interested in visiting this annotation.
+   * interested in visiting this annotation.
    */
   public AnnotationVisitor visitAnnotation(final String descriptor, final boolean visible) {
     if (fv != null) {
@@ -84,15 +74,15 @@ public abstract class FieldVisitor {
   /**
    * Visits an annotation on the type of the field.
    *
-   * @param typeRef a reference to the annotated type. The sort of this type reference must be
-   *     {@link TypeReference#FIELD}. See {@link TypeReference}.
-   * @param typePath the path to the annotated type argument, wildcard bound, array element type, or
-   *     static inner type within 'typeRef'. May be {@literal null} if the annotation targets
-   *     'typeRef' as a whole.
+   * @param typeRef    a reference to the annotated type. The sort of this type reference must be
+   *                   {@link TypeReference#FIELD}. See {@link TypeReference}.
+   * @param typePath   the path to the annotated type argument, wildcard bound, array element type,
+   *                   or static inner type within 'typeRef'. May be {@literal null} if the
+   *                   annotation targets 'typeRef' as a whole.
    * @param descriptor the class descriptor of the annotation class.
-   * @param visible {@literal true} if the annotation is visible at runtime.
+   * @param visible    {@literal true} if the annotation is visible at runtime.
    * @return a visitor to visit the annotation values, or {@literal null} if this visitor is not
-   *     interested in visiting this annotation.
+   * interested in visiting this annotation.
    */
   public AnnotationVisitor visitTypeAnnotation(
       final int typeRef, final TypePath typePath, final String descriptor, final boolean visible) {

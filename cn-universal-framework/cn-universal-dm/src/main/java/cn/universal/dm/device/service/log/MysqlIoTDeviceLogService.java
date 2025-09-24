@@ -63,28 +63,37 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
   private String storePolicy = "mysql";
 
-  @Resource private IoTDeviceLogMapper ioTDeviceLogMapper;
-  @Resource private IoTDeviceLogShardMapper ioTDeviceLogShardMapper;
+  @Resource
+  private IoTDeviceLogMapper ioTDeviceLogMapper;
+  @Resource
+  private IoTDeviceLogShardMapper ioTDeviceLogShardMapper;
 
-  @Resource private IoTDeviceLogMetadataMapper ioTDeviceLogMetadataMapper;
-  @Resource private IoTDeviceLogMetadataShardMapper ioTDeviceLogMetadataShardMapper;
+  @Resource
+  private IoTDeviceLogMetadataMapper ioTDeviceLogMetadataMapper;
+  @Resource
+  private IoTDeviceLogMetadataShardMapper ioTDeviceLogMetadataShardMapper;
 
-  @Resource private IoTDeviceMapper ioTDeviceMapper;
+  @Resource
+  private IoTDeviceMapper ioTDeviceMapper;
 
-  @Resource private IoTDeviceService iotDeviceService;
+  @Resource
+  private IoTDeviceService iotDeviceService;
 
-  @Resource private IoTProductDeviceService iotProductDeviceService;
-  @Resource private StringRedisTemplate stringRedisTemplate;
+  @Resource
+  private IoTProductDeviceService iotProductDeviceService;
+  @Resource
+  private StringRedisTemplate stringRedisTemplate;
 
-  /** 新旧设备分割时间线 */
-  @Value("${shard.device.split.timestamp}")
-  private Long timestamp;
 
-  /** 日志分表是否开启 */
+  /**
+   * 日志分表是否开启
+   */
   @Value("${shard.log.enable}")
   private Boolean enable;
 
-  /** 日志meta分表是否开启 */
+  /**
+   * 日志meta分表是否开启
+   */
   @Value("${shard.logMeta.enable}")
   private Boolean metaEnable;
 
@@ -95,8 +104,8 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
   @Override
   @Async
-  public void saveDeviceLog(
-      BaseUPRequest upRequest, IoTDeviceDTO ioTDeviceDTO, IoTProduct ioTProduct) {
+  public void saveDeviceLog(BaseUPRequest upRequest, IoTDeviceDTO ioTDeviceDTO,
+      IoTProduct ioTProduct) {
     /** 产品数据存储策略，不为空则保存日志 */
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
       try {
@@ -111,10 +120,10 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
       }
       String storePolicyConfiguration = ioTProduct.getStorePolicyConfiguration();
       try {
-        if (StrUtil.isNotBlank(storePolicyConfiguration)
-            || MessageType.EVENT.equals(upRequest.getMessageType())) {
-          LogStorePolicyDTO productLogStorePolicy =
-              iotProductDeviceService.getProductLogStorePolicy(ioTProduct.getProductKey());
+        if (StrUtil.isNotBlank(storePolicyConfiguration) || MessageType.EVENT.equals(
+            upRequest.getMessageType())) {
+          LogStorePolicyDTO productLogStorePolicy = iotProductDeviceService.getProductLogStorePolicy(
+              ioTProduct.getProductKey());
           saveLogStorePolicy(productLogStorePolicy, upRequest, ioTProduct);
         }
       } catch (Exception e) {
@@ -124,8 +133,8 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
   }
 
   @Override
-  public void saveDeviceLog(
-      IoTDeviceLog ioTDeviceLog, IoTDeviceDTO ioTDeviceDTO, IoTProduct ioTProduct) {
+  public void saveDeviceLog(IoTDeviceLog ioTDeviceLog, IoTDeviceDTO ioTDeviceDTO,
+      IoTProduct ioTProduct) {
     /** 产品数据存储策略，不为空则保存日志 */
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
       try {
@@ -141,79 +150,63 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  private void saveLogStorePolicy(
-      LogStorePolicyDTO logStorePolicyDTO, UPRequest up, IoTProduct ioTProduct) {
-    if (MessageType.PROPERTIES.equals(up.getMessageType())
-        && up.getProperties() != null
+  private void saveLogStorePolicy(LogStorePolicyDTO logStorePolicyDTO, UPRequest up,
+      IoTProduct ioTProduct) {
+    if (MessageType.PROPERTIES.equals(up.getMessageType()) && up.getProperties() != null
         && CollectionUtil.isNotEmpty(logStorePolicyDTO.getProperties())) {
-      up.getProperties()
-          .forEach(
-              (key, value) -> {
-                if (logStorePolicyDTO.getProperties().containsKey(key)) {
-                  AbstractPropertyMetadata propertyOrNull =
-                      getDeviceMetadata(ioTProduct.getMetadata()).getPropertyOrNull(key);
-                  IoTDevicePropertiesBO ioTDevicePropertiesBO = new IoTDevicePropertiesBO();
-                  ioTDevicePropertiesBO.withValue(propertyOrNull, value);
-                  // TODO event
-                  IoTDeviceLogMetadataBuilder IoTDeviceLogMetadataBuilder = builder(up);
-                  IoTDeviceLogMetadataBuilder.property(key);
-                  IoTDeviceLogMetadataBuilder.content(
-                      StrUtil.str(value, CharsetUtil.charset("UTF-8")));
-                  IoTDeviceLogMetadataBuilder.ext1(ioTDevicePropertiesBO.getPropertyName());
-                  IoTDeviceLogMetadataBuilder.ext2(ioTDevicePropertiesBO.getFormatValue());
-                  IoTDeviceLogMetadataBuilder.ext3(ioTDevicePropertiesBO.getSymbol());
-                  //
-                  // ioTDeviceLogMetadataMapper.insertUseGeneratedKeys(IoTDeviceLogMetadataBuilder.build());
-                  //         //删除超过数量的记录
-                  //
-                  //          //设置meta删除标记
-                  //          Boolean re = stringRedisTemplate.opsForValue().setIfAbsent(
-                  //              IoTConstant.LOG_META_PROPERTY_DELETE_SIGN + ":" +
-                  // up.getProductKey() + ":"
-                  //                  + up.getDeviceId(),
-                  //              "1", 1, TimeUnit.HOURS);
-                  //          if (Boolean.TRUE.equals(re)) {
-                  //            ioTDeviceLogMetadataMapper
-                  //                .deleteTopPropertiesRecord(up.getIotId(),
-                  //                    logStorePolicyDTO.getProperties().get(key).getMaxStorage(),
-                  //                    key);
-                  //          }
+      up.getProperties().forEach((key, value) -> {
+        if (logStorePolicyDTO.getProperties().containsKey(key)) {
+          AbstractPropertyMetadata propertyOrNull = getDeviceMetadata(
+              ioTProduct.getMetadata()).getPropertyOrNull(key);
+          IoTDevicePropertiesBO ioTDevicePropertiesBO = new IoTDevicePropertiesBO();
+          ioTDevicePropertiesBO.withValue(propertyOrNull, value);
+          // TODO event
+          IoTDeviceLogMetadataBuilder IoTDeviceLogMetadataBuilder = builder(up);
+          IoTDeviceLogMetadataBuilder.property(key);
+          IoTDeviceLogMetadataBuilder.content(StrUtil.str(value, CharsetUtil.charset("UTF-8")));
+          IoTDeviceLogMetadataBuilder.ext1(ioTDevicePropertiesBO.getPropertyName());
+          IoTDeviceLogMetadataBuilder.ext2(ioTDevicePropertiesBO.getFormatValue());
+          IoTDeviceLogMetadataBuilder.ext3(ioTDevicePropertiesBO.getSymbol());
+          //
+          // ioTDeviceLogMetadataMapper.insertUseGeneratedKeys(IoTDeviceLogMetadataBuilder.build());
+          //         //删除超过数量的记录
+          //
+          //          //设置meta删除标记
+          //          Boolean re = stringRedisTemplate.opsForValue().setIfAbsent(
+          //              IoTConstant.LOG_META_PROPERTY_DELETE_SIGN + ":" +
+          // up.getProductKey() + ":"
+          //                  + up.getDeviceId(),
+          //              "1", 1, TimeUnit.HOURS);
+          //          if (Boolean.TRUE.equals(re)) {
+          //            ioTDeviceLogMetadataMapper
+          //                .deleteTopPropertiesRecord(up.getIotId(),
+          //                    logStorePolicyDTO.getProperties().get(key).getMaxStorage(),
+          //                    key);
+          //          }
 
-                  // 新旧表都改
-                  if (metaEnable) {
-                    ioTDeviceLogMetadataShardMapper.insertUseGeneratedKeys(
-                        IoTDeviceLogMetadataBuilder.build());
-                    Boolean re2 =
-                        stringRedisTemplate
-                            .opsForValue()
-                            .setIfAbsent(
-                                IoTConstant.LOG_META_SHARD_PROPERTY_DELETE_SIGN
-                                    + ":"
-                                    + up.getProductKey()
-                                    + ":"
-                                    + up.getDeviceId(),
-                                "1",
-                                20,
-                                TimeUnit.HOURS);
-                    if (Boolean.TRUE.equals(re2)) {
-                      Integer topId =
-                          ioTDeviceLogMetadataShardMapper.getTopPropertiesRecord(
-                              up.getIotId(),
-                              logStorePolicyDTO.getProperties().get(key).getMaxStorage(),
-                              key);
-                      if (topId != null) {
-                        ioTDeviceLogMetadataShardMapper.deleteTopPropertiesRecord(
-                            up.getIotId(), topId, key);
-                      }
-                    }
-                  }
-                }
-              });
+          // 新旧表都改
+          if (metaEnable) {
+            ioTDeviceLogMetadataShardMapper.insertUseGeneratedKeys(
+                IoTDeviceLogMetadataBuilder.build());
+            Boolean re2 = stringRedisTemplate.opsForValue().setIfAbsent(
+                IoTConstant.LOG_META_SHARD_PROPERTY_DELETE_SIGN + ":" + up.getProductKey() + ":"
+                    + up.getDeviceId(), "1", 20, TimeUnit.HOURS);
+            if (Boolean.TRUE.equals(re2)) {
+              Integer topId = ioTDeviceLogMetadataShardMapper.getTopPropertiesRecord(up.getIotId(),
+                  logStorePolicyDTO.getProperties().get(key).getMaxStorage(), key);
+              if (topId != null) {
+                ioTDeviceLogMetadataShardMapper.deleteTopPropertiesRecord(up.getIotId(), topId,
+                    key);
+              }
+            }
+          }
+        }
+      });
     }
     if (MessageType.EVENT.equals(up.getMessageType())) {
       int maxStorage = 10;
-      if (CollectionUtil.isNotEmpty(logStorePolicyDTO.getEvent())
-          && logStorePolicyDTO.getEvent().containsKey(up.getEvent())) {
+      if (CollectionUtil.isNotEmpty(logStorePolicyDTO.getEvent()) && logStorePolicyDTO.getEvent()
+          .containsKey(up.getEvent())) {
         maxStorage = logStorePolicyDTO.getEvent().get(up.getEvent()).getMaxStorage();
       }
       IoTDeviceLogMetadataBuilder IoTDeviceLogMetadataBuilder = builder(up);
@@ -235,25 +228,15 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
       // 新旧表都改
       if (metaEnable) {
         ioTDeviceLogMetadataShardMapper.insertUseGeneratedKeys(IoTDeviceLogMetadataBuilder.build());
-        Boolean re2 =
-            stringRedisTemplate
-                .opsForValue()
-                .setIfAbsent(
-                    IoTConstant.LOG_META_SHARD_EVENT_DELETE_SIGN
-                        + ":"
-                        + up.getProductKey()
-                        + ":"
-                        + up.getDeviceId(),
-                    "1",
-                    20,
-                    TimeUnit.HOURS);
+        Boolean re2 = stringRedisTemplate.opsForValue().setIfAbsent(
+            IoTConstant.LOG_META_SHARD_EVENT_DELETE_SIGN + ":" + up.getProductKey() + ":"
+                + up.getDeviceId(), "1", 20, TimeUnit.HOURS);
         if (Boolean.TRUE.equals(re2)) {
-          Integer topId =
-              ioTDeviceLogMetadataShardMapper.getTopEventRecord(
-                  up.getIotId(), maxStorage, up.getEvent());
+          Integer topId = ioTDeviceLogMetadataShardMapper.getTopEventRecord(up.getIotId(),
+              maxStorage, up.getEvent());
           if (topId != null) {
-            ioTDeviceLogMetadataShardMapper.deleteTopEventRecord(
-                up.getIotId(), topId, up.getEvent());
+            ioTDeviceLogMetadataShardMapper.deleteTopEventRecord(up.getIotId(), topId,
+                up.getEvent());
           }
         }
       }
@@ -266,18 +249,12 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
     PageHelper.startPage(bo.getPageNum(), bo.getPageSize());
     if (ObjectUtil.isNull(bo.getId())) {
       List<IoTDeviceLogVO> ioTDeviceLogVOS = ioTDeviceLogShardMapper.queryLogPageV2List(bo);
-      return new PageBean(
-          ioTDeviceLogVOS,
-          new PageInfo(ioTDeviceLogVOS).getTotal(),
-          bo.getPageSize(),
-          bo.getPageNum());
+      return new PageBean(ioTDeviceLogVOS, new PageInfo(ioTDeviceLogVOS).getTotal(),
+          bo.getPageSize(), bo.getPageNum());
     } else {
       List<IoTDeviceLogVO> ioTDeviceLogVOS = ioTDeviceLogShardMapper.queryLogPageV2ByIdList(bo);
-      return new PageBean(
-          ioTDeviceLogVOS,
-          new PageInfo(ioTDeviceLogVOS).getTotal(),
-          bo.getPageSize(),
-          bo.getPageNum());
+      return new PageBean(ioTDeviceLogVOS, new PageInfo(ioTDeviceLogVOS).getTotal(),
+          bo.getPageSize(), bo.getPageNum());
     }
   }
 
@@ -294,8 +271,8 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
     for (IoTDeviceEvents devEvent : list) {
       List<String> events;
       if (metaEnable) {
-        events =
-            ioTDeviceLogMetadataShardMapper.queryEventTotalByEventAndId(devEvent.getId(), iotId);
+        events = ioTDeviceLogMetadataShardMapper.queryEventTotalByEventAndId(devEvent.getId(),
+            iotId);
       } else {
         events = ioTDeviceLogMetadataMapper.queryEventTotalByEventAndId(devEvent.getId(), iotId);
       }
@@ -319,8 +296,8 @@ public class MysqlIoTDeviceLogService extends AbstractIoTDeviceLogService {
       list = ioTDeviceLogMetadataMapper.selectLogMetaList(logQuery);
     }
 
-    return new PageBean(
-        list, new PageInfo(list).getTotal(), logQuery.getPageSize(), logQuery.getPageNum());
+    return new PageBean(list, new PageInfo(list).getTotal(), logQuery.getPageSize(),
+        logQuery.getPageNum());
   }
 
   @Override

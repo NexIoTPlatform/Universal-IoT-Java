@@ -1,15 +1,3 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.functions;
 
 import cn.universal.core.engine.annotation.Comment;
@@ -38,7 +26,9 @@ import java.util.stream.Stream;
 
 public class StreamExtension {
 
-  /** 将对象转为List */
+  /**
+   * 将对象转为List
+   */
   @Comment("将对象转为List")
   public static List<Object> arrayLikeToList(Object arrayLike) {
     if (arrayLike == null) {
@@ -64,7 +54,9 @@ public class StreamExtension {
     throw new MagicScriptException("不支持的类型:" + arrayLike.getClass());
   }
 
-  /** 将list拼接起来 */
+  /**
+   * 将list拼接起来
+   */
   @Comment("将集合使用连接符拼接起来")
   public static String join(
       Object target, @Comment(name = "separator", value = "拼接符，如`,`") String separator) {
@@ -183,12 +175,12 @@ public class StreamExtension {
   public Object map(
       Object target,
       @Comment(name = "function", value = "转换函数，如提取属性`(item)=>item.xxx`")
-          Function<Object[], Object> function) {
+      Function<Object[], Object> function) {
     List<Object> objects = arrayLikeToList(target);
     List<Object> results = new ArrayList<>(objects.size());
     for (int i = 0, len = objects.size(); i < len; i++) {
       Object object = objects.get(i);
-      results.add(function.apply(new Object[] {object, i, len}));
+      results.add(function.apply(new Object[]{object, i, len}));
     }
     return toOriginType(target, results);
   }
@@ -202,12 +194,12 @@ public class StreamExtension {
   public Object filter(
       Object target,
       @Comment(name = "function", value = "过滤条件，如`(item)=>item.xxx == 1`")
-          Function<Object[], Object> function) {
+      Function<Object[], Object> function) {
     List<Object> objects = arrayLikeToList(target);
     List<Object> results = new ArrayList<>(objects.size());
     for (int i = 0, len = objects.size(); i < len; i++) {
       Object object = objects.get(i);
-      if (BooleanLiteral.isTrue(function.apply(new Object[] {object, i, len}))) {
+      if (BooleanLiteral.isTrue(function.apply(new Object[]{object, i, len}))) {
         results.add(object);
       }
     }
@@ -218,11 +210,11 @@ public class StreamExtension {
   public Object find(
       Object target,
       @Comment(name = "function", value = "匹配条件，如`(item)=>item.xxx == 1`")
-          Function<Object[], Object> function) {
+      Function<Object[], Object> function) {
     List<Object> objects = arrayLikeToList(target);
     for (int i = 0, len = objects.size(); i < len; i++) {
       Object object = objects.get(i);
-      if (BooleanLiteral.isTrue(function.apply(new Object[] {object, i, len}))) {
+      if (BooleanLiteral.isTrue(function.apply(new Object[]{object, i, len}))) {
         return object;
       }
     }
@@ -233,11 +225,11 @@ public class StreamExtension {
   public int findIndex(
       Object target,
       @Comment(name = "function", value = "匹配条件，如`(item)=>item.xxx == 1`")
-          Function<Object[], Object> function) {
+      Function<Object[], Object> function) {
     List<Object> objects = arrayLikeToList(target);
     for (int i = 0, len = objects.size(); i < len; i++) {
       Object object = objects.get(i);
-      if (BooleanLiteral.isTrue(function.apply(new Object[] {object, i, len}))) {
+      if (BooleanLiteral.isTrue(function.apply(new Object[]{object, i, len}))) {
         return i;
       }
     }
@@ -265,7 +257,7 @@ public class StreamExtension {
     Map<Object, Object> map = new LinkedHashMap<>(size);
     for (int i = 0; i < size; i++) {
       Object item = target.get(i);
-      Object[] parameters = new Object[] {item, i, size};
+      Object[] parameters = new Object[]{item, i, size};
       map.put(mappingKey.apply(parameters), mappingValue.apply(parameters));
     }
     return map;
@@ -287,30 +279,34 @@ public class StreamExtension {
   public Object each(
       Object target,
       @Comment(name = "function", value = "循环函数，如循环添加属性`(item)=>{item.xxx = 'newVal'}`")
-          Function<Object[], Object> function) {
+      Function<Object[], Object> function) {
     List<Object> objects = arrayLikeToList(target);
     List<Object> results = new ArrayList<>(objects.size());
     for (int i = 0, len = objects.size(); i < len; i++) {
       Object object = objects.get(i);
-      function.apply(new Object[] {object, i, len});
+      function.apply(new Object[]{object, i, len});
       results.add(object);
     }
     return toOriginType(target, results);
   }
 
-  /** 排序 */
+  /**
+   * 排序
+   */
   @Comment(value = "将集合进行排序，并返回新集合", origin = true)
   public Object sort(
       Object target,
       @Comment(name = "function", value = "排序函数，如从大到小`(a,b)=>a-b`")
-          Function<Object[], Object> function) {
+      Function<Object[], Object> function) {
     List<Object> objects = arrayLikeToList(target);
     objects.sort(
-        (o1, o2) -> ObjectConvertExtension.asInt(function.apply(new Object[] {o1, o2}), 0));
+        (o1, o2) -> ObjectConvertExtension.asInt(function.apply(new Object[]{o1, o2}), 0));
     return toOriginType(target, objects);
   }
 
-  /** 反转 */
+  /**
+   * 反转
+   */
   @Comment(value = "将集合进行反转操作", origin = true)
   public Object reserve(Object target) {
     List<Object> objects = arrayLikeToList(target);
@@ -318,7 +314,9 @@ public class StreamExtension {
     return toOriginType(target, objects);
   }
 
-  /** 将list打乱 */
+  /**
+   * 将list打乱
+   */
   @Comment(value = "将集合的顺序打乱", origin = true)
   public Object shuffle(Object target) {
     List<Object> objects = arrayLikeToList(target);
@@ -354,12 +352,12 @@ public class StreamExtension {
   public Object distinct(
       Object target,
       @Comment(name = "condition", value = "去重转换器，如根据id去重 `item=>item.id`")
-          Function<Object[], Object> condition) {
+      Function<Object[], Object> condition) {
     List<Object> list = arrayLikeToList(target);
     List<Object> result = new ArrayList<>(list.size());
     Set<Object> sets = new LinkedHashSet<>(list.size());
     for (Object e : list) {
-      Object res = condition.apply(new Object[] {e});
+      Object res = condition.apply(new Object[]{e});
       if (!sets.contains(res)) {
         sets.add(res);
         result.add(e);
@@ -368,13 +366,17 @@ public class StreamExtension {
     return toOriginType(target, result);
   }
 
-  /** 将list拼接起来 */
+  /**
+   * 将list拼接起来
+   */
   @Comment("将集合使用`,`拼接起来")
   public String join(Object target) {
     return join(target, ",");
   }
 
-  /** 取最大值 */
+  /**
+   * 取最大值
+   */
   @Comment("取出集合最大值，如果找不到返回`null`")
   public Object max(Object target) {
     return arrayLikeToList(target).stream()
@@ -383,7 +385,9 @@ public class StreamExtension {
         .orElse(null);
   }
 
-  /** 取最小值 */
+  /**
+   * 取最小值
+   */
   @Comment("取出集合最小值，如果找不到返回`null`")
   public Object min(Object target) {
     return arrayLikeToList(target).stream()
@@ -392,7 +396,9 @@ public class StreamExtension {
         .orElse(null);
   }
 
-  /** 取平均值 */
+  /**
+   * 取平均值
+   */
   @Comment("取出集合平均值，如果无法计算返回`null`")
   public Double avg(Object target) {
     OptionalDouble average =
@@ -403,7 +409,9 @@ public class StreamExtension {
     return average.isPresent() ? average.getAsDouble() : null;
   }
 
-  /** 累计求和 */
+  /**
+   * 累计求和
+   */
   @Comment("对集合进行累加操作")
   public Number sum(Object target) {
     return arrayLikeToList(target).stream()
@@ -421,7 +429,7 @@ public class StreamExtension {
   public Map<Object, List<Object>> group(
       Object target,
       @Comment(name = "condition", value = "分组条件，如`item=>item.xxx + '_' + item.yyy`")
-          Function<Object[], Object> condition) {
+      Function<Object[], Object> condition) {
     return arrayLikeToList(target).stream()
         .collect(
             Collectors.groupingBy(
@@ -434,15 +442,15 @@ public class StreamExtension {
    * 分组
    *
    * @param condition 分组条件
-   * @param mapping 结果映射
+   * @param mapping   结果映射
    */
   @Comment("对集合进行分组并转换")
   public Map<Object, Object> group(
       Object target,
       @Comment(name = "condition", value = "分组条件，如`item=>item.xxx + '_' + item.yyy`")
-          Function<Object[], Object> condition,
+      Function<Object[], Object> condition,
       @Comment(name = "mapping", value = "转换函数，如分组求和`(list)=>list.sum()`")
-          Function<Object[], Object> mapping) {
+      Function<Object[], Object> mapping) {
     return arrayLikeToList(target).stream()
         .collect(
             Collectors.groupingBy(
@@ -455,8 +463,8 @@ public class StreamExtension {
   /**
    * 合并两个集合，类似sql join 操作
    *
-   * @param source 左表
-   * @param target 右表
+   * @param source    左表
+   * @param target    右表
    * @param condition 条件
    */
   @Comment("将两个集合关联起来")
@@ -464,7 +472,7 @@ public class StreamExtension {
       Object source,
       @Comment(name = "target", value = "另一个集合") Object target,
       @Comment(name = "condition", value = "关联条件，如:`(left,right)=>left.xxx = right.xxx`")
-          Function<Object[], Object> condition) {
+      Function<Object[], Object> condition) {
     return join(
         source,
         target,
@@ -486,19 +494,19 @@ public class StreamExtension {
   /**
    * 合并两个集合，类似 sql join 操作
    *
-   * @param source 左表
-   * @param target 右表
+   * @param source    左表
+   * @param target    右表
    * @param condition 条件
-   * @param mapping 映射
+   * @param mapping   映射
    */
   @Comment("将两个集合关联并转换")
   public List<Object> join(
       Object source,
       @Comment(name = "target", value = "另一个集合") Object target,
       @Comment(name = "condition", value = "关联条件，如:`(left,right)=>left.xxx == right.xxx`")
-          Function<Object[], Object> condition,
+      Function<Object[], Object> condition,
       @Comment(name = "mapping", value = "映射函数，如:`(left,right)=>{xxx : left.xxx, yyy : right.yyy}`")
-          Function<Object[], Object> mapping) {
+      Function<Object[], Object> mapping) {
     if (target == null) {
       return null;
     }
@@ -542,7 +550,7 @@ public class StreamExtension {
       @Comment(name = "condition", value = "判断条件") Function<Object[], Object> condition) {
     List<Object> objects = arrayLikeToList(source);
     for (int i = 0, size = objects.size(); i < size; i++) {
-      if (!BooleanLiteral.isTrue(condition.apply(new Object[] {objects.get(i), i}))) {
+      if (!BooleanLiteral.isTrue(condition.apply(new Object[]{objects.get(i), i}))) {
         return false;
       }
     }
@@ -555,7 +563,7 @@ public class StreamExtension {
       @Comment(name = "condition", value = "判断条件") Function<Object[], Object> condition) {
     List<Object> objects = arrayLikeToList(source);
     for (int i = 0, size = objects.size(); i < size; i++) {
-      if (BooleanLiteral.isTrue(condition.apply(new Object[] {objects.get(i), i}))) {
+      if (BooleanLiteral.isTrue(condition.apply(new Object[]{objects.get(i), i}))) {
         return true;
       }
     }
@@ -577,7 +585,7 @@ public class StreamExtension {
   public Object reduce(
       Object source,
       @Comment(name = "reduceFunction", value = "处理函数，如累加计算：`(val,item)=>val + item`")
-          Function<Object[], Object> reduceFunction) {
+      Function<Object[], Object> reduceFunction) {
     List<Object> objects = arrayLikeToList(source);
     if (objects.isEmpty()) {
       return null;
@@ -588,7 +596,7 @@ public class StreamExtension {
     }
     Object result = objects.get(0);
     for (int i = 1; i < size; i++) {
-      result = reduceFunction.apply(new Object[] {result, objects.get(i)});
+      result = reduceFunction.apply(new Object[]{result, objects.get(i)});
     }
     return result;
   }

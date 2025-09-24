@@ -1,54 +1,54 @@
-/*
- *
- * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
- *
- * @Description: 本文件由 Aleo 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
- * @Author: Aleo
- * @Email: wo8335224@gmail.com
- * @Wechat: outlookFil
- *
- *
- */
-
 package cn.universal.core.engine.asm;
 
-/** A reference to a field or a method. @Author Remi Forax @Author Eric Bruneton */
+/**
+ * A reference to a field or a method. @Author Remi Forax @Author Eric Bruneton
+ */
 public final class Handle {
 
   /**
    * The kind of field or method designated by this Handle. Should be {@link Opcodes#H_GETFIELD},
-   * {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC}, {@link
-   * Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL},
-   * {@link Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC},
+   * {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
+   * {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or
+   * {@link Opcodes#H_INVOKEINTERFACE}.
    */
   private final int tag;
 
-  /** The internal name of the class that owns the field or method designated by this handle. */
+  /**
+   * The internal name of the class that owns the field or method designated by this handle.
+   */
   private final String owner;
 
-  /** The name of the field or method designated by this handle. */
+  /**
+   * The name of the field or method designated by this handle.
+   */
   private final String name;
 
-  /** The descriptor of the field or method designated by this handle. */
+  /**
+   * The descriptor of the field or method designated by this handle.
+   */
   private final String descriptor;
 
-  /** Whether the owner is an processer or not. */
+  /**
+   * Whether the owner is an processer or not.
+   */
   private final boolean isInterface;
 
   /**
    * Constructs a new field or method handle.
    *
-   * @param tag the kind of field or method designated by this Handle. Must be {@link
-   *     Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link
-   *     Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
-   *     {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or {@link
-   *     Opcodes#H_INVOKEINTERFACE}.
-   * @param owner the internal name of the class that owns the field or method designated by this
-   *     handle.
-   * @param name the name of the field or method designated by this handle.
+   * @param tag        the kind of field or method designated by this Handle. Must be
+   *                   {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC},
+   *                   {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC},
+   *                   {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
+   *                   {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or
+   *                   {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param owner      the internal name of the class that owns the field or method designated by
+   *                   this handle.
+   * @param name       the name of the field or method designated by this handle.
    * @param descriptor the descriptor of the field or method designated by this handle.
-   * @deprecated this constructor has been superseded by {@link #Handle(int, String, String, String,
-   *     boolean)}.
+   * @deprecated this constructor has been superseded by
+   * {@link #Handle(int, String, String, String, boolean)}.
    */
   @Deprecated
   public Handle(final int tag, final String owner, final String name, final String descriptor) {
@@ -58,15 +58,16 @@ public final class Handle {
   /**
    * Constructs a new field or method handle.
    *
-   * @param tag the kind of field or method designated by this Handle. Must be {@link
-   *     Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD}, {@link
-   *     Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
-   *     {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or {@link
-   *     Opcodes#H_INVOKEINTERFACE}.
-   * @param owner the internal name of the class that owns the field or method designated by this
-   *     handle.
-   * @param name the name of the field or method designated by this handle.
-   * @param descriptor the descriptor of the field or method designated by this handle.
+   * @param tag         the kind of field or method designated by this Handle. Must be
+   *                    {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC},
+   *                    {@link Opcodes#H_PUTFIELD}, {@link Opcodes#H_PUTSTATIC},
+   *                    {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
+   *                    {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or
+   *                    {@link Opcodes#H_INVOKEINTERFACE}.
+   * @param owner       the internal name of the class that owns the field or method designated by
+   *                    this handle.
+   * @param name        the name of the field or method designated by this handle.
+   * @param descriptor  the descriptor of the field or method designated by this handle.
    * @param isInterface whether the owner is an processer or not.
    */
   public Handle(
@@ -86,16 +87,17 @@ public final class Handle {
    * Returns the kind of field or method designated by this handle.
    *
    * @return {@link Opcodes#H_GETFIELD}, {@link Opcodes#H_GETSTATIC}, {@link Opcodes#H_PUTFIELD},
-   *     {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link
-   *     Opcodes#H_INVOKESTATIC}, {@link Opcodes#H_INVOKESPECIAL}, {@link
-   *     Opcodes#H_NEWINVOKESPECIAL} or {@link Opcodes#H_INVOKEINTERFACE}.
+   * {@link Opcodes#H_PUTSTATIC}, {@link Opcodes#H_INVOKEVIRTUAL}, {@link Opcodes#H_INVOKESTATIC},
+   * {@link Opcodes#H_INVOKESPECIAL}, {@link Opcodes#H_NEWINVOKESPECIAL} or
+   * {@link Opcodes#H_INVOKEINTERFACE}.
    */
   public int getTag() {
     return tag;
   }
 
   /**
-   * Returns the internal name of the class that owns the field or method designated by this handle.
+   * Returns the internal name of the class that owns the field or method designated by this
+   * handle.
    *
    * @return the internal name of the class that owns the field or method designated by this handle.
    */
