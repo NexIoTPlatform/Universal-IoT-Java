@@ -42,9 +42,18 @@ export const defaultRenderLogo = (h, logo) => {
 
 export const defaultRenderLogoAntTitle = (h, props) => {
   const {collapsed} = props
+  // 标题：默认英文，宽屏时显示 中文+英文
+  let mainTitle = 'NexIoT'
+  try {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1280) {
+      mainTitle = '奈科斯 NexIoT'
+    }
+  } catch (e) {
+    // ignore
+  }
 
   if (collapsed) {
-    // 收缩状态：显示简写 "U-IoT" 或图标样式
+    // 收缩状态：仅显示英文标题
     return (
       <div style={{
         display: 'flex',
@@ -54,39 +63,18 @@ export const defaultRenderLogoAntTitle = (h, props) => {
         height: '64px',
         transition: 'all 0.3s ease'
       }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <span style={{
-            fontWeight: '800',
-            fontSize: '16px',
-            color: '#1890ff',
-            letterSpacing: '0px',
-            fontFamily: 'Arial, sans-serif',
-            lineHeight: '1',
-            textShadow: '0 1px 2px rgba(0,0,0,0.1)'
-          }}>
-            U
-          </span>
-          <span style={{
-            fontWeight: '600',
-            fontSize: '10px',
-            color: '#52c41a',
-            letterSpacing: '0.5px',
-            fontFamily: 'Arial, sans-serif',
-            lineHeight: '1',
-            marginTop: '2px'
-          }}>
-            IoT
-          </span>
-        </div>
+        <span style={{
+          fontWeight: '700',
+          fontSize: '14px',
+          color: '#1890ff',
+          letterSpacing: '0.5px',
+          fontFamily: 'PingFang SC, Microsoft YaHei, Arial, sans-serif',
+          lineHeight: '1.2'
+        }}>NexIoT</span>
       </div>
     )
   } else {
-    // 展开状态：显示完整的 "Universal-IoT" 
+    // 展开状态：仅显示标题文本
     return (
       <div style={{
         display: 'flex',
@@ -100,29 +88,6 @@ export const defaultRenderLogoAntTitle = (h, props) => {
           display: 'flex',
           alignItems: 'center'
         }}>
-          {/* 图标部分 */}
-          <div style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #1890ff 0%, #52c41a 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: '12px',
-            boxShadow: '0 2px 8px rgba(24, 144, 255, 0.3)'
-          }}>
-            <span style={{
-              color: '#fff',
-              fontSize: '16px',
-              fontWeight: '800',
-              fontFamily: 'Arial, sans-serif'
-            }}>
-              U
-            </span>
-          </div>
-
-          {/* 文字部分 */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
@@ -133,22 +98,9 @@ export const defaultRenderLogoAntTitle = (h, props) => {
               fontSize: '16px',
               color: '#1890ff',
               letterSpacing: '0.5px',
-              fontFamily: 'PingFang SC, Microsoft YaHei, sans-serif',
-              lineHeight: '1.2',
-              marginBottom: '2px'
-            }}>
-              Universal
-            </span>
-            <span style={{
-              fontWeight: '500',
-              fontSize: '12px',
-              color: '#52c41a',
-              letterSpacing: '1px',
-              fontFamily: 'Arial, sans-serif',
-              lineHeight: '1'
-            }}>
-              IoT Platform
-            </span>
+              fontFamily: 'PingFang SC, Microsoft YaHei, Arial, sans-serif',
+              lineHeight: '1.2'
+            }}>{mainTitle}</span>
           </div>
         </div>
       </div>

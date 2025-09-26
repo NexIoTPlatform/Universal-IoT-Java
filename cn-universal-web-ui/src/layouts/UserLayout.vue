@@ -8,7 +8,7 @@
       <div class="footer">
         <div class="copyright">
 
-          Copyright &copy; 2025 <a href="" target="_blank">IoT Universal</a>
+          Copyright &copy; 2025 <a href="" target="_blank">NexIoT</a>
           <p>
             <!-- <a href="https://beian.miit.gov.cn/" target="__blank">xxxx-2</a> -->
           </p>
