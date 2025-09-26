@@ -110,19 +110,19 @@ public class IoTDeviceShadowService {
 
       // 1. 最大延迟时间检查
       if (timeSinceLastFlush > MAX_DELAY_MS) {
-        log.info("[ShadowFlush] 最大延迟强制刷盘: iotId={}, 延迟时间={}ms", iotId, timeSinceLastFlush);
+        log.debug("[ShadowFlush] 最大延迟强制刷盘: iotId={}, 延迟时间={}ms", iotId, timeSinceLastFlush);
         return now + FORCE_FLUSH_DELAY_MS;
       }
 
       // 2. 最小间隔检查
       if (timeSinceLastFlush >= MIN_INTERVAL_MS) {
-        log.info("[ShadowFlush] 最小间隔强制刷盘: iotId={}, 间隔时间={}ms", iotId, timeSinceLastFlush);
+        log.debug("[ShadowFlush] 最小间隔强制刷盘: iotId={}, 间隔时间={}ms", iotId, timeSinceLastFlush);
         return now + FORCE_FLUSH_DELAY_MS;
       }
 
       // 3. 版本号检查
       if (checkVersionThreshold(iotId)) {
-        log.info("[ShadowFlush] 版本号强制刷盘: iotId={}", iotId);
+        log.debug("[ShadowFlush] 版本号强制刷盘: iotId={}", iotId);
         return now + FORCE_FLUSH_DELAY_MS;
       }
 
@@ -245,14 +245,14 @@ public class IoTDeviceShadowService {
               IoTDevicePropertiesBO entity = new IoTDevicePropertiesBO();
               Long ts =
                   finalShadow.getMetadata() != null
-                          && finalShadow.getMetadata().getReported() != null
-                          && finalShadow.getMetadata().getReported().getJSONObject(s.getId())
-                              != null
+                      && finalShadow.getMetadata().getReported() != null
+                      && finalShadow.getMetadata().getReported().getJSONObject(s.getId())
+                      != null
                       ? finalShadow
-                          .getMetadata()
-                          .getReported()
-                          .getJSONObject(s.getId())
-                          .getLong("timestamp")
+                      .getMetadata()
+                      .getReported()
+                      .getJSONObject(s.getId())
+                      .getLong("timestamp")
                       : DateUtil.currentSeconds();
               entity.setDesireValue(finalDesireProperties.get(s.getId()));
               entity.withValue(s.getValueType(), obj);
@@ -313,13 +313,13 @@ public class IoTDeviceShadowService {
             entity.withValue(s.getValueType(), obj);
             entity.setTimestamp(
                 finalShadow.getMetadata() != null
-                        && finalShadow.getMetadata().getReported() != null
-                        && finalShadow.getMetadata().getReported().getJSONObject(s.getId()) != null
+                    && finalShadow.getMetadata().getReported() != null
+                    && finalShadow.getMetadata().getReported().getJSONObject(s.getId()) != null
                     ? finalShadow
-                        .getMetadata()
-                        .getReported()
-                        .getJSONObject(s.getId())
-                        .getLong("timestamp")
+                    .getMetadata()
+                    .getReported()
+                    .getJSONObject(s.getId())
+                    .getLong("timestamp")
                     : DateUtil.currentSeconds());
           } else {
             entity.withValue(s.getValueType(), null);
@@ -638,7 +638,7 @@ public class IoTDeviceShadowService {
             && (currentVersion - dbVersion) >= VERSION_THRESHOLD;
       } else {
         // 数据库记录不存在：立即触发刷盘（创建记录）
-        log.info("[ShadowFlush] 数据库记录不存在，立即刷盘: iotId={}, currentVersion={}", iotId, currentVersion);
+        log.debug("[ShadowFlush] 数据库记录不存在，立即刷盘: iotId={}, currentVersion={}", iotId, currentVersion);
         return true;
       }
     } catch (Exception e) {

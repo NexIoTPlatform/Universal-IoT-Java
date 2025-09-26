@@ -126,8 +126,8 @@ public class MQTTStatisticsLogger {
       // 性能指标
       MqttMetricsSnapshot snapshot = metricsCollector.getSnapshot();
 
-      log.info("[MQTT_STATS] ========== MQTT 统计信息 [{}] ==========", timestamp);
-      log.info("[MQTT_STATS] 配置统计: {}", configStats);
+      log.debug("[MQTT_STATS] ========== MQTT 统计信息 [{}] ==========", timestamp);
+      log.debug("[MQTT_STATS] 配置统计: {}", configStats);
       double connectionRate =
           allStatus.size() > 0 ? (effectiveConnected * 100.0 / allStatus.size()) : 0.0;
       log.info(
@@ -138,13 +138,13 @@ public class MQTTStatisticsLogger {
           systemCoveredCount,
           errorCount,
           String.format("%.2f", connectionRate));
-      log.info(
+      log.debug(
           "[MQTT_STATS] 性能指标: 消息处理={}, 平均延迟={}ms, 错误率={}%",
           snapshot.getTotalMessageCount(),
           snapshot.getAverageProcessingTime(),
           String.format("%.2f", snapshot.getErrorRate()));
-      log.info("[MQTT_STATS] 系统MQTT: {}", sysMQTTManager.isEnabled() ? "已启用" : "未启用");
-      log.info("[MQTT_STATS] =================================================");
+      log.debug("[MQTT_STATS] 系统MQTT: {}", sysMQTTManager.isEnabled() ? "已启用" : "未启用");
+      log.debug("[MQTT_STATS] =================================================");
 
     } catch (Exception e) {
       log.error("[MQTT_STATS] 获取基础统计信息失败: ", e);

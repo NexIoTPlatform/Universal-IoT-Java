@@ -70,7 +70,7 @@ public class ThreadMonitor {
 
       // 定期打印线程统计信息
       if (System.currentTimeMillis() % 300000 < 30000) { // 每5分钟打印一次
-        log.info(
+        log.debug(
             "线程统计 - 总数: {}, 守护线程: {}, 峰值: {}",
             threadMXBean.getThreadCount(),
             threadMXBean.getDaemonThreadCount(),

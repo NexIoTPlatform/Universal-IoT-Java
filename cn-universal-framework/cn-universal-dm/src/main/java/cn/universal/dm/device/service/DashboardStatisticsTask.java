@@ -65,7 +65,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
         log.warn("[仪表盘统计] 本地缓存中无活跃平台，使用默认平台列表");
       }
 
-      log.info("[仪表盘统计] 获取到 {} 个活跃平台: {}", platforms.size(), platforms);
+      log.debug("[仪表盘统计] 获取到 {} 个活跃平台: {}", platforms.size(), platforms);
       return platforms;
 
     } catch (Exception e) {
@@ -78,7 +78,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
   /** 应用启动时初始化统计数据 */
   @Override
   public void run(ApplicationArguments args) throws Exception {
-    log.info("[仪表盘统计] 应用启动，开始初始化统计数据");
+    log.debug("[仪表盘统计] 应用启动，开始初始化统计数据");
 
     try {
       // 延迟5秒执行，确保所有组件都已初始化
@@ -87,7 +87,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
       // 执行一次初始刷新
       refreshDatabaseStatisticsWithLock();
 
-      log.info("[仪表盘统计] 统计数据初始化完成");
+      log.debug("[仪表盘统计] 统计数据初始化完成");
     } catch (Exception e) {
       log.error("[仪表盘统计] 统计数据初始化失败", e);
     }
@@ -112,7 +112,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
         long lastTime = Long.parseLong(lastExecutionTime);
         long currentTime = System.currentTimeMillis();
         if (currentTime - lastTime < MIN_EXECUTION_INTERVAL * 1000) {
-          log.info("[仪表盘统计] 距离上次执行时间不足{}秒，跳过本次执行", MIN_EXECUTION_INTERVAL);
+          log.debug("[仪表盘统计] 距离上次执行时间不足{}秒，跳过本次执行", MIN_EXECUTION_INTERVAL);
           return;
         }
       } catch (NumberFormatException e) {
@@ -132,7 +132,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
 
     if (Boolean.TRUE.equals(lockAcquired)) {
       try {
-        log.info("[仪表盘统计] 获取到分布式锁，开始执行10分钟数据库刷新");
+        log.debug("[仪表盘统计] 获取到分布式锁，开始执行10分钟数据库刷新");
 
         LocalDate todayDate = LocalDate.now();
 
@@ -151,7 +151,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
                 LOCK_TIMEOUT,
                 TimeUnit.SECONDS);
 
-        log.info("[仪表盘统计] 10分钟数据库刷新完成");
+        log.debug("[仪表盘统计] 10分钟数据库刷新完成");
       } catch (Exception e) {
         log.error("[仪表盘统计] 10分钟数据库刷新失败", e);
       } finally {
@@ -160,7 +160,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
         log.debug("[仪表盘统计] 释放分布式锁");
       }
     } else {
-      log.info("[仪表盘统计] 未获取到分布式锁，跳过本次执行");
+      log.debug("[仪表盘统计] 未获取到分布式锁，跳过本次执行");
     }
   }
 
@@ -208,9 +208,9 @@ public class DashboardStatisticsTask implements ApplicationRunner {
             platformTotal.getMetricValue());
 
         // 执行前记录
-        log.info("[仪表盘统计] 准备执行recordStatistics，平台: {}", platform);
+        log.debug("[仪表盘统计] 准备执行recordStatistics，平台: {}", platform);
         dashboardService.recordStatistics(platformTotal);
-        log.info("[仪表盘统计] recordStatistics执行完成，平台: {}", platform);
+        log.debug("[仪表盘统计] recordStatistics执行完成，平台: {}", platform);
 
         // 更新平台推送消息数
         IoTDashboardStatistics platformPush =
@@ -399,7 +399,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
 
   /** 手动刷新统计数据 */
   public void manualRefreshStatistics() {
-    log.info("[仪表盘统计] 手动触发统计数据刷新");
+    log.debug("[仪表盘统计] 手动触发统计数据刷新");
     refreshDatabaseStatisticsWithLock();
   }
 
@@ -426,12 +426,12 @@ public class DashboardStatisticsTask implements ApplicationRunner {
   /** 清理重复的统计数据 */
   public void cleanupDuplicateStatistics(LocalDate date) {
     try {
-      log.info("[仪表盘统计] 开始清理{}的重复统计数据", date);
+      log.debug("[仪表盘统计] 开始清理{}的重复统计数据", date);
 
       // 删除指定日期的所有统计数据
       int deletedCount = dashboardStatisticsMapper.deleteByDate(date);
 
-      log.info("[仪表盘统计] 清理完成，删除了{}条重复记录", deletedCount);
+      log.debug("[仪表盘统计] 清理完成，删除了{}条重复记录", deletedCount);
     } catch (Exception e) {
       log.error("[仪表盘统计] 清理重复统计数据失败", e);
     }
