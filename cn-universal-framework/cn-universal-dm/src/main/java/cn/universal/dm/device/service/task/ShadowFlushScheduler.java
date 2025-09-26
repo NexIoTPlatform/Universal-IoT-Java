@@ -87,7 +87,7 @@ public class ShadowFlushScheduler {
 
     long now = System.currentTimeMillis();
     String instanceId = instanceIdProvider.getInstanceId();
-    log.info("[ShadowFlush] 开始设备影子扫描: scanTime={}, instanceId={}", now, instanceId);
+    log.debug("[ShadowFlush] 开始设备影子扫描: scanTime={}, instanceId={}", now, instanceId);
 
     // 使用分布式锁工具类执行任务，确保集群环境下只有一个实例执行
     Integer result =
@@ -95,7 +95,7 @@ public class ShadowFlushScheduler {
             lockKey, lockWaitTime, lockLeaseTime, TimeUnit.SECONDS, this::executeFlushTask);
 
     if (result != null) {
-      log.info(
+      log.debug(
           "[ShadowFlush] 影子扫描完成: processed={}, cost={}ms, instanceId={}",
           result,
           (System.currentTimeMillis() - now),
@@ -380,7 +380,7 @@ public class ShadowFlushScheduler {
       // 获取缓存数据
       Map<String, String> cacheData = getCacheData(dueIds);
       if (cacheData.isEmpty()) {
-        log.warn("[ShadowFlush] 缓存数据为空，跳过刷盘: dueIds={}, instanceId={}", dueIds, instanceId);
+        log.debug("[ShadowFlush] 缓存数据为空，跳过刷盘: dueIds={}, instanceId={}", dueIds, instanceId);
         return 0;
       }
 
@@ -428,7 +428,7 @@ public class ShadowFlushScheduler {
         10, // 持有10秒
         TimeUnit.SECONDS,
         () -> {
-          log.info("[ShadowFlush] 测试锁获取成功，当前时间: {}", DateUtil.now());
+          log.debug("[ShadowFlush] 测试锁获取成功，当前时间: {}", DateUtil.now());
           try {
             Thread.sleep(2000); // 模拟处理时间
           } catch (InterruptedException e) {
