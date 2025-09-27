@@ -24,7 +24,7 @@ export default {
   menu: {
     locale: true
   },
-  title: 'Universal-IoT',
+  title: 'NexIoT',
   pwa: false,
   iconfontUrl: '',
   production: process.env.NODE_ENV === 'production'

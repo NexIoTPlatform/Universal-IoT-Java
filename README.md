@@ -53,9 +53,10 @@ NexIoT IoT
 
 ### 🎯 演示地址
 
-- **管理后台**: <http://iot.192886.xyz:81/>
+- **演示地址**: <http://iot.192886.xyz:81/>
 - **调试IDE**: <http://iot.192886.xyz:81/magic/debug/index.html>
-- **演示账号**: test/Haha@2025
+- **演示账号**: test
+- **演示密码**: Haha@2025
 - **文档地址**: <https://nexiotplatform.github.io/universal-iot-docs/>
 - **文档地址(国内)**: <http://docs.192886.xyz:81/>
 
