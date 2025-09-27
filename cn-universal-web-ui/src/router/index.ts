@@ -28,7 +28,7 @@ router.beforeEach(async (to, from, next) => {
   const token = userStore.token
 
   // 设置页面标题
-  document.title = `${to.meta.title} - Iot Universe`
+  document.title = `${to.meta.title} - NexIoT`
 
   if (to.meta.requiresAuth) {
     if (!token) {

@@ -53,9 +53,10 @@ NexIoT IoT
 
 ### 🎯 演示地址
 
-- **管理后台**: <http://iot.192886.xyz:81/>
+- **演示地址**: <http://iot.192886.xyz:81/>
 - **调试IDE**: <http://iot.192886.xyz:81/magic/debug/index.html>
-- **演示账号**: test/Haha@2025
+- **演示账号**: test
+- **演示密码**: Haha@2025
 - **文档地址**: <https://nexiotplatform.github.io/universal-iot-docs/>
 - **文档地址(国内)**: <http://docs.192886.xyz:81/>
 
@@ -209,7 +210,9 @@ cd cn-universal-web & ./bin/restart.sh
     - 📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
     - 📝 内容：数据流介绍、调试IDE的编写和调试、645电表的编写
 
+#### ⚡ 教程成果演示（电表外接灯泡）
 
+![直接使用天翼产品](__MACOSX/shot/dianbiao.gif)
 
 ### 🎯 更多教程
 
