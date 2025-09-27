@@ -210,9 +210,9 @@ cd cn-universal-web & ./bin/restart.sh
     - 📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
     - 📝 内容：数据流介绍、调试IDE的编写和调试、645电表的编写
 
-#### ⚡ 教程成果演示（电表外接灯泡）
+#### ⚡ 视频教程成果动画，登陆可见（电表外接灯泡）
 
-![直接使用天翼产品](__MACOSX/shot/dianbiao.gif)
+![登陆可见动态](__MACOSX/shot/dianbiao.gif)
 
 ### 🎯 更多教程
 
