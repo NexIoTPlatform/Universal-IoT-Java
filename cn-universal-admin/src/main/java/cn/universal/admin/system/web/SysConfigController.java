@@ -12,14 +12,15 @@
 
 package cn.universal.admin.system.web;
 
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.ISysConfigService;
 import cn.universal.common.constant.IoTUserConstants;
 import cn.universal.persistence.entity.admin.SysConfig;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;

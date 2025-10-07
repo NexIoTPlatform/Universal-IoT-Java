@@ -14,7 +14,6 @@ package cn.universal.web.controller.common;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.system.service.IIotUserService;
 import cn.universal.admin.system.service.impl.UserApplicationService;
 import cn.universal.common.exception.IoTErrorCode;
 import cn.universal.common.exception.IoTException;
@@ -32,13 +31,15 @@ import java.util.List;
  */
 public class BaseApiController {
 
-  @Resource protected IoTDeviceService iotDeviceService;
+  @Resource
+  protected IoTDeviceService iotDeviceService;
 
-  @Resource private IoTProductDeviceService iotProductDeviceService;
+  @Resource
+  private IoTProductDeviceService iotProductDeviceService;
 
-  @Resource protected UserApplicationService userApplicationService;
+  @Resource
+  protected UserApplicationService userApplicationService;
 
-  @Resource private IIotUserService iIotUserService;
 
   /***
    * 获取用户唯一标志

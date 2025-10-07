@@ -13,10 +13,10 @@
 package cn.universal.admin.platform.web;
 
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.platform.service.IIoTProductSortService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.entity.IoTProductSort;

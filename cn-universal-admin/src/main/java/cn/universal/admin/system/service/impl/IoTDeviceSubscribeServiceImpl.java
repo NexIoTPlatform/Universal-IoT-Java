@@ -14,7 +14,7 @@ package cn.universal.admin.system.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.universal.admin.common.service.BaseServiceImpl;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.IoTDeviceSubscribeService;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTConstant.DeviceSubscribe;

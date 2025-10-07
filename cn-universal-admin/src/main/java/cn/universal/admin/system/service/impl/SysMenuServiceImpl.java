@@ -14,7 +14,7 @@ package cn.universal.admin.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.admin.system.service.ISysMenuService;
 import cn.universal.common.constant.Constants;
 import cn.universal.common.constant.IoTUserConstants;
@@ -51,7 +51,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
   @Resource private SysRoleMenuMapper roleMenuMapper;
   @Resource private SysMenuMapper menuMapper;
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
 
   /**
    * 根据用户查询系统菜单列表
@@ -75,7 +75,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
   public List<SysMenu> selectMenuList(SysMenu menu, String unionId) {
     List<SysMenu> menuList = null;
     // 管理员显示所有菜单信息
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
     if (iotUser.isAdmin()) {
       menuList = menuMapper.selectMenuList(menu);
     } else {
@@ -106,7 +106,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
   @Override
   public List<SysMenu> selectMenuTreeByUnionId(String unionId) {
     List<SysMenu> menus = null;
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
     if (iotUser.isAdmin()) {
       menus = menuMapper.selectMenuTreeAll();
     } else {

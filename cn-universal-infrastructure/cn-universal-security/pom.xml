@@ -70,11 +70,5 @@
       <!--排除这个slf4j-log4j12-->
       <groupId>org.springframework.boot</groupId>
     </dependency>
-    <dependency>
-      <groupId>cn.universal.iot</groupId>
-      <artifactId>cn-universal-admin</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency>
   </dependencies>
 </project> 

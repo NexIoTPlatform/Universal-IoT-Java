@@ -14,8 +14,8 @@ package cn.universal.admin.system.quartz;
 
 import cn.hutool.core.util.StrUtil;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.BaseController;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
 import cn.universal.quartz.constant.Constants;

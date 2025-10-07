@@ -12,12 +12,13 @@
 
 package cn.universal.admin.system.web;
 
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.ISysDictTypeService;
 import cn.universal.common.constant.IoTUserConstants;
 import cn.universal.persistence.entity.admin.SysDictType;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,7 +17,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.admin.common.service.BaseServiceImpl;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.BatchFunctionTask;
 import cn.universal.admin.platform.service.IIoTDeviceFunctionTaskService;
 import cn.universal.common.exception.IoTException;

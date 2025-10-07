@@ -12,7 +12,7 @@
 
 package cn.universal.admin.platform.web;
 
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.dm.device.service.log.IIoTDeviceDataService;
 import cn.universal.persistence.entity.IoTDeviceEvents;
 import cn.universal.persistence.entity.vo.IoTDeviceLogMetadataVO;

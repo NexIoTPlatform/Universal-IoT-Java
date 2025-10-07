@@ -17,6 +17,7 @@ import cn.universal.core.protocol.ProtocolModuleRegistry;
 import cn.universal.core.protocol.ProtocolModuleRuntimeRegistry;
 import cn.universal.core.service.IoTDownlFactory;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;

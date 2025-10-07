@@ -12,10 +12,10 @@
 
 package cn.universal.admin.platform.web;
 
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.platform.service.IIoTDeviceGroupService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.persistence.entity.IoTDevice;
 import cn.universal.persistence.entity.bo.IoTDeviceGroupBO;
 import cn.universal.persistence.entity.vo.IoTDeviceGroupVO;

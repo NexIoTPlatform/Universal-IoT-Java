@@ -12,10 +12,11 @@
 
 package cn.universal.admin.system.web;
 
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.IndexQueryService;
 import cn.universal.persistence.dto.IndexQueryDTO;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;

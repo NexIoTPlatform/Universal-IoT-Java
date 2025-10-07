@@ -17,7 +17,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.network.service.INetworkService;
 import cn.universal.admin.network.utils.NetworkTypeUtil;
 import cn.universal.common.constant.IoTConstant.DownCmd;
@@ -68,14 +68,10 @@ import tk.mybatis.mapper.entity.Example;
 @Service
 public class NetworkServiceImpl implements INetworkService {
 
-  @Resource
-  private NetworkMapper networkMapper;
-  @Resource
-  private IoTDeviceMapper ioTDeviceMapper;
-  @Resource
-  private IoTProductMapper ioTProductMapper;
-  @Resource
-  private IoTDeviceFenceRelMapper ioTDeviceFenceRelMapper;
+  @Resource private NetworkMapper networkMapper;
+  @Resource private IoTDeviceMapper ioTDeviceMapper;
+  @Resource private IoTProductMapper ioTProductMapper;
+  @Resource private IoTDeviceFenceRelMapper ioTDeviceFenceRelMapper;
 
   // 直接注入 TCP 和 MQTT 服务
   @Qualifier("tcpClusterService")
@@ -165,8 +161,7 @@ public class NetworkServiceImpl implements INetworkService {
       IoTProduct ioTProduct = ioTProductMapper.getProductByProductKey(ioTDevice.getProductKey());
       result = IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(downRequest);
       if (!result.getCode().equals(0)) {
-        return R.error(
-            "设备名称: " + ioTDevice.getDeviceName() + " 删除失败，原因: " + result.getMsg());
+        return R.error("设备名称: " + ioTDevice.getDeviceName() + " 删除失败，原因: " + result.getMsg());
       }
       ioTDeviceFenceRelMapper.deleteFenceInstance(ioTDevice.getIotId());
     }
@@ -334,9 +329,7 @@ public class NetworkServiceImpl implements INetworkService {
     return vo;
   }
 
-  /**
-   * 检查端口是否被占用或为常用端口
-   */
+  /** 检查端口是否被占用或为常用端口 */
   private void checkPortAvailable(Network network, boolean isUpdate) {
     if (StrUtil.isBlank(network.getConfiguration())) {
       return;
@@ -349,7 +342,7 @@ public class NetworkServiceImpl implements INetworkService {
     // 常用端口
     Set<Integer> commonPorts = new HashSet<>();
     int[] arr = {
-        80, 443, 3306, 6379, 8080, 22, 21, 25, 53, 123, 1521, 5432, 8888, 9000, 5000, 7001, 27017
+      80, 443, 3306, 6379, 8080, 22, 21, 25, 53, 123, 1521, 5432, 8888, 9000, 5000, 7001, 27017
     };
     for (int p : arr) {
       commonPorts.add(p);
@@ -525,7 +518,7 @@ public class NetworkServiceImpl implements INetworkService {
         log.info("启动网络组件成功: {}", network.getName());
         return 1;
       } else {
-        throw new IoTException("系统协议类型模块不存在，请检查");
+        throw new RuntimeException("启动失败: " + network.getName());
       }
     } catch (Exception e) {
       log.error("启动网络组件失败: {}", network.getName(), e);
@@ -656,7 +649,7 @@ public class NetworkServiceImpl implements INetworkService {
   /**
    * 检查网络组件配置的唯一性
    *
-   * @param network   网络组件
+   * @param network 网络组件
    * @param excludeId 排除的网络组件ID（用于更新时排除自己）
    */
   private void checkConfigurationUniqueness(Network network, Integer excludeId) {
@@ -720,18 +713,24 @@ public class NetworkServiceImpl implements INetworkService {
    */
   private boolean startNetworkByType(Network network) {
     String type = network.getType();
-    switch (type) {
-      case NetworkTypeConstants.TCP_CLIENT:
-      case NetworkTypeConstants.TCP_SERVER:
-        return startTcpNetwork(network);
-      case NetworkTypeConstants.MQTT_CLIENT:
-      case NetworkTypeConstants.MQTT_SERVER:
-        return startMqttNetwork(network);
-      case NetworkTypeConstants.UDP:
-        return startUdpNetwork(network);
-      default:
-        log.warn("不支持的网络类型: {}", type);
-        return false;
+
+    try {
+      switch (type) {
+        case NetworkTypeConstants.TCP_CLIENT:
+        case NetworkTypeConstants.TCP_SERVER:
+          return startTcpNetwork(network);
+        case NetworkTypeConstants.MQTT_CLIENT:
+        case NetworkTypeConstants.MQTT_SERVER:
+          return startMqttNetwork(network);
+        case NetworkTypeConstants.UDP:
+          return startUdpNetwork(network);
+        default:
+          log.warn("不支持的网络类型: {}", type);
+          return false;
+      }
+    } catch (Exception e) {
+      log.error("启动网络组件失败: type={}, name={}", type, network.getName(), e);
+      return false;
     }
   }
 
@@ -804,6 +803,7 @@ public class NetworkServiceImpl implements INetworkService {
       throw new IoTException("TCP模块未注入，无法启动TCP网络组件");
     }
 
+
     String productKey = network.getProductKey();
     if (StrUtil.isBlank(productKey)) {
       log.error("TCP网络组件缺少productKey: {}", network.getName());
@@ -837,6 +837,7 @@ public class NetworkServiceImpl implements INetworkService {
       throw new IoTException("TCP模块未注入，无法启动TCP网络组件");
     }
 
+
     String productKey = network.getProductKey();
     if (StrUtil.isBlank(productKey)) {
       log.error("TCP网络组件缺少productKey: {}", network.getName());
@@ -868,6 +869,7 @@ public class NetworkServiceImpl implements INetworkService {
       log.error("TCP服务管理器未注入，无法启动TCP网络组件: {}", network.getName());
       throw new IoTException("TCP模块未注入，无法启动TCP网络组件");
     }
+
 
     String productKey = network.getProductKey();
     if (StrUtil.isBlank(productKey)) {

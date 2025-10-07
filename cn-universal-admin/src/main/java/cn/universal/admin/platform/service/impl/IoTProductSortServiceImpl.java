@@ -13,7 +13,7 @@
 package cn.universal.admin.platform.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTProductSortService;
 import cn.universal.persistence.entity.IoTProductSort;
 import cn.universal.persistence.entity.bo.RuleModelBO.IoTProductSortBO;

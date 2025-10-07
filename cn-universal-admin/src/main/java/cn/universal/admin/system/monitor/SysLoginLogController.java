@@ -12,12 +12,12 @@
 
 package cn.universal.admin.system.monitor;
 
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.ISysLogininforService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.SysLogininfor;
 import cn.universal.persistence.page.TableDataInfo;

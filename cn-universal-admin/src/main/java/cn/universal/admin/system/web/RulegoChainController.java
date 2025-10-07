@@ -12,14 +12,15 @@
 
 package cn.universal.admin.system.web;
 
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.persistence.entity.bo.RulegoChainBO;
 import cn.universal.persistence.entity.vo.RulegoChainVO;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
 import cn.universal.rule.rulego.service.RulegoChainService;
+import cn.universal.security.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
