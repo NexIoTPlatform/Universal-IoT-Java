@@ -210,9 +210,9 @@ cd cn-universal-web & ./bin/restart.sh
     - 📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
     - 📝 内容：数据流介绍、调试IDE的编写和调试、645电表的编写
 
-#### ⚡ 教程成果演示（电表外接灯泡）
+#### ⚡ 视频教程成果动画，登陆可见（电表外接灯泡）
 
-![直接使用天翼产品](__MACOSX/shot/dianbiao.gif)
+![登陆可见动态](__MACOSX/shot/dianbiao.gif)
 
 ### 🎯 更多教程
 
@@ -312,6 +312,17 @@ cd cn-universal-web & ./bin/restart.sh
 - 在 Issues 中提出新功能建议
 - 详细描述功能需求和预期效果
 - 欢迎讨论技术实现方案
+
+
+### 💬 社区交流
+
+- 【相互尊重】你入群我欢迎，有疑问力所能及第一时间回复，喜欢点个star，不喜欢也不要入群！很勉强你点个star，拿到东西，马上取消，你也不要进来了，太难为你了，也不要恶心我。互相尊重🫡
+- 【致自媒体】任何人可以转发代码和项目信息，但请遵循AGPL3.0开源协议和保留企业授权信息；如单位误用引起产生法律后果保留追责责任。
+
+
+| QQ群                           | 微信                            | B站                               | 抖音                               |
+|-------------------------------|-------------------------------|----------------------------------|----------------------------------|
+| ![QQ群](/__MACOSX/shot/qq.png) | ![微信群](/__MACOSX/shot/wx.png) | ![微信群](/__MACOSX/shot/bzhan.jpg) | ![抖音](/__MACOSX/shot/douyin.jpg) |
 
 ## 📄 开源协议
 

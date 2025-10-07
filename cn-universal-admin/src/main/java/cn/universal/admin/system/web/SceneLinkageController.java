@@ -12,10 +12,10 @@
 
 package cn.universal.admin.system.web;
 
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.SceneLinkage;
@@ -24,6 +24,7 @@ import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
 import cn.universal.rule.model.ExeRunContext;
 import cn.universal.rule.scene.service.SceneLinkageService;
+import cn.universal.security.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;

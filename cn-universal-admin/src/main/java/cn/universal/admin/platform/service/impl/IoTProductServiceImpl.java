@@ -27,7 +27,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.dm.device.service.protocol.ProtocolClusterService;
 import cn.universal.admin.common.service.BaseServiceImpl;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTProductService;
 import cn.universal.admin.system.service.IoTDeviceProtocolService;
 import cn.universal.cache.annotation.MultiLevelCacheable;

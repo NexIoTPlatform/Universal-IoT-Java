@@ -17,9 +17,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.admin.common.service.BaseServiceImpl;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.IIoTUserApplicationService;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.IoTUser;
@@ -50,7 +50,7 @@ public class IoTUserApplicationServiceImpl extends BaseServiceImpl
     implements IIoTUserApplicationService {
 
   @Resource private IoTUserApplicationMapper iotUserApplicationMapper;
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
 
   @Resource private OauthClientDetailsMapper oauthClientDetailsMapper;
 
@@ -117,7 +117,7 @@ public class IoTUserApplicationServiceImpl extends BaseServiceImpl
   public IoTUserApplication checkSelf(String appUniqueId) {
     IoTUserApplication a = IoTUserApplication.builder().appUniqueId(appUniqueId).build();
     String unionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
-    if (!iIotUserService.selectUserByUnionId(unionId).isAdmin()) {
+    if (!ioTUserService.selectUserByUnionId(unionId).isAdmin()) {
       a.setUnionId(unionId);
     }
     IoTUserApplication iotUserApplication = iotUserApplicationMapper.selectOne(a);

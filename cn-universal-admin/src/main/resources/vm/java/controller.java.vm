@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import ${packageName}.domain.${ClassName};
 import ${packageName}.service.I${ClassName}Service;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.persistence.query.AjaxResult;
 import com.zebra.common.utils.poi.ExcelUtil;
     #if($table.crud)

@@ -15,11 +15,11 @@ package cn.universal.security.provider;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.system.service.AsyncService;
-import cn.universal.admin.system.service.IIotUserService;
 import cn.universal.common.constant.Constants;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.persistence.entity.IoTUser;
+import cn.universal.security.service.AdminLogService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.security.token.SmsAuthenticationToken;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +38,10 @@ import org.springframework.util.StringUtils;
 
 @Component
 public class SmsAuthenticationProvider implements AuthenticationProvider {
-
+  @Autowired private AdminLogService adminLogService;
+  @Autowired private IoTUserService ioTUserService;
   @Autowired private StringRedisTemplate stringRedisTemplate;
   @Autowired private UserDetailsService userDetailsService;
-
-  @Autowired private AsyncService asyncService;
-  @Autowired private IIotUserService iIotUserService;
 
   private static final Integer maxRetryCount = 5;
   private static final Integer maxIpRetryCount = 15;
@@ -95,7 +93,7 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
     }
 
     // 根据手机号查找用户
-    IoTUser user = iIotUserService.selectUserByMobile(phone);
+    IoTUser user = ioTUserService.selectUserByMobile(phone);
     if (ObjectUtil.isEmpty(user)) {
       stringRedisTemplate
           .opsForValue()
@@ -124,7 +122,8 @@ public class SmsAuthenticationProvider implements AuthenticationProvider {
     UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
     // 登录成功
-    asyncService.recordLogininfor(user.getUsername(), Constants.LOGIN_SUCCESS, "短信验证码登录成功", null);
+    adminLogService.recordLogininfor(
+        user.getUsername(), Constants.LOGIN_SUCCESS, "短信验证码登录成功", null);
     stringRedisTemplate.delete(retryKey);
     stringRedisTemplate.delete(ipKey);
 

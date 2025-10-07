@@ -1,8 +1,8 @@
 package cn.universal.admin.system.notice;
 
 import cn.hutool.json.JSONObject;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.BaseController;
 import cn.universal.manager.notice.dto.NoticeChannelDTO;
 import cn.universal.manager.notice.model.NoticeChannel;
 import cn.universal.manager.notice.service.NoticeChannelService;

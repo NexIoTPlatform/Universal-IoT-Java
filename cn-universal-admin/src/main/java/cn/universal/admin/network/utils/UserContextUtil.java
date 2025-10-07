@@ -12,7 +12,7 @@
 
 package cn.universal.admin.network.utils;
 
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.persistence.entity.IoTUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

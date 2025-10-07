@@ -13,10 +13,10 @@
 package cn.universal.admin.system.web;
 
 import cn.hutool.json.JSONObject;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.persistence.entity.bo.RuleModelBO;
 import cn.universal.persistence.entity.vo.RuleModelVO;
 import cn.universal.persistence.page.TableDataInfo;
@@ -24,6 +24,7 @@ import cn.universal.persistence.query.AjaxResult;
 import cn.universal.rule.model.bo.RuleBo;
 import cn.universal.rule.model.bo.RuleTargetTestBO;
 import cn.universal.rule.service.RuleService;
+import cn.universal.security.BaseController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RuleController extends BaseController {
 
   @Resource private RuleService ruleService;
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
 
   @Operation(summary = "查询规则列表")
   @GetMapping("rule/list")

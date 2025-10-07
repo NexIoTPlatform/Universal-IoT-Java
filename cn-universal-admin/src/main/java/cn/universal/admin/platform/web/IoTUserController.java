@@ -20,14 +20,14 @@ import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.IIoTUserApplicationService;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.admin.system.service.ISysRoleService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTUserConstants;
 import cn.universal.common.exception.IoTException;
@@ -68,7 +68,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class IoTUserController extends BaseController {
 
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
   @Resource private ISysRoleService iSysRoleService;
 
   @Resource private IIoTUserApplicationService iotUserApplicationService;
@@ -77,13 +77,13 @@ public class IoTUserController extends BaseController {
   @GetMapping("/list")
   public TableDataInfo<IoTUser> pageList(IoTUser user) {
     log.info("当前用户={}", SecurityUtils.getUnionId());
-    if (iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
+    if (ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
       user.setCreateBy(null);
     } else {
       user.setCreateBy(SecurityUtils.getUnionId());
     }
     startPage();
-    List<IoTUser> userList = iIotUserService.selectUserList(user);
+    List<IoTUser> userList = ioTUserService.selectUserList(user);
     return getDataTable(userList);
   }
 
@@ -92,12 +92,12 @@ public class IoTUserController extends BaseController {
   @Log(title = "导出用户应用信息列表", businessType = BusinessType.EXPORT)
   public void export(HttpServletResponse response, IoTUser iotUser) {
     log.info("导出用户,操作人={},参数={}", SecurityUtils.getUnionId(), JSONUtil.toJsonStr(iotUser));
-    if (iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
+    if (ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
       iotUser.setCreateBy(null);
     } else {
       iotUser.setCreateBy(SecurityUtils.getUnionId());
     }
-    List<IoTUser> list = iIotUserService.selectUserList(iotUser);
+    List<IoTUser> list = ioTUserService.selectUserList(iotUser);
     ExcelUtil<IoTUser> util = new ExcelUtil<IoTUser>(IoTUser.class);
     util.exportExcel(response, list, "用户信息数据");
   }
@@ -108,7 +108,7 @@ public class IoTUserController extends BaseController {
 
     JSONObject jsonObject = new JSONObject();
     List<SysRole> roles = iSysRoleService.selectRoleAll();
-    IoTUser currentUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    IoTUser currentUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
     jsonObject.set(
         "roles",
         currentUser.isAdmin()
@@ -117,7 +117,7 @@ public class IoTUserController extends BaseController {
                 .filter(r -> SecurityUtils.getUnionId().equals(r.getCreateBy()))
                 .collect(Collectors.toList()));
     if (StringUtils.isNotNull(id)) {
-      IoTUser iotUser = iIotUserService.selectUserById(id);
+      IoTUser iotUser = ioTUserService.selectUserById(id);
       if (!SecurityUtils.getUnionId().equalsIgnoreCase(iotUser.getParentUnionId())
           && !currentUser.isAdmin()) {
         throw new IoTException("你无权查询用户");
@@ -137,7 +137,7 @@ public class IoTUserController extends BaseController {
   public AjaxResult<Void> add(@Validated @RequestBody IoTUserBO userbo) {
     log.info("新增用户,操作人={},参数={}", SecurityUtils.getUnionId(), JSONUtil.toJsonStr(userbo));
     String unionId = SecurityUtils.getUnionId();
-    IoTUser parentUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser parentUser = ioTUserService.selectUserByUnionId(unionId);
     if (!parentUser.isAdmin()) {
       throw new IoTException("你无权操作");
     }
@@ -145,10 +145,10 @@ public class IoTUserController extends BaseController {
     if (Objects.isNull(user.getMobile())) {
       return AjaxResult.error("新增用户'" + user.getUsername() + "'失败，手机号码不得为空");
     }
-    if (IoTUserConstants.NOT_UNIQUE.equals(iIotUserService.checkUserNameUnique(user))) {
+    if (IoTUserConstants.NOT_UNIQUE.equals(ioTUserService.checkUserNameUnique(user))) {
       return AjaxResult.error("新增用户'" + user.getUsername() + "'失败，用户名已存在");
     } else if (Validator.isNotEmpty(user.getMobile())
-        && IoTUserConstants.NOT_UNIQUE.equals(iIotUserService.checkPhoneUnique(user))) {
+        && IoTUserConstants.NOT_UNIQUE.equals(ioTUserService.checkPhoneUnique(user))) {
       return AjaxResult.error("新增用户'" + user.getUsername() + "'失败，手机号码已存在");
     }
     if (StrUtil.isNotEmpty(user.getPassword())) {
@@ -173,7 +173,7 @@ public class IoTUserController extends BaseController {
       userbo.setLicense(5000);
       userbo.setLicenseTotalAmount(5000);
     }
-    return toAjax(iIotUserService.insertUser(userbo));
+    return toAjax(ioTUserService.insertUser(userbo));
   }
 
   /** 修改用户 */
@@ -183,9 +183,9 @@ public class IoTUserController extends BaseController {
   public AjaxResult<Void> edit(@Validated @RequestBody IoTUserBO userbo) {
     log.info("修改用户,操作人={},参数={}", SecurityUtils.getUnionId(), JSONUtil.toJsonStr(userbo));
     IoTUser user = BeanUtil.toBean(userbo, IoTUser.class);
-    iIotUserService.checkUserAllowed(user);
-    IoTUser updateUser = iIotUserService.selectUserById(userbo.getId());
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    ioTUserService.checkUserAllowed(user);
+    IoTUser updateUser = ioTUserService.selectUserById(userbo.getId());
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
     // 非超管身份只能操作自己和子账户
     if (!SecurityUtils.getUnionId().equalsIgnoreCase(updateUser.getParentUnionId())
         && (iotUser == null || !user.getId().equals(iotUser.getId()))
@@ -195,7 +195,7 @@ public class IoTUserController extends BaseController {
     if (Validator.isEmpty(user.getMobile())) {
       return error("修改用户'" + user.getUsername() + "'失败，手机号码不能为空");
     }
-    if (IoTUserConstants.NOT_UNIQUE.equals(iIotUserService.checkPhoneUnique(user))) {
+    if (IoTUserConstants.NOT_UNIQUE.equals(ioTUserService.checkPhoneUnique(user))) {
       return error("修改用户'" + user.getUsername() + "'失败，手机号码已存在");
     }
 
@@ -212,7 +212,7 @@ public class IoTUserController extends BaseController {
     }
     userbo.setUpdateBy(SecurityUtils.getUnionId());
     userbo.setUpdateDate(new Date());
-    int count = iIotUserService.updateUser(userbo);
+    int count = ioTUserService.updateUser(userbo);
     if (count > 0) {
       iotUserApplicationService.EnDisableIoTUser(
           userbo.getUnionId(), IoTConstant.NORMAL.toString().equals(iotUser.getStatus()));
@@ -228,12 +228,12 @@ public class IoTUserController extends BaseController {
     if (userIds != null && userIds.length > 1) {
       return error("不允许批量删除");
     }
-    boolean isAdmin = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin();
-    IoTUser deleteUser = iIotUserService.selectUserById(userIds[0]);
+    boolean isAdmin = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin();
+    IoTUser deleteUser = ioTUserService.selectUserById(userIds[0]);
     if (!SecurityUtils.getUnionId().equalsIgnoreCase(deleteUser.getParentUnionId()) && !isAdmin) {
       return error("你无权删除用户");
     }
-    return toAjax(iIotUserService.deleteUserByIds(userIds));
+    return toAjax(ioTUserService.deleteUserByIds(userIds));
   }
 
   /** 根据用户编号获取授权角色 */
@@ -242,8 +242,8 @@ public class IoTUserController extends BaseController {
     log.info("授权用户,操作人={},参数={}", SecurityUtils.getUnionId(), id);
 
     JSONObject object = new JSONObject();
-    IoTUser currentUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
-    IoTUser user = iIotUserService.selectUserById(id);
+    IoTUser currentUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    IoTUser user = ioTUserService.selectUserById(id);
     if (!SecurityUtils.getUnionId().equalsIgnoreCase(user.getParentUnionId())
         && !currentUser.isAdmin()) {
       return error("你无权操作用户");
@@ -261,13 +261,13 @@ public class IoTUserController extends BaseController {
   /** 用户授权角色 */
   @PutMapping("/authRole")
   public AjaxResult<Void> insertAuthRole(String unionId, Long[] roleIds) {
-    IoTUser currentUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
-    IoTUser user = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser currentUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    IoTUser user = ioTUserService.selectUserByUnionId(unionId);
     if (!SecurityUtils.getUnionId().equalsIgnoreCase(user.getParentUnionId())
         && !currentUser.isAdmin()) {
       return error("你无权操作用户");
     }
-    iIotUserService.insertUserAuth(unionId, roleIds);
+    ioTUserService.insertUserAuth(unionId, roleIds);
     return success();
   }
 }

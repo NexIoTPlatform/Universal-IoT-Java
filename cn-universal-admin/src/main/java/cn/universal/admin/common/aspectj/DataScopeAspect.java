@@ -14,9 +14,9 @@ package cn.universal.admin.common.aspectj;
 
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.common.annotation.DataScope;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.common.annotation.DataScope;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.common.domain.BaseEntity;
 import cn.universal.common.utils.ReflectUtils;
 import cn.universal.persistence.entity.IoTUser;
@@ -39,10 +39,10 @@ public class DataScopeAspect {
   /** 数据范围 */
   public static final String SCOPE = "scope";
 
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
 
   // 配置织入点
-  @Pointcut("@annotation(cn.universal.admin.common.annotation.DataScope)")
+  @Pointcut("@annotation(cn.universal.common.annotation.DataScope)")
   public void dataScopePointCut() {}
 
   @Before("dataScopePointCut()")
@@ -57,7 +57,7 @@ public class DataScopeAspect {
     if (controllerDataScope == null) {
       return;
     }
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
     if (!iotUser.isAdmin()) {
       dataScopeFilter(joinPoint, controllerDataScope, iotUser.getUnionId());
     }

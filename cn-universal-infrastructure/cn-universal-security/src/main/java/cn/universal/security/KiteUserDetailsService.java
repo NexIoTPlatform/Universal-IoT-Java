@@ -12,12 +12,12 @@
 
 package cn.universal.security;
 
-import cn.universal.admin.system.service.AsyncService;
 import cn.universal.common.constant.Constants;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.utils.ServletUtils;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.mapper.IoTUserMapper;
+import cn.universal.security.service.AdminLogService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class KiteUserDetailsService implements UserDetailsService {
 
   @Resource private IoTUserMapper iotUserMapper;
 
-  @Resource private AsyncService asyncService;
+  @Resource private AdminLogService adminLogService;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -56,11 +56,11 @@ public class KiteUserDetailsService implements UserDetailsService {
 
       if (iotUser == null) {
         HttpServletRequest request = ServletUtils.getRequest();
-        asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, "用户名或密码错误", request);
+        adminLogService.recordLogininfor(username, Constants.LOGIN_FAIL, "用户名或密码错误", request);
         throw new UsernameNotFoundException("the user is not found");
       } else if (IoTConstant.UN_NORMAL.toString().equals(iotUser.getStatus())) {
         HttpServletRequest request = ServletUtils.getRequest();
-        asyncService.recordLogininfor(
+        adminLogService.recordLogininfor(
             iotUser.getUsername(), Constants.LOGIN_FAIL, "用户已冻结,请联系管理员解冻", request);
         throw new UsernameNotFoundException("the user is  disabled");
       }

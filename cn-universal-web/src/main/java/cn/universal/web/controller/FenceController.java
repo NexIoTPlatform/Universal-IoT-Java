@@ -15,7 +15,7 @@ package cn.universal.web.controller;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.universal.admin.platform.service.IIoTDeviceService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.domain.R;
 import cn.universal.persistence.entity.IoTDevice;
 import cn.universal.persistence.entity.IoTDeviceFenceRel;

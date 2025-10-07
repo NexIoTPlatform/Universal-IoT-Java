@@ -14,7 +14,7 @@ package cn.universal.admin.platform.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.universal.admin.common.service.BaseServiceImpl;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTDeviceGroupService;
 import cn.universal.persistence.dto.IoTDeviceDTO;
 import cn.universal.persistence.entity.IoTDevice;

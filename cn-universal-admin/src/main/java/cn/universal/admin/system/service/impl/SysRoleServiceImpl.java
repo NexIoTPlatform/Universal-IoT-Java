@@ -13,9 +13,8 @@
 package cn.universal.admin.system.service.impl;
 
 import cn.hutool.core.lang.Validator;
-import cn.universal.admin.common.annotation.DataScope;
-import cn.universal.admin.common.utils.SecurityUtils;
 import cn.universal.admin.system.service.ISysRoleService;
+import cn.universal.common.annotation.DataScope;
 import cn.universal.common.constant.IoTUserConstants;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.admin.SysRole;
@@ -24,6 +23,7 @@ import cn.universal.persistence.entity.admin.SysUserRole;
 import cn.universal.persistence.mapper.admin.SysRoleMapper;
 import cn.universal.persistence.mapper.admin.SysRoleMenuMapper;
 import cn.universal.persistence.mapper.admin.SysUserRoleMapper;
+import cn.universal.security.utils.SecurityUtils;
 import jakarta.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;

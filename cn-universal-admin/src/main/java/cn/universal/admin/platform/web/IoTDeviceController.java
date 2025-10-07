@@ -16,15 +16,14 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTDeviceService;
 import cn.universal.admin.system.service.IIoTUserApplicationService;
 import cn.universal.admin.system.service.IoTDeviceProtocolService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.domain.R;
 import cn.universal.common.exception.IoTException;
 import cn.universal.common.poi.ExcelTemplate;
@@ -192,32 +191,15 @@ public class IoTDeviceController extends BaseController {
   @PostMapping
   @Log(title = "新增设备", businessType = BusinessType.INSERT)
   public R add(@RequestBody IoTDeviceBO devInstancebo) {
-    R result = iIotDeviceService.insertDevInstance(devInstancebo);
-    JSONObject jsonObject = JSONUtil.parseObj(result);
-    String code = jsonObject.getStr("code");
-    String msg = jsonObject.getStr("msg");
-    if ("0".equals(code)) {
-      return R.ok();
-    } else {
-      return R.error(msg);
-    }
+    return iIotDeviceService.insertDevInstance(devInstancebo);
   }
 
   /** 修改设备 */
   @PutMapping
   @Log(title = "修改设备", businessType = BusinessType.UPDATE)
   public R edit(@RequestBody IoTDeviceBO devInstancebo) {
-    IoTDevice ioTDevice =
-        iIotDeviceService.selectDevInstanceById(String.valueOf(devInstancebo.getId()));
-    R result = iIotDeviceService.updateDevInstance(devInstancebo);
-    JSONObject jsonObject = JSONUtil.parseObj(result);
-    String code = jsonObject.getStr("code");
-    String msg = jsonObject.getStr("msg");
-    if ("0".equals(code)) {
-      return R.ok();
-    } else {
-      return R.error(msg);
-    }
+    iIotDeviceService.selectDevInstanceById(String.valueOf(devInstancebo.getId()));
+    return iIotDeviceService.updateDevInstance(devInstancebo);
   }
 
   /** 绑定设备平台 */
@@ -245,15 +227,7 @@ public class IoTDeviceController extends BaseController {
   @DeleteMapping("/{ids}")
   @Log(title = "删除设备", businessType = BusinessType.DELETE)
   public R remove(@PathVariable String[] ids) {
-    R result = iIotDeviceService.deleteDevInstanceByIds(ids);
-    JSONObject jsonObject = JSONUtil.parseObj(result);
-    String code = jsonObject.getStr("code");
-    String msg = jsonObject.getStr("msg");
-    if ("0".equals(code)) {
-      return R.ok();
-    } else {
-      return R.error(msg);
-    }
+    return iIotDeviceService.deleteDevInstanceByIds(ids);
   }
 
   /** 获取所有设备型号 */

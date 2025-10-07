@@ -14,8 +14,8 @@ package cn.universal.admin.system.oss;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.http.HttpUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.BaseController;
 import cn.universal.common.exception.IoTException;
 import cn.universal.common.utils.FileUtils;
 import cn.universal.ossm.entity.SysOss;

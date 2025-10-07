@@ -13,11 +13,11 @@
 package cn.universal.admin.platform.web;
 
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTDeviceFunctionTaskService;
 import cn.universal.admin.platform.service.IIoTDeviceService;
 import cn.universal.admin.system.service.IIoTUserApplicationService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.domain.R;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.IoTDevice;

@@ -13,11 +13,11 @@
 package cn.universal.admin.system.web;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.admin.system.service.ISysRoleService;
 import cn.universal.common.constant.IoTUserConstants;
 import cn.universal.common.exception.IoTException;
@@ -27,6 +27,7 @@ import cn.universal.persistence.entity.admin.SysUserRole;
 import cn.universal.persistence.entity.bo.IoTUserBO;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Date;
@@ -49,11 +50,11 @@ public class SysRoleController extends BaseController {
 
   @Autowired private ISysRoleService roleService;
 
-  @Autowired private IIotUserService userService;
+  @Autowired private IoTUserService ioTUserService;
 
   @GetMapping("/list")
   public TableDataInfo list(SysRole role) {
-    if (!userService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
+    if (!ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
       role.setCreateBy(SecurityUtils.getUnionId());
     }
     startPage();
@@ -62,7 +63,7 @@ public class SysRoleController extends BaseController {
 
   @PostMapping("/export")
   public void export(HttpServletResponse response, SysRole role) {
-    if (!userService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
+    if (!ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()) {
       role.setCreateBy(SecurityUtils.getUnionId());
     }
     List<SysRole> list = roleService.selectRoleList(role);
@@ -88,7 +89,7 @@ public class SysRoleController extends BaseController {
   @Log(title = "新增角色", businessType = BusinessType.INSERT)
   public AjaxResult add(@Validated @RequestBody SysRole role) {
     String unionId = SecurityUtils.getUnionId();
-    IoTUser parentUser = userService.selectUserByUnionId(unionId);
+    IoTUser parentUser = ioTUserService.selectUserByUnionId(unionId);
     if (!parentUser.isAdmin()) {
       throw new IoTException("你无权操作");
     }
@@ -196,7 +197,7 @@ public class SysRoleController extends BaseController {
       throw new IoTException("你无权操作");
     }
     startPage();
-    return getDataTable(userService.selectAllocatedList(iotUserBo));
+    return getDataTable(ioTUserService.selectAllocatedList(iotUserBo));
   }
 
   /** 查询未分配用户角色列表 */
@@ -211,7 +212,7 @@ public class SysRoleController extends BaseController {
     }
     startPage();
     user.setCreateBy(SecurityUtils.getUnionId());
-    return getDataTable(userService.selectUnallocatedList(user));
+    return getDataTable(ioTUserService.selectUnallocatedList(user));
   }
 
   /** 取消授权用户 */

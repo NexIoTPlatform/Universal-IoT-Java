@@ -18,8 +18,8 @@ import cn.hutool.core.util.PhoneUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.service.IoTUserService;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.ISysRoleService;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTUserConstants;
@@ -28,6 +28,7 @@ import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.bo.IoTUserBO;
 import cn.universal.persistence.entity.bo.PasswordBO;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import jakarta.annotation.Resource;
 import java.util.Date;
 import java.util.Objects;
@@ -44,7 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/system/user/profile")
 public class SysProfileController extends BaseController {
 
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
   @Resource private ISysRoleService iSysRoleService;
 
   /** 查询个人信息 */
@@ -53,7 +54,7 @@ public class SysProfileController extends BaseController {
     JSONObject jsonObject = new JSONObject();
     String unionId = SecurityUtils.getUnionId();
 
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
     // 手机号脱敏
     if (StrUtil.isNotEmpty(iotUser.getMobile())) {
       iotUser.setMobile(PhoneUtil.hideBetween(iotUser.getMobile()).toString());
@@ -72,10 +73,10 @@ public class SysProfileController extends BaseController {
       return error("修改个人信息失败，手机号码不能为空");
     }
     IoTUser user = BeanUtil.toBean(iotUserBo, IoTUser.class);
-    if (IoTUserConstants.NOT_UNIQUE.equals(iIotUserService.checkPhoneUnique(user))) {
+    if (IoTUserConstants.NOT_UNIQUE.equals(ioTUserService.checkPhoneUnique(user))) {
       return error("修改个人信息失败，手机号码已存在");
     }
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
     iotUser.setAlias(iotUserBo.getAlias());
     iotUser.setEmail(iotUserBo.getEmail());
     iotUser.setMobile(iotUserBo.getMobile());
@@ -87,7 +88,7 @@ public class SysProfileController extends BaseController {
       origin.set(IoTConstant.EXCLUSIVE_FIRST_LOGIN, latest.get(IoTConstant.EXCLUSIVE_FIRST_LOGIN));
       iotUser.setCfg(JSONUtil.toJsonStr(origin));
     }
-    iIotUserService.updateUserById(iotUser);
+    ioTUserService.updateUserById(iotUser);
     return AjaxResult.success();
   }
 
@@ -95,7 +96,7 @@ public class SysProfileController extends BaseController {
   @PutMapping("/updatePwd")
   public AjaxResult<Void> updatePwd(@RequestBody PasswordBO bo) {
     String unionId = SecurityUtils.getUnionId();
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
     Matcher matcher = IoTConstant.pattern.matcher(bo.getNewPassword());
     if (!matcher.matches()) {
       throw new IoTException("密码中必须包含字母、数字、特殊字符，至少8个字符，最多30个字符");
@@ -106,7 +107,7 @@ public class SysProfileController extends BaseController {
     iotUser.setPassword(SecurityUtils.encryptPassword(bo.getNewPassword()));
     iotUser.setUpdateBy(unionId);
     iotUser.setUpdateDate(new Date());
-    iIotUserService.updateUserById(iotUser);
+    ioTUserService.updateUserById(iotUser);
     return AjaxResult.success();
   }
 
@@ -114,13 +115,13 @@ public class SysProfileController extends BaseController {
   @RequestMapping("/updateMobile/{mobile}")
   public AjaxResult<Void> updatePwd(@PathVariable("mobile") String mobile) {
     String unionId = SecurityUtils.getUnionId();
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
-    IoTUser user = iIotUserService.selectUserByMobile(mobile);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
+    IoTUser user = ioTUserService.selectUserByMobile(mobile);
     if (Objects.nonNull(user)) {
       throw new IoTException("手机号码已存在,请勿重复添加");
     } else {
       iotUser.setMobile(mobile);
-      iIotUserService.updateUserById(iotUser);
+      ioTUserService.updateUserById(iotUser);
       return AjaxResult.success();
     }
   }

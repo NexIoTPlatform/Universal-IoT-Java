@@ -19,7 +19,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.admin.common.service.BaseServiceImpl;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTDeviceService;
 import cn.universal.common.constant.IoTConstant.DeviceNode;
 import cn.universal.common.constant.IoTConstant.DownCmd;
