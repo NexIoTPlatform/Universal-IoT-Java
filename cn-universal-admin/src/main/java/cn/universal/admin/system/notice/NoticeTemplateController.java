@@ -1,7 +1,7 @@
 package cn.universal.admin.system.notice;
 
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.utils.SecurityUtils;
+import cn.universal.security.BaseController;
 import cn.universal.manager.notice.dto.NoticeTemplateDTO;
 import cn.universal.manager.notice.model.NoticeTemplate;
 import cn.universal.manager.notice.service.NoticeTemplateService;

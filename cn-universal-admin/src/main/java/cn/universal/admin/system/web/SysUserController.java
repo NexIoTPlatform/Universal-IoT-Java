@@ -13,9 +13,9 @@
 package cn.universal.admin.system.web;
 
 import cn.hutool.core.util.StrUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.permission.SysPermissionService;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.admin.system.service.ISysMenuService;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.domain.R;
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("admin")
 public class SysUserController {
 
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
 
   @Resource private ISysMenuService menuService;
 
@@ -55,7 +55,7 @@ public class SysUserController {
   @GetMapping("getInfo")
   public R getInfo(HttpServletRequest request) {
     final String unionId = SecurityUtils.getUnionId();
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(unionId);
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(unionId);
     // 更新登录时间
     // 角色集合
     Set<String> roles = permissionService.getRolePermission(iotUser);

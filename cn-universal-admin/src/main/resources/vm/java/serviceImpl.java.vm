@@ -1,6 +1,6 @@
 package ${packageName}.service.impl;
 
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import java.util.Date;
 import java.util.List;
     #if($table.tree)

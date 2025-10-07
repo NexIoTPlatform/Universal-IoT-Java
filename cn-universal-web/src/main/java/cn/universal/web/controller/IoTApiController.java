@@ -14,7 +14,6 @@ package cn.universal.web.controller;
 
 import cn.hutool.json.JSONObject;
 import cn.universal.admin.platform.service.IIoTProductService;
-import cn.universal.admin.system.web.BaseController;
 import cn.universal.common.domain.R;
 import cn.universal.core.service.IoTDownlFactory;
 import cn.universal.dm.device.entity.IoTDevicePropertiesBO;
@@ -25,6 +24,7 @@ import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.entity.vo.IoTDeviceLogMetadataVO;
 import cn.universal.persistence.query.LogQuery;
 import cn.universal.persistence.query.PageBean;
+import cn.universal.security.BaseController;
 import cn.universal.web.context.IoTInnerAuthContext;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,35 +53,48 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j(topic = "api_log")
 public class IoTApiController extends BaseController {
 
-  /** IoT产品设备服务 */
-  @Resource private IoTProductDeviceService iotProductDeviceService;
+  /**
+   * IoT产品设备服务
+   */
+  @Resource
+  private IoTProductDeviceService iotProductDeviceService;
 
-  /** IoT设备影子服务 */
-  @Resource private IoTDeviceShadowService iotDeviceShadowService;
+  /**
+   * IoT设备影子服务
+   */
+  @Resource
+  private IoTDeviceShadowService iotDeviceShadowService;
 
-  /** IoT内部认证上下文 */
-  @Resource private IoTInnerAuthContext ioTInnerAuthContext;
+  /**
+   * IoT内部认证上下文
+   */
+  @Resource
+  private IoTInnerAuthContext ioTInnerAuthContext;
 
-  /** 设备产品服务 */
-  @Resource private IIoTProductService devProductService;
+  /**
+   * 设备产品服务
+   */
+  @Resource
+  private IIoTProductService devProductService;
 
-  /** IoT设备数据服务 */
-  @Autowired private IIoTDeviceDataService iIoTDeviceDataService;
+  /**
+   * IoT设备数据服务
+   */
+  @Autowired
+  private IIoTDeviceDataService iIoTDeviceDataService;
 
   /**
    * 设备下行指令发送（加密版本）
    *
    * <p>向指定产品的设备发送加密的下行指令，支持消息验证和解密
    *
-   * @param productKey 产品标识
+   * @param productKey  产品标识
    * @param downRequest 加密的下行请求内容
-   * @param request HTTP请求对象
+   * @param request     HTTP请求对象
    * @return 处理结果
    */
   @RequestMapping("/v1/down/{productKey}")
-  public R iotDown(
-      @PathVariable("productKey") String productKey,
-      @RequestBody String downRequest,
+  public R iotDown(@PathVariable("productKey") String productKey, @RequestBody String downRequest,
       HttpServletRequest request) {
     JSONObject data = ioTInnerAuthContext.checkAndDecryptMsg(downRequest, request);
     IoTProduct ioTProduct = iotProductDeviceService.getProduct(productKey);
@@ -126,8 +139,8 @@ public class IoTApiController extends BaseController {
    */
   @PostMapping("/device/meta/list")
   public Object logMeta(@RequestBody LogQuery logQuery) {
-    PageBean<IoTDeviceLogMetadataVO> devLogMetaVoPageBean =
-        iIoTDeviceDataService.queryLogMeta(logQuery);
+    PageBean<IoTDeviceLogMetadataVO> devLogMetaVoPageBean = iIoTDeviceDataService.queryLogMeta(
+        logQuery);
     return devLogMetaVoPageBean;
   }
 

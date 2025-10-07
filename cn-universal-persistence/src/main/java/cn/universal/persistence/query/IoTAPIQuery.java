@@ -12,6 +12,7 @@
 
 package cn.universal.persistence.query;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,14 +30,19 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class IoTAPIQuery extends BasePage {
 
+  @Schema(name = "extDeviceId", description = "网关设备deviceId、第三方平台iotId")
+  private String extDeviceId;
+
+  @Schema(name = "applicationId", description = "应用主键Id")
   private String applicationId;
 
-  private String application;
-
+  @Schema(name = "iotUnionId", description = "设备归属者，一般是createId")
   private String iotUnionId;
 
+  @Schema(name = "iotId", description = "productKey+deviceId")
   private String iotId;
 
+  @Schema(name = "productName", description = "产品名称")
   private String productName;
 
   private String productKey;

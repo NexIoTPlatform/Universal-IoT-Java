@@ -15,16 +15,17 @@ package cn.universal.admin.common.aspectj;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessStatus;
-import cn.universal.admin.common.enums.HttpMethod;
-import cn.universal.admin.common.utils.SecurityUtils;
-import cn.universal.admin.system.service.AsyncService;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessStatus;
+import cn.universal.common.enums.HttpMethod;
+import cn.universal.common.utils.LocationUtils;
 import cn.universal.common.utils.ServletUtils;
 import cn.universal.common.utils.SpringUtils;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.SysOperLog;
+import cn.universal.security.service.AdminLogService;
+import cn.universal.security.service.IoTUserService;
+import cn.universal.security.utils.SecurityUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -50,11 +51,11 @@ import org.springframework.web.servlet.HandlerMapping;
 @Component
 public class LogAspect {
 
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
   private static final Logger log = LoggerFactory.getLogger(LogAspect.class);
 
   // 配置织入点
-  @Pointcut("@annotation(cn.universal.admin.common.annotation.Log)")
+  @Pointcut("@annotation(cn.universal.common.annotation.Log)")
   public void logPointCut() {}
 
   /**
@@ -87,7 +88,7 @@ public class LogAspect {
       }
 
       // 获取当前的用户
-      IoTUser iotUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+      IoTUser iotUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
 
       // *========数据库日志=========*//
       SysOperLog operLog = new SysOperLog();
@@ -95,6 +96,7 @@ public class LogAspect {
       // 请求的地址
       String ip = ServletUtils.getClientIP();
       operLog.setOperIp(ip);
+      operLog.setOperLocation(LocationUtils.getLocationByIp(ip));
       // 返回参数
       operLog.setJsonResult(JSONUtil.toJsonStr(jsonResult));
 
@@ -116,7 +118,7 @@ public class LogAspect {
       // 处理设置注解上的参数
       getControllerMethodDescription(joinPoint, controllerLog, operLog);
       // 保存数据库
-      SpringUtils.getBean(AsyncService.class).recordOper(operLog);
+      SpringUtils.getBean(AdminLogService.class).recordOper(operLog);
     } catch (Exception exp) {
       // 记录本地异常日志
       log.error("==前置通知异常==");

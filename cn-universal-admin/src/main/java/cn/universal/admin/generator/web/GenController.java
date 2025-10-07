@@ -17,7 +17,7 @@ import cn.universal.admin.generator.domain.GenTable;
 import cn.universal.admin.generator.domain.GenTableColumn;
 import cn.universal.admin.generator.service.IGenTableColumnService;
 import cn.universal.admin.generator.service.IGenTableService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
 import jakarta.servlet.http.HttpServletResponse;

@@ -13,14 +13,15 @@
 package cn.universal.admin.system.web;
 
 import cn.hutool.core.lang.Validator;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.system.service.ISysMenuService;
 import cn.universal.common.constant.IoTUserConstants;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.admin.SysMenu;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
+import cn.universal.security.utils.SecurityUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

@@ -116,7 +116,25 @@
     </dependency>
     <dependency>
       <groupId>cn.universal.iot</groupId>
+      <artifactId>cn-tcp-protocol</artifactId>
+      <scope>compile</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.universal.iot</groupId>
+      <artifactId>cn-udp-protocol</artifactId>
+      <scope>compile</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cn.universal.iot</groupId>
       <artifactId>cn-universal-notice</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>cn.universal.iot</groupId>
+      <artifactId>cn-universal-security</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>

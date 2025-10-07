@@ -325,6 +325,9 @@
       <if test="deviceId!=null and deviceId!=''">
         AND a.device_id = #{deviceId}
       </if>
+      <if test="extDeviceId!=null and extDeviceId!=''">
+        AND a.ext_device_id = #{extDeviceId}
+      </if>
       <if test="iotId!=null and iotId!=''">
         AND a.iot_id = #{iotId}
       </if>

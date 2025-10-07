@@ -13,13 +13,14 @@
 package cn.universal.admin.system.web;
 
 import cn.hutool.core.lang.Validator;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.system.service.ISysDictDataService;
 import cn.universal.admin.system.service.ISysDictTypeService;
 import cn.universal.persistence.entity.admin.SysDictData;
 import cn.universal.persistence.entity.admin.vo.SysDictDataVo;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.persistence.query.AjaxResult;
+import cn.universal.security.BaseController;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

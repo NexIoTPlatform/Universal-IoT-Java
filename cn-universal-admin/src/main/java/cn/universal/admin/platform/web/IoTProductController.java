@@ -16,9 +16,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.network.service.INetworkService;
 import cn.universal.admin.platform.dto.ConnectionInfoDTO;
 import cn.universal.admin.platform.service.ConnectionInfoService;
@@ -27,8 +27,9 @@ import cn.universal.admin.platform.service.IIoTProductService;
 import cn.universal.admin.platform.service.impl.IoTProductServiceImpl;
 import cn.universal.admin.system.service.ISysDictTypeService;
 import cn.universal.admin.system.service.IoTDeviceProtocolService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.constant.IoTConstant;
+import cn.universal.common.constant.IoTConstant.DownCmd;
 import cn.universal.common.constant.IoTConstant.ProtocolModule;
 import cn.universal.common.constant.IoTConstant.TcpFlushType;
 import cn.universal.common.event.EventTopics;
@@ -319,9 +320,9 @@ public class IoTProductController extends BaseController {
   }
 
   /** 新增电信公共产品 */
-  @PostMapping(value = "/ctwing/pubproadd")
+  @PostMapping(value = "/ctaiot/public/product")
   @Log(title = "新增电信公共产品", businessType = BusinessType.INSERT)
-  public AjaxResult addCtwingPubPro(@RequestBody String downRequest) {
+  public AjaxResult addCtAIotPublicProduct(@RequestBody String downRequest) {
     String creatorId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
     JSONObject jsonObject = JSONUtil.parseObj(downRequest);
     JSONObject downProRequest = new JSONObject();
@@ -333,7 +334,7 @@ public class IoTProductController extends BaseController {
     downProRequest.set("classifiedId", jsonObject.getStr("classifiedId"));
     downProRequest.set("classifiedName", jsonObject.getStr("classifiedName"));
     downProRequest.set("companyNo", jsonObject.getStr("companyNo"));
-    downProRequest.set("cmd", "PUBPRO_ADD");
+    downProRequest.set("cmd", DownCmd.PUBPRO_ADD.name());
     downProRequest.set("data", data);
     return AjaxResult.success(
         IoTDownlFactory.safeInvokeDown(
@@ -483,7 +484,7 @@ public class IoTProductController extends BaseController {
       }
       // 删除协议
       ioTDeviceProtocolService.deleteDevProtocolById(ioTProduct.getProductKey());
-      
+
       // 发布产品删除事件
       Map<String, Object> eventData = new HashMap<>();
       eventData.put("type", "product");
@@ -738,7 +739,6 @@ public class IoTProductController extends BaseController {
 
   /** 查看连接信息 */
   @PostMapping("/connect/info")
-  @Log(title = "查看连接信息", businessType = BusinessType.OTHER)
   public AjaxResult connectInfo(@RequestParam String productKey) {
     try {
       ConnectionInfoDTO connectionInfo = connectionInfoService.getConnectionInfo(productKey);

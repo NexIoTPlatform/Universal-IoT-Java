@@ -14,11 +14,11 @@ package cn.universal.admin.network.web;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.network.service.INetworkService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.domain.R;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.entity.IoTDevice;

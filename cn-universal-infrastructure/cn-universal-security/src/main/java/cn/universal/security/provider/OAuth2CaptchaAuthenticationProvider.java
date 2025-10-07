@@ -15,12 +15,12 @@ package cn.universal.security.provider;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.system.service.AsyncService;
-import cn.universal.admin.system.service.IIotUserService;
 import cn.universal.common.constant.Constants;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.utils.RSAUtils;
 import cn.universal.persistence.entity.IoTUser;
+import cn.universal.security.service.AdminLogService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.security.token.OAuth2CaptchaAuthenticationToken;
 import java.security.Principal;
 import java.util.concurrent.TimeUnit;
@@ -59,8 +59,8 @@ public class OAuth2CaptchaAuthenticationProvider implements AuthenticationProvid
   @Autowired private StringRedisTemplate stringRedisTemplate;
   @Autowired private UserDetailsService userDetailsService;
 
-  @Autowired private AsyncService asyncService;
-  @Autowired private IIotUserService iIotUserService;
+  @Autowired private AdminLogService adminLogService;
+  @Autowired private IoTUserService ioTUserService;
   @Autowired private OAuth2AuthorizationService authorizationService;
   @Autowired private OAuth2TokenGenerator<?> tokenGenerator;
 
@@ -144,7 +144,7 @@ public class OAuth2CaptchaAuthenticationProvider implements AuthenticationProvid
     }
 
     // 独占式登录判断
-    IoTUser user = iIotUserService.selectUserByUserName(username);
+    IoTUser user = ioTUserService.selectUserByUserName(username);
     if (ObjectUtil.isEmpty(user)) {
       stringRedisTemplate
           .opsForValue()
@@ -171,7 +171,7 @@ public class OAuth2CaptchaAuthenticationProvider implements AuthenticationProvid
     // 注释密码验证，专注解决类型转换问题
     BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-      asyncService.recordLogininfor(username, Constants.LOGIN_FAIL, "用户名或密码错误", null);
+      adminLogService.recordLogininfor(username, Constants.LOGIN_FAIL, "用户名或密码错误", null);
       stringRedisTemplate
           .opsForValue()
           .set(retryKey, String.valueOf(retryCount + 1), 10, TimeUnit.MINUTES);
@@ -182,7 +182,7 @@ public class OAuth2CaptchaAuthenticationProvider implements AuthenticationProvid
     }
 
     // 登录成功
-    asyncService.recordLogininfor(username, Constants.LOGIN_SUCCESS, "验证码登录成功", null);
+    adminLogService.recordLogininfor(username, Constants.LOGIN_SUCCESS, "验证码登录成功", null);
     stringRedisTemplate.delete(retryKey);
     stringRedisTemplate.delete(ipKey);
 

@@ -23,15 +23,15 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 
 import cn.hutool.json.JSONUtil;
-import cn.universal.admin.common.annotation.Log;
-import cn.universal.admin.common.enums.BusinessType;
+import cn.universal.common.annotation.Log;
+import cn.universal.common.enums.BusinessType;
 import cn.universal.admin.common.utils.ExcelUtil;
-import cn.universal.admin.common.utils.SecurityUtils;
+import cn.universal.security.utils.SecurityUtils;
 import cn.universal.admin.platform.service.IIoTDeviceService;
 import cn.universal.admin.system.service.IIoTUserApplicationService;
-import cn.universal.admin.system.service.IIotUserService;
+import cn.universal.security.service.IoTUserService;
 import cn.universal.admin.system.service.IOAuthClientDetailsService;
-import cn.universal.admin.system.web.BaseController;
+import cn.universal.security.BaseController;
 import cn.universal.common.exception.IoTException;
 import cn.universal.persistence.base.BaseUPRequest;
 import cn.universal.persistence.entity.IoTUser;
@@ -81,7 +81,7 @@ public class IoTUserAppController extends BaseController {
   @Resource private IoTUserApplicationMapper iotUserApplicationMapper;
   @Resource private IOAuthClientDetailsService oauthClientDetailsService;
   @Resource private IIoTDeviceService iIotDeviceService;
-  @Resource private IIotUserService iIotUserService;
+  @Resource private IoTUserService ioTUserService;
 
   /** 查询用户应用信息列表 */
   @Operation(summary = "查询用户应用信息列表")
@@ -116,7 +116,7 @@ public class IoTUserAppController extends BaseController {
   public void export(HttpServletResponse response, IoTUserApplication iotUserApplication) {
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
     iotUserApplication.setUnionId(
-        iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()
+        ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId()).isAdmin()
             ? null
             : SecurityUtils.getUnionId());
     List<IoTUserApplicationVO> list =
@@ -248,7 +248,7 @@ public class IoTUserAppController extends BaseController {
         "修改用户应用信息,操作人={},参数={}",
         SecurityUtils.getUnionId(),
         JSONUtil.toJsonStr(iotUserApplication));
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
     IoTUserApplication app =
         iotUserApplicationService.selectIotUserApplicationById(iotUserApplication.getAppUniqueId());
     if (app != null
@@ -332,7 +332,7 @@ public class IoTUserAppController extends BaseController {
   @Operation(summary = "HTTP推送启/停用")
   @PostMapping(value = "/enable")
   public AjaxResult<Void> HttpEnable(@RequestBody IoTUserApplication iotUserApplication) {
-    IoTUser iotUser = iIotUserService.selectUserByUnionId(SecurityUtils.getUnionId());
+    IoTUser iotUser = ioTUserService.selectUserByUnionId(SecurityUtils.getUnionId());
     IoTUserApplication app =
         iotUserApplicationService.selectIotUserApplicationById(iotUserApplication.getAppUniqueId());
     if (app != null
