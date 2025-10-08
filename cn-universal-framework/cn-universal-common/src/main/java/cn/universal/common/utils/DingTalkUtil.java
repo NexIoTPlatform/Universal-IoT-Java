@@ -33,10 +33,10 @@ public class DingTalkUtil {
 
   //	@Value("${notice.dingTalk.dingTalk-addr}")
   private static final String token =
-      "https://oapi.dingtalk.com/robot/send?access_token=f731085dd9ef094114794a0f5ff2cc09e017d18acea205415cc03039af472661";
+      "https://oapi.dingtalk.com/robot/send?access_token=";
   //	@Value("${notice.dingTalk.dingTalk-secret}")
   private static final String secret =
-      "SEC34946b12a19f67f32f0e7a1a42b1ca110f6c2ddb224214ce474e594b025efd1e";
+      "";
   //	@Value("${notice.dingTalk.sign}")
   private static final String mark = "platform Universal";
   private static Set<String> prodProfileActive =
