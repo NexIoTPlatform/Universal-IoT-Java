@@ -255,6 +255,7 @@ cd cn-universal-web & ./bin/restart.sh
 |![功能截图19](/__MACOSX/shot/19.png)| ![功能截图20](/__MACOSX/shot/20.png) |![功能截图21](/__MACOSX/shot/21.png)|
 |![功能截图22](/__MACOSX/shot/22.png)| ![功能截图23](/__MACOSX/shot/23.png) |![功能截图24](/__MACOSX/shot/54.png)|
 |![功能截图52](/__MACOSX/shot/52.png)| ![功能截图51](/__MACOSX/shot/51.png) |![功能截图50](/__MACOSX/shot/50.png)|
+| ![功能截图qiaojie](/__MACOSX/shot/qiaojie.png) | ![功能截图51](/__MACOSX/shot/qiaojie2.png) | ![功能截图50](/__MACOSX/shot/qiaojie3.png) |
 
 ### 🧪 案例展示
 
