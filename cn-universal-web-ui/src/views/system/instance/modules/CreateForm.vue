@@ -118,10 +118,10 @@
       <a-form-model-item label="设备名称" prop="deviceName">
         <a-input v-model="form.deviceName" placeholder="请输入设备名称"/>
       </a-form-model-item>
-      <a-form-model-item label="所属网关" prop="extDeviceId"
+      <a-form-model-item label="所属网关设备" prop="extDeviceId"
                          v-if="deviceNode === 'GATEWAY_SUB_DEVICE'">
         <a-select
-          placeholder="请选择所属网关"
+          placeholder="请选择所属网关设备"
           v-model="form.extDeviceId"
           style="width: 100%"
           allow-clear
@@ -130,7 +130,7 @@
           :filter-option="filterOption">
           <a-select-option v-for="(item) in gatewayList" :key="item.deviceId"
                            :value="item.deviceId">
-            {{ item.concatName }}
+            {{ item.deviceName }}
           </a-select-option>
         </a-select>
       </a-form-model-item>
@@ -290,7 +290,7 @@ export default {
         deviceName: [
           {required: true, message: '请输入设备名称', trigger: 'blur'}],
         extDeviceId: [
-          {required: true, message: '请输入所属网关', trigger: 'blur'}],
+          {required: true, message: '请选择所属网关设备', trigger: 'blur'}],
         deviceId: [
           {required: true, message: '请输入设备序列号', trigger: 'blur'},
           {

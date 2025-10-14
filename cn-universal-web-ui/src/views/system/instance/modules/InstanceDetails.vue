@@ -177,7 +177,7 @@
                     <span class="info-value">{{ productDetails.transportProtocol }}</span>
                   </div>
                   <div class="info-item" v-if="deviceNode === 'GATEWAY_SUB_DEVICE'">
-                    <span class="info-label">所属网关</span>
+                    <span class="info-label">所属网关设备</span>
                     <span class="info-value">{{ devDetails.gwDeviceInfo }}</span>
                   </div>
                   <div class="info-item ">
@@ -886,31 +886,31 @@ export default {
         this.showSmartTip = true
         return
       }
-      
+
       // 检查是否有数据类型不匹配的问题
       const hasDataTypeMismatch = this.properties.some(prop => {
-        return prop.formatValue && prop.formatValue !== '--' && 
-               (prop.dataType && prop.dataType !== prop.expectedType)
+        return prop.formatValue && prop.formatValue !== '--' &&
+          (prop.dataType && prop.dataType !== prop.expectedType)
       })
-      
+
       if (hasDataTypeMismatch) {
         this.smartTipType = 'dataTypeMismatch'
         this.showSmartTip = true
         return
       }
-      
+
       // 检查是否有JSON解析错误
       const hasJsonError = this.properties.some(prop => {
-        return prop.formatValue && prop.formatValue.includes('JSON') && 
-               prop.formatValue.includes('错误')
+        return prop.formatValue && prop.formatValue.includes('JSON') &&
+          prop.formatValue.includes('错误')
       })
-      
+
       if (hasJsonError) {
         this.smartTipType = 'jsonError'
         this.showSmartTip = true
         return
       }
-      
+
       // 默认情况下隐藏提示
       this.showSmartTip = false
     },
@@ -954,24 +954,24 @@ export default {
         version: '2.0', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
         plugins: ['AMap.Geocoder', 'AMap.AutoComplete'] // 需要使用的的插件列表，如比例尺'AMap.Scale'等
       })
-      .then((AMap) => {
-        window.AMap = AMap
-        this.map = new AMap.Map('showmap-modal-container', {
-          zoom: 12,
-          center: [81.368244,44.620889]
-        })
-        this.geocoder = new AMap.Geocoder()
-        this.autoComplete = new AMap.AutoComplete()
+        .then((AMap) => {
+          window.AMap = AMap
+          this.map = new AMap.Map('showmap-modal-container', {
+            zoom: 12,
+            center: [81.368244,44.620889]
+          })
+          this.geocoder = new AMap.Geocoder()
+          this.autoComplete = new AMap.AutoComplete()
 
-        // 如果有位置信息，绘制标点
-        if (this.location.lng && this.location.lat) {
-          this.drawPoint()
-          this.map.panTo([this.location.lng, this.location.lat])
-        }
-      })
-      .catch((e) => {
-        console.log('地图初始化失败:', e)
-      })
+          // 如果有位置信息，绘制标点
+          if (this.location.lng && this.location.lat) {
+            this.drawPoint()
+            this.map.panTo([this.location.lng, this.location.lat])
+          }
+        })
+        .catch((e) => {
+          console.log('地图初始化失败:', e)
+        })
     },
 
     drawPoint() {
@@ -1115,12 +1115,12 @@ export default {
 
       this.devEventShadow(this.productKey, this.devId)
       this.devPropertiesShadow(this.devId)
-      
+
       // 延迟执行智能提示判断，确保数据已更新
       this.$nextTick(() => {
         this.shouldShowSmartTip()
       })
-      
+
       this.$message.success('刷新成功', 2)
     },
 
@@ -1577,7 +1577,7 @@ export default {
   color: #0369a1;
   transition: all 0.2s ease;
   cursor: pointer;
-  
+
   &:hover {
     background: #e0f2fe;
     border-color: #7dd3fc;
@@ -1602,11 +1602,11 @@ export default {
   background: #fef3c7;
   border-color: #fbbf24;
   color: #92400e;
-  
+
   .tip-icon {
     color: #f59e0b;
   }
-  
+
   &:hover {
     background: #fde68a;
     border-color: #f59e0b;
@@ -1618,11 +1618,11 @@ export default {
   background: #fef2f2;
   border-color: #f87171;
   color: #991b1b;
-  
+
   .tip-icon {
     color: #ef4444;
   }
-  
+
   &:hover {
     background: #fee2e2;
     border-color: #ef4444;
@@ -1634,11 +1634,11 @@ export default {
   background: #fdf4ff;
   border-color: #e879f9;
   color: #7c2d12;
-  
+
   .tip-icon {
     color: #d946ef;
   }
-  
+
   &:hover {
     background: #fae8ff;
     border-color: #d946ef;

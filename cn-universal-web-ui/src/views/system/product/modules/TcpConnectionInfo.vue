@@ -6,7 +6,7 @@
         <a-icon type="link" style="color: #1890ff; margin-right: 8px;"/>
         <span class="section-title">TCP连接信息</span>
       </div>
-      
+
       <!-- 连接方式选择 -->
       <div v-if="connectionInfo" class="connection-mode-selector">
         <div class="selector-title">
@@ -35,7 +35,7 @@
             管理{{ getPlatformTitle() }}服务端
           </a-button> -->
         </div>
-        
+
         <!-- 连接方式说明 -->
         <div class="connection-mode-description">
           <div class="mode-item">
@@ -54,19 +54,19 @@
           </div>
         </div>
       </div>
-      
+
       <!-- 当前连接信息展示 -->
       <div v-if="connectionInfo" class="current-connection-display">
         <div class="current-connection-header">
           <div class="connection-status">
             <a-icon :type="getCurrentConnectionIcon()" :style="{ color: getCurrentConnectionColor() }"/>
             <span class="status-text">{{ getCurrentConnectionTitle() }}</span>
-            <a-badge v-if="currentConnectionMode === 'server'" 
+            <a-badge v-if="currentConnectionMode === 'server'"
                      :status="connectionInfo.network.state ? 'success' : 'default'"
                      :text="connectionInfo.network.state ? '运行中' : '已停止'"/>
           </div>
         </div>
-        
+
         <!-- 当前连接详细信息 -->
         <div class="connection-details">
           <a-descriptions :column="1" size="small" bordered>
@@ -85,7 +85,7 @@
           </a-descriptions>
         </div>
       </div>
-      
+
       <!-- 加载中状态 -->
       <div v-else class="loading-connection">
         <a-spin size="large">
@@ -199,7 +199,7 @@
                     {{ item.name }}
                   </a>
                 </div>
-                
+
                 <div class="card-body">
                   <div class="card-row">
                     <a-icon type="cloud-server" style="margin-right:4px;"/>
@@ -221,14 +221,14 @@
                     </span>
                   </div>
                 </div>
-                
+
                 <div class="card-actions">
-                  <div class="action-btn bind-btn" 
+                  <div class="action-btn bind-btn"
                        @click.stop="bindComponent(item)"
                        :class="{ disabled: product.networkUnionId === item.unionId }">
                     <a-icon type="link"/>
                   </div>
-                  <div class="action-btn edit-btn" 
+                  <div class="action-btn edit-btn"
                        @click.stop="viewComponentDetail(item)"
                        v-hasPermi="['network:tcp:edit']">
                     <a-icon type="edit"/>
@@ -447,7 +447,7 @@ export default {
       if (!this.product.productKey) {
         return
       }
-      
+
       try {
         const response = await getProductConnectInfo(this.product.productKey)
         if (response.code === 200 || response.code === 0) {
@@ -460,11 +460,11 @@ export default {
         this.$message.error('加载连接信息失败：' + error.message)
       }
     },
-    
+
     /** 初始化连接模式 */
     initConnectionMode() {
       if (!this.connectionInfo) return
-      
+
       // 默认选择服务端，如果服务端不可用且是TCP协议，则选择SNI
       if (this.product.networkUnionId && this.connectionInfo.network.enabled) {
         this.currentConnectionMode = 'server'
@@ -474,16 +474,16 @@ export default {
         this.currentConnectionMode = 'server'
       }
     },
-    
+
     /** 连接模式切换 */
     onConnectionModeChange(e) {
       this.currentConnectionMode = e.target.value
     },
-    
+
     /** 获取当前连接信息 */
     getCurrentConnectionInfo() {
       if (!this.connectionInfo) return {}
-      
+
       if (this.currentConnectionMode === 'server' && this.connectionInfo.network.enabled) {
         // 服务端连接信息
         const config = this.getConfigValue(this.boundComponent, 'allowedAddresses')
@@ -504,7 +504,7 @@ export default {
         }
       }
     },
-    
+
     /** 获取当前连接图标 */
     getCurrentConnectionIcon() {
       if (this.currentConnectionMode === 'server') {
@@ -513,7 +513,7 @@ export default {
         return 'global'
       }
     },
-    
+
     /** 获取当前连接颜色 */
     getCurrentConnectionColor() {
       if (this.currentConnectionMode === 'server') {
@@ -522,7 +522,7 @@ export default {
         return '#52c41a'
       }
     },
-    
+
     /** 获取当前连接标题 */
     getCurrentConnectionTitle() {
       if (this.currentConnectionMode === 'server' && this.connectionInfo && this.connectionInfo.network.enabled) {
@@ -531,7 +531,7 @@ export default {
         return 'SNI域名（设备需支持TLS）'
       }
     },
-    
+
     /** 显示TCP服务端管理弹窗 */
     showServerManagementModal() {
       this.serverManagementModalVisible = true
@@ -539,58 +539,58 @@ export default {
         this.loadComponentList()
       }
     },
-    
+
     /** 关闭TCP服务端管理弹窗 */
     closeServerManagementModal() {
       this.serverManagementModalVisible = false
       this.selectedComponent = null
     },
-    
-    
+
+
     /** 检查TCP配置是否完整 */
     isTcpConfigured(item) {
       if (!item.configuration) {
-        console.log('isTcpConfigured: 无配置信息', item)
+        // console.log('isTcpConfigured: 无配置信息', item)
         return false
       }
       try {
-        const config = typeof item.configuration === 'string' 
-          ? JSON.parse(item.configuration) 
+        const config = typeof item.configuration === 'string'
+          ? JSON.parse(item.configuration)
           : item.configuration
-        
-        console.log('isTcpConfigured: 解析后的配置', config)
-        console.log('isTcpConfigured: host=', config.host, 'port=', config.port)
-        
+
+        // console.log('isTcpConfigured: 解析后的配置', config)
+        // console.log('isTcpConfigured: host=', config.host, 'port=', config.port)
+
         const isConfigured = !!(config.host && config.port)
-        console.log('isTcpConfigured: 配置完整=', isConfigured)
-        
+        // console.log('isTcpConfigured: 配置完整=', isConfigured)
+
         return isConfigured
       } catch (e) {
-        console.log('isTcpConfigured: 配置解析失败', e, item.configuration)
+        // console.log('isTcpConfigured: 配置解析失败', e, item.configuration)
         return false
       }
     },
-    
+
     /** 获取状态文本 */
     getStatusText(item) {
-      console.log('getStatusText: 检查状态', {
-        running: item.running,
-        state: item.state,
-        configuration: item.configuration
-      })
-      
+      // console.log('getStatusText: 检查状态', {
+      //   running: item.running,
+      //   state: item.state,
+      //   configuration: item.configuration
+      // })
+
       if (item.running) {
-        console.log('getStatusText: 返回运行中')
+        // console.log('getStatusText: 返回运行中')
         return '运行中'
       } else if (this.isTcpConfigured(item)) {
-        console.log('getStatusText: 返回已停止')
+        // console.log('getStatusText: 返回已停止')
         return '已停止'
       } else {
-        console.log('getStatusText: 返回未配置')
+        // console.log('getStatusText: 返回未配置')
         return '未配置'
       }
     },
-    
+
     /** 获取状态样式类 */
     getStatusClass(item) {
       if (item.running) {
@@ -611,7 +611,7 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 16px;
-    
+
     .section-title {
       font-size: 16px;
       font-weight: 600;
@@ -632,7 +632,7 @@ export default {
       background: #ffffff;
       border-radius: 6px;
       border: 1px solid #e8e8e8;
-      
+
       .selector-title {
         display: flex;
         align-items: center;
@@ -641,39 +641,39 @@ export default {
         font-weight: 600;
         color: #333;
       }
-      
+
       .selector-content {
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
-      
+
       .connection-mode-description {
         margin-top: 16px;
         padding: 12px;
         background: #f8f9fa;
         border-radius: 6px;
         border: 1px solid #e8e8e8;
-        
+
         .mode-item {
           display: flex;
           align-items: flex-start;
           margin-bottom: 8px;
-          
+
           &:last-child {
             margin-bottom: 0;
           }
-          
+
           .mode-info {
             flex: 1;
-            
+
             .mode-name {
               font-size: 13px;
               font-weight: 600;
               color: #333;
               margin-bottom: 2px;
             }
-            
+
             .mode-desc {
               font-size: 12px;
               color: #666;
@@ -682,28 +682,28 @@ export default {
           }
         }
       }
-      
+
       .ant-radio-group {
         .ant-radio-button-wrapper {
           border-radius: 4px;
           margin-right: 8px;
-          
+
           &:hover {
             border-color: #1890ff;
             color: #1890ff;
           }
-          
+
           &.ant-radio-button-wrapper-checked {
             background: #1890ff;
             border-color: #1890ff;
             color: #ffffff;
-            
+
             &:hover {
               background: #40a9ff;
               border-color: #40a9ff;
             }
           }
-          
+
           &.ant-radio-button-wrapper-disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -715,7 +715,7 @@ export default {
     .current-connection-display {
       .current-connection-header {
         margin-bottom: 16px;
-        
+
         .connection-status {
           display: flex;
           align-items: center;
@@ -723,20 +723,20 @@ export default {
           background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
           border-radius: 6px;
           border: 1px solid #b7eb8f;
-          
+
           .status-text {
             margin-left: 8px;
             font-size: 16px;
             font-weight: 600;
             color: #333;
           }
-          
+
           .ant-badge {
             margin-left: 12px;
           }
         }
       }
-      
+
       .connection-details {
         .ant-descriptions {
           background: #ffffff;
@@ -744,11 +744,11 @@ export default {
         }
       }
     }
-    
+
     .loading-connection {
       text-align: center;
       padding: 40px 0;
-      
+
       .loading-text {
         margin-top: 16px;
         color: #666;
@@ -761,7 +761,7 @@ export default {
 .server-management-modal {
   .current-binding-status {
     margin-bottom: 24px;
-    
+
     .status-header {
       display: flex;
       align-items: center;
@@ -770,7 +770,7 @@ export default {
       font-weight: 600;
       color: #333;
     }
-    
+
     .bound-component-info {
       .ant-descriptions {
         background: #fafafa;
@@ -778,14 +778,14 @@ export default {
       }
     }
   }
-  
+
   .component-selection {
     .selection-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
-      
+
       h4 {
         margin: 0;
         font-size: 16px;
@@ -793,17 +793,17 @@ export default {
         color: #1a202c;
       }
     }
-    
+
     .empty-state {
       padding: 40px 0;
       text-align: center;
     }
-    
+
     .component-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 16px;
-      
+
       .network-card {
         margin-bottom: 16px;
         border-radius: 8px;
@@ -812,16 +812,16 @@ export default {
         position: relative;
         padding-bottom: 8px;
         cursor: pointer;
-        
+
         &:hover {
           box-shadow: 0 4px 16px #e6f7ff;
         }
-        
+
         &.selected {
           border-color: #1890ff;
           box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
         }
-        
+
         .card-header {
           display: flex;
           align-items: center;
@@ -830,7 +830,7 @@ export default {
           font-weight: bold;
           margin-bottom: 8px;
         }
-        
+
         .card-title {
           margin-left: 8px;
           cursor: pointer;
@@ -841,16 +841,16 @@ export default {
           text-overflow: ellipsis;
           display: block;
           flex: 1;
-          
+
           &:hover {
             color: #40a9ff;
           }
         }
-        
+
         .card-body {
           margin: 12px 0 8px 0;
         }
-        
+
         .card-row {
           font-size: 13px;
           color: #666;
@@ -859,7 +859,7 @@ export default {
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        
+
         .card-actions {
           display: flex;
           gap: 12px;
@@ -869,7 +869,7 @@ export default {
           justify-content: center;
           align-items: center;
         }
-        
+
         .action-btn {
           width: 36px;
           height: 36px;
@@ -882,36 +882,36 @@ export default {
           border: 1px solid #e8e8e8;
           font-size: 16px;
           background: #ffffff;
-          
+
           &:hover {
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           }
-          
+
           &.disabled {
             opacity: 0.3;
             cursor: not-allowed;
-            
+
             &:hover {
               transform: none;
               box-shadow: none;
             }
           }
         }
-        
+
         .bind-btn {
           color: #52c41a;
-          
+
           &:hover:not(.disabled) {
             background: #f6ffed;
             border-color: #b7eb8f;
             color: #52c41a;
           }
         }
-        
+
         .edit-btn {
           color: #0958d9;
-          
+
           &:hover:not(.disabled) {
             background: #e6f7ff;
             border-color: #91d5ff;
