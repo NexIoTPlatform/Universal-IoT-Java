@@ -1,98 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!-- 引入 Spring 配置的日志路径 -->
-  <springProperty scope="context" name="log.path" source="logging.file.path"/>
+  <springProperty scope="context" name="log.path" source="logging.file.path" defaultValue="./logs"/>
   <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
 
   <!-- 日志格式定义 -->
-  <property name="console.log.pattern"
-    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] %-5level %logger{36} - %msg%n"/>
-  <property name="log.pattern"
-    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] %-5level %logger{36} - %msg%n"/>
-  <property name="tcp.pattern"
-    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{ctxId}] [%X{traceId}] [TCP] %-5level - %msg%n"/>
-  <property name="mqtt.pattern"
-    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{ctxId}] [%X{traceId}] [MQTT] %-5level - %msg%n"/>
+  <!-- 全局合并日志格式：增加模块标识，便于区分来源 -->
+  <property name="all.pattern"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%X{ctxId}] [%logger] %-5level - %msg%n"/>
+  <!-- 模块独立日志格式（保持原样） -->
+  <property name="module.pattern"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%X{ctxId}] %-5level - %msg%n"/>
+  <!-- 控制台和其他格式 -->
+  <property name="console.pattern"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] [%logger] %-5level - %msg%n"/>
+  <property name="global.pattern"
+    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] %-5level %logger{30} - %msg%n"/>
 
-  <!-- 1. 全局 info 日志 -->
-  <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${log.path}/sys-info.log</file>
+  <!-- 1. 全局合并日志（汇总所有日志） -->
+  <appender name="ALL_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/all.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>${log.path}/sys-info.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
-      <maxFileSize>1024MB</maxFileSize>
-      <maxHistory>60</maxHistory>
+      <fileNamePattern>${log.path}/all.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>1GB</maxFileSize> <!-- 合并日志可适当放大 -->
+      <maxHistory>15</maxHistory> <!-- 保留15天，避免过大 -->
     </rollingPolicy>
     <encoder>
-      <pattern>${log.pattern}</pattern>
-      <charset>utf-8</charset>
+      <pattern>${all.pattern}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level> <!-- 合并日志默认输出INFO及以上 -->
+    </filter>
+  </appender>
+
+  <!-- 2. 全局非模块日志（按级别拆分） -->
+  <appender name="GLOBAL_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/global/info.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${log.path}/global/info.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>500MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${global.pattern}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
       <level>INFO</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
     </filter>
   </appender>
 
-  <!-- 2. API 模块日志 -->
-  <appender name="api_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${log.path}/api.log</file>
+  <appender name="GLOBAL_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/global/warn.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>${log.path}/api.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
-      <maxFileSize>1024MB</maxFileSize>
-      <maxHistory>60</maxHistory>
+      <fileNamePattern>${log.path}/global/warn.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>500MB</maxFileSize>
+      <maxHistory>30</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>${log.pattern}</pattern>
-      <charset>utf-8</charset>
+      <pattern>${global.pattern}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>DEBUG</level>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>WARN</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
     </filter>
   </appender>
 
-  <!-- 3. TCP 模块专属日志 -->
-  <appender name="tcp" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${log.path}/tcp.log</file>
+  <appender name="GLOBAL_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/global/error.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>${log.path}/tcp.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
-      <maxFileSize>1024MB</maxFileSize>
-      <maxHistory>60</maxHistory>
+      <fileNamePattern>${log.path}/global/error.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>500MB</maxFileSize>
+      <maxHistory>90</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>${tcp.pattern}</pattern> <!-- 使用 TCP 专属格式 -->
-      <charset>utf-8</charset>
-    </encoder>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>DEBUG</level>
-    </filter>
-  </appender>
-
-  <!-- 4. MQTT 模块专属日志 -->
-  <appender name="mqtt" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${log.path}/mqtt.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>${log.path}/mqtt.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
-      <maxFileSize>1024MB</maxFileSize>
-      <maxHistory>60</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <pattern>${mqtt.pattern}</pattern> <!-- 使用 MQTT 专属格式 -->
-      <charset>utf-8</charset>
-    </encoder>
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>DEBUG</level>
-    </filter>
-  </appender>
-
-  <!-- 5. 全局错误日志 -->
-  <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>${log.path}/sys-error.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>${log.path}/sys-error.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
-      <maxFileSize>1024MB</maxFileSize>
-      <maxHistory>60</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <pattern>${log.pattern}</pattern>
-      <charset>utf-8</charset>
+      <pattern>${global.pattern}</pattern>
+      <charset>UTF-8</charset>
     </encoder>
     <filter class="ch.qos.logback.classic.filter.LevelFilter">
       <level>ERROR</level>
@@ -101,85 +88,135 @@
     </filter>
   </appender>
 
-  <!-- 环境差异化配置 -->
+  <!-- 3. 模块独立日志 -->
+  <appender name="API_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/api/api.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${log.path}/api/api.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>500MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${module.pattern}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <appender name="TCP_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/tcp/tcp.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${log.path}/tcp/tcp.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>500MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${module.pattern}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <appender name="MQTT_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/mqtt/mqtt.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${log.path}/mqtt/mqtt.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+      <maxFileSize>500MB</maxFileSize>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${module.pattern}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <!-- 4. 控制台输出 -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${console.pattern}</pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+  </appender>
+
+  <!-- 开发环境（dev） -->
   <springProfile name="dev">
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>${console.log.pattern}</pattern>
-        <charset>utf-8</charset>
-      </encoder>
-    </appender>
-    <root level="DEBUG">
-      <appender-ref ref="console"/>
-    </root>
-    <logger name="org.springframework.data.redis.listener" level="DEBUG"/>
-    <logger name="org.springframework.data.redis" level="DEBUG"/>
-
-  </springProfile>
-
-  <!-- 环境差异化配置 -->
-  <springProfile name="test,test2,huo">
-    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-      <encoder>
-        <pattern>${console.log.pattern}</pattern>
-        <charset>utf-8</charset>
-      </encoder>
-    </appender>
-    <root level="DEBUG">
-      <appender-ref ref="file_error"/>
-      <appender-ref ref="file_info"/>
-      <appender-ref ref="console"/>
-
-      <!-- 从 root 中移除 tcp appender -->
-    </root>
-    <!-- 精确控制 API 日志 -->
-    <logger name="cn.universal.web" level="DEBUG" additivity="false">
-      <appender-ref ref="api_log"/>
-    </logger>
-    <!-- 精确控制 MQTT 日志 -->
-    <logger name="cn.universal.mqtt" level="INFO" additivity="true">
-      <appender-ref ref="mqtt"/>
-    </logger>
-    <!-- 精确控制 TCP 日志 -->
-    <logger name="cn.tcp" level="INFO" additivity="true">
-      <appender-ref ref="tcp"/>
-    </logger>
-
-
-    <logger name="org.springframework.data.redis.listener" level="DEBUG"/>
-    <logger name="org.springframework.data.redis" level="DEBUG"/>
-    <!-- 为 cn.universal 绑定支持 DEBUG 的 Appender -->
-    <logger name="cn.universal" level="INFO" additivity="false">
-      <appender-ref ref="file_info"/> <!-- 仅输出到全局 INFO 日志 -->
-    </logger>
-  </springProfile>
-
-  <springProfile name="prod,beta,out">
     <root level="INFO">
-      <appender-ref ref="file_error"/>
-      <appender-ref ref="file_info"/>
-      <!-- 从 root 中移除 tcp appender -->
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="ALL_LOG"/> <!-- 全局合并日志 -->
+      <appender-ref ref="GLOBAL_INFO"/>
+      <appender-ref ref="GLOBAL_WARN"/>
+      <appender-ref ref="GLOBAL_ERROR"/>
     </root>
-    <!-- 精确控制 API 日志 -->
-    <logger name="cn.universal.web" level="DEBUG" additivity="false">
-      <appender-ref ref="api_log"/>
+
+    <!-- 模块日志：输出到独立文件 + 合并日志 + 控制台 -->
+    <logger name="api" level="DEBUG" additivity="true"> <!-- additivity=true：允许继承root的appender（含ALL_LOG） -->
+      <appender-ref ref="API_LOG"/> <!-- 独立文件 -->
     </logger>
-    <!-- 精确控制 MQTT 日志 -->
-    <logger name="cn.universal.mqtt" level="INFO" additivity="true">
-      <appender-ref ref="mqtt"/>
+    <logger name="tcp" level="DEBUG" additivity="true">
+      <appender-ref ref="TCP_LOG"/>
     </logger>
-    <!-- 精确控制 TCP 日志 -->
-    <logger name="cn.tcp" level="INFO" additivity="true">
-      <appender-ref ref="tcp"/>
+    <logger name="mqtt" level="DEBUG" additivity="true">
+      <appender-ref ref="MQTT_LOG"/>
     </logger>
 
-    <logger name="cn.universal" level="INFO" additivity="false">
-      <appender-ref ref="file_info"/> <!-- 仅输出到全局 INFO 日志 -->
-    </logger>
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="cn.hutool" level="INFO"/>
   </springProfile>
 
-  <!-- 通用 logger 配置 -->
-  <logger name="cn.hutool" level="DEBUG"/>
-  <logger name="org.springframework" level="WARN"/>
-  <logger name="io.lettuce" level="INFO"/>
+  <!-- 测试环境（huo） -->
+  <springProfile name="test,test2,huo">
+    <root level="INFO">
+      <appender-ref ref="ALL_LOG"/> <!-- 全局合并日志 -->
+      <appender-ref ref="GLOBAL_INFO"/>
+      <appender-ref ref="GLOBAL_WARN"/>
+      <appender-ref ref="GLOBAL_ERROR"/>
+    </root>
+
+    <!-- 模块日志：独立文件 + 合并日志 -->
+    <logger name="api" level="INFO" additivity="true">
+      <appender-ref ref="API_LOG"/>
+    </logger>
+    <logger name="tcp" level="INFO" additivity="true">
+      <appender-ref ref="TCP_LOG"/>
+    </logger>
+    <logger name="mqtt" level="INFO" additivity="true">
+      <appender-ref ref="MQTT_LOG"/>
+    </logger>
+
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="cn.hutool" level="WARN"/>
+  </springProfile>
+
+  <!-- 生产环境 -->
+  <springProfile name="prod,beta,out">
+    <root level="WARN">
+      <appender-ref ref="ALL_LOG"/> <!-- 全局合并日志 -->
+      <appender-ref ref="GLOBAL_WARN"/>
+      <appender-ref ref="GLOBAL_ERROR"/>
+    </root>
+
+    <!-- 模块日志：独立文件 + 合并日志 -->
+    <logger name="api" level="INFO" additivity="true">
+      <appender-ref ref="API_LOG"/>
+    </logger>
+    <logger name="tcp" level="INFO" additivity="true">
+      <appender-ref ref="TCP_LOG"/>
+    </logger>
+    <logger name="mqtt" level="INFO" additivity="true">
+      <appender-ref ref="MQTT_LOG"/>
+    </logger>
+
+    <logger name="org.springframework" level="ERROR"/>
+    <logger name="cn.hutool" level="ERROR"/>
+  </springProfile>
 </configuration>
