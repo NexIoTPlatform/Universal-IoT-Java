@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTDeviceRuleLogMapper">
+  <resultMap id="BaseResultMap" type="cn.universal.persistence.entity.IoTDeviceRuleLog">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id"/>
+    <result column="c_id" jdbcType="VARCHAR" property="cId"/>
+    <result column="c_name" jdbcType="VARCHAR" property="cName"/>
+    <result column="c_status" jdbcType="TINYINT" property="cStatus"/>
+    <result column="c_type" jdbcType="TINYINT" property="cType"/>
+    <result column="conditions" jdbcType="VARCHAR" property="conditions"/>
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    <result column="content" jdbcType="LONGVARCHAR" property="content"/>
+  </resultMap>
+</mapper>

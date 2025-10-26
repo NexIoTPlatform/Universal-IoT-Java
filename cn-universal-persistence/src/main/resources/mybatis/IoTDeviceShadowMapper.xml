@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTDeviceShadowMapper">
+  <resultMap id="BaseResultMap" type="cn.universal.persistence.entity.IoTDeviceShadow">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id"/>
+    <result column="iot_id" jdbcType="VARCHAR" property="iotId"/>
+    <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
+    <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+    <result column="ext_device_id" jdbcType="VARCHAR" property="extDeviceId"/>
+    <result column="active_time" jdbcType="TIMESTAMP" property="activeTime"/>
+    <result column="online_time" jdbcType="TIMESTAMP" property="onlineTime"/>
+    <result column="last_time" jdbcType="TIMESTAMP" property="lastTime"/>
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate"/>
+    <result column="metadata" jdbcType="LONGVARCHAR" property="metadata"/>
+    <result column="instance" jdbcType="VARCHAR" property="instance"/>
+  </resultMap>
+
+
+  <select id="getDeviceShadow" resultMap="BaseResultMap" parameterType="String">
+    select *
+    from iot_device_shadow
+    where iot_id = #{id}
+  </select>
+  <select id="getShadowMetadata" resultType="String">
+    select `metadata`
+    from iot_device_shadow
+    where product_key = #{productKey}
+      AND device_id = #{deviceId} limit 1
+  </select>
+
+  <!-- 批量查询设备影子 -->
+  <select id="selectByIotIds" resultMap="BaseResultMap">
+    select *
+    from iot_device_shadow
+    where iot_id in
+    <foreach collection="iotIds" item="iotId" open="(" separator="," close=")">
+      #{iotId}
+    </foreach>
+  </select>
+
+  <!-- 批量插入设备影子 -->
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into iot_device_shadow (
+    iot_id, product_key, device_id, ext_device_id,
+    active_time, online_time, last_time, update_date,
+    metadata, `instance`
+    ) values
+    <foreach collection="shadows" item="shadow" separator=",">
+      (
+      #{shadow.iotId}, #{shadow.productKey}, #{shadow.deviceId}, #{shadow.extDeviceId},
+      #{shadow.activeTime}, #{shadow.onlineTime}, #{shadow.lastTime}, #{shadow.updateDate},
+      #{shadow.metadata}, #{shadow.instance}
+      )
+    </foreach>
+  </insert>
+
+  <!-- 批量更新设备影子 -->
+  <update id="batchUpdate" parameterType="java.util.List">
+    <foreach collection="shadows" item="shadow" separator=";">
+      update iot_device_shadow
+      set
+      product_key = #{shadow.productKey},
+      device_id = #{shadow.deviceId},
+      ext_device_id = #{shadow.extDeviceId},
+      online_time = #{shadow.onlineTime},
+      last_time = #{shadow.lastTime},
+      update_date = #{shadow.updateDate},
+      metadata = #{shadow.metadata},
+      `instance` = #{shadow.instance}
+      where iot_id = #{shadow.iotId}
+    </foreach>
+  </update>
+</mapper>

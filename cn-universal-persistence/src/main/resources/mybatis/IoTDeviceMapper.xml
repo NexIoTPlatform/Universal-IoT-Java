@@ -1,0 +1,1147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTDeviceMapper">
+  <resultMap id="BaseResultMap" type="cn.universal.persistence.entity.IoTDevice">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="BIGINT" property="id"/>
+    <result column="iot_id" jdbcType="VARCHAR" property="iotId"/>
+    <result column="device_id" jdbcType="VARCHAR" property="deviceId"/>
+    <result column="ext_device_id" jdbcType="VARCHAR" property="extDeviceId"/>
+    <result column="product_name" jdbcType="VARCHAR" property="productName"/>
+    <result column="nick_name" jdbcType="VARCHAR" property="nickName"/>
+    <result column="features" jdbcType="BIGINT" property="features"/>
+    <result column="gw_product_key" jdbcType="VARCHAR" property="gwProductKey"/>
+    <result column="device_secret" jdbcType="VARCHAR" property="deviceSecret"/>
+    <result column="product_key" jdbcType="VARCHAR" property="productKey"/>
+    <result column="device_name" jdbcType="VARCHAR" property="deviceName"/>
+    <result column="creator_id" jdbcType="VARCHAR" property="creatorId"/>
+    <result column="creator_name" jdbcType="VARCHAR" property="creatorName"/>
+    <result column="state" jdbcType="BIT" property="state"/>
+    <result column="detail" jdbcType="VARCHAR" property="detail"/>
+    <result column="create_time" jdbcType="BIGINT" property="createTime"/>
+    <result column="derive_metadata" jdbcType="LONGVARCHAR" property="deriveMetadata"/>
+    <result column="configuration" jdbcType="LONGVARCHAR" property="configuration"/>
+    <result column="areas_id" jdbcType="BIGINT" property="areasId"/>
+    <result column="coordinate" property="coordinate"/>
+  </resultMap>
+  <resultMap id="group" type="cn.universal.persistence.entity.vo.IoTDeviceCompanyVO">
+    <result property="companyNo" column="company_no"/>
+    <result property="companyName" column="company_name"/>
+    <collection property="devices" ofType="cn.universal.persistence.entity.vo.IoTDeviceTypeVO">
+      <result property="deviceType" column="device_type"/>
+      <result property="deviceTypeName" column="device_type_name"/>
+      <collection property="models" ofType="cn.universal.persistence.entity.vo.IoTDeviceModelVO">
+        <result property="deviceModel" column="device_model"/>
+        <result property="deviceModelName" column="device_model_name"/>
+        <result property="protocol" column="protocol"/>
+        <result property="productKey" column="product_key"/>
+        <result property="pageCtrl" column="page_ctrl"/>
+      </collection>
+    </collection>
+  </resultMap>
+
+  <resultMap id="ioTDeviceDTO" type="cn.universal.persistence.dto.IoTDeviceDTO">
+    <result property="applicationId" column="applicationId"/>
+    <result property="userUnionId" column="userUnionId"/>
+    <result property="appId" column="app_id"/>
+    <result property="userId" column="userId"/>
+    <result property="deviceId" column="deviceId"/>
+    <result property="deviceName" column="deviceName"/>
+    <result property="productKey" column="productKey"/>
+    <result property="productName" column="productName"/>
+    <result property="extDeviceId" column="extDeviceId"/>
+    <result property="iotId" column="iotId"/>
+    <result property="metadata" column="metadata"/>
+    <result property="upTopic" column="upTopic"/>
+    <result property="state" column="state"/>
+    <result property="registryTime" column="registryTime"/>
+    <result property="onlineTime" column="onlineTime"/>
+    <result property="downTopic" column="downTopic"/>
+    <result property="scope" column="scope"/>
+    <result property="thirdPlatform" column="thirdPlatform"/>
+    <result property="deviceNode" column="deviceNode"/>
+    <result property="configuration" column="configuration"/>
+    <result property="appDisable" column="appDisable"/>
+    <result property="shadow" column="shadow"/>
+    <result property="devConfiguration" column="devConfiguration"/>
+    <result property="storePolicy" column="storePolicy"/>
+    <result property="storePolicyCfg" column="storePolicyCfg"/>
+    <result property="areasId" column="areasId"/>
+    <result property="coordinate" column="coordinate"/>
+    <result property="detail" column="detail"/>
+    <result property="extDeviceId" column="extDeviceId"/>
+    <collection property="devGroupId" ofType="java.lang.String" javaType="java.util.List">
+      <result column="devGroupId"/>
+    </collection>
+  </resultMap>
+
+  <!-- 根据设备ID，查询产品和应用信息 -->
+  <select id="selectIoTDeviceBO" resultMap="ioTDeviceDTO">
+    SELECT
+    up.app_unique_id `applicationId`,
+    up.app_id,
+    u.union_id `userUnionId`,
+    u.id `userId`,
+    a.device_id `deviceId`,
+    a.device_name `deviceName`,
+    a.coordinate `coordinate`,
+    a.product_key `productKey`,
+    a.product_name `productName`,
+    a.ext_device_id `extDeviceId`,
+    a.state `state`,
+    a.iot_id `iotId`,
+    a.registry_time `registryTime`,
+    a.online_time `onlineTime`,
+    a.gw_product_key `gwProductKey`,
+    (CASE when a.derive_metadata is null then dp.metadata else a.derive_metadata end ) `metadata`,
+    ( CASE WHEN up.app_status IS NULL THEN 1 ELSE up.app_status END ) `appDisable`,
+    dp.third_platform thirdPlatform,
+    dp.device_node `deviceNode`,
+    dp.configuration `configuration`,
+    dp.store_policy storePolicy,
+    dp.store_policy_configuration storePolicyCfg,
+    IFNULL(da.id,0) `shadow`,
+    tg.`value` `devGroupId`,
+    a.configuration devConfiguration,
+    a.areas_id areasId,
+    a.detail detail
+    FROM
+    iot_device a
+    LEFT JOIN iot_product dp ON dp.product_key = a.product_key
+    LEFT JOIN iot_user u ON a.creator_id = u.union_id
+    LEFT JOIN iot_user_application up ON up.app_unique_id = a.application
+    LEFT JOIN iot_device_shadow da on da.iot_id=a.iot_id
+    LEFT JOIN iot_device_tags tg on (tg.iot_id=a.iot_id AND tg.`key`='devGroup')
+    <where>
+      <if test="productKey!=null and productKey!=''">
+        AND a.product_key = #{productKey}
+      </if>
+      <if test="deviceId!=null and deviceId!=''">
+        AND a.device_id = #{deviceId}
+      </if>
+      <if test="iotId!=null and iotId!=''">
+        AND a.iot_id = #{iotId}
+      </if>
+      <if test="extDeviceId!=null and extDeviceId!=''">
+        AND a.ext_device_id = #{extDeviceId}
+      </if>
+      <if test="gwProductKey!=null and gwProductKey!=''">
+        AND a.gw_product_key = #{gwProductKey}
+      </if>
+      <if test="thirdPlatform!=null and thirdPlatform!=''">
+        AND dp.third_platform = #{thirdPlatform}
+      </if>
+    </where>
+    limit 1
+  </select>
+
+  <!-- 新：支持 thirdPlatform 过滤的设备列表 -->
+  <select id="selectDevInstanceListByPlatform" parameterType="map" resultMap="BaseResultMap">
+    SELECT
+    d.id,
+    d.device_id,
+    d.ext_device_id,
+    d.gw_product_key,
+    d.product_name,
+    d.product_key,
+    d.device_name,
+    d.`instance`,
+    d.application,
+    d.`state`,
+    d.online_time,
+    d.configuration,
+    d.detail,
+    p.device_node deviceNode
+    FROM
+    iot_device d LEFT JOIN iot_product p on p.product_key = d.product_key
+    <where>
+      <if test="ioTDevice.iotId != null  and ioTDevice.iotId != ''">and d.iot_id like concat('%', #{ioTDevice.iotId}, '%')</if>
+      <if test="ioTDevice.deviceId != null  and ioTDevice.deviceId != ''">and d.device_id like concat('%', #{ioTDevice.deviceId}, '%')</if>
+      <if test="ioTDevice.deviceName != null  and ioTDevice.deviceName != ''">and d.device_name like concat('%', #{ioTDevice.deviceName}, '%')</if>
+      <if test="ioTDevice.state != null ">and d.`state` = #{ioTDevice.state}</if>
+      <if test="unionId != null and unionId != ''">and d.creator_id=#{unionId}</if>
+      <if test="thirdPlatform != null and thirdPlatform != ''">and p.third_platform = #{thirdPlatform}</if>
+    </where>
+    ORDER BY d.create_time DESC
+  </select>
+
+  <!-- 根据设备信息，分页 -->
+  <select id="selectDevInstanceBOV2List" resultMap="ioTDeviceDTO">
+    SELECT
+    up.app_unique_id `applicationId`,
+    u.union_id `userUnionId`,
+    u.id `userId`,
+    a.device_id `deviceId`,
+    a.device_name `deviceName`,
+    a.coordinate `coordinate`,
+    a.product_key `productKey`,
+    a.product_name `productName`,
+    a.ext_device_id `extDeviceId`,
+    a.state `state`,
+    a.iot_id `iotId`,
+    a.registry_time `registryTime`,
+    a.online_time `onlineTime`,
+    (CASE when a.derive_metadata is null then dp.metadata else a.derive_metadata end ) `metadata`,
+    ( CASE WHEN up.app_status IS NULL THEN 1 ELSE up.app_status END ) `appDisable`,
+    up.notify_url `notifyUrl`,
+    up.up_topic `upTopic`,
+    up.down_topic `downTopic`,
+    up.scope,
+    dp.third_platform thirdPlatform,
+    dp.device_node `deviceNode`,
+    dp.configuration `configuration`,
+    IFNULL(da.id,0) `shadow`,
+    tg.`value` `devGroupId`
+    FROM
+    iot_device a
+    LEFT JOIN iot_product dp ON dp.product_key = a.product_key
+    LEFT JOIN iot_user u ON a.creator_id = u.union_id
+    LEFT JOIN iot_user_application up ON up.app_unique_id = a.application
+    LEFT JOIN iot_device_shadow da on da.iot_id=a.iot_id
+    LEFT JOIN iot_device_tags tg on (tg.iot_id=a.iot_id AND tg.`key`='devGroup')
+    <where>
+      <if test="deviceId!=null and deviceId!=''">
+        AND a.device_id = #{deviceId}
+      </if>
+      <if test="productKey!=null and productKey!=''">
+        AND a.product_key = #{productKey}
+      </if>
+      <if test="iotId!=null and iotId!=''">
+        AND a.iot_id = #{iotId}
+      </if>
+      <if test="extDeviceId!=null and extDeviceId!=''">
+        AND a.ext_device_id = #{extDeviceId}
+      </if>
+      <if test="gwProductKey!=null and gwProductKey!=''">
+        AND a.gw_product_key = #{gwProductKey}
+      </if>
+    </where>
+  </select>
+
+  <select id="countDevByApplication" parameterType="String"
+    resultType="cn.universal.persistence.entity.vo.IoTDeviceCountVO">
+    select application , count( application ) as `devNum` from iot_device
+    <where>
+      <if test="appUniqueId!=null and appUniqueId!=''">
+        application=#{appUniqueId}
+      </if>
+    </where>
+    group by application
+  </select>
+  <select id="selectDevMetadataBo" resultType="cn.universal.persistence.dto.IoTDeviceMetadataBO">
+    SELECT dp.company_no         `companyNo`,
+           di.creator_id         `creatorId`,
+           di.device_secret      `deviceSecret`,
+           dp.classified_id      `classifiedId`,
+           dp.transport_protocol `transportProtocol`,
+           dt.`value`            `point`
+    FROM iot_device di
+           LEFT JOIN iot_product dp ON di.product_key = dp.product_key
+           LEFT JOIN iot_device_tags dt ON (dt.iot_id = di.iot_id AND dt.type = 'geoPoint')
+    WHERE di.iot_id = #{iotId}
+  </select>
+
+  <select id="selectList" resultMap="BaseResultMap">
+    SELECT
+    *
+    FROM
+    iot_device
+    WHERE
+    product_key = #{productKey}
+    <if test="start != null and start != '' and limit != null and limit != ''">
+      limit #{start} , #{limit}
+    </if>
+  </select>
+  <select id="selectListByProductKey" resultMap="BaseResultMap">
+    SELECT *
+    FROM iot_device
+    WHERE product_key = #{productKey}
+  </select>
+
+  <select id="apiDeviceInfo" resultType="cn.universal.persistence.entity.vo.IoTDeviceVO">
+    SELECT a.iot_id iotId
+    , a.device_id deviceId
+    , a.coordinate coordinate
+    , a.product_name productName
+    , a.nick_name nickName
+    , a.features features
+    , p.device_node `deviceNode`
+    , a.gw_product_key gwProductKey
+    , a.product_key productKey
+    , a.device_name deviceName
+    , a.state state
+    , a.detail
+    , a.coordinate latlng
+    FROM iot_device a
+    LEFT JOIN iot_product p on p.product_key = a.product_key
+    <where>
+      <if test="deviceId!=null and deviceId!=''">
+        AND a.device_id = #{deviceId}
+      </if>
+      <if test="iotId!=null and iotId!=''">
+        AND a.iot_id = #{iotId}
+      </if>
+      <if test="gwProductKey!=null and gwProductKey!=''">
+        AND a.gw_product_key = #{gwProductKey}
+      </if>
+      <if test="productId!=null and productId!=''">
+        AND p.product_id = #{productId}
+      </if>
+      <if test="productKey!=null and productKey!=''">
+        AND p.product_key = #{productKey}
+      </if>
+      <if test="companyNo!=null and companyNo!=''">
+        AND p.company_no like '%${companyNo}%'
+      </if>
+      <if test="iotUnionId!=null and iotUnionId!=''">
+        AND a.creator_id = #{iotUnionId}
+      </if>
+      <if test="applicationId!=null and applicationId!=''">
+        AND a.application = #{application}
+      </if>
+    </where>
+  </select>
+
+  <select id="apiDeviceList" resultType="cn.universal.persistence.entity.vo.IoTDeviceVO">
+    SELECT a.iot_id iotId,
+    a.device_id deviceId,
+    a.product_name productName,
+    a.nick_name nickName,
+    a.features features,
+    p.device_node `deviceNode`,
+    a.gw_product_key gwProductKey,
+    a.product_key productKey,
+    a.device_name deviceName ,
+    a.coordinate coordinate ,
+    a.state state,
+    a.detail,
+    a.coordinate latlng
+    FROM iot_device a
+    LEFT JOIN iot_product p on p.product_key=a.product_key
+    <where>
+      <if test="deviceId!=null and deviceId!=''">
+        AND a.device_id = #{deviceId}
+      </if>
+      <if test="extDeviceId!=null and extDeviceId!=''">
+        AND a.ext_device_id = #{extDeviceId}
+      </if>
+      <if test="iotId!=null and iotId!=''">
+        AND a.iot_id = #{iotId}
+      </if>
+      <if test="gwProductKey!=null and gwProductKey!=''">
+        AND a.gw_product_key = #{gwProductKey}
+      </if>
+      <if test="productId!=null and productId!=''">
+        AND p.product_id = #{productId}
+      </if>
+      <if test="companyNo!=null and companyNo!=''">
+        AND p.company_no like '%${companyNo}%'
+      </if>
+      <if test="iotUnionId!=null and iotUnionId!=''">
+        AND a.creator_id = #{iotUnionId}
+      </if>
+      <if test="applicationId!=null and applicationId!=''">
+        AND a.application = #{applicationId}
+      </if>
+    </where>
+  </select>
+
+  <sql id="selectDevInstanceVo">
+    select d.id,
+           d.iot_id,
+           d.coordinate,
+           d.device_id,
+           d.ext_device_id,
+           d.derive_metadata,
+           d.configuration,
+           d.product_name,
+           d.nick_name,
+           d.features,
+           d.gw_product_key,
+           d.device_secret,
+           d.product_key,
+           d.device_name,
+           d.creator_id,
+           d.`instance`,
+           d.application,
+           d.creator_name,
+           d.`state`,
+           d.detail,
+           d.create_time,
+           d.registry_time,
+           d.online_time,
+           d.areas_id
+    from iot_device d
+           left join iot_user u on u.union_id = d.creator_id
+  </sql>
+
+  <select id="selectDevInstanceList" parameterType="cn.universal.persistence.entity.IoTDevice"
+    resultMap="BaseResultMap">
+    SELECT
+    d.id,
+    d.device_id,
+    d.ext_device_id,
+    d.gw_product_key,
+    d.product_name,
+    d.product_key,
+    d.device_name,
+    d.`instance`,
+    d.application,
+    d.`state`,
+    d.online_time,
+    d.configuration,
+    d.detail,
+    p.device_node deviceNode
+    FROM
+    iot_device d LEFT JOIN iot_product p on p.product_key = d.product_key
+    <where>
+      <if test="ioTDevice.iotId != null  and ioTDevice.iotId != ''">and d.iot_id like concat('%',
+        #{ioTDevice.iotId}, '%')
+      </if>
+      <if test="ioTDevice.deviceId != null  and ioTDevice.deviceId != ''">and d.device_id like
+        concat('%',
+        #{ioTDevice.deviceId},
+        '%')
+      </if>
+      <if test="ioTDevice.extDeviceId != null  and ioTDevice.extDeviceId != ''">and
+        d.ext_device_id =
+        #{ioTDevice.extDeviceId}
+      </if>
+      <if test="ioTDevice.deriveMetadata != null  and ioTDevice.deriveMetadata != ''">and
+        d.derive_metadata =
+        #{ioTDevice.deriveMetadata}
+      </if>
+      <if test="ioTDevice.configuration != null  and ioTDevice.configuration != ''">and
+        d.configuration =
+        #{ioTDevice.configuration}
+      </if>
+      <if test="ioTDevice.productName != null  and ioTDevice.productName != ''">and d.product_name
+        like concat('%',
+        #{ioTDevice.productName}, '%')
+      </if>
+      <if test="ioTDevice.nickName != null  and ioTDevice.nickName != ''">and d.nick_name like
+        concat('%',
+        #{ioTDevice.nickName},
+        '%')
+      </if>
+      <if test="ioTDevice.features != null ">and d.features = #{ioTDevice.features}</if>
+      <if test="ioTDevice.gwProductKey != null  and ioTDevice.gwProductKey != ''">and
+        d.gw_product_key =
+        #{ioTDevice.gwProductKey}
+      </if>
+      <if test="ioTDevice.deviceSecret != null  and ioTDevice.deviceSecret != ''">and
+        d.device_secret =
+        #{ioTDevice.deviceSecret}
+      </if>
+      <if test="ioTDevice.productKey != null  and ioTDevice.productKey != ''">and d.product_key
+        like concat('%',
+        #{ioTDevice.productKey}, '%')
+      </if>
+      <if test="ioTDevice.deviceName != null  and ioTDevice.deviceName != ''">and d.device_name
+        like concat('%',
+        #{ioTDevice.deviceName}, '%')
+      </if>
+      <if test="ioTDevice.creatorId != null  and ioTDevice.creatorId != ''">and d.creator_id =
+        #{ioTDevice.creatorId}
+      </if>
+      <if test="ioTDevice.instance != null  and ioTDevice.instance != ''">and d.`instance` =
+        #{ioTDevice.instance}
+      </if>
+      <if test="ioTDevice.application != null  and ioTDevice.application != ''">and d.application
+        =
+        #{ioTDevice.application}
+      </if>
+      <if test="ioTDevice.creatorName != null  and ioTDevice.creatorName != ''">and d.creator_name
+        like concat('%',
+        #{ioTDevice.creatorName}, '%')
+      </if>
+      <if test="ioTDevice.state != null ">and d.`state` = #{ioTDevice.state}</if>
+      <if test="ioTDevice.detail != null  and ioTDevice.detail != ''">and d.`detail` like
+        concat('%',#{ioTDevice.detail},'%')
+      </if>
+      <if test="ioTDevice.registryTime != null ">and d.registry_time = #{ioTDevice.registryTime}
+      </if>
+      <if test="ioTDevice.onlineTime != null ">and d.online_time = #{ioTDevice.onlineTime}</if>
+      <if test="ioTDevice.areasId != null  and ioTDevice.areasId != ''">and d.areas_id =
+        #{ioTDevice.areasId}
+      </if>
+      <if test="unionId != null and unionId != ''">
+        and d.creator_id=#{unionId}
+      </if>
+      <!--      <if test="params.scope != null and params.scope != ''">-->
+      <!--        AND ( ${params.scope} )-->
+      <!--      </if>-->
+    </where>
+    ORDER BY d.create_time DESC
+  </select>
+
+  <select id="selectDevInstanceForExport"
+    parameterType="cn.universal.persistence.entity.IoTDevice"
+    resultMap="BaseResultMap">
+    <include refid="selectDevInstanceVo"/>
+    <where>
+      <if test="ioTDevice.iotId != null  and ioTDevice.iotId != ''">and d.iot_id like concat('%',
+        #{ioTDevice.iotId}, '%')
+      </if>
+      <if test="ioTDevice.deviceId != null  and ioTDevice.deviceId != ''">and d.device_id like
+        concat('%',
+        #{ioTDevice.deviceId},
+        '%')
+      </if>
+      <if test="ioTDevice.extDeviceId != null  and ioTDevice.extDeviceId != ''">and
+        d.ext_device_id =
+        #{ioTDevice.extDeviceId}
+      </if>
+      <if test="ioTDevice.deriveMetadata != null  and ioTDevice.deriveMetadata != ''">and
+        d.derive_metadata =
+        #{ioTDevice.deriveMetadata}
+      </if>
+      <if test="ioTDevice.configuration != null  and ioTDevice.configuration != ''">and
+        d.configuration =
+        #{ioTDevice.configuration}
+      </if>
+      <if test="ioTDevice.productName != null  and ioTDevice.productName != ''">and d.product_name
+        like concat('%',
+        #{ioTDevice.productName}, '%')
+      </if>
+      <if test="ioTDevice.nickName != null  and ioTDevice.nickName != ''">and d.nick_name like
+        concat('%',
+        #{ioTDevice.nickName},
+        '%')
+      </if>
+      <if test="ioTDevice.features != null ">and features = #{ioTDevice.features}</if>
+      <if test="ioTDevice.gwProductKey != null  and ioTDevice.gwProductKey != ''">and
+        d.gw_product_key =
+        #{ioTDevice.gwProductKey}
+      </if>
+      <if test="ioTDevice.deviceSecret != null  and ioTDevice.deviceSecret != ''">and
+        d.device_secret =
+        #{ioTDevice.deviceSecret}
+      </if>
+      <if test="ioTDevice.productKey != null  and ioTDevice.productKey != ''">and d.product_key
+        like concat('%',
+        #{ioTDevice.productKey}, '%')
+      </if>
+      <if test="ioTDevice.deviceName != null  and ioTDevice.deviceName != ''">and d.device_name
+        like concat('%',
+        #{ioTDevice.deviceName}, '%')
+      </if>
+      <if test="ioTDevice.creatorId != null  and ioTDevice.creatorId != ''">and d.creator_id =
+        #{ioTDevice.creatorId}
+      </if>
+      <if test="ioTDevice.instance != null  and ioTDevice.instance != ''">and d.`instance` =
+        #{ioTDevice.instance}
+      </if>
+      <if test="ioTDevice.application != null  and ioTDevice.application != ''">and d.application
+        =
+        #{ioTDevice.application}
+      </if>
+      <if test="ioTDevice.creatorName != null  and ioTDevice.creatorName != ''">and d.creator_name
+        like concat('%',
+        #{ioTDevice.creatorName}, '%')
+      </if>
+      <if test="ioTDevice.state != null ">and state = #{ioTDevice.state}</if>
+      <if test="ioTDevice.detail != null  and ioTDevice.detail != ''">and d.detail =
+        #{ioTDevice.detail}
+      </if>
+      <if test="ioTDevice.registryTime != null ">and d.registry_time = #{ioTDevice.registryTime}
+      </if>
+      <if test="ioTDevice.onlineTime != null ">and d.online_time = #{ioTDevice.onlineTime}</if>
+      <if test="ioTDevice.areasId != null  and ioTDevice.areasId != ''">and d.areas_id =
+        #{ioTDevice.areasId}
+      </if>
+      <if test="unionId != null and unionId != ''">
+        and d.creator_id=#{unionId}
+      </if>
+      <!--      <if test="params.scope != null and params.scope != ''">-->
+      <!--        AND ( ${params.scope} )-->
+      <!--      </if>-->
+    </where>
+    ORDER BY d.create_time DESC
+  </select>
+
+  <select id="selectDevInstanceUnList" parameterType="cn.universal.persistence.entity.IoTDevice"
+    resultMap="BaseResultMap">
+    <include refid="selectDevInstanceVo"/>
+    <where>
+      <if test="ioTDevice.iotId != null  and ioTDevice.iotId != ''">and d.iot_id like concat('%',
+        #{ioTDevice.iotId}, '%')
+      </if>
+      <if test="ioTDevice.deviceId != null  and ioTDevice.deviceId != ''">and d.device_id like
+        concat('%',
+        #{ioTDevice.deviceId},
+        '%')
+      </if>
+      <if test="ioTDevice.deviceName != null  and ioTDevice.deviceName != ''">and d.device_name
+        like concat('%',
+        #{ioTDevice.deviceName}, '%')
+      </if>
+      <if test="unionId != null and unionId != ''">
+        and d.creator_id=#{unionId}
+      </if>
+      <if test="ioTDevice.detail != null  and ioTDevice.detail != ''">and d.detail
+        like concat('%',
+        #{ioTDevice.detail}, '%')
+      </if>
+    </where>
+    and application is null
+  </select>
+
+  <select id="selectDevInstanceById" parameterType="String" resultMap="BaseResultMap">
+    <include refid="selectDevInstanceVo"/>
+    where d.id = #{id}
+  </select>
+
+  <select id="selectDevListByIds" resultType="cn.universal.persistence.entity.IoTDevice"
+    resultMap="BaseResultMap">
+    <include refid="selectDevInstanceVo"/>
+    where d.iot_id IN(SELECT iot_id FROM iot_device_tags
+    WHERE type = 'devGroup'
+    AND `value` = #{groupId})
+  </select>
+
+  <insert id="insertDevInstance" parameterType="cn.universal.persistence.entity.IoTDevice"
+    useGeneratedKeys="true" keyProperty="id">
+    insert into iot_device
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="iotId != null">iot_id,</if>
+      <if test="deviceId != null and deviceId != ''">device_id,</if>
+      <if test="extDeviceId != null">ext_device_id,</if>
+      <if test="deriveMetadata != null">derive_metadata,</if>
+      <if test="configuration != null">configuration,</if>
+      <if test="productName != null">product_name,</if>
+      <if test="nickName != null">nick_name,</if>
+      <if test="features != null">features,</if>
+      <if test="gwProductKey != null">gw_product_key,</if>
+      <if test="deviceSecret != null">device_secret,</if>
+      <if test="productKey != null">product_key,</if>
+      <if test="deviceName != null">device_name,</if>
+      <if test="creatorId != null">creator_id,</if>
+      <if test="instance != null">instance,</if>
+      <if test="application != null">application,</if>
+      <if test="creatorName != null">creator_name,</if>
+      <if test="state != null">state,</if>
+      <if test="detail != null">detail,</if>
+      <if test="createTime != null">create_time,</if>
+      <if test="registryTime != null">registry_time,</if>
+      <if test="onlineTime != null">online_time,</if>
+      <if test="areasId != null">areas_id,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="iotId != null">#{iotId},</if>
+      <if test="deviceId != null and deviceId != ''">#{deviceId},</if>
+      <if test="extDeviceId != null">#{extDeviceId},</if>
+      <if test="deriveMetadata != null">#{deriveMetadata},</if>
+      <if test="configuration != null">#{configuration},</if>
+      <if test="productName != null">#{productName},</if>
+      <if test="nickName != null">#{nickName},</if>
+      <if test="features != null">#{features},</if>
+      <if test="gwProductKey != null">#{gwProductKey},</if>
+      <if test="deviceSecret != null">#{deviceSecret},</if>
+      <if test="productKey != null">#{productKey},</if>
+      <if test="deviceName != null">#{deviceName},</if>
+      <if test="creatorId != null">#{creatorId},</if>
+      <if test="instance != null">#{instance},</if>
+      <if test="application != null">#{application},</if>
+      <if test="creatorName != null">#{creatorName},</if>
+      <if test="state != null">#{state},</if>
+      <if test="detail != null">#{detail},</if>
+      <if test="createTime != null">#{createTime},</if>
+      <if test="registryTime != null">#{registryTime},</if>
+      <if test="onlineTime != null">#{onlineTime},</if>
+      <if test="areasId != null">#{areasId},</if>
+    </trim>
+  </insert>
+
+  <update id="updateDevInstance" parameterType="cn.universal.persistence.entity.IoTDevice">
+    update iot_device
+    <trim prefix="SET" suffixOverrides=",">
+      <if test="iotId != null">iot_id = #{iotId},</if>
+      <if test="deviceId != null and deviceId != ''">device_id = #{deviceId},</if>
+      <if test="extDeviceId != null">ext_device_id = #{extDeviceId},</if>
+      <if test="deriveMetadata != null">derive_metadata = #{deriveMetadata},</if>
+      <if test="configuration != null">configuration = #{configuration},</if>
+      <if test="productName != null">product_name = #{productName},</if>
+      <if test="nickName != null">nick_name = #{nickName},</if>
+      <if test="features != null">features = #{features},</if>
+      <if test="gwProductKey != null">gw_product_key = #{gwProductKey},</if>
+      <if test="deviceSecret != null">device_secret = #{deviceSecret},</if>
+      <if test="productKey != null">product_key = #{productKey},</if>
+      <if test="deviceName != null">device_name = #{deviceName},</if>
+      <if test="creatorId != null">creator_id = #{creatorId},</if>
+      <if test="instance != null">instance = #{instance},</if>
+      <if test="application != null">application = #{application},</if>
+      <if test="creatorName != null">creator_name = #{creatorName},</if>
+      <if test="state != null">state = #{state},</if>
+      <if test="detail != null">detail = #{detail},</if>
+      <if test="createTime != null">create_time = #{createTime},</if>
+      <if test="registryTime != null">registry_time = #{registryTime},</if>
+      <if test="onlineTime != null">online_time = #{onlineTime},</if>
+      <if test="areasId != null">areas_id = #{areasId},</if>
+      <if test="coordinate != null">coordinate=#{coordinate},</if>
+    </trim>
+    where id = #{id}
+  </update>
+
+  <update id="bindApp" parameterType="String">
+    update iot_device
+    set application = #{appUniqueId}
+    where id in
+    <foreach item="id" collection="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <update id="apiBindApp" parameterType="String">
+    update iot_device
+    set application = #{appUniqueId}
+    where iot_id = #{iotId}
+  </update>
+  <update id="apiUnBindApp" parameterType="String">
+    update iot_device
+    set application =null
+    where iot_id = #{iotId}
+  </update>
+
+
+  <delete id="deleteDevInstanceById" parameterType="String">
+    delete
+    from iot_device
+    where id = #{id}
+  </delete>
+
+  <delete id="deleteDevInstanceByIds" parameterType="String">
+    delete from iot_device where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="selectDevByAppUniqueId" parameterType="String" resultType="Integer">
+    select count(*) from iot_device where application in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+  <select id="selectAllBySupportChild"
+    resultMap="group">
+    select
+    company_no,company_name,device_type,device_type_name,device_model,device_model_name,protocol,product_key,page_ctrl
+    from iot_device_model
+    <where>
+      <if test="supportChild">
+        and support_child = 1
+      </if>
+      <if test="apps != null and apps != ''">
+        and find_in_set(#{apps},apps )
+      </if>
+    </where>
+  </select>
+  <select id="getOneByDeviceId" resultType="cn.universal.persistence.entity.IoTDevice">
+    select *
+    from iot_device
+    <where>
+      device_id = #{query.deviceId}
+      <if test="query.productKey!=null and query.productKey!='' ">
+        and product_key=#{query.productKey}
+      </if>
+    </where>
+    limit 1
+  </select>
+  <select id="selectIoTDevice" resultType="cn.universal.persistence.entity.IoTDevice">
+    select *
+    from iot_device
+    where product_key = #{productKey}
+      AND device_id = #{deviceId} limit 1
+  </select>
+  <select id="getModelByProductKey"
+    resultType="cn.universal.persistence.entity.vo.IoTDeviceModelVO">
+    select *
+    from iot_device_model
+    where product_key = #{productKey}
+  </select>
+
+  <select id="selectNotBindDevInstanceList"
+    parameterType="cn.universal.persistence.entity.IoTDevice"
+    resultMap="BaseResultMap">
+    <include refid="selectDevInstanceVo"/>
+    <where>
+      d.iot_id NOT IN (
+      SELECT iot_id
+      FROM iot_device_tags
+      WHERE `key` = 'devGroup' AND CAST(`value` AS SIGNED) = #{groupId}
+      )
+      <if test="dev.iotId != null  and dev.iotId != ''">and d.iot_id like concat('%', #{dev.iotId},
+        '%')
+      </if>
+      <if test="dev.deviceId != null  and dev.deviceId != ''">and d.device_id like concat('%',
+        #{dev.deviceId},
+        '%')
+      </if>
+      <if test="dev.extDeviceId != null  and dev.extDeviceId != ''">and ext_device_id =
+        #{dev.extDeviceId}
+      </if>
+      <if test="dev.deriveMetadata != null  and dev.deriveMetadata != ''">and derive_metadata =
+        #{dev.deriveMetadata}
+      </if>
+      <if test="dev.configuration != null  and dev.configuration != ''">and configuration =
+        #{dev.configuration}
+      </if>
+      <if test="dev.productName != null  and dev.productName != ''">and product_name like
+        concat('%',
+        #{dev.productName}, '%')
+      </if>
+      <if test="dev.nickName != null  and dev.nickName != ''">and nick_name like concat('%',
+        #{dev.nickName},
+        '%')
+      </if>
+      <if test="dev.features != null ">and features = #{dev.features}</if>
+      <if test="dev.gwProductKey != null  and dev.gwProductKey != ''">and gw_product_key =
+        #{dev.gwProductKey}
+      </if>
+      <if test="dev.deviceSecret != null  and dev.deviceSecret != ''">and d.device_secret =
+        #{dev.deviceSecret}
+      </if>
+      <if test="dev.productKey != null  and dev.productKey != ''">and d.product_key like
+        concat('%',
+        #{dev.productKey}, '%')
+      </if>
+      <if test="dev.deviceName != null  and dev.deviceName != ''">and d.device_name like
+        concat('%',
+        #{dev.deviceName}, '%')
+      </if>
+      <if test="dev.creatorId != null  and dev.creatorId != ''">and creator_id = #{dev.creatorId}
+      </if>
+      <if test="dev.instance != null  and dev.instance != ''">and d.instance = #{dev.instance}
+      </if>
+      <if test="dev.application != null  and dev.application != ''">and application =
+        #{dev.application}
+      </if>
+      <if test="dev.creatorName != null  and dev.creatorName != ''">and creator_name like
+        concat('%',
+        #{dev.creatorName}, '%')
+      </if>
+      <if test="dev.state != null ">and state = #{dev.state}</if>
+      <if test="dev.detail != null  and dev.detail != ''">and detail = #{dev.detail}</if>
+      <if test="dev.registryTime != null ">and registry_time = #{dev.registryTime}</if>
+      <if test="dev.onlineTime != null ">and online_time = #{dev.onlineTime}</if>
+      <if test="dev.areasId != null  and dev.areasId != ''">and areas_id = #{dev.areasId}</if>
+      <if test="dev.params.scope != null and dev.params.scope != ''">
+        AND ( ${dev.params.scope} )
+      </if>
+      <if test="unionId != null and unionId != ''">
+        and creator_id=#{unionId}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectOfflineThresholdIotIds" resultType="java.lang.String">
+    <![CDATA[
+    SELECT device_id
+
+    FROM iot_device
+
+    WHERE product_key = #{productKey}
+      AND `state` = 1
+      AND online_time <= #{difference} limit 500
+    ]]>
+  </select>
+
+  <select id="selectOfflineCamera" resultType="cn.universal.persistence.entity.IoTDevice">
+    select * from iot_device
+    <where>
+      <if test="productKeyList!=null and productKeyList.size>0">
+        and product_key in
+        <foreach collection="productKeyList" item="pro" index="index" open="(" close=")"
+          separator=",">
+          #{pro}
+        </foreach>
+      </if>
+      <if test="status != null">
+        and `state` = #{status}
+      </if>
+      <if test="discardValue != null">
+        and IF(JSON_EXTRACT(configuration,'$.discardValue') IS NULL,0,
+        JSON_EXTRACT(configuration,'$.discardValue')) &lt;= #{discardValue}
+      </if>
+      <if test="start != null and limit != null">
+        limit #{start} , #{limit}
+      </if>
+    </where>
+  </select>
+
+  <insert id="insertDevInstanceHistory"
+    parameterType="cn.universal.persistence.entity.bo.IoTDeviceHistoryBO">
+    insert into dev_instance_history
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="deviceId != null">device_id,</if>
+      <if test="deviceName != null">device_Name,</if>
+      <if test="productKey != null">product_key,</if>
+      <if test="coordinate != null">coordinate,</if>
+      <if test="firstOnlineTime != null">first_online_time,</if>
+      <if test="creater != null">creater,</if>
+      <if test="deleteTime != null">delete_time,</if>
+      <if test="createTime != null">create_time,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="deviceId != null">#{deviceId},</if>
+      <if test="deviceName != null">#{deviceName},</if>
+      <if test="productKey != null">#{productKey},</if>
+      <if test="coordinate != null">#{coordinate},</if>
+      <if test="firstOnlineTime != null">#{firstOnlineTime},</if>
+      <if test="creater != null">#{creater},</if>
+      <if test="deleteTime != null">#{deleteTime},</if>
+      <if test="createTime != null">#{createTime},</if>
+    </trim>
+  </insert>
+
+  <select id="selectDevInstanceHistory"
+    parameterType="cn.universal.persistence.entity.bo.IoTDeviceHistoryBO" resultType="int">
+    select count(1)
+    from dev_instance_history
+    <where>
+      <if test="deviceId != null  and deviceId != ''">and device_id =
+        #{deviceId}
+      </if>
+      <if test="deviceName != null  and deviceName != ''">and device_name =
+        #{deviceName}
+      </if>
+      <if test="productKey != null  and productKey != ''">and product_key =
+        #{productKey}
+      </if>
+      <if test="coordinate != null  and coordinate != ''">and coordinate =
+        #{coordinate}
+      </if>
+      <if test="firstOnlineTime != null  and firstOnlineTime != ''">and first_online_time =
+        #{firstOnlineTime}
+      </if>
+    </where>
+  </select>
+
+  <update id="updateDevConfiguration" parameterType="java.util.Map">
+    update iot_device
+    set configuration = #{configuration}
+    where device_id = #{deviceId}
+  </update>
+  <update id="clearDevBindInfo">
+    update iot_device
+    set creator_id=null and creator_name = null and application = null and coordinate = null and
+                   areas_id = null
+    where id = #{id}
+  </update>
+
+  <select id="selectFenceDevice" parameterType="cn.universal.persistence.entity.bo.IoTDeviceBO"
+    resultType="cn.universal.persistence.entity.vo.IoTDeviceVO">
+    select i.id,i.state,i.device_id,i.iot_id,i.device_name,p.classified_name,p.name from
+    iot_device i
+    left join iot_device_fence_rel f on i.iot_id=f.iot_id
+    left join iot_product p on i.product_key=p.product_key
+    <where>
+      f.fence_id=#{fenceId}
+      <if test="deviceName != null  and deviceName != ''">and i.device_name like concat('%',
+        #{deviceName}, '%')
+      </if>
+      <if test="online != null  and online != ''">and i.state =
+        #{online}
+      </if>
+    </where>
+  </select>
+
+  <select id="hikDeviceList" resultType="cn.universal.persistence.entity.IoTDevice">
+    SELECT *
+    FROM iot_device
+    <where>
+      <if test="iotUnionId!=null and iotUnionId!=''">
+        AND creator_id = #{iotUnionId}
+      </if>
+      <if test="applicationId!=null and applicationId!=''">
+        AND application = #{application}
+      </if>
+    </where>
+  </select>
+
+  <select id="queryMileSightList" resultMap="BaseResultMap">
+    SELECT d.id,
+           device_id,
+           product_name,
+           product_key,
+           device_name,
+           d.`instance`,
+           application,
+           `state`,
+           online_time
+    FROM iot_device d
+    where JSON_EXTRACT(configuration, concat('$.', 'gatewayEUI')) = #{bo.unionId}
+    ORDER BY create_time DESC
+  </select>
+
+  <select id="getGatewayDeviceList"
+    resultType="cn.universal.persistence.entity.vo.GatewayDeviceVo">
+    select device_id, device_name, product_key, iot_id
+    from iot_device
+    <where>
+      product_key=#{bo.gwProductKey}
+      <if test="bo.creatorId!=null and bo.creatorId !=''">
+        and creator_id=#{bo.creatorId}
+      </if>
+    </where>
+  </select>
+  <select id="getOneByIotId" resultType="cn.universal.persistence.entity.IoTDevice">
+    select *
+    from iot_device
+    <where>
+      iot_id = #{query.iotId}
+      <if test="query.productKey!=null and query.productKey!='' ">
+        and product_key=#{query.productKey}
+      </if>
+    </where>
+    limit 1
+
+  </select>
+  <select id="selectDevInstanceListWithTags" resultMap="BaseResultMap">
+    SELECT
+    d.id,
+    d.device_id,
+    d.product_name,
+    d.product_key,
+    d.device_name,
+    d.instance,
+    d.application,
+    d.state,
+    d.online_time
+    FROM
+    iot_device d
+    left join iot_device_tags t on d.iot_id=t.iot_id
+    <where>
+
+      <if test="ioTDevice.iotId != null  and ioTDevice.iotId != ''">and d.iot_id like
+        concat('%',
+        #{ioTDevice.iotId}, '%')
+      </if>
+      <if test="ioTDevice.deviceId != null  and ioTDevice.deviceId != ''">and d.device_id like
+        concat('%',
+        #{ioTDevice.deviceId},
+        '%')
+      </if>
+      <if test="ioTDevice.productName != null  and ioTDevice.productName != ''">and
+        d.product_name
+        like concat('%',
+        #{ioTDevice.productName}, '%')
+      </if>
+      <if test="ioTDevice.gwProductKey != null  and ioTDevice.gwProductKey != ''">and
+        d.gw_product_key =
+        #{ioTDevice.gwProductKey}
+      </if>
+      <if test="ioTDevice.productKey != null  and ioTDevice.productKey != ''">and d.product_key
+        like concat('%',
+        #{ioTDevice.productKey}, '%')
+      </if>
+      <if test="ioTDevice.deviceName != null  and ioTDevice.deviceName != ''">and d.device_name
+        like concat('%',
+        #{ioTDevice.deviceName}, '%')
+      </if>
+      <if test="ioTDevice.creatorId != null  and ioTDevice.creatorId != ''">and d.creator_id =
+        #{ioTDevice.creatorId}
+      </if>
+      <if test="ioTDevice.application != null  and ioTDevice.application != ''">and
+        d.application
+        =
+        #{ioTDevice.application}
+      </if>
+      <if test="ioTDevice.creatorName != null  and ioTDevice.creatorName != ''">and
+        d.creator_name
+        like concat('%',
+        #{ioTDevice.creatorName}, '%')
+      </if>
+      <if test="ioTDevice.state != null ">and d.state = #{ioTDevice.state}</if>
+      <if test="unionId != null and unionId != ''">
+        and d.creator_id=#{unionId}
+      </if>
+      <if test="ioTDevice.devGroupId != null ">
+        and t.type='devGroup' and t.value=#{ioTDevice.devGroupId}
+      </if>
+    </where>
+    ORDER BY d.create_time DESC
+  </select>
+  <select id="listByIds" resultType="cn.universal.persistence.entity.IoTDevice">
+    select device_id,device_name,iot_id,product_key,configuration from iot_device where id in
+    <foreach item="id" collection="array" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+  <select id="selectProductListInBatchFunction"
+    resultType="cn.universal.persistence.entity.IoTProduct">
+    select di.product_key,dp.name
+    from iot_device di
+    left join iot_product dp on di.product_key = dp.product_key
+    <where>
+      <if test="applicationId != null">
+        and di.application=#{applicationId}
+      </if>
+      <if test="unionId!=null and unionId!=''">
+        and di.creator_id = #{unionId}
+      </if>
+    </where>
+    group by di.product_key
+  </select>
+  <select id="checkIotIdUnique" resultType="java.lang.Integer">
+    select count(*)
+    from iot_device
+    where iot_id = #{iotId}
+  </select>
+  <select id="getOneByExtId" resultType="cn.universal.persistence.entity.IoTDevice">
+    select *
+    from iot_device
+    where ext_device_id = #{extId} limit 1
+  </select>
+
+  <select id="countByProductKey" resultType="int" parameterType="string">
+    SELECT COUNT(1)
+    FROM iot_device
+    WHERE product_key = #{productKey}
+  </select>
+
+  <update id="batchFlushLog">
+    UPDATE iot_device
+    SET
+    online_time = UNIX_TIMESTAMP(),
+    state = 1,
+    registry_time = IF(registry_time IS NULL, UNIX_TIMESTAMP(), registry_time)
+    WHERE iot_id IN
+    <foreach collection="iotIds" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <!-- 统计所有设备总数 -->
+  <select id="countAllDevices" resultType="long">
+    SELECT COUNT(1)
+    FROM iot_device
+  </select>
+
+  <!-- 统计在线设备总数 -->
+  <select id="countOnlineDevices" resultType="long">
+    SELECT COUNT(1)
+    FROM iot_device
+    WHERE state = 1
+  </select>
+
+  <!-- 根据创建者统计设备总数 -->
+  <select id="countDevicesByCreator" resultType="long">
+    SELECT COUNT(1)
+    FROM iot_device
+    WHERE creator_id = #{creatorId}
+  </select>
+
+  <!-- 根据创建者统计在线设备总数 -->
+  <select id="countOnlineDevicesByCreator" resultType="long">
+    SELECT COUNT(1)
+    FROM iot_device
+    WHERE creator_id = #{creatorId}
+      AND state = 1
+  </select>
+
+</mapper>

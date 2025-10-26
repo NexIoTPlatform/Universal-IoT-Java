@@ -1,0 +1,77 @@
+/*
+ *
+ * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
+ *
+ * @Description: 本文件由 gitee.com/NexIoT 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
+ * @Author: gitee.com/NexIoT
+
+ * @Wechat: outlookFil
+ *
+ *
+ */
+
+package cn.universal.persistence.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Table(name = "iot_device_log")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class IoTDeviceLog implements Serializable {
+
+  @Id private Long id;
+
+  /** 唯一编码 */
+  @Column(name = "iot_id", length = 128)
+  private String iotId;
+
+  /** 设备自身序号 */
+  @Column(name = "device_id")
+  private String deviceId;
+
+
+  /** 产品ID */
+  @Column(name = "product_key")
+  private String productKey;
+
+  /** 设备名称 */
+  @Column(name = "device_name")
+  private String deviceName;
+
+  /** 消息类型 */
+  @Column(name = "message_type")
+  private String messageType;
+
+  /** 指令ID */
+  @Column(name = "command_id")
+  private String commandId;
+
+  /** 指令ID */
+  @Column(name = "command_status")
+  private Integer commandStatus;
+
+
+  /** 事件名称 */
+  private String event;
+
+
+  /** 创建时间 */
+  @Column(name = "create_time")
+  private LocalDateTime createTime;
+
+  /** 内容 */
+  private String content;
+
+  private String point;
+  private static final long serialVersionUID = 1L;
+}

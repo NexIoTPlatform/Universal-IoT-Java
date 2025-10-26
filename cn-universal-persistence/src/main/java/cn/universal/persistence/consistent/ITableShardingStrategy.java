@@ -1,0 +1,31 @@
+/*
+ *
+ * Copyright (c) 2025, IoT-Universal. All Rights Reserved.
+ *
+ * @Description: 本文件由 gitee.com/NexIoT 开发并拥有版权，未经授权严禁擅自商用、复制或传播。
+ * @Author: gitee.com/NexIoT
+
+ * @Wechat: outlookFil
+ *
+ *
+ */
+
+package cn.universal.persistence.consistent;
+
+import cn.hutool.core.util.StrUtil;
+
+public interface ITableShardingStrategy {
+
+  /**
+   * @param tableNamePrefix 表前缀名
+   * @param value 值
+   */
+  String generateTableName(String tableNamePrefix, Object value);
+
+  /** 验证tableNamePrefix */
+  default void verificationTableNamePrefix(String tableNamePrefix) {
+    if (StrUtil.isBlank(tableNamePrefix)) {
+      throw new RuntimeException("tableNamePrefix is null");
+    }
+  }
+}

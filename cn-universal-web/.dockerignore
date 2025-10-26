@@ -1,0 +1,34 @@
+# 排除源代码和开发文件
+src/
+pom.xml
+target/classes/
+target/test-classes/
+target/maven-status/
+target/surefire-reports/
+target/coverage-reports/
+
+# 排除 IDE 文件
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# 排除版本控制文件
+.git/
+.gitignore
+.gitattributes
+
+# 排除日志文件
+*.log
+logs/
+
+# 排除临时文件
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# 排除配置文件 (使用 Docker 环境变量)
+application-*.properties
+!application-docker.properties
