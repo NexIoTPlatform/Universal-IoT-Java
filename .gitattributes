@@ -1,0 +1,7 @@
+# 环境相关配置文件 - 合并时保留目标分支版本
+cn-universal-web/src/main/resources/application-docker.properties merge=ours
+cn-universal-web/src/main/resources/application-huo.properties merge=ours
+cn-universal-web/src/main/resources/application-redisson-examples merge=ours
+cn-universal-web/src/main/resources/application-test.properties merge=ours
+cn-universal-web/src/main/resources/application-test2.properties merge=ours
+cn-universal-web/src/main/java/cn/universal/web/controller/VersionController.java merge=ours

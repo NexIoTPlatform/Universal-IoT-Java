@@ -1,0 +1,211 @@
+// 统一的小尺寸按钮样式
+.btn-small {
+  border-radius: 4px !important;
+  height: 28px !important;
+  padding: 0 12px !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+  line-height: 26px !important;
+  transition: all 0.3s ease !important;
+  border: none !important;
+
+  &:hover {
+    transform: translateY(-1px) !important;
+  }
+}
+
+// 主要按钮样式（科技蓝主题）
+.btn-primary-small {
+  .btn-small();
+  background: #0066FF !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0, 102, 255, 0.12) !important;
+
+  &:hover {
+    background: #0052CC !important;
+    box-shadow: 0 2px 6px rgba(0, 102, 255, 0.2) !important;
+  }
+}
+
+// 成功按钮样式（物联网绿主题）
+.btn-success-small {
+  .btn-small();
+  background: #00D4AA !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(0, 212, 170, 0.12) !important;
+
+  &:hover {
+    background: #00B894 !important;
+    box-shadow: 0 2px 6px rgba(0, 212, 170, 0.2) !important;
+  }
+}
+
+// 危险按钮样式（科技红主题）
+.btn-danger-small {
+  .btn-small();
+  background: #FF4757 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(255, 71, 87, 0.12) !important;
+
+  &:hover {
+    background: #FF3742 !important;
+    box-shadow: 0 2px 6px rgba(255, 71, 87, 0.2) !important;
+  }
+}
+
+// 警告按钮样式（科技橙主题）
+.btn-warning-small {
+  .btn-small();
+  background: #FFA502 !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(255, 165, 2, 0.12) !important;
+
+  &:hover {
+    background: #FF9500 !important;
+    box-shadow: 0 2px 6px rgba(255, 165, 2, 0.2) !important;
+  }
+}
+
+// 默认按钮样式（无边框）
+.btn-default-small {
+  .btn-small();
+  background: #fff !important;
+  color: #666 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+
+  &:hover {
+    background: #f5f5f5 !important;
+    color: #0066FF !important;
+  }
+}
+
+// 圆形按钮样式
+.btn-circle-small {
+  .btn-small();
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  background: #fff !important;
+  color: #666 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+
+  &:hover {
+    background: #f5f5f5 !important;
+    color: #0066FF !important;
+  }
+}
+
+// 按钮组样式
+.btn-group-small {
+  .ant-btn {
+    margin-right: 8px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}
+
+// 全局覆盖，确保小尺寸按钮样式生效
+.ant-btn.btn-primary-small,
+.ant-btn.btn-danger-small,
+.ant-btn.btn-default-small,
+.ant-btn.btn-circle-small {
+  height: 28px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  line-height: 26px !important;
+  border-radius: 4px !important;
+  border: none !important;
+}
+
+// 全局按钮样式覆盖 - 让所有按钮都变小且无边框
+// 使用更高优先级的选择器
+html body .ant-btn,
+#app .ant-btn,
+.ant-btn {
+  height: 28px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  line-height: 26px !important;
+  border-radius: 4px !important;
+  border: none !important;
+
+  // 圆形按钮特殊处理
+  &.ant-btn-circle {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+  }
+
+  // 大尺寸按钮保持原样
+  &.ant-btn-lg {
+    height: 40px !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
+    line-height: 38px !important;
+  }
+
+  // 链接和文本按钮保持原样
+  &.ant-btn-link,
+  &.ant-btn-text {
+    height: auto !important;
+    padding: 0 !important;
+    line-height: normal !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  // 虚线按钮特殊处理
+  &.ant-btn-dashed {
+    border: 1px dashed #d9d9d9 !important;
+    background: #fff !important;
+
+    &:hover {
+      border-color: #0066FF !important;
+      color: #0066FF !important;
+    }
+  }
+}
+
+// 最强制性的覆盖 - 确保在所有情况下都生效
+* .ant-btn {
+  height: 28px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  line-height: 26px !important;
+  border-radius: 4px !important;
+  border: none !important;
+
+  &.ant-btn-circle {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+  }
+
+  &.ant-btn-lg {
+    height: 40px !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
+    line-height: 38px !important;
+  }
+
+  &.ant-btn-link,
+  &.ant-btn-text {
+    height: auto !important;
+    padding: 0 !important;
+    line-height: normal !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  &.ant-btn-dashed {
+    border: 1px dashed #d9d9d9 !important;
+    background: #fff !important;
+
+    &:hover {
+      border-color: #0066FF !important;
+      color: #0066FF !important;
+    }
+  }
+} 

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTDeviceFunctionHistoryMapper">
+    <insert id="batchInsert" parameterType="java.util.List" useGeneratedKeys="true">
+        insert into iot_device_function_history (id,product_key, iot_id, device_id, device_name,
+        down_state,down_result,down_error,task_id,update_time,retry,ext_param)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.productKey},#{item.iotId},#{item.deviceId},#{item.deviceName},#{item.downState},#{item.downResult}
+            ,#{item.downError},#{item.taskId},#{item.updateTime},#{item.retry},#{item.extParam})
+        </foreach>
+    </insert>
+
+
+    <update id="retryHistory">
+        update iot_device_function_history
+        set down_state=0
+        where task_id=#{bo.taskId} and
+        id in
+        <foreach item="id" collection="bo.ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,34 @@
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 主要图标部分 -->
+  <g id="logo-icon">
+    <!-- 中心核心 -->
+    <circle cx="16" cy="16" r="3" fill="#3370ff"/>
+
+    <!-- 连接节点 -->
+    <circle cx="6" cy="8" r="2" fill="#3370ff" opacity="0.8"/>
+    <circle cx="26" cy="8" r="2" fill="#3370ff" opacity="0.8"/>
+    <circle cx="6" cy="24" r="2" fill="#3370ff" opacity="0.8"/>
+    <circle cx="26" cy="24" r="2" fill="#3370ff" opacity="0.8"/>
+
+    <!-- 连接线 -->
+    <line x1="8" y1="9" x2="14" y2="14" stroke="#3370ff" stroke-width="1.5" opacity="0.6"/>
+    <line x1="24" y1="9" x2="18" y2="14" stroke="#3370ff" stroke-width="1.5" opacity="0.6"/>
+    <line x1="8" y1="23" x2="14" y2="18" stroke="#3370ff" stroke-width="1.5" opacity="0.6"/>
+    <line x1="24" y1="23" x2="18" y2="18" stroke="#3370ff" stroke-width="1.5" opacity="0.6"/>
+
+    <!-- 数据流动效果 -->
+    <circle cx="10" cy="11" r="1" fill="#00d4aa" opacity="0.9">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="22" cy="11" r="1" fill="#00d4aa" opacity="0.9">
+      <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- 文字部分 -->
+  <g id="logo-text">
+    <text x="40" y="20" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="13"
+          font-weight="600" fill="#1d2129">IoT Platform
+    </text>
+  </g>
+</svg> 

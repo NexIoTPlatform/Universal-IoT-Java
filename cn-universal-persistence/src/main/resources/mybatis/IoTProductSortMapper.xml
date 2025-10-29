@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTProductSortMapper">
+
+    <resultMap type="cn.universal.persistence.entity.IoTProductSort" id="DevProductSortResult">
+        <result property="id" column="id"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="hasChild" column="has_child"/>
+        <result property="identification" column="identification"/>
+        <result property="classifiedName" column="classified_name"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="create_time"/>
+        <result property="createBy" column="create_by"/>
+    </resultMap>
+
+    <sql id="selectDevProductSortVo">
+        select id,
+               parent_id,
+               has_child,
+               identification,
+               classified_name,
+               description,
+               create_time,
+               create_by
+        from iot_product_sort
+    </sql>
+
+    <select id="selectDevProductSortList"
+            parameterType="cn.universal.persistence.entity.IoTProductSort" resultMap="DevProductSortResult">
+        <include refid="selectDevProductSortVo"/>
+        <where>
+            <if test="parentId != null  and parentId != ''">and parent_id = #{parentId}</if>
+            <if test="hasChild != null ">and has_child = #{hasChild}</if>
+            <if test="identification != null  and identification != ''">and identification like
+                concat('%', #{identification}, '%')
+            </if>
+            <if test="classifiedName != null  and classifiedName != ''">and classified_name like
+                concat('%', #{classifiedName}, '%')
+            </if>
+            <if test="description != null  and description != ''">and description = #{description}</if>
+            <if test="createTime != null ">and create_time = #{createTime}</if>
+            <if test="createBy != null  and createBy != ''">and create_by = #{createBy}</if>
+        </where>
+    </select>
+
+    <select id="selectDevProductSortById" parameterType="String" resultMap="DevProductSortResult">
+        <include refid="selectDevProductSortVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDevProductSort" parameterType="cn.universal.persistence.entity.IoTProductSort">
+        insert into iot_product_sort
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="hasChild != null">has_child,</if>
+            <if test="identification != null and identification != ''">identification,</if>
+            <if test="classifiedName != null and classifiedName != ''">classified_name,</if>
+            <if test="description != null">description,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="createBy != null">create_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="hasChild != null">#{hasChild},</if>
+            <if test="identification != null and identification != ''">#{identification},</if>
+            <if test="classifiedName != null and classifiedName != ''">#{classifiedName},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDevProductSort" parameterType="cn.universal.persistence.entity.IoTProductSort">
+        update iot_product_sort
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="hasChild != null">has_child = #{hasChild},</if>
+            <if test="identification != null and identification != ''">identification =
+                #{identification},
+            </if>
+            <if test="classifiedName != null and classifiedName != ''">classified_name =
+                #{classifiedName},
+            </if>
+            <if test="description != null">description = #{description},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDevProductSortById" parameterType="String">
+        delete
+        from iot_product_sort
+        where id = #{id}
+    </delete>
+
+    <delete id="deleteDevProductSortByIds" parameterType="String">
+        delete from iot_product_sort where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="getListByParentId" parameterType="String" resultMap="DevProductSortResult">
+        <include refid="selectDevProductSortVo"/>
+        where parent_id = #{parentId} order by id desc
+    </select>
+</mapper>

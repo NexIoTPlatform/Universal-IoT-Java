@@ -1,0 +1,1265 @@
+@import '~ant-design-vue/es/style/themes/default.less';
+@import './assets/styles/button.less';
+@import './assets/styles/input.less';
+
+html,
+body,
+#app, #root {
+  height: 100%;
+}
+
+.colorWeak {
+  filter: invert(80%);
+}
+
+.ant-layout.layout-basic {
+  height: 100vh;
+  // min-height: 100vh;
+}
+
+canvas {
+  display: block;
+}
+
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 数据列表 样式
+.table-alert {
+  margin-bottom: 16px;
+}
+
+// 数据列表 操作
+.table-operator {
+  margin-bottom: 18px;
+
+  button {
+    margin-right: 8px;
+  }
+}
+
+// 数据列表 搜索条件
+.table-page-search-wrapper {
+
+  .ant-form-inline {
+    .ant-form-item {
+      display: flex;
+      margin-bottom: 24px;
+      margin-right: 0;
+
+      .ant-form-item-control-wrapper {
+        flex: 1 1;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      > .ant-form-item-label {
+        line-height: 32px;
+        padding-right: 8px;
+        width: auto;
+      }
+
+      .ant-form-item-control {
+        height: 32px;
+        line-height: 32px;
+      }
+    }
+  }
+
+  .table-page-search-submitButtons {
+    display: block;
+    margin-bottom: 24px;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: @screen-xs) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+}
+
+//表格上方操作条
+.table-operations {
+  margin-bottom: 16px;
+}
+
+.table-operations > button {
+  margin-right: 8px;
+}
+
+// 详情页底部按钮
+.bottom-control {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid #e8e8e8;
+  padding: 10px 16px;
+  text-align: right;
+  left: 0;
+  background: #fff;
+  border-radius: 0 0 4px 4px;
+}
+
+.ant-drawer-body {
+  padding: 24px 24px 50px 24px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ant-pagination-item {
+  border: none;
+}
+
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+  border: none;
+}
+
+// 全局样式变量
+:root {
+  // 字体变量
+  --font-family: @font-family;
+  --font-size-base: @font-size-base;
+  --font-size-lg: @font-size-lg;
+  --font-size-sm: @font-size-sm;
+  --font-size-xs: @font-size-sm;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-base: @line-height-base;
+  --line-height-lg: 2;
+  --line-height-sm: 1.25;
+
+  // 颜色变量
+  --primary-color: @primary-color;
+  --primary-color-hover: @primary-5;
+  --primary-color-active: @primary-7;
+  --primary-color-outline: @primary-1;
+  --primary-1: @primary-1;
+  --primary-2: @primary-2;
+  --primary-3: @primary-3;
+  --primary-4: @primary-4;
+  --primary-5: @primary-5;
+  --primary-6: @primary-6;
+  --primary-7: @primary-7;
+  --primary-8: @primary-8;
+  --primary-9: @primary-9;
+  --primary-10: @primary-10;
+
+  --success-color: @success-color;
+  --warning-color: @warning-color;
+  --error-color: @error-color;
+  --info-color: @info-color;
+
+  --heading-color: @heading-color;
+  --text-color: @text-color;
+  --text-color-secondary: @text-color-secondary;
+
+  --border-radius-base: @border-radius-base;
+  --border-radius-sm: @border-radius-sm;
+
+  // 按钮相关变量
+  --btn-height-base: 32px;
+  --btn-height-sm: 28px;
+  --btn-height-lg: 40px;
+  --btn-padding-horizontal-base: 16px;
+  --btn-padding-horizontal-sm: 12px;
+  --btn-padding-horizontal-lg: 24px;
+  --btn-default-bg: #fff;
+  --btn-default-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --btn-primary-shadow: 0 1px 3px rgba(24, 144, 255, 0.2);
+  --border-color-base: #d9d9d9;
+  --background-color-base: #f5f5f5;
+
+  --shadow-1: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-2: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-3: 0 6px 24px rgba(0, 0, 0, 0.08);
+
+  --transition-duration: 0.2s;
+  --transition-timing: ease-in-out;
+
+  // Semi Design 特定变量
+  // --semi-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.08);
+  // --semi-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.08);
+  // --semi-shadow-3: 0 6px 24px rgba(0, 0, 0, 0.08);
+  // --semi-transition-duration: 0.2s;
+  // --semi-transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// 全局基础样式
+html {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--text-color);
+  background-color: @layout-body-background;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+// 卡片样式增强
+.ant-card {
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-1);
+  transition: all var(--transition-duration) var(--transition-timing);
+
+  &:hover {
+    box-shadow: var(--shadow-2);
+  }
+
+  .ant-card-head {
+    border-bottom: 1px solid @border-color-split;
+    padding: @card-head-padding;
+
+    .ant-card-head-title {
+      font-weight: 500;
+    }
+  }
+
+  .ant-card-body {
+    padding: @card-padding-base;
+  }
+}
+
+// 表格样式增强
+.ant-table {
+  .ant-table-thead > tr > th {
+    background: @table-header-bg;
+    font-weight: 500;
+    color: @table-header-color;
+    padding: @table-padding-vertical @table-padding-horizontal;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: @table-padding-vertical @table-padding-horizontal;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: @table-row-hover-bg;
+  }
+}
+
+// 按钮样式增强 - 物联网科技感配色
+.ant-btn {
+  height: 32px !important;
+  font-size: 13px !important;
+  padding: 0 14px !important;
+  border-radius: 6px !important;
+  min-width: 64px;
+  transition: all 0.3s ease !important;
+
+  // 主要按钮 - 科技蓝
+  &.ant-btn-primary {
+    background: #0066FF !important;
+    border-color: #0066FF !important;
+    color: #fff !important;
+    box-shadow: 0 1px 3px rgba(0, 102, 255, 0.12) !important;
+
+    &:hover, &:focus {
+      background: #0052CC !important;
+      border-color: #0052CC !important;
+      box-shadow: 0 2px 6px rgba(0, 102, 255, 0.2) !important;
+    }
+
+    &:active {
+      background: #0047B3 !important;
+      border-color: #0047B3 !important;
+    }
+  }
+
+  // 成功按钮 - 物联网绿
+  &.ant-btn-success {
+    background: #00D4AA !important;
+    border-color: #00D4AA !important;
+    color: #fff !important;
+    box-shadow: 0 1px 3px rgba(0, 212, 170, 0.12) !important;
+
+    &:hover, &:focus {
+      background: #00B894 !important;
+      border-color: #00B894 !important;
+      box-shadow: 0 2px 6px rgba(0, 212, 170, 0.2) !important;
+    }
+
+    &:active {
+      background: #009D7C !important;
+      border-color: #009D7C !important;
+    }
+  }
+
+  // 危险按钮 - 科技红
+  &.ant-btn-danger {
+    background: #FF4757 !important;
+    border-color: #FF4757 !important;
+    color: #fff !important;
+    box-shadow: 0 1px 3px rgba(255, 71, 87, 0.12) !important;
+
+    &:hover, &:focus {
+      background: #FF3742 !important;
+      border-color: #FF3742 !important;
+      box-shadow: 0 2px 6px rgba(255, 71, 87, 0.2) !important;
+    }
+
+    &:active {
+      background: #FF2E3A !important;
+      border-color: #FF2E3A !important;
+    }
+  }
+
+  // 警告按钮 - 科技橙
+  &.ant-btn-warning {
+    background: #FFA502 !important;
+    border-color: #FFA502 !important;
+    color: #fff !important;
+    box-shadow: 0 1px 3px rgba(255, 165, 2, 0.12) !important;
+
+    &:hover, &:focus {
+      background: #FF9500 !important;
+      border-color: #FF9500 !important;
+      box-shadow: 0 2px 6px rgba(255, 165, 2, 0.2) !important;
+    }
+
+    &:active {
+      background: #FF8C00 !important;
+      border-color: #FF8C00 !important;
+    }
+  }
+
+  // 默认按钮
+  &.ant-btn-default {
+    background: #fff !important;
+    border-color: #E5E6EB !important;
+    color: #1D2129 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+
+    &:hover, &:focus {
+      background: #F7F8FA !important;
+      border-color: #0066FF !important;
+      color: #0066FF !important;
+      box-shadow: 0 2px 6px rgba(0, 102, 255, 0.1) !important;
+    }
+
+    &:active {
+      background: #E8F3FF !important;
+      border-color: #0052CC !important;
+      color: #0052CC !important;
+    }
+  }
+
+  // 虚线按钮
+  &.ant-btn-dashed {
+    background: #fff !important;
+    border-color: #E5E6EB !important;
+    color: #1D2129 !important;
+
+    &:hover, &:focus {
+      border-color: #0066FF !important;
+      color: #0066FF !important;
+    }
+  }
+
+  // 链接按钮
+  &.ant-btn-link {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #0066FF !important;
+    box-shadow: none !important;
+
+    &:hover, &:focus {
+      color: #0052CC !important;
+      background: rgba(0, 102, 255, 0.04) !important;
+    }
+  }
+
+  // 文本按钮
+  &.ant-btn-text {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: #1D2129 !important;
+    box-shadow: none !important;
+
+    &:hover, &:focus {
+      background: rgba(0, 0, 0, 0.04) !important;
+      color: #0066FF !important;
+    }
+  }
+}
+
+.ant-btn > .anticon {
+  font-size: 14px !important;
+}
+
+.bottom-control .ant-btn {
+  height: 32px !important;
+  font-size: 13px !important;
+  padding: 0 18px !important;
+  border-radius: 6px !important;
+}
+
+// 输入框样式增强
+.ant-input,
+.ant-input-affix-wrapper {
+  border-radius: var(--border-radius-base);
+  transition: all var(--transition-duration) var(--transition-timing);
+
+  &:hover {
+    border-color: @primary-5;
+  }
+
+  &:focus,
+  &-focused {
+    border-color: @primary-color;
+    box-shadow: 0 0 0 2px @primary-1;
+  }
+}
+
+// 选择器样式增强
+.ant-select {
+  .ant-select-selector {
+    border-radius: 3px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  &:hover .ant-select-selector {
+    border-color: @primary-5 !important;
+  }
+
+  &-focused .ant-select-selector {
+    border-color: @primary-color !important;
+    box-shadow: 0 0 0 2px @primary-1 !important;
+  }
+}
+
+// 标签页样式增强
+.ant-tabs {
+  .ant-tabs-nav {
+    margin-bottom: 16px;
+
+    &::before {
+      border-bottom: 1px solid @border-color-split;
+    }
+
+    .ant-tabs-tab {
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: @primary-5;
+      }
+
+      &.ant-tabs-tab-active {
+        .ant-tabs-tab-btn {
+          color: @primary-color;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .ant-tabs-ink-bar {
+      background: @primary-color;
+      height: 2px;
+      border-radius: 1px;
+    }
+  }
+}
+
+// 抽屉样式增强
+.ant-drawer {
+  .ant-drawer-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid @border-color-split;
+
+    .ant-drawer-title {
+      font-weight: 500;
+      color: @heading-color;
+    }
+  }
+
+  .ant-drawer-body {
+    padding: 24px;
+  }
+}
+
+// 模态框样式增强
+.ant-modal {
+  .ant-modal-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid @border-color-split;
+
+    .ant-modal-title {
+      font-weight: 500;
+      color: @heading-color;
+    }
+  }
+
+  .ant-modal-body {
+    padding: 24px;
+  }
+
+  .ant-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid @border-color-split;
+  }
+}
+
+// 分页样式增强
+.ant-pagination {
+  .ant-pagination-item {
+    border-radius: 3px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: @primary-5;
+    }
+
+    &-active {
+      background: @primary-color;
+      border-color: @primary-color;
+
+      a {
+        color: #fff;
+      }
+
+      &:hover {
+        border-color: @primary-5;
+      }
+    }
+  }
+
+  .ant-pagination-prev,
+  .ant-pagination-next {
+    .ant-pagination-item-link {
+      border-radius: 3px;
+    }
+  }
+}
+
+// 菜单样式增强
+.ant-menu {
+  .ant-menu-item {
+    margin: 4px 0;
+    padding: 0 16px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: #3370ff;
+    }
+
+    &-selected {
+      background: #e8f3ff;
+      color: #3370ff;
+      font-weight: 500;
+    }
+  }
+
+  .ant-menu-submenu {
+    .ant-menu-submenu-title {
+      margin: 4px 0;
+      padding: 0 16px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 3px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #3370ff;
+      }
+    }
+  }
+}
+
+// 动画类
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity var(--transition-duration) var(--transition-timing);
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all var(--transition-duration) var(--transition-timing);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+// 工具类
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.mt-1 {
+  margin-top: 4px;
+}
+
+.mt-2 {
+  margin-top: 8px;
+}
+
+.mt-3 {
+  margin-top: 12px;
+}
+
+.mt-4 {
+  margin-top: 16px;
+}
+
+.mb-1 {
+  margin-bottom: 4px;
+}
+
+.mb-2 {
+  margin-bottom: 8px;
+}
+
+.mb-3 {
+  margin-bottom: 12px;
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.ml-1 {
+  margin-left: 4px;
+}
+
+.ml-2 {
+  margin-left: 8px;
+}
+
+.ml-3 {
+  margin-left: 12px;
+}
+
+.ml-4 {
+  margin-left: 16px;
+}
+
+.mr-1 {
+  margin-right: 4px;
+}
+
+.mr-2 {
+  margin-right: 8px;
+}
+
+.mr-3 {
+  margin-right: 12px;
+}
+
+.mr-4 {
+  margin-right: 16px;
+}
+
+.p-0 {
+  padding: 0;
+}
+
+.p-1 {
+  padding: 4px;
+}
+
+.p-2 {
+  padding: 8px;
+}
+
+.p-3 {
+  padding: 12px;
+}
+
+.p-4 {
+  padding: 16px;
+}
+
+// 响应式工具类
+@media (max-width: @screen-xs) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+
+@media (max-width: @screen-sm) {
+  .hidden-sm {
+    display: none !important;
+  }
+}
+
+@media (max-width: @screen-md) {
+  .hidden-md {
+    display: none !important;
+  }
+}
+
+@media (max-width: @screen-lg) {
+  .hidden-lg {
+    display: none !important;
+  }
+}
+
+@media (max-width: @screen-xl) {
+  .hidden-xl {
+    display: none !important;
+  }
+}
+
+// 字体工具类
+.text-xs {
+  font-size: var(--font-size-xs);
+}
+
+.text-sm {
+  font-size: var(--font-size-sm);
+}
+
+.text-base {
+  font-size: var(--font-size-base);
+}
+
+.text-lg {
+  font-size: var(--font-size-lg);
+}
+
+.font-regular {
+  font-weight: var(--font-weight-regular);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+// Semi Design 风格的按钮
+// .ant-btn {
+//   border-radius: var(--border-radius-service);
+//   transition: all var(--semi-transition-duration) var(--semi-transition-timing);
+//   font-weight: var(--font-weight-regular);
+//   height: var(--btn-height-sm);
+//   padding: 0 var(--btn-padding-horizontal-sm);
+//   border: 1px solid var(--border-color-service);
+//   background: var(--btn-default-bg);
+//   box-shadow: var(--btn-default-shadow);
+//   font-size: var(--font-size-sm);
+
+//   &:not(.ant-btn-link):not(.ant-btn-text) {
+//     &:hover {
+//       transform: translateY(-1px);
+//       box-shadow: var(--semi-shadow-1);
+//     }
+
+//     &:active {
+//       transform: translateY(0);
+//       box-shadow: none;
+//     }
+//   }
+
+//   &-primary {
+//     background: var(--primary-color);
+//     border-color: var(--primary-color);
+//     color: #fff;
+//     box-shadow: var(--btn-primary-shadow);
+
+//     &:hover {
+//       background: var(--primary-5);
+//       border-color: var(--primary-5);
+//     }
+
+//     &:active {
+//       background: var(--primary-7);
+//       border-color: var(--primary-7);
+//     }
+//   }
+
+//   &-dashed {
+//     border-style: dashed;
+//   }
+
+//   &-text {
+//     border: none;
+//     box-shadow: none;
+//     padding: 0;
+//     height: auto;
+
+//     &:hover {
+//       background: var(--background-color-service);
+//     }
+//   }
+
+//   &-link {
+//     border: none;
+//     box-shadow: none;
+//     padding: 0;
+//     height: auto;
+
+//     &:hover {
+//       color: var(--primary-5);
+//     }
+//   }
+
+//   &-sm {
+//     height: var(--btn-height-sm);
+//     padding: 0 var(--btn-padding-horizontal-sm);
+//     font-size: var(--font-size-sm);
+//   }
+
+//   &-lg {
+//     height: var(--btn-height-lg);
+//     padding: 0 var(--btn-padding-horizontal-lg);
+//     font-size: var(--font-size-lg);
+//   }
+// }
+
+// Semi Design 风格的卡片
+// .ant-card {
+//   border-radius: var(--border-radius-service);
+//   box-shadow: var(--semi-shadow-1);
+//   transition: all var(--semi-transition-duration) var(--semi-transition-timing);
+//   border: 1px solid var(--border-color-split);
+
+//   &:hover {
+//     box-shadow: var(--semi-shadow-2);
+//   }
+
+//   .ant-card-head {
+//     border-bottom: var(--card-head-border-bottom);
+//     padding: var(--card-head-padding);
+
+//     .ant-card-head-title {
+//       font-weight: var(--font-weight-medium);
+//       color: var(--heading-color);
+//     }
+//   }
+
+//   .ant-card-body {
+//     padding: var(--card-padding-service);
+//   }
+// }
+
+// Semi Design 风格的表格
+// .ant-table {
+//   .ant-table-thead > tr > th {
+//     background: var(--table-header-bg);
+//     font-weight: var(--font-weight-medium);
+//     color: var(--table-header-color);
+//     padding: var(--table-padding-vertical) var(--table-padding-horizontal);
+//     border-bottom: 1px solid var(--table-border-color);
+//   }
+
+//   .ant-table-tbody > tr > td {
+//     padding: var(--table-padding-vertical) var(--table-padding-horizontal);
+//     border-bottom: 1px solid var(--table-border-color);
+//   }
+
+//   .ant-table-tbody > tr:hover > td {
+//     background: var(--table-row-hover-bg);
+//   }
+
+//   .ant-table-tbody > tr.ant-table-row-selected > td {
+//     background: var(--table-selected-row-bg);
+//   }
+// }
+
+// Semi Design 风格的选择器
+// .ant-select {
+//   .ant-select-selector {
+//     border-radius: var(--border-radius-service) !important;
+//     transition: all var(--semi-transition-duration) var(--semi-transition-timing) !important;
+//     border: 1px solid var(--border-color-service) !important;
+//     background: var(--input-bg) !important;
+//     height: var(--input-height-service) !important;
+//     padding: var(--input-padding-vertical-service) var(--input-padding-horizontal) !important;
+//   }
+
+//   &:hover .ant-select-selector {
+//     border-color: var(--primary-5) !important;
+//   }
+
+//   &-focused .ant-select-selector {
+//     border-color: var(--primary-color) !important;
+//     box-shadow: 0 0 0 2px var(--primary-1) !important;
+//   }
+
+//   &-sm .ant-select-selector {
+//     height: var(--input-height-sm) !important;
+//     padding: var(--input-padding-vertical-sm) var(--input-padding-horizontal) !important;
+//     font-size: var(--font-size-sm) !important;
+//   }
+
+//   &-lg .ant-select-selector {
+//     height: var(--input-height-lg) !important;
+//     padding: var(--input-padding-vertical-lg) var(--input-padding-horizontal) !important;
+//     font-size: var(--font-size-lg) !important;
+//   }
+// }
+
+// Semi Design 风格的标签页
+// .ant-tabs {
+//   .ant-tabs-nav {
+//     margin-bottom: 16px;
+
+//     &::before {
+//       border-bottom: 1px solid var(--border-color-split);
+//     }
+
+//     .ant-tabs-tab {
+//       transition: all var(--semi-transition-duration) var(--semi-transition-timing);
+//       padding: 12px 0;
+//       margin: 0 32px 0 0;
+
+//       &:hover {
+//         color: var(--primary-5);
+//       }
+
+//       &.ant-tabs-tab-active {
+//         .ant-tabs-tab-btn {
+//           color: var(--primary-color);
+//           font-weight: var(--font-weight-medium);
+//         }
+//       }
+//     }
+
+//     .ant-tabs-ink-bar {
+//       background: var(--primary-color);
+//       height: 2px;
+//       border-radius: 1px;
+//     }
+//   }
+// }
+
+// Semi Design 风格的分页
+// .ant-pagination {
+//   .ant-pagination-item {
+//     border-radius: var(--border-radius-service);
+//     transition: all var(--semi-transition-duration) var(--semi-transition-timing);
+//     border: 1px solid var(--border-color-service);
+//     background: var(--pagination-item-bg);
+
+//     &:hover {
+//       border-color: var(--primary-5);
+//     }
+
+//     &-active {
+//       background: var(--primary-color);
+//       border-color: var(--primary-color);
+
+//       a {
+//         color: #fff;
+//       }
+
+//       &:hover {
+//         border-color: var(--primary-5);
+//       }
+//     }
+//   }
+
+//   .ant-pagination-prev,
+//   .ant-pagination-next {
+//     .ant-pagination-item-link {
+//       border-radius: var(--border-radius-service);
+//     }
+//   }
+// }
+
+
+// ===== ProLayout兼容样式 =====
+// 移除了可能冲突的header样式，让ProLayout正常工作
+
+// ===== 响应式适配 =====
+@media (max-width: 768px) {
+  // 移除了可能影响ProLayout的样式
+}
+
+
+.ant-layout-sider-collapsed .ant-menu-item span,
+.ant-layout-sider-collapsed .ant-menu-submenu-title span,
+.ant-menu-inline-collapsed .ant-menu-item span,
+.ant-menu-inline-collapsed .ant-menu-submenu-title span {
+  display: none !important;
+}
+
+.ant-layout-sider-collapsed .ant-menu-item .anticon,
+.ant-layout-sider-collapsed .ant-menu-submenu-title .anticon,
+.ant-menu-inline-collapsed .ant-menu-item .anticon,
+.ant-menu-inline-collapsed .ant-menu-submenu-title .anticon {
+  margin-right: 0 !important;
+  font-size: 20px !important;
+  color: #6b7280 !important;
+  display: inline-block !important;
+  width: 20px !important;
+  height: 20px !important;
+  text-align: center !important;
+  line-height: 20px !important;
+  vertical-align: middle !important;
+}
+
+.ant-layout-sider-collapsed .ant-menu-item:hover .anticon,
+.ant-layout-sider-collapsed .ant-menu-submenu-title:hover .anticon,
+.ant-menu-inline-collapsed .ant-menu-item:hover .anticon,
+.ant-menu-inline-collapsed .ant-menu-submenu-title:hover .anticon,
+.ant-layout-sider-collapsed .ant-menu-item-selected .anticon,
+.ant-layout-sider-collapsed .ant-menu-item-active .anticon,
+.ant-menu-inline-collapsed .ant-menu-item-selected .anticon,
+.ant-menu-inline-collapsed .ant-menu-item-active .anticon {
+  color: #3370ff !important;
+}
+
+// 进一步减少内容区顶部空白
+.layout-content, .ant-layout-content, .ant-pro-basicLayout-content {
+  padding-top: 0 !important;
+  padding-bottom: 16px !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+  background: #f7f8fa !important;
+  min-height: unset !important;
+  height: auto !important;
+}
+
+.page-container, .page-wrapper {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+// 卡片现代化
+.ant-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06) !important;
+  border: none !important;
+  background: #fff !important;
+  margin-bottom: 24px !important;
+  transition: box-shadow 0.2s;
+}
+
+.ant-card:hover {
+  box-shadow: 0 6px 24px 0 rgba(51, 112, 255, 0.10) !important;
+}
+
+.ant-card-head {
+  border-bottom: none !important;
+  padding: 24px 24px 0 24px !important;
+}
+
+.ant-card-head-title {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #1d2129 !important;
+}
+
+.ant-card-body {
+  padding: 20px 24px 24px 24px !important;
+}
+
+// 卡片内主信息
+.card-title, .ant-card-meta-title {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #1d2129 !important;
+}
+
+.card-desc, .ant-card-meta-description {
+  color: #86909c !important;
+  font-size: 14px !important;
+}
+
+// 卡片标签色块
+.card-tag, .ant-tag {
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  padding: 2px 10px !important;
+  font-weight: 500 !important;
+}
+
+// 按钮现代化
+.ant-btn {
+  border-radius: 8px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  height: 40px !important;
+  padding: 0 24px !important;
+  box-shadow: none !important;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.ant-btn-primary {
+  background: #3370ff !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+.ant-btn-primary:hover, .ant-btn-primary:focus {
+  background: #2253c8 !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px 0 rgba(51, 112, 255, 0.10) !important;
+}
+
+.ant-btn-default {
+  background: #f7f8fa !important;
+  color: #3370ff !important;
+  border: 1px solid #e5e6eb !important;
+}
+
+.ant-btn-default:hover, .ant-btn-default:focus {
+  background: #e8f3ff !important;
+  color: #2253c8 !important;
+  border: 1px solid #3370ff !important;
+}
+
+// 卡片间距
+.card-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.card-list .ant-card {
+  flex: 1 1 320px;
+  min-width: 320px;
+  max-width: 100%;
+}
+
+// 全局按钮样式覆盖 - 确保所有按钮都使用小尺寸
+// 这个样式放在最后，确保优先级最高
+html body .ant-btn {
+  height: 28px !important;
+  padding: 0 12px !important;
+  font-size: 12px !important;
+  line-height: 26px !important;
+  border-radius: 4px !important;
+
+  // 圆形按钮特殊处理
+  &.ant-btn-circle {
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+  }
+
+  // 大尺寸按钮保持原样
+  &.ant-btn-lg {
+    height: 40px !important;
+    padding: 0 16px !important;
+    font-size: 14px !important;
+    line-height: 38px !important;
+  }
+
+  // 链接和文本按钮保持原样
+  &.ant-btn-link,
+  &.ant-btn-text {
+    height: auto !important;
+    padding: 0 !important;
+    line-height: normal !important;
+  }
+}
+

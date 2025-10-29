@@ -1,0 +1,30 @@
+{
+  "currentVersion": "2.0.0",
+  "changelogUrl": "https://gitee.com/NexIoT/Universal-IoT-Java/releases",
+  "apiEndpoint": "",
+  "checkInterval": 300000,
+  "versions": [
+    {
+      "version": "2.0.0",
+      "type": "major",
+      "date": "2025-10-28",
+      "title": "V2.0 架构升级版本",
+      "description": "网关子设备管理系统、云端轮询、产品驱动体系、数据桥接性能优化等重大升级",
+      "features": [
+        "🏠 网关子设备管理系统完整实现，支持DTU网关能力和子设备功能下发",
+        "☁️ 新增云端轮询功能，支持网关设备主动拉取指令",
+        "🚀 产品驱动体系升级，支持产品配置一键导入导出",
+        "🔗 下行消息转换架构重构，增加设备下行拦截器",
+        "📊 数据桥接性能大幅提升，支持连接池管理和开关控制",
+        "🔧 场景联动系统定稿，支持通知人设置和执行日志",
+        "🌐 国际化体系完善，优化中英文切换和本地化适配",
+        "📈 设备趋势支持自定义时间范围查看更多数据",
+        "🔒 安全性增强：日志脱敏、密码处理、XSS防护优化",
+        "⚡ 性能优化：异步处理统一配置、数据库连接池优化",
+        "🐛 修复大量已知问题，提升系统稳定性"
+      ],
+      "changelog": "https://gitee.com/NexIoT/Universal-IoT-Java/releases/tag/v2.0.0",
+      "isNew": true
+    }
+  ]
+}

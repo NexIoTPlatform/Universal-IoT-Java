@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清除版本缓存工具</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1890ff;
+            margin-top: 0;
+        }
+        button {
+            background: #1890ff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+        }
+        button:hover {
+            background: #40a9ff;
+        }
+        .info {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+        .success {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #52c41a;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 版本缓存清除工具</h1>
+        
+        <div class="info">
+            <strong>说明：</strong><br>
+            如果版本更新弹窗没有正确显示，使用此工具清除缓存后刷新页面。
+        </div>
+
+        <h3>当前缓存状态：</h3>
+        <div id="status"></div>
+
+        <h3>操作：</h3>
+        <button onclick="clearVersionCache()">清除版本缓存</button>
+        <button onclick="clearReadVersions()">清除已读标记</button>
+        <button onclick="clearAll()">清除所有</button>
+        <button onclick="checkStatus()">刷新状态</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function checkStatus() {
+            const versionInfo = localStorage.getItem('version_info');
+            const lastReadVersion = localStorage.getItem('last_read_version');
+            // 对旧版本兼容
+            const readVersions = localStorage.getItem('read_versions');
+            
+            let html = '<pre style="text-align: left;">';
+            html += '=== LocalStorage 版本缓存状态 ===\n\n';
+            
+            html += '1. version_info: ' + (versionInfo ? '\u2705 存在' : '\u274c 不存在') + '\n';
+            if (versionInfo) {
+                try {
+                    const info = JSON.parse(versionInfo);
+                    html += '   - 当前版本: ' + info.currentVersion + '\n';
+                    html += '   - 版本数量: ' + (info.versions ? info.versions.length : 0) + '\n';
+                    html += '   - 缓存时间: ' + (info.lastCheckTime ? new Date(info.lastCheckTime).toLocaleString() : '未知') + '\n';
+                    if (info.versions && info.versions.length > 0) {
+                        html += '   - 最新版本: ' + info.versions[0].version + '\n';
+                        html += '   - 版本列表: ' + info.versions.map(v => v.version).join(', ') + '\n';
+                    }
+                } catch(e) {
+                    html += '   - \u26a0\ufe0f 解析错误: ' + e.message + '\n';
+                }
+            }
+            
+            html += '\n2. last_read_version (新): ' + (lastReadVersion ? '\u2705 ' + lastReadVersion : '\u274c 不存在') + '\n';
+            
+            if (readVersions) {
+                html += '\n3. read_versions (旧): ' + '\u26a0\ufe0f 检测到旧版本数据\n';
+                try {
+                    const reads = JSON.parse(readVersions);
+                    html += '   - 已读版本: ' + (reads.length > 0 ? reads.join(', ') : '无') + '\n';
+                    html += '   - \u5efa议: 点击"清除所有"升级到新版本\n';
+                } catch(e) {
+                    html += '   - \u26a0\ufe0f 解析错误: ' + e.message + '\n';
+                }
+            }
+            
+            html += '\n=== 当前 version.json 配置 ===\n';
+            html += '请查看 /src/config/version.json 文件\n';
+            html += '- currentVersion: 2.0.0\n';
+            html += '- checkInterval: 300000 (5分钟)\n';
+            html += '- 存储格式: 单一版本号 (last_read_version)\n';
+            html += '</pre>';
+            
+            document.getElementById('status').innerHTML = html;
+        }
+
+        function clearVersionCache() {
+            localStorage.removeItem('version_info');
+            showResult('版本缓存已清除！', 'success');
+            checkStatus();
+        }
+
+        function clearReadVersions() {
+            // 清除新版本
+            localStorage.removeItem('last_read_version');
+            // 清除旧版本（兼容）
+            localStorage.removeItem('read_versions');
+            showResult('已读标记已清除！下次刷新页面将重新显示版本弹窗。', 'success');
+            checkStatus();
+        }
+
+        function clearAll() {
+            localStorage.removeItem('version_info');
+            localStorage.removeItem('last_read_version');
+            localStorage.removeItem('read_versions');  // 兼容旧版本
+            showResult('所有版本相关缓存已清除！现在可以刷新页面查看最新版本弹窗。', 'success');
+            checkStatus();
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'info ' + type;
+            resultDiv.innerHTML = '<strong>' + message + '</strong>';
+            setTimeout(() => {
+                resultDiv.innerHTML = '';
+                resultDiv.className = '';
+            }, 3000);
+        }
+
+        // 页面加载时检查状态
+        checkStatus();
+    </script>
+</body>
+</html>

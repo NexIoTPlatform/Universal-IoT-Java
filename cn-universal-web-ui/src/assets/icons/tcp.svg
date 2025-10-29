@@ -1,0 +1,39 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg t="1577186573535" class="icon" viewBox="0 0 1024 1024" version="1.1"
+     xmlns="http://www.w3.org/2000/svg" p-id="1068"
+     width="81" height="81">
+  <defs>
+    <style type="text/css"></style>
+  </defs>
+  <path
+    d="M896 192H128c-35.2 0-64 28.8-64 64v512c0 35.2 28.8 64 64 64h768c35.2 0 64-28.8 64-64V256c0-35.2-28.8-64-64-64z m0 576H128V256h768v512z"
+    p-id="1069"></path>
+  <path
+    d="M192 320h640v32H192V320z m0 96h640v32H192V416z m0 96h640v32H192V512z m0 96h640v32H192V608z m0 96h320v32H192V704z"
+    p-id="1070"></path>
+  <path
+    d="M256 352h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z"
+    p-id="1071"></path>
+  <path
+    d="M256 448h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z"
+    p-id="1072"></path>
+  <path
+    d="M256 544h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z"
+    p-id="1073"></path>
+  <path
+    d="M256 640h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z"
+    p-id="1074"></path>
+  <path
+    d="M256 736h32v32h-32z m96 0h32v32h-32z m96 0h32v32h-32z"
+    p-id="1075"></path>
+  <path
+    d="M192 896h640v32H192z"
+    p-id="1076"></path>
+  <path
+    d="M128 512h64v32H128z m704 0h64v32h-64z"
+    p-id="1077"></path>
+  <path
+    d="M512 128h32v64h-32z m0 704h32v64h-32z"
+    p-id="1078"></path>
+</svg>

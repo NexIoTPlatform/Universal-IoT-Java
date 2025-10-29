@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.universal.persistence.mapper.IoTDeviceFunctionTaskMapper">
+    <update id="retryTask">
+        update iot_device_function_task
+        set `status`=0
+        where id = #{id}
+    </update>
+
+
+    <select id="selectTaskList"
+            resultType="cn.universal.persistence.entity.vo.IoTDeviceFunctionTaskVO">
+        select t.*,count(h.id) as `total_num`,sum(h.down_result) as `success_num`
+        from iot_device_function_task t
+        left join iot_device_function_history h on t.id = h.task_id
+        <where>
+            <if test="bo.taskName!=null and bo.taskName!=''">
+                and t.task_name like concat ('%',#{bo.taskName},'%')
+            </if>
+            <if
+                    test="bo.params!=null and bo.params.queryBeginTime != null and bo.params.queryBeginTime != ''">
+                and date_format(t.begin_time,'%y%m%d%H%i%S') &gt;=
+                date_format(#{bo.params.queryBeginTime},'%y%m%d%H%i%S')
+            </if>
+            <if test="bo.params!=null and bo.params.queryEndTime != null and bo.params.queryEndTime!=''">
+                and date_format(#{bo.params.queryEndTime},'%y%m%d%H%i%S') &gt;=
+                date_format(t.begin_time,'%y%m%d%H%i%S')
+            </if>
+            <if test="unionId != null and unionId != ''">
+                and t.creator_id=#{unionId}
+            </if>
+        </where>
+        group by t.id order by t.id desc
+    </select>
+    <select id="queryFunctionListByTaskId"
+            resultType="cn.universal.persistence.entity.vo.IoTDeviceFunctionHistoryVO">
+        select h.*,t.command_data
+        from iot_device_function_history h
+        left join iot_device_function_task t on h.task_id=t.id
+        <where>
+            h.task_id=#{bo.taskId}
+            <if test="bo.deviceId!=null and bo.deviceId!=''">
+                and h.device_id like concat ('%',#{bo.deviceId},'%')
+            </if>
+            <if test="bo.deviceName!=null and bo.deviceName!=''">
+                and h.device_name like concat ('%',#{bo.deviceName},'%')
+            </if>
+            <if test="bo.downState != null">
+                and h.down_state=#{bo.downState}
+            </if>
+            <if test="bo.downResult != null">
+                and h.down_result=#{bo.downResult}
+            </if>
+            <if test="unionId != null and unionId != ''">
+                and t.creator_id=#{unionId}
+            </if>
+        </where>
+        order by h.id
+    </select>
+    <select id="selectOneTask" resultType="cn.universal.persistence.entity.IoTDeviceFunctionTask">
+        select * from iot_device_function_task t
+        <where>
+            <if test="bo.status!=null">
+                and t.status = #{bo.status}
+            </if>
+            <if test="bo.id!=null">
+                and t.id = #{bo.id}
+            </if>
+        </where>
+        order by t.id limit 1
+    </select>
+</mapper>
