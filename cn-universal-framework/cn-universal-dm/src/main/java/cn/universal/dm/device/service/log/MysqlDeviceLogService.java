@@ -126,9 +126,6 @@ public class MysqlDeviceLogService extends AbstractIoTDeviceLogService {
     /** 产品数据存储策略，不为空则保存日志 */
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
       try {
-        //        ioTDeviceLog.setPoint(ioTDeviceDTO.getCoordinate());
-        //        ioTDeviceLogMapper.insertSelective(ioTDeviceLog);
-        // 日志分表 暂时双写单读
         if (enable) {
           ioTDeviceLogShardMapper.insertSelective(ioTDeviceLog);
         }
@@ -159,23 +156,6 @@ public class MysqlDeviceLogService extends AbstractIoTDeviceLogService {
                   IoTDeviceLogMetadataBuilder.ext1(ioTDevicePropertiesBO.getPropertyName());
                   IoTDeviceLogMetadataBuilder.ext2(ioTDevicePropertiesBO.getFormatValue());
                   IoTDeviceLogMetadataBuilder.ext3(ioTDevicePropertiesBO.getSymbol());
-                  //
-                  // ioTDeviceLogMetadataMapper.insertUseGeneratedKeys(IoTDeviceLogMetadataBuilder.build());
-                  //         //删除超过数量的记录
-                  //
-                  //          //设置meta删除标记
-                  //          Boolean re = stringRedisTemplate.opsForValue().setIfAbsent(
-                  //              IoTConstant.LOG_META_PROPERTY_DELETE_SIGN + ":" +
-                  // up.getProductKey() + ":"
-                  //                  + up.getDeviceId(),
-                  //              "1", 1, TimeUnit.HOURS);
-                  //          if (Boolean.TRUE.equals(re)) {
-                  //            ioTDeviceLogMetadataMapper
-                  //                .deleteTopPropertiesRecord(up.getIotId(),
-                  //                    logStorePolicyDTO.getProperties().get(key).getMaxStorage(),
-                  //                    key);
-                  //          }
-
                   // 新旧表都改
                   if (metaEnable) {
                     ioTDeviceLogMetadataShardMapper.insertUseGeneratedKeys(
@@ -216,20 +196,6 @@ public class MysqlDeviceLogService extends AbstractIoTDeviceLogService {
       IoTDeviceLogMetadataBuilder IoTDeviceLogMetadataBuilder = builder(up);
       IoTDeviceLogMetadataBuilder.event(up.getEvent());
       IoTDeviceLogMetadataBuilder.content(up.getEventName());
-      //
-      // ioTDeviceLogMetadataMapper.insertUseGeneratedKeys(IoTDeviceLogMetadataBuilder.build());
-      //      //设置meta删除标记
-      //      Boolean re = stringRedisTemplate.opsForValue().setIfAbsent(
-      //          IoTConstant.LOG_META_EVENT_DELETE_SIGN + ":" + up.getProductKey() + ":"
-      //              + up.getDeviceId(),
-      //          "1", 1, TimeUnit.HOURS);
-      //      if (Boolean.TRUE.equals(re)) {
-      //        //删除超过数量的记录
-      //        ioTDeviceLogMetadataMapper
-      //            .deleteTopEventRecord(up.getIotId(), maxStorage,
-      //                up.getEvent());
-      //      }
-      // 新旧表都改
       if (metaEnable) {
         ioTDeviceLogMetadataShardMapper.insertUseGeneratedKeys(IoTDeviceLogMetadataBuilder.build());
         Boolean re2 =
