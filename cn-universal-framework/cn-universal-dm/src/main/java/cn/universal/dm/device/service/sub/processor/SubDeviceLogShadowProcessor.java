@@ -234,7 +234,7 @@ public class SubDeviceLogShadowProcessor extends AbstratIoTService
   @Override
   public boolean preCheck(SubDeviceRequest request) {
     // 检查必要的数据
-      return true;
+    return true;
   }
 
   @Override

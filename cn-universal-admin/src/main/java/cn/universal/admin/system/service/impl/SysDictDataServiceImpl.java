@@ -187,7 +187,6 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
   }
 
   /** 新增字典类型(进销人员) */
-
   @Override
   @Cacheable(
       cacheNames = "selectWhitelist",

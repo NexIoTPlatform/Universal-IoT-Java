@@ -64,7 +64,8 @@
       <div v-if="connectionInfo" class="current-connection-display">
         <div class="current-connection-header">
           <div class="connection-status">
-            <a-icon :type="getCurrentConnectionIcon()" :style="{ color: getCurrentConnectionColor() }"/>
+            <a-icon :type="getCurrentConnectionIcon()"
+                    :style="{ color: getCurrentConnectionColor() }"/>
             <span class="status-text">{{ getCurrentConnectionTitle() }}</span>
             <a-badge v-if="currentConnectionMode === 'server'"
                      :status="connectionInfo.network.state ? 'success' : 'default'"
@@ -140,7 +141,8 @@
                     <a-button type="default" size="small" @click="viewComponentDetail">
                       查看详情
                     </a-button>
-                    <a-button type="danger" size="small" @click="unbindComponent" :loading="unbinding">
+                    <a-button type="danger" size="small" @click="unbindComponent"
+                              :loading="unbinding">
                       解绑组件
                     </a-button>
                   </a-space>
@@ -220,7 +222,7 @@
                   </div>
                   <div class="card-row">
                     <a-icon type="poweroff" style="margin-right:4px;"/>
-                    {{$t('common.status')}}：
+                    {{ $t('common.status') }}：
                     <span :class="getStatusClass(item)">
                       {{ getStatusText(item) }}
                     </span>
@@ -468,7 +470,9 @@ export default {
 
     /** 初始化连接模式 */
     initConnectionMode() {
-      if (!this.connectionInfo) return
+      if (!this.connectionInfo) {
+        return
+      }
 
       // 默认选择服务端，如果服务端不可用且是TCP协议，则选择SNI
       if (this.product.networkUnionId && this.connectionInfo.network.enabled) {
@@ -487,7 +491,9 @@ export default {
 
     /** 获取当前连接信息 */
     getCurrentConnectionInfo() {
-      if (!this.connectionInfo) return {}
+      if (!this.connectionInfo) {
+        return {}
+      }
 
       if (this.currentConnectionMode === 'server' && this.connectionInfo.network.enabled) {
         // 服务端连接信息
@@ -530,7 +536,8 @@ export default {
 
     /** 获取当前连接标题 */
     getCurrentConnectionTitle() {
-      if (this.currentConnectionMode === 'server' && this.connectionInfo && this.connectionInfo.network.enabled) {
+      if (this.currentConnectionMode === 'server' && this.connectionInfo
+        && this.connectionInfo.network.enabled) {
         return `${this.getPlatformTitle()} (${this.connectionInfo.network.name})`
       } else {
         return 'SNI域名（设备需支持TLS）'
@@ -550,7 +557,6 @@ export default {
       this.serverManagementModalVisible = false
       this.selectedComponent = null
     },
-
 
     /** 检查TCP配置是否完整 */
     isTcpConfigured(item) {

@@ -45,7 +45,6 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2023/05/19 19:28
  */
 @Slf4j
-
 public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
     implements ProtocolCodecLoader, ProtocolCodecSupport, ProtocolCodecWrapper {
 

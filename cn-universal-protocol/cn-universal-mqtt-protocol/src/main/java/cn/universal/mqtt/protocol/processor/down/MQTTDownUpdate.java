@@ -67,7 +67,10 @@ public class MQTTDownUpdate extends AbstratIoTService implements MQTTDownMessage
     return updateDevInstance(ioTDeviceOne, downRequest);
   }
 
-  /** 修改本地数据库设备 详见文档 https://apiportalweb.ctwing.cn/index.html#/apiDetail/10255/218/1001 gitee.com/NexIoT */
+  /**
+   * 修改本地数据库设备 详见文档 https://apiportalweb.ctwing.cn/index.html#/apiDetail/10255/218/1001
+   * gitee.com/NexIoT
+   */
   private R<?> updateDevInstance(IoTDevice ioTDevice, MQTTDownRequest downRequest) {
     if (StrUtil.isNotBlank(downRequest.getDownCommonData().getLatitude())
         && StrUtil.isNotBlank(downRequest.getDownCommonData().getLongitude())) {

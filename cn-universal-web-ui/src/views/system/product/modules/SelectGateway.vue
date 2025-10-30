@@ -1,8 +1,8 @@
 <template>
-  <a-modal 
-    v-model="visible" 
-    title="选择网关产品" 
-    @ok="handleOk" 
+  <a-modal
+    v-model="visible"
+    title="选择网关产品"
+    @ok="handleOk"
     width="600px"
     :bodyStyle="{ padding: '20px' }"
   >
@@ -19,11 +19,11 @@
       />
 
       <div class="gateway-list">
-        <a-empty v-if="list.length === 0" description="暂无可用网关" />
+        <a-empty v-if="list.length === 0" description="暂无可用网关"/>
         <a-radio-group v-else v-model="selectedValue" class="gateway-radio-group">
-          <div 
-            v-for="item in list" 
-            :key="item.productKey" 
+          <div
+            v-for="item in list"
+            :key="item.productKey"
             class="gateway-item"
             :class="{ selected: selectedValue === item.productKey }"
             @click="selectedValue = item.productKey"
@@ -32,19 +32,22 @@
               <div class="gateway-card-content">
                 <!-- 网关图片 -->
                 <div class="gateway-image">
-                  <img v-if="getProductImage(item)" :src="getProductImage(item)" alt="网关图片" />
+                  <img v-if="getProductImage(item)" :src="getProductImage(item)" alt="网关图片"/>
                   <div v-else class="default-image">
-                    <SvgDefaultProduct />
+                    <SvgDefaultProduct/>
                   </div>
                 </div>
-                
+
                 <!-- 网关信息 -->
                 <div class="gateway-info">
                   <div class="gateway-header">
                     <div class="gateway-name">{{ item.name }}</div>
                     <div class="gateway-tags">
                       <a-tag size="small" color="blue">{{ item.thirdPlatform || 'tcp' }}</a-tag>
-                      <a-tag size="small" color="cyan">{{ getDeviceNodeText(item.deviceNode) }}</a-tag>
+                      <a-tag size="small" color="cyan">{{
+                          getDeviceNodeText(item.deviceNode)
+                        }}
+                      </a-tag>
                     </div>
                   </div>
                   <div class="gateway-meta">
@@ -113,31 +116,33 @@ export default {
       }
       this.visible = false
     },
-    
+
     onSearch() {
       this.list = this.originList.filter(item => item.name.includes(this.keywords))
     },
-    
+
     getList() {
       gatewayList().then(res => {
         this.originList = res.data
         this.list = res.data
       })
     },
-    
+
     // 获取产品图片
     getProductImage(product) {
-      if (!product.photoUrl) return ''
+      if (!product.photoUrl) {
+        return ''
+      }
       try {
-        const photoObj = typeof product.photoUrl === 'string' 
-          ? JSON.parse(product.photoUrl) 
+        const photoObj = typeof product.photoUrl === 'string'
+          ? JSON.parse(product.photoUrl)
           : product.photoUrl
         return photoObj && photoObj.img ? photoObj.img : ''
       } catch (e) {
         return ''
       }
     },
-    
+
     // 获取设备节点文本
     getDeviceNodeText(deviceNode) {
       const nodeMap = {
@@ -250,7 +255,7 @@ export default {
         align-items: center;
         justify-content: center;
         background: #fff;
-        
+
         // SvgDefaultProduct组件样式
         :deep(svg) {
           width: 60px;

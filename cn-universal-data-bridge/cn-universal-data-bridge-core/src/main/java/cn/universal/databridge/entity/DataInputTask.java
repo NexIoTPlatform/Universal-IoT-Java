@@ -34,76 +34,72 @@ import lombok.NoArgsConstructor;
 @Table(name = "iot_data_input_task")
 public class DataInputTask implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    /** 配置ID */
-    @Column(name = "config_id")
-    private Long configId;
+  /** 配置ID */
+  @Column(name = "config_id")
+  private Long configId;
 
-    /** 任务名称 */
-    @Column(name = "task_name")
-    private String taskName;
+  /** 任务名称 */
+  @Column(name = "task_name")
+  private String taskName;
 
-    /** 任务类型 */
-    @Column(name = "task_type")
-    @Enumerated(EnumType.STRING)
-    private TaskType taskType;
+  /** 任务类型 */
+  @Column(name = "task_type")
+  @Enumerated(EnumType.STRING)
+  private TaskType taskType;
 
-    /** Cron表达式 */
-    @Column(name = "cron_expression")
-    private String cronExpression;
+  /** Cron表达式 */
+  @Column(name = "cron_expression")
+  private String cronExpression;
 
-    /** 最后执行时间 */
-    @Column(name = "last_execution_time")
-    private LocalDateTime lastExecutionTime;
+  /** 最后执行时间 */
+  @Column(name = "last_execution_time")
+  private LocalDateTime lastExecutionTime;
 
-    /** 下次执行时间 */
-    @Column(name = "next_execution_time")
-    private LocalDateTime nextExecutionTime;
+  /** 下次执行时间 */
+  @Column(name = "next_execution_time")
+  private LocalDateTime nextExecutionTime;
 
-    /** 状态 */
-    @Column(name = "status")
-    @Enumerated(EnumType.STRING)
-    private Status status;
+  /** 状态 */
+  @Column(name = "status")
+  @Enumerated(EnumType.STRING)
+  private Status status;
 
-    /** 错误信息 */
-    @Column(name = "error_message")
-    private String errorMessage;
+  /** 错误信息 */
+  @Column(name = "error_message")
+  private String errorMessage;
 
-    /** 创建时间 */
-    @Column(name = "create_time")
-    private LocalDateTime createTime;
+  /** 创建时间 */
+  @Column(name = "create_time")
+  private LocalDateTime createTime;
 
-    /** 更新时间 */
-    @Column(name = "update_time")
-    private LocalDateTime updateTime;
+  /** 更新时间 */
+  @Column(name = "update_time")
+  private LocalDateTime updateTime;
 
-    /** 创建者 */
-    @Column(name = "create_by")
-    private String createBy;
+  /** 创建者 */
+  @Column(name = "create_by")
+  private String createBy;
 
-    /** 更新者 */
-    @Column(name = "update_by")
-    private String updateBy;
+  /** 更新者 */
+  @Column(name = "update_by")
+  private String updateBy;
 
-    /**
-     * 任务类型枚举
-     */
-    public enum TaskType {
-        SCHEDULED,  // 定时任务
-        REALTIME    // 实时任务
-    }
+  /** 任务类型枚举 */
+  public enum TaskType {
+    SCHEDULED, // 定时任务
+    REALTIME // 实时任务
+  }
 
-    /**
-     * 状态枚举
-     */
-    public enum Status {
-        RUNNING,    // 运行中
-        STOPPED,    // 已停止
-        ERROR       // 错误状态
-    }
+  /** 状态枚举 */
+  public enum Status {
+    RUNNING, // 运行中
+    STOPPED, // 已停止
+    ERROR // 错误状态
+  }
 }

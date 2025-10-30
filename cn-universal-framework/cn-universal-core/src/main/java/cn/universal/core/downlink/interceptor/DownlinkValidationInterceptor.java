@@ -21,8 +21,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * 下行数据校验拦截器
- * 校验下行消息的必要参数
+ * 下行数据校验拦截器 校验下行消息的必要参数
  *
  * @version 1.0
  * @since 2025/10/24

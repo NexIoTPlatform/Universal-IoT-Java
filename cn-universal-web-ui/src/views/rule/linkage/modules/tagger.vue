@@ -12,7 +12,7 @@
         </a-select>
       </a-col>
       <a-col :span="8" v-if="isTimer">
-        <cron-selector v-model="cron" @change="onCronChange" />
+        <cron-selector v-model="cron" @change="onCronChange"/>
       </a-col>
       <a-col :span="6" v-if="isDevice" @click="$refs.device.openModal">
         <a-select v-model="value.deviceName" placeholder="请选择设备" @change="onChangeDevice">
@@ -183,7 +183,7 @@ export default {
         console.warn('Failed to load meta data for editing:', error)
         this.isProperties = (this.value.type === 'properties')
         this.isEvent = (this.value.type === 'event')
-        
+
         // 如果是因为缺少 productKey 导致的错误，提供更友好的提示
         if (!this.value.productKey && this.value.deviceId) {
           console.warn(`设备 ${this.value.deviceId} 缺少 productKey，无法加载物模型数据`)
@@ -253,7 +253,7 @@ export default {
     },
     getMeta() {
       return new Promise(resolve => {
-        console.log("设备触发",this.value);
+        console.log("设备触发", this.value);
         if (!this.value.productKey) {
           console.warn('productKey is empty, cannot get meta data')
           resolve({})

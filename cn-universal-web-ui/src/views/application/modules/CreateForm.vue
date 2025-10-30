@@ -284,7 +284,12 @@
 </template>
 
 <script>
-import {addApplication, checkUrl, getApplication, updateApplication} from '@/api/application/application'
+import {
+  addApplication,
+  checkUrl,
+  getApplication,
+  updateApplication
+} from '@/api/application/application'
 
 export default {
   name: 'CreateForm',

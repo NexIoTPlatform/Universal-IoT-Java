@@ -377,25 +377,25 @@ export const DataBridgeMappings = {
   // 根据分类获取资源类型
   getResourceTypesByCategory(category) {
     return Object.entries(RESOURCE_TYPE_MAPPINGS)
-      .filter(([, config]) => config.category === category)
-      .map(([value, config]) => ({
-        value,
-        label: config.name,
-        icon: config.icon,
-        color: config.color
-      }))
+    .filter(([, config]) => config.category === category)
+    .map(([value, config]) => ({
+      value,
+      label: config.name,
+      icon: config.icon,
+      color: config.color
+    }))
   },
 
   // 根据分类获取插件类型
   getPluginTypesByCategory(category) {
     return Object.entries(PLUGIN_TYPE_MAPPINGS)
-      .filter(([, config]) => config.category === category)
-      .map(([value, config]) => ({
-        value,
-        label: config.name,
-        icon: config.icon,
-        color: config.color
-      }))
+    .filter(([, config]) => config.category === category)
+    .map(([value, config]) => ({
+      value,
+      label: config.name,
+      icon: config.icon,
+      color: config.color
+    }))
   }
 }
 

@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * 网关轮询服务接口
- * 
+ *
  * @author Aleo
  * @date 2025-10-26
  */
@@ -27,7 +27,7 @@ public interface IGatewayPollingService {
 
   /**
    * 保存或更新网关轮询配置
-   * 
+   *
    * @param dto 配置DTO
    * @return 操作结果
    */
@@ -35,7 +35,7 @@ public interface IGatewayPollingService {
 
   /**
    * 获取网关轮询配置
-   * 
+   *
    * @param productKey 产品Key
    * @param deviceId 设备ID
    * @return 配置信息
@@ -44,7 +44,7 @@ public interface IGatewayPollingService {
 
   /**
    * 删除网关轮询配置
-   * 
+   *
    * @param productKey 产品Key
    * @param deviceId 设备ID
    * @return 操作结果
@@ -53,14 +53,14 @@ public interface IGatewayPollingService {
 
   /**
    * 执行单个网关的轮询任务
-   * 
+   *
    * @param config 轮询配置
    */
   void pollGatewayDevice(GatewayPollingConfig config);
 
   /**
    * 查询待轮询的网关设备列表
-   * 
+   *
    * @param intervalSeconds 轮询间隔
    * @return 待轮询设备列表
    */
@@ -68,7 +68,7 @@ public interface IGatewayPollingService {
 
   /**
    * 测试轮询 - 立即执行一次轮询
-   * 
+   *
    * @param productKey 产品Key
    * @param deviceId 设备ID
    * @return 操作结果

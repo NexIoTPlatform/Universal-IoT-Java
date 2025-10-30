@@ -33,19 +33,23 @@
       <div class="table-operations">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['system:sort:add']">
-          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button type="primary" :disabled="single"
                   @click="$refs.createForm.handleUpdate(undefined, ids)"
                   v-hasPermi="['system:sort:edit']">
-          <iot-icon type="icon-u-edit"/>{{ $t('button.edit') }}
+          <iot-icon type="icon-u-edit"/>
+          {{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['system:sort:remove']">
-          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>
+          {{ $t('button.delete') }}
         </a-button>
         <a-button type="primary" @click="handleExport" v-hasPermi="['system:sort:export']">
-          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>
+          {{ $t('button.export') }}
         </a-button>
         <a-button
           type="dashed"
@@ -237,14 +241,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return delSort(ids)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

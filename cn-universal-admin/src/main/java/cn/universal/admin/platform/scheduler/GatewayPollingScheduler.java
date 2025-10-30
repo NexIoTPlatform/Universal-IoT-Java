@@ -26,58 +26,50 @@ import org.springframework.stereotype.Component;
 
 /**
  * 网关轮询定时任务调度器
- * 
+ *
  * <p>使用固定轮询间隔(30s, 60s, 120s, 300s, 600s)，通过分布式锁保证集群环境下只有一个节点执行
- * 
+ *
  * @author Aleo
  * @date 2025-10-26
  */
 @Component
 @Slf4j
-@ConditionalOnProperty(prefix = "gateway.polling", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(
+    prefix = "gateway.polling",
+    name = "enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public class GatewayPollingScheduler {
 
-  @Autowired
-  private IGatewayPollingService gatewayPollingService;
+  @Autowired private IGatewayPollingService gatewayPollingService;
 
-  @Autowired
-  private RedissonClient redissonClient;
+  @Autowired private RedissonClient redissonClient;
 
-  /**
-   * 30秒轮询任务
-   */
+  /** 30秒轮询任务 */
   @Scheduled(cron = "0/30 * * * * ?")
   public void polling30s() {
     executePollingWithLock(30);
   }
 
-  /**
-   * 60秒轮询任务
-   */
+  /** 60秒轮询任务 */
   @Scheduled(cron = "0 0/1 * * * ?")
   public void polling60s() {
     executePollingWithLock(60);
   }
 
-  /**
-   * 120秒轮询任务
-   */
+  /** 120秒轮询任务 */
   @Scheduled(cron = "0 0/2 * * * ?")
   public void polling120s() {
     executePollingWithLock(120);
   }
 
-  /**
-   * 300秒轮询任务 (5分钟)
-   */
+  /** 300秒轮询任务 (5分钟) */
   @Scheduled(cron = "0 0/5 * * * ?")
   public void polling300s() {
     executePollingWithLock(300);
   }
 
-  /**
-   * 600秒轮询任务 (10分钟)
-   */
+  /** 600秒轮询任务 (10分钟) */
   @Scheduled(cron = "0 0/10 * * * ?")
   public void polling600s() {
     executePollingWithLock(600);
@@ -85,7 +77,7 @@ public class GatewayPollingScheduler {
 
   /**
    * 使用分布式锁执行轮询任务
-   * 
+   *
    * @param intervalSeconds 轮询间隔(秒)
    */
   private void executePollingWithLock(int intervalSeconds) {
@@ -118,14 +110,15 @@ public class GatewayPollingScheduler {
 
   /**
    * 执行轮询任务
-   * 
+   *
    * @param intervalSeconds 轮询间隔(秒)
    */
   private void executePollingTask(int intervalSeconds) {
     long startTime = System.currentTimeMillis();
 
     // 1. 查询待轮询的网关设备
-    List<GatewayPollingConfig> configs = gatewayPollingService.getDuePollingDevices(intervalSeconds);
+    List<GatewayPollingConfig> configs =
+        gatewayPollingService.getDuePollingDevices(intervalSeconds);
 
     if (configs == null || configs.isEmpty()) {
       log.debug("本次{}s轮询无待执行设备", intervalSeconds);
@@ -149,7 +142,12 @@ public class GatewayPollingScheduler {
     }
 
     long costTime = System.currentTimeMillis() - startTime;
-    log.info("{}s轮询任务完成: 总数={}, 成功={}, 失败={}, 耗时={}ms",
-        intervalSeconds, configs.size(), successCount, failCount, costTime);
+    log.info(
+        "{}s轮询任务完成: 总数={}, 成功={}, 失败={}, 耗时={}ms",
+        intervalSeconds,
+        configs.size(),
+        successCount,
+        failCount,
+        costTime);
   }
 }

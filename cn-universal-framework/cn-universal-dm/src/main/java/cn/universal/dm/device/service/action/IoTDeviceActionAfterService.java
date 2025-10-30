@@ -157,7 +157,7 @@ public class IoTDeviceActionAfterService extends IoTUPPushAdapter<BaseUPRequest>
     BaseUPRequest upRequest = build(dev);
     upRequest.setEvent(DevLifeCycle.online.name());
     upRequest.setEventName(DevLifeCycle.online.getValue());
-    //处理物模型有上下线的事件推送
+    // 处理物模型有上下线的事件推送
     doOnOffline(dev);
     // 避免短期时间内无法下线
     log.info(

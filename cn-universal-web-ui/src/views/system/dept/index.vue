@@ -23,7 +23,9 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{ $t('button.search') }}</a-button>
+                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{
+                    $t('button.search')
+                  }}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon
                   type="reload"/>{{ $t('button.reset') }}</a-button>
               </span>
@@ -39,7 +41,8 @@
           <a-button type="primary" @click="$refs.createForm.handleAdd()"
                     v-hasPermi="['system:dept:add']">
             <a-icon type="plus"/>
-            {{ $t('button.add') }}</a-button>
+            {{ $t('button.add') }}
+          </a-button>
         </a-space>
         <a-button
           type="dashed"
@@ -206,13 +209,13 @@ export default {
         content: '当前选中编号为' + deptId + '的数据',
         onOk() {
           return delDept(deptId)
-            .then(() => {
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

@@ -14,7 +14,8 @@
         <ul v-if="v.key == 'custom'">
           <li v-for="(icon, key) in v.icons" :key="`${v.key}-${key}`"
               :class="{ 'active': selectedIcon==icon }" @click="handleSelectedIcon(icon)">
-            <a-icon :component="allIcon[icon] || allIcon[icon + 'Icon']" :style="{ fontSize: '24px' }"/>
+            <a-icon :component="allIcon[icon] || allIcon[icon + 'Icon']"
+                    :style="{ fontSize: '24px' }"/>
           </li>
         </ul>
       </a-tab-pane>

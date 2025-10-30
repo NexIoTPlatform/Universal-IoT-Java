@@ -10,7 +10,8 @@
       <div class="table-operations">
         <a-button type="primary" size="small" @click="$refs.createDataForm.handleAdd()"
                   v-hasPermi="['system:dict:add']" ghost>
-          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button
           type="danger"
@@ -19,7 +20,8 @@
           size="small"
           v-hasPermi="['system:dict:remove']"
           ghost>
-          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>
+          {{ $t('button.delete') }}
         </a-button>
         <a-button
           type="dashed"
@@ -233,14 +235,14 @@ export default {
         content: '当前选中字典编码为' + dictCodes + '的数据',
         onOk() {
           return delData(dictCodes)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

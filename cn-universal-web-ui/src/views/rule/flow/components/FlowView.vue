@@ -132,12 +132,12 @@ export default {
         onOk() {
           dataForm.status = (dataForm.status === 'run' ? 'stop' : 'run')
           return changeRuleStatus(dataForm)
-            .then(() => {
-              that.$message.success(
-                `${dataForm.status === 'run' ? '停止' : '启用'}成功`,
-                3
-              )
-            })
+          .then(() => {
+            that.$message.success(
+              `${dataForm.status === 'run' ? '停止' : '启用'}成功`,
+              3
+            )
+          })
         },
         onCancel() {
         }

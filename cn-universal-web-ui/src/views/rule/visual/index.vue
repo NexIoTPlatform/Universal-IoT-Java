@@ -21,7 +21,9 @@
             <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons"
                     :style="{ float: 'right', overflow: 'hidden' } || {}">
-                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{ $t('button.search') }}</a-button>
+                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{
+                    $t('button.search')
+                  }}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon
                   type="reload"/>{{ $t('button.reset') }}</a-button>
               </span>
@@ -91,7 +93,12 @@
 </template>
 
 <script>
-import {changeRuleFlowStatus, deleteRuleFlow, executeRuleFlow, listRuleFlows} from '@/api/rule/visualRuleFlow'
+import {
+  changeRuleFlowStatus,
+  deleteRuleFlow,
+  executeRuleFlow,
+  listRuleFlows
+} from '@/api/rule/visualRuleFlow'
 
 export default {
   name: 'VisualRuleFlowList',

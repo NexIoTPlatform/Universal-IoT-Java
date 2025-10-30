@@ -393,7 +393,8 @@ public abstract class AbstratIoTService extends IoTDownAdapter {
         .userUnionId(ioTDeviceDTO.getUserUnionId());
   }
 
-  protected BaseUPRequest buildCodecNullBean(JSONObject jsonObject, BaseUPRequest requestUPRequest) {
+  protected BaseUPRequest buildCodecNullBean(
+      JSONObject jsonObject, BaseUPRequest requestUPRequest) {
     final BaseUPRequest.BaseUPRequestBuilder<?, ?> builder =
         getBaseUPRequest(requestUPRequest.getIoTDeviceDTO());
     // 判断是否为有效的JSON结构（包含messageType字段）

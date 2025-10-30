@@ -41,7 +41,10 @@
               条件：
               <div class="tagger" v-if="open" v-for="(item,index) in taggers" :key="index">
                 <strong>触发器{{ index + 1 }}</strong>
-                <a-button type="text" style="float:right;" @click="delTagger(index)">{{ $t('button.delete') }}</a-button>
+                <a-button type="text" style="float:right;" @click="delTagger(index)">{{
+                    $t('button.delete')
+                  }}
+                </a-button>
                 <tagger
                   v-model="taggers[index]"
                   :index="index"
@@ -59,7 +62,10 @@
             <a-form-model-item label="执行动作">
               <div class="tagger" v-if="open" v-for="(item,index) in actions" :key="index">
                 <strong>动作{{ index + 1 }}</strong>
-                <a-button type="text" style="float:right;" @click="delAction(index)">{{ $t('button.delete') }}</a-button>
+                <a-button type="text" style="float:right;" @click="delAction(index)">{{
+                    $t('button.delete')
+                  }}
+                </a-button>
                 <exec
                   ref="exec"
                   v-model="actions[index]"
@@ -224,10 +230,10 @@ export default {
         this.form = response.data
         this.taggers = JSON.parse(this.form.triggerCondition)
         this.actions = JSON.parse(this.form.execAction)
-        
+
         // 检查并警告缺少 productKey 的情况
         this.checkMissingProductKey()
-        
+
         this.open = true
         this.formTitle = '修改'
       })
@@ -235,23 +241,24 @@ export default {
     /** 检查缺少 productKey 的情况 */
     checkMissingProductKey() {
       let hasMissingProductKey = false
-      
+
       this.taggers.forEach((tagger, index) => {
         if (tagger.deviceId && !tagger.productKey) {
           console.warn(`触发器 ${index + 1} 缺少 productKey，deviceId: ${tagger.deviceId}`)
           hasMissingProductKey = true
         }
       })
-      
+
       this.actions.forEach((action, index) => {
         if (action.deviceId && !action.productKey) {
           console.warn(`动作 ${index + 1} 缺少 productKey，deviceId: ${action.deviceId}`)
           hasMissingProductKey = true
         }
       })
-      
+
       if (hasMissingProductKey) {
-        this.$message.warning('检测到部分设备缺少产品Key，可能影响编辑功能。建议重新选择设备以确保功能正常。')
+        this.$message.warning(
+          '检测到部分设备缺少产品Key，可能影响编辑功能。建议重新选择设备以确保功能正常。')
       }
     },
     /** 手动触发按钮操作 */
@@ -291,7 +298,7 @@ export default {
     submitForm: function () {
       // 确保 productKey 被正确设置
       this.ensureProductKeyInData()
-      
+
       this.form.triggerCondition = this.taggers
       this.form.execAction = this.actions
       this.$refs.form.validate(valid => {
@@ -330,7 +337,7 @@ export default {
           // 或者提示用户重新选择设备
         }
       })
-      
+
       // 处理执行动作数据
       this.actions.forEach(action => {
         if (action.deviceId && !action.productKey) {

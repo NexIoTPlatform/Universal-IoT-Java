@@ -57,16 +57,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/v1/protocol")
 public class IoTDeviceProtocolController extends BaseController {
 
-  @Autowired
-  private IoTDeviceProtocolService devProtocolService;
-  @Resource
-  private IoTDeviceMessageCodecService ioTDeviceMessageCodecService;
-  @Resource
-  private ISysOssService ossService;
+  @Autowired private IoTDeviceProtocolService devProtocolService;
+  @Resource private IoTDeviceMessageCodecService ioTDeviceMessageCodecService;
+  @Resource private ISysOssService ossService;
 
-  /**
-   * 查询设备协议列表
-   */
+  /** 查询设备协议列表 */
   @GetMapping("/list")
   public TableDataInfo list(IoTDeviceProtocol ioTDeviceProtocol) {
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
@@ -76,9 +71,7 @@ public class IoTDeviceProtocolController extends BaseController {
     return getDataTable(list);
   }
 
-  /**
-   * 查询设备协议列表
-   */
+  /** 查询设备协议列表 */
   @GetMapping("/list/ids")
   public AjaxResult<List<String>> idList(IoTDeviceProtocol ioTDeviceProtocol) {
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
@@ -88,9 +81,7 @@ public class IoTDeviceProtocolController extends BaseController {
     return AjaxResult.success(list1);
   }
 
-  /**
-   * 导出设备协议列表
-   */
+  /** 导出设备协议列表 */
   @PostMapping("/export")
   @Log(title = "导出设备协议列表", businessType = BusinessType.EXPORT)
   public void export(HttpServletResponse response, IoTDeviceProtocol ioTDeviceProtocol) {
@@ -101,9 +92,7 @@ public class IoTDeviceProtocolController extends BaseController {
     util.exportExcel(response, list, "设备协议数据");
   }
 
-  /**
-   * 获取设备协议详细信息
-   */
+  /** 获取设备协议详细信息 */
   @GetMapping(value = "/{id}")
   public AjaxResult getInfo(@PathVariable("id") String id) {
     if (StrUtil.isBlank(id)) {
@@ -126,9 +115,7 @@ public class IoTDeviceProtocolController extends BaseController {
     return AjaxResult.success(devProductVO);
   }
 
-  /**
-   * 新增设备协议
-   */
+  /** 新增设备协议 */
   @PostMapping
   @Log(title = "新增设备协议", businessType = BusinessType.INSERT)
   public AjaxResult add(@RequestBody IoTDeviceProtocolBO ioTDeviceProtocolBO) {
@@ -157,9 +144,7 @@ public class IoTDeviceProtocolController extends BaseController {
     return toAjax(devProtocolService.insertDevProtocol(ioTDeviceProtocol));
   }
 
-  /**
-   * 修改设备协议
-   */
+  /** 修改设备协议 */
   @PutMapping
   @Log(title = "修改设备协议", businessType = BusinessType.UPDATE)
   public AjaxResult edit(@RequestBody IoTDeviceProtocolBO ioTDeviceProtocolBO) {
@@ -167,9 +152,7 @@ public class IoTDeviceProtocolController extends BaseController {
     return toAjax(devProtocolService.updateDevProtocol(ioTDeviceProtocolBO, iotUser));
   }
 
-  /**
-   * 删除设备协议
-   */
+  /** 删除设备协议 */
   @DeleteMapping("/{ids}")
   @Log(title = "删除设备协议", businessType = BusinessType.DELETE)
   public AjaxResult remove(@PathVariable String[] ids) {
@@ -182,9 +165,7 @@ public class IoTDeviceProtocolController extends BaseController {
     return toAjax(devProtocolService.deleteDevProtocolByIds(ids));
   }
 
-  /**
-   * 编解码测试
-   */
+  /** 编解码测试 */
   @PostMapping("/codec")
   public AjaxResult codec(@RequestBody IoTDeviceProtocolBO ioTDeviceProtocolBO) {
 

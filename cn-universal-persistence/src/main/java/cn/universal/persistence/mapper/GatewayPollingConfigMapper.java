@@ -20,7 +20,7 @@ import tk.mybatis.mapper.common.Mapper;
 
 /**
  * 网关轮询配置 Mapper
- * 
+ *
  * @author Aleo
  * @date 2025-10-26
  */
@@ -28,7 +28,7 @@ public interface GatewayPollingConfigMapper extends Mapper<GatewayPollingConfig>
 
   /**
    * 查询待轮询的网关设备
-   * 
+   *
    * @param intervalSeconds 轮询间隔
    * @return 待轮询设备列表
    */
@@ -36,17 +36,17 @@ public interface GatewayPollingConfigMapper extends Mapper<GatewayPollingConfig>
 
   /**
    * 根据设备ID和产品KEY查询轮询配置
-   * 
+   *
    * @param productKey 产品KEY
    * @param deviceId 设备ID
    * @return 轮询配置
    */
-  GatewayPollingConfig selectByDevice(@Param("productKey") String productKey, 
-                                       @Param("deviceId") String deviceId);
+  GatewayPollingConfig selectByDevice(
+      @Param("productKey") String productKey, @Param("deviceId") String deviceId);
 
   /**
    * 更新轮询成功状态
-   * 
+   *
    * @param id 配置ID
    * @param nextPollTime 下次轮询时间
    * @return 更新行数
@@ -55,7 +55,7 @@ public interface GatewayPollingConfigMapper extends Mapper<GatewayPollingConfig>
 
   /**
    * 更新轮询失败状态
-   * 
+   *
    * @param id 配置ID
    * @return 更新行数
    */
@@ -63,7 +63,7 @@ public interface GatewayPollingConfigMapper extends Mapper<GatewayPollingConfig>
 
   /**
    * 重置失败计数
-   * 
+   *
    * @param id 配置ID
    * @return 更新行数
    */

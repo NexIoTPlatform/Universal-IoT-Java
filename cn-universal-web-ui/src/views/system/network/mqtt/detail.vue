@@ -40,7 +40,8 @@
           <div class="mqtt-detail-section-title">
             配置信息
             <a-button v-if="!editing" type="link" size="small" style="float:right;"
-                      @click="editing = true">{{ $t('button.edit') }} </a-button>
+                      @click="editing = true">{{ $t('button.edit') }}
+            </a-button>
           </div>
           <template v-if="!editing">
             <a-descriptions :column="1" size="default">
@@ -88,7 +89,10 @@
                 </a-col>
               </a-row>
               <div style="margin-top:16px;text-align:right;">
-                <a-button type="link" size="small" @click="handleSaveConfig">{{ $t('button.save') }}</a-button>
+                <a-button type="link" size="small" @click="handleSaveConfig">{{
+                    $t('button.save')
+                  }}
+                </a-button>
                 <a-button type="link" size="small" style="margin-left:8px;" @click="cancelEdit">
                   取消
                 </a-button>
@@ -219,7 +223,13 @@
 </template>
 
 <script>
-import {getNetwork, restartNetwork, startNetwork, stopNetwork, updateNetwork} from '@/api/system/network'
+import {
+  getNetwork,
+  restartNetwork,
+  startNetwork,
+  stopNetwork,
+  updateNetwork
+} from '@/api/system/network'
 import {getDictMap, getDicts} from '@/api/system/dict/data'
 import * as echarts from 'echarts'
 

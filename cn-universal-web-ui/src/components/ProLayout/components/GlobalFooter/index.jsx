@@ -1,7 +1,10 @@
 import './index.less'
 
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
-import {getComponentFromProp, hasProp} from 'ant-design-vue/lib/_util/props-util'
+import {
+  getComponentFromProp,
+  hasProp
+} from 'ant-design-vue/lib/_util/props-util'
 
 const GlobalFooterProps = {
   links: PropTypes.array,

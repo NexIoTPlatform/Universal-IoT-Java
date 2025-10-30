@@ -982,28 +982,28 @@ export default {
           version: "2.0", // Loca 版本
         },
       })
-        .then((AMap) => {
-          window.AMap = AMap
-          this.map = new AMap.Map('showmap-modal-container', {
-            zoom: 12,
-            center: [81.368244, 44.620889]
-          })
-
-          // 添加比例尺组件到地图实例上
-          this.map.addControl(new AMap.Scale())
-
-          this.geocoder = new AMap.Geocoder()
-          this.autoComplete = new AMap.AutoComplete()
-
-          // 如果有位置信息，绘制标点
-          if (this.location.lng && this.location.lat) {
-            this.drawPoint()
-            this.map.panTo([this.location.lng, this.location.lat])
-          }
+      .then((AMap) => {
+        window.AMap = AMap
+        this.map = new AMap.Map('showmap-modal-container', {
+          zoom: 12,
+          center: [81.368244, 44.620889]
         })
-        .catch((e) => {
-          console.error('地图初始化失败:', e) // 加载错误提示
-        })
+
+        // 添加比例尺组件到地图实例上
+        this.map.addControl(new AMap.Scale())
+
+        this.geocoder = new AMap.Geocoder()
+        this.autoComplete = new AMap.AutoComplete()
+
+        // 如果有位置信息，绘制标点
+        if (this.location.lng && this.location.lat) {
+          this.drawPoint()
+          this.map.panTo([this.location.lng, this.location.lat])
+        }
+      })
+      .catch((e) => {
+        console.error('地图初始化失败:', e) // 加载错误提示
+      })
     },
 
     drawPoint() {
@@ -1281,7 +1281,9 @@ export default {
     },
     // 规范化设备详情中的时间字段
     normalizeDevTimeFields(dev) {
-      if (!dev || typeof dev !== 'object') return
+      if (!dev || typeof dev !== 'object') {
+        return
+      }
       // registryTime 兼容 activeTime
       if (!dev.registryTime && dev.activeTime) {
         dev.registryTime = dev.activeTime
@@ -1301,9 +1303,13 @@ export default {
     },
     // 将任意时间值格式化为字符串
     formatTimeValue(value) {
-      if (!value) return '无'
+      if (!value) {
+        return '无'
+      }
       const d = toDate(value)
-      if (isNaN(d.getTime())) return '无'
+      if (isNaN(d.getTime())) {
+        return '无'
+      }
       return this.formatDate(d)
     },
     // 时间转换

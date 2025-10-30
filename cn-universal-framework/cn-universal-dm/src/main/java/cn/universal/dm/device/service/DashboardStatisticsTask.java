@@ -60,8 +60,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
 
       // 如果本地缓存中没有平台数据，使用默认的平台列表
       if (platforms.isEmpty()) {
-        platforms =
-            Arrays.asList("ctaiot",  "ezviz", "onenet", "imoulife", "tcp", "snitcp");
+        platforms = Arrays.asList("ctaiot", "ezviz", "onenet", "imoulife", "tcp", "snitcp");
         log.warn("[仪表盘统计] 本地缓存中无活跃平台，使用默认平台列表");
       }
 
@@ -71,7 +70,7 @@ public class DashboardStatisticsTask implements ApplicationRunner {
     } catch (Exception e) {
       log.error("[仪表盘统计] 获取活跃平台失败", e);
       // 异常时返回默认平台列表
-      return Arrays.asList("ctaiot",  "ezviz", "onenet", "imoulife", "tcp", "snitcp");
+      return Arrays.asList("ctaiot", "ezviz", "onenet", "imoulife", "tcp", "snitcp");
     }
   }
 

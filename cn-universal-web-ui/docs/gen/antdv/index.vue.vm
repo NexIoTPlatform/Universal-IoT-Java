@@ -465,14 +465,14 @@
           content: '当前选中编号为' + ${pkColumn.javaField}s + '的数据',
           onOk() {
             return del${BusinessName}(${pkColumn.javaField}s)
-              .then(() => {
-                that.onSelectChange([], [])
-                that.getList()
-                that.$message.success(
-                  '删除成功',
-                3
-                )
-              })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+              3
+              )
+            })
           },
           onCancel() {
           }

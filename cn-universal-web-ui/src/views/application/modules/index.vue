@@ -195,7 +195,8 @@
                     />
                   </a-collapse-panel>
                   <!-- RocketMQ推送配置 -->
-                  <a-collapse-panel key="rocketmq" v-if="getConfig('rocketmq').support !== undefined">
+                  <a-collapse-panel key="rocketmq"
+                                    v-if="getConfig('rocketmq').support !== undefined">
                     <template slot="header">
                       <span class="protocol-header-title">
                         <a-icon type="cluster"/> RocketMQ推送
@@ -318,7 +319,12 @@
 
 <script>
 import DeviceBind from '@/views/application/modules/DeviceBind'
-import {enable, enableOrDisablePush, getApplication, resetSecret} from '@/api/application/application'
+import {
+  enable,
+  enableOrDisablePush,
+  getApplication,
+  resetSecret
+} from '@/api/application/application'
 import CreateForm from '@/views/application/modules/CreateForm'
 import HttpPushConfig from '@/views/application/modules/HttpPushConfig'
 import RocketMQPushConfig from '@/views/application/modules/RocketMQPushConfig'
@@ -422,12 +428,10 @@ export default {
       })
     },
 
-
     /** 显示/隐藏密钥 */
     appSecretShow() {
       this.showAppSecret = !this.showAppSecret
     },
-
 
     /** 获取HTTP配置 */
     getHttpConfig() {
@@ -584,27 +588,29 @@ export default {
       }
       // 调用后台API
       enableOrDisablePush(this.appUniqueId, pushType, enable)
-        .then(response => {
-          if (response.code === 0) {
-            this.$message.success(enable ? `${this.getPushTypeName(pushType)}推送已启用` : `${this.getPushTypeName(pushType)}推送已停用`)
-            // 重新获取应用信息，确保数据同步
-            this.refreshPushConfig()
-          } else {
-            // API调用失败，回滚本地状态
-            if (this.httpConfig && this.httpConfig[pushType]) {
-              this.httpConfig[pushType].enable = !enable
-            }
-            this.$message.error(response.msg || '操作失败')
-          }
-        })
-        .catch(error => {
-          // 网络错误，回滚本地状态
+      .then(response => {
+        if (response.code === 0) {
+          this.$message.success(
+            enable ? `${this.getPushTypeName(pushType)}推送已启用` : `${this.getPushTypeName(
+              pushType)}推送已停用`)
+          // 重新获取应用信息，确保数据同步
+          this.refreshPushConfig()
+        } else {
+          // API调用失败，回滚本地状态
           if (this.httpConfig && this.httpConfig[pushType]) {
             this.httpConfig[pushType].enable = !enable
           }
-          this.$message.error('网络错误，操作失败')
-          console.error('启用/停用推送配置失败:', error)
-        })
+          this.$message.error(response.msg || '操作失败')
+        }
+      })
+      .catch(error => {
+        // 网络错误，回滚本地状态
+        if (this.httpConfig && this.httpConfig[pushType]) {
+          this.httpConfig[pushType].enable = !enable
+        }
+        this.$message.error('网络错误，操作失败')
+        console.error('启用/停用推送配置失败:', error)
+      })
     },
 
     /** 获取推送方式的中文名称 */

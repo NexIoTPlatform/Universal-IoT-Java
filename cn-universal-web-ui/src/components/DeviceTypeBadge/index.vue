@@ -27,7 +27,8 @@ export default {
     color: {
       type: String,
       default: '',
-      validator: value => ['', 'blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta'].includes(value)
+      validator: value => ['', 'blue', 'green', 'orange', 'red', 'purple', 'cyan',
+        'magenta'].includes(value)
     },
     // 自定义背景色
     backgroundColor: {

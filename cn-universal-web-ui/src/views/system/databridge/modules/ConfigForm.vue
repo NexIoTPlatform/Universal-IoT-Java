@@ -110,7 +110,8 @@
             </a-form-model-item>
 
             <!-- 指定产品：多选产品 -->
-            <a-form-model-item v-if="form.sourceScope === 'SPECIFIC_PRODUCTS'" label="选择产品" prop="sourceProductKeys"
+            <a-form-model-item v-if="form.sourceScope === 'SPECIFIC_PRODUCTS'" label="选择产品"
+                               prop="sourceProductKeys"
                                class="form-item-large">
               <a-select
                 v-model="form.sourceProductKeys"
@@ -119,7 +120,8 @@
                 style="width: 100%"
                 size="large"
                 allow-clear>
-                <a-select-option v-for="(p) in productList" :key="p.productKey" :value="p.productKey">
+                <a-select-option v-for="(p) in productList" :key="p.productKey"
+                                 :value="p.productKey">
                   {{ p.name }} ({{ p.productKey }})
                 </a-select-option>
               </a-select>
@@ -127,7 +129,8 @@
             </a-form-model-item>
 
             <!-- 应用：单选应用 -->
-            <a-form-model-item v-if="form.sourceScope === 'APPLICATION'" label="选择应用" prop="sourceApplicationId"
+            <a-form-model-item v-if="form.sourceScope === 'APPLICATION'" label="选择应用"
+                               prop="sourceApplicationId"
                                class="form-item-large">
               <a-select
                 v-model="form.sourceApplicationId"
@@ -135,7 +138,8 @@
                 style="width: 100%"
                 size="large"
                 allow-clear>
-                <a-select-option v-for="(d, index) in applicationList" :key="index" :value="d.appId">
+                <a-select-option v-for="(d, index) in applicationList" :key="index"
+                                 :value="d.appId">
                   {{ d.appName }}
                 </a-select-option>
               </a-select>
@@ -192,7 +196,8 @@
                     <a-tag :color="getResourceTypeColor(resource.type)" size="small">
                       {{ getResourceTypeName(resource.type) }}
                     </a-tag>
-                    <a-tag v-if="resource.pluginType" :color="getPluginTypeColor(resource.pluginType)" size="small">
+                    <a-tag v-if="resource.pluginType"
+                           :color="getPluginTypeColor(resource.pluginType)" size="small">
                       {{ resource.pluginType }}
                     </a-tag>
                     <a-tag :color="getDirectionColor(resource.direction)" size="small">
@@ -423,7 +428,9 @@ export default {
   computed: {
     // 过滤资源列表，根据当前桥接方向
     filteredResourceList() {
-      if (!this.resourceList) return []
+      if (!this.resourceList) {
+        return []
+      }
       return this.resourceList
     }
   },
@@ -483,7 +490,8 @@ export default {
           this.$message.error('请选择数据源范围')
           return
         }
-        if (this.form.sourceScope === 'SPECIFIC_PRODUCTS' && (!this.form.sourceProductKeys || this.form.sourceProductKeys.length === 0)) {
+        if (this.form.sourceScope === 'SPECIFIC_PRODUCTS' && (!this.form.sourceProductKeys
+          || this.form.sourceProductKeys.length === 0)) {
           this.$message.error('请选择至少一个产品')
           return
         }

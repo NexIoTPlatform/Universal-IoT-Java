@@ -76,33 +76,33 @@ export default {
       version: '2.0', // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
       plugins: ['AMap.Geocoder', 'AMap.AutoComplete'] // 需要使用的的插件列表，如比例尺'AMap.Scale'等
     })
-      .then((AMap) => {
-        window.AMap = AMap
-        this.map = new AMap.Map(`container_${this._uid}`, {
-          zoom: this.zoom,
-          center: [110.291848, 35.448023]
-        })
+    .then((AMap) => {
+      window.AMap = AMap
+      this.map = new AMap.Map(`container_${this._uid}`, {
+        zoom: this.zoom,
+        center: [110.291848, 35.448023]
+      })
 
-        this.geocoder = new AMap.Geocoder()
-        this.autoComplete = new AMap.AutoComplete()
+      this.geocoder = new AMap.Geocoder()
+      this.autoComplete = new AMap.AutoComplete()
 
-        this.drawPoint()
-        this.map.panTo([this.location.lng, this.location.lat])
+      this.drawPoint()
+      this.map.panTo([this.location.lng, this.location.lat])
 
-        if (this.disableClick) {
-          return
+      if (this.disableClick) {
+        return
+      }
+      this.map.on('click', (e) => {
+        this.location = {
+          lng: e.lnglat.lng,
+          lat: e.lnglat.lat
         }
-        this.map.on('click', (e) => {
-          this.location = {
-            lng: e.lnglat.lng,
-            lat: e.lnglat.lat
-          }
-          this.drawPoint()
-        })
+        this.drawPoint()
       })
-      .catch((e) => {
-        console.log(e)
-      })
+    })
+    .catch((e) => {
+      console.log(e)
+    })
   },
   methods: {
     drawPoint() {

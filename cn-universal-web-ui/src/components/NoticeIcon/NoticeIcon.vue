@@ -38,7 +38,7 @@
         </a-spin>
       </template>
       <span @click="fetchNotice" class="header-notice" ref="noticeRef">
-        <a-icon style="font-size: 20px;" type="bell" />
+        <a-icon style="font-size: 20px;" type="bell"/>
       </span>
     </a-popover>
     <notice-detail ref="noticeDetail" :typeOptions="typeOptions"/>
@@ -99,8 +99,8 @@ export default {
             console.error('获取字典数据失败:', error)
             // 如果字典数据获取失败，使用默认数据
             this.typeOptions = [
-              { dictValue: '1', dictLabel: '通知' },
-              { dictValue: '2', dictLabel: '公告' }
+              {dictValue: '1', dictLabel: '通知'},
+              {dictValue: '2', dictLabel: '公告'}
             ]
           })
         }

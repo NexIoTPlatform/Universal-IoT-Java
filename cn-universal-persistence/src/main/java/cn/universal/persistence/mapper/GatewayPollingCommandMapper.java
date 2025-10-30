@@ -19,7 +19,7 @@ import tk.mybatis.mapper.common.Mapper;
 
 /**
  * 网关轮询指令 Mapper
- * 
+ *
  * @author Aleo
  * @date 2025-10-26
  */
@@ -27,27 +27,29 @@ public interface GatewayPollingCommandMapper extends Mapper<GatewayPollingComman
 
   /**
    * 根据网关设备查询指令列表
-   * 
+   *
    * @param gatewayProductKey 网关产品KEY
    * @param gatewayDeviceId 网关设备ID
    * @return 指令列表(按执行顺序排序)
    */
-  List<GatewayPollingCommand> selectByGateway(@Param("gatewayProductKey") String gatewayProductKey,
-                                               @Param("gatewayDeviceId") String gatewayDeviceId);
+  List<GatewayPollingCommand> selectByGateway(
+      @Param("gatewayProductKey") String gatewayProductKey,
+      @Param("gatewayDeviceId") String gatewayDeviceId);
 
   /**
    * 根据网关设备删除指令
-   * 
+   *
    * @param gatewayProductKey 网关产品KEY
    * @param gatewayDeviceId 网关设备ID
    * @return 删除行数
    */
-  int deleteByGateway(@Param("gatewayProductKey") String gatewayProductKey,
-                      @Param("gatewayDeviceId") String gatewayDeviceId);
+  int deleteByGateway(
+      @Param("gatewayProductKey") String gatewayProductKey,
+      @Param("gatewayDeviceId") String gatewayDeviceId);
 
   /**
    * 批量插入指令
-   * 
+   *
    * @param commands 指令列表
    * @return 插入行数
    */

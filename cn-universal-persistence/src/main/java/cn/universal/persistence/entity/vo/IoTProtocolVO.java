@@ -39,6 +39,7 @@ public class IoTProtocolVO implements Serializable {
   private String url;
   private String jscript;
   private String needBs4Decode;
+
   /** 创建时间 */
   private Long createTime;
 }

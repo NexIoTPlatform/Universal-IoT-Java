@@ -45,7 +45,6 @@
 <script>
 import VueResizable from 'vue-resizable'
 
-
 export default {
   name: 'App',
   components: {

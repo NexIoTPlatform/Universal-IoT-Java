@@ -26,7 +26,8 @@
       <a-form-model-item label="图标" prop="icon" v-if="form.menuType != 'F'">
         <a-space size="large">
           <a-icon :component="allIcon[form.icon]" v-if="allIcon[form.icon]"/>
-          <a-icon :component="allIcon[form.icon + 'Icon']" v-if="!allIcon[form.icon] && allIcon[form.icon + 'Icon']"/>
+          <a-icon :component="allIcon[form.icon + 'Icon']"
+                  v-if="!allIcon[form.icon] && allIcon[form.icon + 'Icon']"/>
           <a-icon :type="form.icon" v-if="!allIcon[form.icon] && !allIcon[form.icon + 'Icon']"/>
           <a-button type="dashed" @click="selectIcon">
             选择图标
@@ -116,7 +117,7 @@
       </a-form-model-item>
       <a-form-model-item prop="status" v-if="form.menuType != 'F'">
         <span slot="label">
-          {{$t('common.status')}}
+          {{ $t('common.status') }}
           <a-tooltip>
             <template slot="title">
               选择停用则路由将不会出现在侧边栏，也不能被访问

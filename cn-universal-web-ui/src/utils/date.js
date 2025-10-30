@@ -8,7 +8,9 @@ export function toDate(value) {
     // 纯数字字符串按时间戳处理（兼容秒/毫秒）
     if (/^\d+(\.\d+)?$/.test(trimmed)) {
       const asNumber = Number(trimmed)
-      if (!isFinite(asNumber) || asNumber <= 0) return new Date(NaN)
+      if (!isFinite(asNumber) || asNumber <= 0) {
+        return new Date(NaN)
+      }
       const msFromNum = asNumber < 1e12 ? asNumber * 1000 : asNumber
       return new Date(msFromNum)
     }
@@ -28,9 +30,13 @@ export function toDate(value) {
 
 // 将任意时间值格式化为字符串（非法/空返回“无”）
 export function formatTimeValue(value, formatter) {
-  if (!value) return '无'
+  if (!value) {
+    return '无'
+  }
   const d = toDate(value)
-  if (isNaN(d.getTime())) return '无'
+  if (isNaN(d.getTime())) {
+    return '无'
+  }
   return (formatter || defaultFormatDate)(d)
 }
 
@@ -43,7 +49,8 @@ export function defaultFormatDate(time) {
   const minutes = time.getMinutes()
   const seconds = time.getSeconds()
   const pad = (n) => (n > 9 ? n : '0' + n)
-  return `${year}-${pad(month)}-${pad(date)} ${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  return `${year}-${pad(month)}-${pad(date)} ${pad(hours)}:${pad(
+    minutes)}:${pad(seconds)}`
 }
 
 

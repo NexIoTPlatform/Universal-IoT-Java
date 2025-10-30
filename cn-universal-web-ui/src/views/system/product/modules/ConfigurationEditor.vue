@@ -440,7 +440,8 @@ export default {
       this.previewVisible = false
       const rawForm = this.currentEditType === 'publicConfiguration' ? this.publicConfigForm
         : this.privateConfigForm
-      const metaArray = this.currentEditType === 'publicConfiguration' ? this.enhancedPublicConfigurationArray
+      const metaArray = this.currentEditType === 'publicConfiguration'
+        ? this.enhancedPublicConfigurationArray
         : this.enhancedConfigurationArray
       const formData = this.normalizeFormData(metaArray, rawForm)
       updateConfig({

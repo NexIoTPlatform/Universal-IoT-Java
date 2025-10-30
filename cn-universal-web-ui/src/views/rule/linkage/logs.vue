@@ -23,7 +23,8 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item :label="$t('linkage.triggerMethod')">
-                  <a-select v-model="queryParam.triggerType" placeholder="请选择触发方式" allow-clear
+                  <a-select v-model="queryParam.triggerType" placeholder="请选择触发方式"
+                            allow-clear
                             style="width: 100%">
                     <a-select-option value="device">设备触发</a-select-option>
                     <a-select-option value="time">定时触发</a-select-option>
@@ -124,7 +125,7 @@
         />
       </a-card>
     </page-header-wrapper>
-    
+
     <!-- 日志详情弹窗 -->
     <a-modal
       v-model="logDetailVisible"
@@ -145,54 +146,71 @@
                     <div class="info-item">
                       <a-icon type="home" class="info-icon info-icon-primary"/>
                       <b>场景名称：</b>
-                      <span class="info-value info-value-primary">{{ parseDeviceMeta(logDetail.cdeviceMeta).sceneName }}</span>
+                      <span class="info-value info-value-primary">{{
+                          parseDeviceMeta(logDetail.cdeviceMeta).sceneName
+                        }}</span>
                     </div>
                   </a-col>
                   <a-col :span="8">
                     <div class="info-item">
                       <a-icon type="key" class="info-icon info-icon-warning"/>
                       <b>所属产品：</b>
-                      <span class="info-value info-value-warning">{{ parseDeviceMeta(logDetail.cdeviceMeta).productKey }}</span>
+                      <span class="info-value info-value-warning">{{
+                          parseDeviceMeta(logDetail.cdeviceMeta).productKey
+                        }}</span>
                     </div>
                   </a-col>
                   <a-col :span="8">
                     <div class="info-item">
                       <a-icon type="mobile" class="info-icon info-icon-success"/>
                       <b>设备ID：</b>
-                      <span class="info-value info-value-success">{{ parseDeviceMeta(logDetail.cdeviceMeta).deviceId }}</span>
+                      <span class="info-value info-value-success">{{
+                          parseDeviceMeta(logDetail.cdeviceMeta).deviceId
+                        }}</span>
                     </div>
                   </a-col>
                   <a-col :span="8">
                     <div class="info-item">
                       <a-icon type="message" class="info-icon info-icon-purple"/>
                       <b>消息类型：</b>
-                      <a-tag color="purple" class="info-tag">{{ (parseDeviceMeta(logDetail.cdeviceMeta).messageType) === 'PROPERTIES' ? '属性' : '事件' }}</a-tag>
+                      <a-tag color="purple" class="info-tag">{{
+                          (parseDeviceMeta(logDetail.cdeviceMeta).messageType) === 'PROPERTIES'
+                            ? '属性' : '事件'
+                        }}
+                      </a-tag>
                     </div>
                   </a-col>
                 </a-row>
               </div>
-              
+
               <!-- 触发条件 -->
-              <div v-if="parseDeviceMeta(logDetail.cdeviceMeta).triggerConditions" class="trigger-conditions">
+              <div v-if="parseDeviceMeta(logDetail.cdeviceMeta).triggerConditions"
+                   class="trigger-conditions">
                 <div class="trigger-conditions-header">
                   <a-icon type="filter" class="trigger-icon"/>
                   <b>触发条件</b>
                 </div>
-                <div v-for="(condition, idx) in parseDeviceMeta(logDetail.cdeviceMeta).triggerConditions" :key="idx" 
-                     class="condition-item">
+                <div
+                  v-for="(condition, idx) in parseDeviceMeta(logDetail.cdeviceMeta).triggerConditions"
+                  :key="idx"
+                  class="condition-item">
                   <a-row class="condition-basic-info">
                     <a-col :span="10">
                       <div class="condition-info-item">
                         <a-icon type="desktop" class="condition-icon condition-icon-success"/>
                         <b>设备名称：</b>
-                        <span class="condition-value condition-value-success">{{ condition.deviceName || condition.deviceId }}</span>
+                        <span class="condition-value condition-value-success">{{
+                            condition.deviceName || condition.deviceId
+                          }}</span>
                       </div>
                     </a-col>
                     <a-col :span="10">
                       <div class="condition-info-item">
                         <a-icon type="desktop" class="condition-icon condition-icon-success"/>
                         <b>设备ID：</b>
-                        <span class="condition-value condition-value-success">{{ condition.deviceId }}</span>
+                        <span class="condition-value condition-value-success">{{
+                            condition.deviceId
+                          }}</span>
                       </div>
                     </a-col>
                   </a-row>
@@ -201,23 +219,28 @@
                       <a-icon type="setting" class="filters-icon"/>
                       <b>过滤条件：</b>
                     </div>
-                    <div v-for="(filter, fIdx) in condition.filters" :key="fIdx" 
+                    <div v-for="(filter, fIdx) in condition.filters" :key="fIdx"
                          class="filter-item">
                       <div class="filter-content">
                         <div class="filter-condition">
                           <a-icon type="code" class="filter-icon"/>
                           <span class="filter-key">{{ filter.key }}</span>
-                          <span class="filter-operator">{{ getOperatorText(filter.operator) }}</span>
+                          <span class="filter-operator">{{
+                              getOperatorText(filter.operator)
+                            }}</span>
                           <span class="filter-value">{{ filter.value }}</span>
                         </div>
-                        <div v-if="getCurrentValue(filter.key, logDetail.cdeviceMeta)" class="filter-result">
-                          <a-tooltip placement="top" :title="getFullDeviceData(logDetail.cdeviceMeta)">
+                        <div v-if="getCurrentValue(filter.key, logDetail.cdeviceMeta)"
+                             class="filter-result">
+                          <a-tooltip placement="top"
+                                     :title="getFullDeviceData(logDetail.cdeviceMeta)">
                             <span class="current-value">
                               <a-icon type="eye" class="current-value-icon"/>
                               触发值: {{ getCurrentValue(filter.key, logDetail.cdeviceMeta) }}
                             </span>
                           </a-tooltip>
-                          <span v-if="isConditionMet(filter, logDetail.cdeviceMeta)" class="condition-status condition-met">
+                          <span v-if="isConditionMet(filter, logDetail.cdeviceMeta)"
+                                class="condition-status condition-met">
                             <a-icon type="check-circle" class="status-icon"/>
                             满足条件
                           </span>
@@ -234,11 +257,11 @@
             </div>
           </a-card>
         </div>
-        
+
         <!-- 动作执行结果 -->
         <div>
           <a-card title="⚡ 动作执行结果" size="small" class="action-result-card">
-            <div v-for="(item, idx) in parseLogContext(logDetail.content)" :key="idx" 
+            <div v-for="(item, idx) in parseLogContext(logDetail.content)" :key="idx"
                  class="action-item">
               <a-row type="flex" align="middle" class="action-header">
                 <a-col :span="6">
@@ -252,7 +275,9 @@
                   <div class="action-info-item">
                     <a-icon type="target" class="action-icon action-icon-success"/>
                     <b>目标：</b>
-                    <span class="action-value action-value-success">{{ item.targetName || item.target }}</span>
+                    <span class="action-value action-value-success">{{
+                        item.targetName || item.target
+                      }}</span>
                   </div>
                 </a-col>
                 <a-col :span="8">
@@ -367,7 +392,8 @@ export default {
       this.loading = true
       const params = {
         ...this.queryParam,
-        createTimeStart: this.dateRange && this.dateRange.length > 0 ? this.dateRange[0] : undefined,
+        createTimeStart: this.dateRange && this.dateRange.length > 0 ? this.dateRange[0]
+          : undefined,
         createTimeEnd: this.dateRange && this.dateRange.length > 0 ? this.dateRange[1] : undefined
       }
       getRuleLogPage(params).then(response => {
@@ -559,7 +585,9 @@ export default {
       return operatorMap[operator] || operator
     },
     getCurrentValue(key, cdeviceMeta) {
-      if (!cdeviceMeta) return null
+      if (!cdeviceMeta) {
+        return null
+      }
       try {
         const metaData = JSON.parse(cdeviceMeta)
         if (metaData.actualDeviceData && metaData.actualDeviceData.properties) {
@@ -571,21 +599,23 @@ export default {
       }
     },
     isConditionMet(filter, cdeviceMeta) {
-      if (!cdeviceMeta) return false
+      if (!cdeviceMeta) {
+        return false
+      }
       try {
         const metaData = JSON.parse(cdeviceMeta)
         if (!metaData.actualDeviceData || !metaData.actualDeviceData.properties) {
           return false
         }
-        
+
         const currentValue = metaData.actualDeviceData.properties[filter.key]
         const expectedValue = parseFloat(filter.value)
         const currentValueNum = parseFloat(currentValue)
-        
+
         if (isNaN(currentValueNum) || isNaN(expectedValue)) {
           return false
         }
-        
+
         switch (filter.operator) {
           case 'gte':
             return currentValueNum >= expectedValue
@@ -607,7 +637,9 @@ export default {
       }
     },
     getFullDeviceData(cdeviceMeta) {
-      if (!cdeviceMeta) return '无设备数据'
+      if (!cdeviceMeta) {
+        return '无设备数据'
+      }
       try {
         const metaData = JSON.parse(cdeviceMeta)
         if (metaData.actualDeviceData && metaData.actualDeviceData.properties) {
@@ -639,7 +671,7 @@ export default {
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .info-item {
@@ -695,7 +727,7 @@ export default {
   background: #fff;
   padding: 16px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .trigger-conditions-header {
@@ -858,7 +890,7 @@ export default {
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .action-header {

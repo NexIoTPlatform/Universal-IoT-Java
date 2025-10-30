@@ -50,22 +50,23 @@ public class SysMQTTManager
   @Value("${mqtt.cfg.maxInflight:500}")
   private int maxInflight;
 
-  @Autowired
-  private cn.universal.common.util.WebInterfaceReadyChecker webInterfaceReadyChecker;
+  @Autowired private cn.universal.common.util.WebInterfaceReadyChecker webInterfaceReadyChecker;
 
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
     // 使用Web接口就绪检查器，等待所有Controller和Webhook接口完全就绪
     // 这对于EMQX webhook回调特别重要
-    webInterfaceReadyChecker.executeAfterWebInterfaceReady(() -> {
-      try {
-        log.info("开始延迟初始化SysMQTTManager...");
-        initialize();
-        log.info("SysMQTTManager初始化完成");
-      } catch (Exception e) {
-        log.error("SysMQTTManager初始化失败", e);
-      }
-    }, scheduledExecutor);
+    webInterfaceReadyChecker.executeAfterWebInterfaceReady(
+        () -> {
+          try {
+            log.info("开始延迟初始化SysMQTTManager...");
+            initialize();
+            log.info("SysMQTTManager初始化完成");
+          } catch (Exception e) {
+            log.error("SysMQTTManager初始化失败", e);
+          }
+        },
+        scheduledExecutor);
   }
 
   @Autowired private MqttUPProcessorChain processorChain;

@@ -44,17 +44,18 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
   @Override
   public List<SourceScope> getSupportedSourceScopes() {
     return List.of(
-        SourceScope.ALL_PRODUCTS,
-        SourceScope.SPECIFIC_PRODUCTS,
-        SourceScope.APPLICATION
-    );
+        SourceScope.ALL_PRODUCTS, SourceScope.SPECIFIC_PRODUCTS, SourceScope.APPLICATION);
   }
 
   @Override
-  protected void processProcessedData(Object processedData, BaseUPRequest request, DataBridgeConfig config, ResourceConnection connection) {
+  protected void processProcessedData(
+      Object processedData,
+      BaseUPRequest request,
+      DataBridgeConfig config,
+      ResourceConnection connection) {
     try (MqttClient client = createMqttClient(connection)) {
       client.connect(buildOptions(connection));
-      
+
       String payload;
       if (processedData instanceof String) {
         payload = (String) processedData;
@@ -63,11 +64,11 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
         Map<String, Object> variables = buildTemplateVariables(request, config);
         payload = processTemplate(config.getTemplate(), variables);
       }
-      
+
       String topic = extractTopic(config);
       client.publish(topic, new MqttMessage(payload.getBytes()));
       client.disconnect();
-      
+
     } catch (Exception e) {
       log.error("MQTT数据处理失败: {}", e.getMessage(), e);
       throw new RuntimeException(e);
@@ -75,14 +76,18 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
   }
 
   @Override
-  protected void processTemplateResult(String templateResult, BaseUPRequest request, DataBridgeConfig config, ResourceConnection connection) {
+  protected void processTemplateResult(
+      String templateResult,
+      BaseUPRequest request,
+      DataBridgeConfig config,
+      ResourceConnection connection) {
     try (MqttClient client = createMqttClient(connection)) {
       client.connect(buildOptions(connection));
-      
+
       String topic = extractTopic(config);
       client.publish(topic, new MqttMessage(templateResult.getBytes()));
       client.disconnect();
-      
+
     } catch (Exception e) {
       log.error("MQTT模板处理失败: {}", e.getMessage(), e);
       throw new RuntimeException(e);
@@ -106,8 +111,7 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
 
   @Override
   public Boolean validateConfig(DataBridgeConfig config) {
-    return StrUtil.isNotBlank(extractTopic(config))
-        && validateMagicScript(config.getMagicScript());
+    return StrUtil.isNotBlank(extractTopic(config)) && validateMagicScript(config.getMagicScript());
   }
 
   private MqttClient createMqttClient(ResourceConnection connection) throws Exception {
@@ -120,14 +124,14 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
     options.setCleanSession(true);
     options.setConnectionTimeout(30);
     options.setKeepAliveInterval(60);
-    
+
     if (StrUtil.isNotBlank(connection.getUsername())) {
       options.setUserName(connection.getUsername());
     }
     if (StrUtil.isNotBlank(connection.getPassword())) {
       options.setPassword(connection.getPassword().toCharArray());
     }
-    
+
     return options;
   }
 
@@ -136,7 +140,7 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
     if (StrUtil.isBlank(config.getConfig())) {
       return "/iot/bridge"; // 默认topic
     }
-    
+
     try {
       JSONObject configJson = JSONUtil.parseObj(config.getConfig());
       return configJson.getStr("topic", "/iot/bridge");
@@ -146,20 +150,21 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
     }
   }
 
-  private Map<String, Object> buildTemplateVariables(BaseUPRequest request, DataBridgeConfig config) {
+  private Map<String, Object> buildTemplateVariables(
+      BaseUPRequest request, DataBridgeConfig config) {
     Map<String, Object> variables = new HashMap<>();
-    
+
     // 设备信息
     if (request.getIoTDeviceDTO() != null) {
       variables.put("deviceKey", request.getIoTDeviceDTO().getDeviceId());
       variables.put("productKey", request.getIoTDeviceDTO().getProductKey());
     }
-    
+
     // 消息信息
     variables.put("messageType", request.getMessageType().name());
     variables.put("timestamp", System.currentTimeMillis());
     variables.put("properties", request.getProperties());
-    
+
     // 配置信息
     if (StrUtil.isNotBlank(config.getConfig())) {
       try {
@@ -168,7 +173,7 @@ public class MqttDataBridgePlugin extends AbstractDataOutputPlugin {
         log.warn("解析配置JSON失败: {}", e.getMessage());
       }
     }
-    
+
     return variables;
   }
 }

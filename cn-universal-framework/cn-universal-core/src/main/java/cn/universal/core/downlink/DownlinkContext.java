@@ -20,8 +20,7 @@ import java.util.Map;
 import lombok.Data;
 
 /**
- * 下行处理上下文
- * 贯穿整个下行处理流程，用于拦截器间传递数据
+ * 下行处理上下文 贯穿整个下行处理流程，用于拦截器间传递数据
  *
  * @version 1.0
  * @since 2025/10/24

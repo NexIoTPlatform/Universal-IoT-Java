@@ -150,7 +150,8 @@
       </a-form-model-item>
 
       <a-form-model-item label="设备序列号" prop="deviceId">
-        <a-input v-model="form.deviceId" placeholder="请输入设备序列号" :disabled="isEdit || isModbusSubDevice"/>
+        <a-input v-model="form.deviceId" placeholder="请输入设备序列号"
+                 :disabled="isEdit || isModbusSubDevice"/>
         <div v-if="isModbusSubDevice" class="form-item-help">
           设备ID将根据父设备ID和从站地址自动生成
         </div>

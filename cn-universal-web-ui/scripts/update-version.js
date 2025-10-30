@@ -3,25 +3,25 @@
 /**
  * 版本更新脚本
  * 用于更新 version.json 配置文件
- * 
+ *
  * 使用方法：
  * node scripts/update-version.js --version=1.2.1 --type=patch --title="问题修复"
  */
 
 const fs = require('fs')
 const path = require('path')
-const { program } = require('commander')
+const {program} = require('commander')
 
 // 解析命令行参数
 program
-  .option('-v, --version <version>', '版本号')
-  .option('-t, --type <type>', '版本类型 (major|minor|patch|hotfix)')
-  .option('--title <title>', '版本标题')
-  .option('--description <description>', '版本描述')
-  .option('--features <features>', '新功能列表，用逗号分隔')
-  .option('--changelog <changelog>', '更新日志链接')
-  .option('--new', '标记为新版本')
-  .parse()
+.option('-v, --version <version>', '版本号')
+.option('-t, --type <type>', '版本类型 (major|minor|patch|hotfix)')
+.option('--title <title>', '版本标题')
+.option('--description <description>', '版本描述')
+.option('--features <features>', '新功能列表，用逗号分隔')
+.option('--changelog <changelog>', '更新日志链接')
+.option('--new', '标记为新版本')
+.parse()
 
 const options = program.opts()
 
@@ -44,7 +44,8 @@ if (!options.version) {
   process.exit(1)
 }
 
-if (!options.type || !['major', 'minor', 'patch', 'hotfix'].includes(options.type)) {
+if (!options.type || !['major', 'minor', 'patch', 'hotfix'].includes(
+  options.type)) {
   console.error('错误: 必须指定有效的版本类型 (major|minor|patch|hotfix)')
   process.exit(1)
 }
@@ -56,8 +57,10 @@ const newVersion = {
   date: new Date().toISOString().split('T')[0], // YYYY-MM-DD 格式
   title: options.title || getDefaultTitle(options.type),
   description: options.description || getDefaultDescription(options.type),
-  features: options.features ? options.features.split(',').map(f => f.trim()) : [],
-  changelog: options.changelog || `https://gitee.com/NexIoT/Universal-IoT-Java/releases/tag/v${options.version}`,
+  features: options.features ? options.features.split(',').map(f => f.trim())
+    : [],
+  changelog: options.changelog
+    || `https://gitee.com/NexIoT/Universal-IoT-Java/releases/tag/v${options.version}`,
   isNew: options.new || false
 }
 

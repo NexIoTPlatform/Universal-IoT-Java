@@ -63,21 +63,24 @@ import org.springframework.stereotype.Service;
 @DependsOn("sysMQTTManager")
 public class ThirdMQTTServerManager implements ApplicationListener<ApplicationReadyEvent> {
 
-  @Autowired
-  private cn.universal.common.util.DelayedStartupUtil delayedStartupUtil;
+  @Autowired private cn.universal.common.util.DelayedStartupUtil delayedStartupUtil;
 
   @Override
   public void onApplicationEvent(ApplicationReadyEvent event) {
     // 等待SysMQTTManager初始化完成后再启动
-    delayedStartupUtil.executeAfterBeanReady(() -> {
-      try {
-        log.info("开始延迟初始化ThirdMQTTServerManager...");
-        initialize();
-        log.info("ThirdMQTTServerManager初始化完成");
-      } catch (Exception e) {
-        log.error("ThirdMQTTServerManager初始化失败", e);
-      }
-    }, "sysMQTTManager", 10, executorService);
+    delayedStartupUtil.executeAfterBeanReady(
+        () -> {
+          try {
+            log.info("开始延迟初始化ThirdMQTTServerManager...");
+            initialize();
+            log.info("ThirdMQTTServerManager初始化完成");
+          } catch (Exception e) {
+            log.error("ThirdMQTTServerManager初始化失败", e);
+          }
+        },
+        "sysMQTTManager",
+        10,
+        executorService);
   }
 
   @Autowired private ThirdMQTTConfigService configService;

@@ -27,7 +27,6 @@ public class IoTProductVO extends IoTProduct {
   private int powerModel;
   private String lwm2mEdrxTime;
 
-
   private int devNum;
 
   private String storePolicy;

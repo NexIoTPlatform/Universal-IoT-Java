@@ -35,7 +35,6 @@ export default {
   'button.reset.password': '重置密码',
   'button.assign.role': '分配角色',
 
-
   // 通用状态
   'status.enable': '启用',
   'status.disable': '禁用',
@@ -192,8 +191,8 @@ export default {
   'platform.feature.security': '安全可靠',
   'platform.feature.security.desc': '企业级安全保障，支持设备认证、数据加密和访问控制',
   'platform.start.using': '开始使用',
-  'login.slogan':'万物智联，协议主动适配，更不屑于标准',
-  'login.intro':'连接万物，智控未来。IoT平台为设备互联、数据采集与智能分析提供一站式解决方案，支持多协议、多插件扩展，强调主动适配各种物联网场景。',
+  'login.slogan': '万物智联，协议主动适配，更不屑于标准',
+  'login.intro': '连接万物，智控未来。IoT平台为设备互联、数据采集与智能分析提供一站式解决方案，支持多协议、多插件扩展，强调主动适配各种物联网场景。',
 
   // 快捷操作
   'quick.action.create.app': '创建应用',

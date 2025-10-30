@@ -14,7 +14,8 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item :label="$t('common.status')" prop="status">
-                  <a-select v-model="queryParams.status" placeholder="请选择状态" style="width: 100%"
+                  <a-select v-model="queryParams.status" placeholder="请选择状态"
+                            style="width: 100%"
                             allow-clear>
                     <a-select-option value="draft">草稿</a-select-option>
                     <a-select-option value="deployed">已部署</a-select-option>
@@ -41,7 +42,8 @@
           <a-button type="primary" @click="handleAdd"
                     v-hasPermi="['rulego:chain:add']">
             <a-icon type="plus"/>
-            {{ $t('button.add') }}</a-button>
+            {{ $t('button.add') }}
+          </a-button>
           <a-button type="primary" size="small" :loading="loading" :style="{ float: 'right' }"
                     @click="getList">
             <a-icon type="sync" :spin="loading"/>
@@ -66,7 +68,9 @@
 
           <div slot="description" slot-scope="text, record" class="description-cell">
             <div class="description-content">
-              <span v-if="record.description" class="description-text">{{ record.description }}</span>
+              <span v-if="record.description" class="description-text">{{
+                  record.description
+                }}</span>
               <span v-else class="description-empty">暂无描述</span>
             </div>
           </div>
@@ -80,28 +84,40 @@
           </div>
 
           <div slot="createTime" slot-scope="text, record" class="time-cell">
-            <div class="time-main">{{ parseTime(record.createTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+            <div class="time-main">{{
+                parseTime(record.createTime, '{y}-{m}-{d} {h}:{i}:{s}')
+              }}
+            </div>
           </div>
 
           <div slot="lastSyncTime" slot-scope="text, record" class="time-cell">
-            <div class="time-main">{{ parseTime(record.lastSyncTime, '{y}-{m}-{d} {h}:{i}:{s}') }}</div>
+            <div class="time-main">{{
+                parseTime(record.lastSyncTime, '{y}-{m}-{d} {h}:{i}:{s}')
+              }}
+            </div>
           </div>
 
           <span slot="operation" slot-scope="text, record" class="operation-buttons">
-            <a @click="handleDesign(record)" v-hasPermi="['rulego:chain:design']" class="operation-btn">
+            <a @click="handleDesign(record)" v-hasPermi="['rulego:chain:design']"
+               class="operation-btn">
               <a-icon type="edit"/>
               {{ $t('button.design') }} </a>
             <a-divider type="vertical" v-hasPermi="['rulego:chain:edit']"/>
-            <a @click="handleUpdate(record)" v-hasPermi="['rulego:chain:edit']" class="operation-btn">
+            <a @click="handleUpdate(record)" v-hasPermi="['rulego:chain:edit']"
+               class="operation-btn">
               <a-icon type="edit"/>
               {{ $t('button.edit') }} </a>
-            <a-divider type="vertical" v-if="record.status === 'draft'" v-hasPermi="['rulego:chain:deploy']"/>
-            <a @click="handleDeploy(record)" v-if="record.status === 'draft'" v-hasPermi="['rulego:chain:deploy']"
+            <a-divider type="vertical" v-if="record.status === 'draft'"
+                       v-hasPermi="['rulego:chain:deploy']"/>
+            <a @click="handleDeploy(record)" v-if="record.status === 'draft'"
+               v-hasPermi="['rulego:chain:deploy']"
                class="operation-btn">
               <a-icon type="upload"/>
               {{ $t('button.deploy') }} </a>
-            <a-divider type="vertical" v-if="record.status === 'deployed'" v-hasPermi="['rulego:chain:stop']"/>
-            <a @click="handleStop(record)" v-if="record.status === 'deployed'" v-hasPermi="['rulego:chain:stop']"
+            <a-divider type="vertical" v-if="record.status === 'deployed'"
+                       v-hasPermi="['rulego:chain:stop']"/>
+            <a @click="handleStop(record)" v-if="record.status === 'deployed'"
+               v-hasPermi="['rulego:chain:stop']"
                class="operation-btn">
               <a-icon type="pause"/>
               {{ $t('button.stop') }}</a>
@@ -110,7 +126,8 @@
               <a-icon type="reload"/>
               {{ $t('button.sync') }} </a>
             <a-divider type="vertical" v-hasPermi="['rulego:chain:remove']"/>
-            <a style="color:#F53F3F" @click="handleDelete(record)" v-hasPermi="['rulego:chain:remove']"
+            <a style="color:#F53F3F" @click="handleDelete(record)"
+               v-hasPermi="['rulego:chain:remove']"
                class="operation-btn">
               <a-icon type="delete"/>
               {{ $t('button.delete') }} </a>
@@ -511,12 +528,12 @@ export default {
       if (format) {
         const pad = n => n < 10 ? '0' + n : n;
         return format
-          .replace('{y}', d.getFullYear())
-          .replace('{m}', pad(d.getMonth() + 1))
-          .replace('{d}', pad(d.getDate()))
-          .replace('{h}', pad(d.getHours()))
-          .replace('{i}', pad(d.getMinutes()))
-          .replace('{s}', pad(d.getSeconds()));
+        .replace('{y}', d.getFullYear())
+        .replace('{m}', pad(d.getMonth() + 1))
+        .replace('{d}', pad(d.getDate()))
+        .replace('{h}', pad(d.getHours()))
+        .replace('{i}', pad(d.getMinutes()))
+        .replace('{s}', pad(d.getSeconds()));
       }
       const pad = n => n < 10 ? '0' + n : n;
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(

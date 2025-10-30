@@ -35,7 +35,9 @@
             <span class="table-page-search-submitButtons">
               <a-button type="primary" @click="handleQuery"><iot-icon
                 type="icon-search"/>{{ $t('button.search') }}</a-button>
-              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
+              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{
+                  $t('button.reset')
+                }}</a-button>
             </span>
           </a-col>
         </a-row>

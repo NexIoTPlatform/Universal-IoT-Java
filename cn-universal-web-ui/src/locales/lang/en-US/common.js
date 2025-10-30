@@ -171,7 +171,6 @@ export default {
   'template.content': 'Template Content',
   'template.enabled': 'Enabled Templates',
 
-
   // 平台特性
   'platform.feature.multi.protocol': 'Multi-Protocol Access',
   'platform.feature.multi.protocol.desc': 'Support MQTT, CoAP, HTTP and other IoT protocols for easy device integration',
@@ -363,7 +362,6 @@ export default {
   'common.status': 'Status',
   'common.running.status': 'Running Status',
   'common.port': 'Port',
-
 
   'compound.deviceNameDeviceId': 'Device Name/DeviceId',
   'compound.productProductKey': 'Product/ProductKey',

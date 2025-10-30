@@ -106,22 +106,21 @@ public class DefaultJdbcOutPlugin extends AbstractDataOutputPlugin {
       BaseUPRequest request,
       DataBridgeConfig config,
       ResourceConnection connection) {
-    
+
     try {
       // 获取数据源
       DataSource dataSource = connectionManager.getOrCreateDataSource(connection);
-      
+
       // 使用Spring的JdbcTemplate执行SQL
       JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
       jdbcTemplate.update(templateResult);
-      
-      
+
     } catch (Exception e) {
       log.error("执行SQL失败: {} - {}", templateResult, e.getMessage());
-      
+
       // 清除可能损坏的连接池
       connectionManager.removeDataSource(connection);
-      
+
       throw new RuntimeException("SQL执行失败: " + e.getMessage(), e);
     }
   }
@@ -183,6 +182,4 @@ public class DefaultJdbcOutPlugin extends AbstractDataOutputPlugin {
 
     return result;
   }
-
-
 }

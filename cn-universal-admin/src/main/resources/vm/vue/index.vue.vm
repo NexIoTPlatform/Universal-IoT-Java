@@ -68,9 +68,11 @@
             #end
         #end
       <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">{{ $t('button.search') }}
+        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">{{ $t
+          ('button.search') }}
         </el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">{{ $t('button.reset') }}</el-button>
+        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">{{ $t('button.reset') }}
+        </el-button>
       </el-form-item>
     </el-form>
 

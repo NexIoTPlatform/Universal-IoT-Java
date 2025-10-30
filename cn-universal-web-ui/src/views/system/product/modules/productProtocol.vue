@@ -26,7 +26,9 @@
             <span
               class="table-page-search-submitButtons"
               :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-              <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{ $t('button.search') }}</a-button>
+              <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{
+                  $t('button.search')
+                }}</a-button>
               <a-button style="margin-left: 8px" @click="resetQuery"><a-icon
                 type="reload"/>{{ $t('button.reset') }}</a-button>
             </span>
@@ -40,11 +42,13 @@
         <a-button type="primary" @click="$refs.createForm.productAdd()"
                   v-hasPermi="['protocol:protocol:add']" v-if="userName===$store.state.user.name"
                   :disabled="list.length !== 0">
-          <a-icon type="plus"/>{{ $t('button.add') }}
+          <a-icon type="plus"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['protocol:protocol:remove']" ghost>
-          <a-icon type="delete"/>{{ $t('button.delete') }}
+          <a-icon type="delete"/>
+          {{ $t('button.delete') }}
         </a-button>
       </a-space>
       <a-button
@@ -315,13 +319,13 @@ export default {
       const text = row.state === 1 ? '停用' : '发布'
       row.state = row.state === 0 ? 1 : 0
       updateProtocol(row)
-        .then(() => {
-          this.$message.success(
-            text + '成功',
-            3
-          )
-          this.getList()
-        }).catch(function () {
+      .then(() => {
+        this.$message.success(
+          text + '成功',
+          3
+        )
+        this.getList()
+      }).catch(function () {
         this.$message.error(
           text + '发生异常',
           3
@@ -339,14 +343,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return delProtocol(ids)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

@@ -39,21 +39,16 @@ public class IoTDeviceProtocol implements Serializable {
   private String name;
   private String description;
   private Byte state;
-  @Id
-  private String id;
+  @Id private String id;
   private String type;
   private String configuration;
   private String example;
 
-  /**
-   * 版本号
-   */
+  /** 版本号 */
   @Column(name = "version")
   private String version;
 
-  /**
-   * 创建时间
-   */
+  /** 创建时间 */
   @Column(name = "create_time")
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date createTime;
@@ -70,9 +65,13 @@ public class IoTDeviceProtocol implements Serializable {
     definition.setState(getState());
     if (object != null && object.containsKey("supportMethods")) {
       JSONArray jsonArray = object.getJSONArray("supportMethods");
-      definition.setSupportMethods(jsonArray.stream().map(s -> {
-        return (String) s;
-      }).collect(Collectors.toSet()));
+      definition.setSupportMethods(
+          jsonArray.stream()
+              .map(
+                  s -> {
+                    return (String) s;
+                  })
+              .collect(Collectors.toSet()));
     }
     return definition;
   }
@@ -93,9 +92,13 @@ public class IoTDeviceProtocol implements Serializable {
     definition.setState(getState());
     if (object != null && object.containsKey("supportMethods")) {
       JSONArray jsonArray = object.getJSONArray("supportMethods");
-      definition.setSupportMethods(jsonArray.stream().map(s -> {
-        return (String) s;
-      }).collect(Collectors.toSet()));
+      definition.setSupportMethods(
+          jsonArray.stream()
+              .map(
+                  s -> {
+                    return (String) s;
+                  })
+              .collect(Collectors.toSet()));
     }
     return definition;
   }

@@ -77,8 +77,13 @@
                       <h1 class="product-name">{{ productDetails.name || '产品名称' }}</h1>
                       <div class="product-meta-tags">
                         <a-tag color="blue">{{ productDetails.thirdPlatform || '-' }}</a-tag>
-                        <a-tag color="cyan">{{ getDeviceNodeText(productDetails.deviceNode) || '-' }}</a-tag>
-                        <a-tag v-if="productDetails.transportProtocol" color="purple">{{ productDetails.transportProtocol }}</a-tag>
+                        <a-tag color="cyan">{{
+                            getDeviceNodeText(productDetails.deviceNode) || '-'
+                          }}
+                        </a-tag>
+                        <a-tag v-if="productDetails.transportProtocol" color="purple">
+                          {{ productDetails.transportProtocol }}
+                        </a-tag>
                       </div>
                       <div class="product-key-row">
                         <span class="key-label">ProductKey</span>
@@ -121,11 +126,15 @@
                       <div class="detail-item"
                            v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin">
                         <span class="detail-label">数据协议</span>
-                        <span class="detail-value">{{ productDetails.transportProtocol || '-' }}</span>
+                        <span class="detail-value">{{
+                            productDetails.transportProtocol || '-'
+                          }}</span>
                       </div>
                       <div class="detail-item">
                         <span class="detail-label">设备节点</span>
-                        <span class="detail-value">{{ getDeviceNodeText(productDetails.deviceNode) || '-' }}</span>
+                        <span class="detail-value">{{
+                            getDeviceNodeText(productDetails.deviceNode) || '-'
+                          }}</span>
                       </div>
                       <div class="detail-item" v-if="productDetails.storePolicy">
                         <span class="detail-label">存储类型</span>
@@ -171,7 +180,7 @@
                       <div class="detail-item">
                         <span class="detail-label">产品状态</span>
                         <span class="detail-value">
-                          <a-badge :status="productDetails.state === 0 ? 'success' : 'default'" />
+                          <a-badge :status="productDetails.state === 0 ? 'success' : 'default'"/>
                           {{ productDetails.state === 0 ? '启用' : '禁用' }}
                         </span>
                       </div>
@@ -181,11 +190,15 @@
                       </div>
                       <div class="detail-item">
                         <span class="detail-label">创建时间</span>
-                        <span class="detail-value">{{ formatTime(productDetails.createTime) || '-' }}</span>
+                        <span class="detail-value">{{
+                            formatTime(productDetails.createTime) || '-'
+                          }}</span>
                       </div>
                       <div class="detail-item" v-if="productDetails.updateTime">
                         <span class="detail-label">更新时间</span>
-                        <span class="detail-value">{{ formatTime(productDetails.updateTime) || '-' }}</span>
+                        <span class="detail-value">{{
+                            formatTime(productDetails.updateTime) || '-'
+                          }}</span>
                       </div>
                     </div>
                   </div>
@@ -193,15 +206,18 @@
                   <!-- 右侧：产品图片 -->
                   <div class="product-right-section">
                     <div class="product-image-section">
-                      <div class="image-wrapper" @click="openImagePreview" :class="{ clickable: !!productImageUrl }">
-                        <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片" class="product-image"/>
+                      <div class="image-wrapper" @click="openImagePreview"
+                           :class="{ clickable: !!productImageUrl }">
+                        <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片"
+                             class="product-image"/>
                         <div v-else class="image-placeholder">
                           <a-icon type="picture" class="placeholder-icon"/>
                           <span class="placeholder-text">暂无图片</span>
                         </div>
                       </div>
                       <div class="image-actions">
-                        <a v-if="productImageUrl" @click.prevent="openImagePreview" class="action-link">
+                        <a v-if="productImageUrl" @click.prevent="openImagePreview"
+                           class="action-link">
                           <a-icon type="eye"/>
                           {{ $t('app.view') }}
                         </a>
@@ -229,7 +245,8 @@
               </div>
 
               <!-- 设备标签卡片 -->
-              <div class="info-card"  v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin">
+              <div class="info-card"
+                   v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin">
                 <div class="card-header">
                   <div class="card-title">
                     <a-icon type="tags"/>
@@ -283,7 +300,8 @@
               </div>
 
               <!-- 网关产品卡片 -->
-              <div class="info-card gateway-card" v-if="productDetails.deviceNode === 'GATEWAY_SUB_DEVICE'">
+              <div class="info-card gateway-card"
+                   v-if="productDetails.deviceNode === 'GATEWAY_SUB_DEVICE'">
                 <div class="card-header">
                   <div class="card-title">
                     <a-icon type="gateway"/>
@@ -315,7 +333,8 @@
                     <div class="gateway-info-box">
                       <!-- 网关图片或默认图标 -->
                       <div class="gateway-image">
-                        <img v-if="gatewayImageUrl" :src="gatewayImageUrl" alt="网关图片" class="gateway-photo"/>
+                        <img v-if="gatewayImageUrl" :src="gatewayImageUrl" alt="网关图片"
+                             class="gateway-photo"/>
                         <a-icon v-else type="gateway" class="gateway-icon"/>
                       </div>
                       <div class="gateway-details">
@@ -339,7 +358,8 @@
                     <p class="empty-text">暂未关联网关产品</p>
                     <p class="empty-hint">子设备需要通过网关连接到平台</p>
                   </div>
-                  <SelectGateway ref="selectGateway" @add="addGateway" :selectedGateway="selectedGateway"/>
+                  <SelectGateway ref="selectGateway" @add="addGateway"
+                                 :selectedGateway="selectedGateway"/>
                 </div>
               </div>
 
@@ -547,8 +567,10 @@
       :type="metadataShowType"
       @close="closeMetadataDetail"/>
     <!-- 图片预览 -->
-    <a-modal :visible="imagePreviewVisible" :footer="null" @cancel="imagePreviewVisible=false" :width="520">
-      <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片" style="width: 100%; border-radius: 8px;"/>
+    <a-modal :visible="imagePreviewVisible" :footer="null" @cancel="imagePreviewVisible=false"
+             :width="520">
+      <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片"
+           style="width: 100%; border-radius: 8px;"/>
     </a-modal>
     <!-- 物模型导入 -->
     <import-metadata
@@ -1062,7 +1084,7 @@
       color: #1e293b;
       font-weight: 600;
       line-height: 1.4;
-      
+
       // 状态badge样式优化
       :deep(.ant-badge) {
         margin-right: 6px;
@@ -1895,7 +1917,12 @@
 </style>
 <script>
 
-import {getProduct, modifyProductGateway, updateProduct, uploadProductImage} from '@/api/system/dev/product'
+import {
+  getProduct,
+  modifyProductGateway,
+  updateProduct,
+  uploadProductImage
+} from '@/api/system/dev/product'
 import {getInfo} from '@/api/system/dev/sort'
 import CreateForm from './CreateForm'
 import metadata from './metadata'
@@ -2135,7 +2162,7 @@ export default {
         // console.log('response = ', JSON.parse(response.data.metadata))
 
         // 新的API结构：直接返回 gwName、gwProductKey 和 gwPhotoUrl
-        if (response.data.gwProductKey && response.data.gwName) { 
+        if (response.data.gwProductKey && response.data.gwName) {
           this.selectedGateway = {
             name: response.data.gwName,
             productKey: response.data.gwProductKey
@@ -2160,7 +2187,7 @@ export default {
 
         response.data.tagsName = this.getProductTags(response.data.tags)
         this.productDetails = response.data
-        
+
         // 解析产品图片 - 优先使用 photoUrl 中的 img 字段
         this.productImageUrl = ''
         if (this.productDetails.photoUrl) {
@@ -2173,7 +2200,7 @@ export default {
             this.productImageUrl = ''
           }
         }
-        
+
         if (this.productDetails.tags) {
           this.tagList = this.productDetails.tags.split(',')
         }
@@ -2423,9 +2450,9 @@ export default {
     modifyGateway() {
       const gwProductKey = this.selectedGateway ? this.selectedGateway.productKey : ''
       modifyProductGateway(this.productId, gwProductKey)
-        .then(() => {
-          this.$message.success('操作成功!')
-        })
+      .then(() => {
+        this.$message.success('操作成功!')
+      })
     },
     // 搜索|过滤产品
     filterOption(value, option) {
@@ -2587,16 +2614,21 @@ export default {
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
         d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
     },
-    
+
     formatTime(val) {
-      if (!val) return '-'
+      if (!val) {
+        return '-'
+      }
       // 如果是时间戳，转换为日期
       const timestamp = typeof val === 'string' ? new Date(val).getTime() : val
       const d = new Date(timestamp)
-      if (isNaN(d.getTime())) return '-'
-      
+      if (isNaN(d.getTime())) {
+        return '-'
+      }
+
       const pad = n => n < 10 ? '0' + n : n
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
+        d.getHours())}:${pad(d.getMinutes())}`
     },
     getSslKeyFromConfig(config) {
       if (!config) {
@@ -2609,7 +2641,7 @@ export default {
         return ''
       }
     },
-    
+
     // 处理存储策略变更
     handleStorePolicyChange(value) {
       // 显示确认对话框
@@ -2642,21 +2674,21 @@ export default {
         }
       })
     },
-    
+
     // 开始编辑存储策略
     startEditStorePolicy() {
       // 保存原始值
       this.originalStorePolicy = this.productDetails.storePolicy
       this.editStorePolicyMode = true
     },
-    
+
     // 取消编辑存储策略
     cancelEditStorePolicy() {
       // 恢复原值
       this.productDetails.storePolicy = this.originalStorePolicy
       this.editStorePolicyMode = false
     },
-    
+
     // 获取存储策略标签
     getStorePolicyLabel(value) {
       const option = this.storePolicyOptions.find(item => item.value === value)

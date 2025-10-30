@@ -62,7 +62,9 @@
           >
             <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
               <div>参数标志：{{ item.id }} 参数名称：{{ item.name }}</div>
-              <a slot="actions" @click="editParam(item)" v-show="!form.isConfig">{{ $t('button.edit') }}</a>
+              <a slot="actions" @click="editParam(item)" v-show="!form.isConfig">{{
+                  $t('button.edit')
+                }}</a>
               <a slot="actions" @click="delParam(index)">{{ $t('button.delete') }}</a>
             </a-list-item>
           </a-list>

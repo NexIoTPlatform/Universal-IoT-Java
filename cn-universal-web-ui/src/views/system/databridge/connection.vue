@@ -26,7 +26,8 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="插件类型" prop="pluginType">
-                <a-select v-model="queryParam.pluginType" placeholder="请选择插件类型" style="width: 100%"
+                <a-select v-model="queryParam.pluginType" placeholder="请选择插件类型"
+                          style="width: 100%"
                           allow-clear>
                   <a-select-option value="JDBC">JDBC</a-select-option>
                   <a-select-option value="KAFKA">Kafka</a-select-option>
@@ -40,7 +41,9 @@
             <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons">
                 <a-button type="primary" @click="handleQuery">{{ $t('button.search') }}</a-button>
-                <a-button style="margin-left: 8px" @click="resetQuery">{{ $t('button.reset') }}</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery">{{
+                    $t('button.reset')
+                  }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -48,7 +51,9 @@
       </div>
       <!-- 操作 -->
       <div class="table-operations">
-        <a-button type="primary" @click="handleAdd" v-hasPermi="['databridge:resource:add']">{{ $t('button.add') }}
+        <a-button type="primary" @click="handleAdd" v-hasPermi="['databridge:resource:add']">{{
+            $t('button.add')
+          }}
         </a-button>
         <a-button type="primary" :disabled="single"
                   @click="handleUpdate(undefined, ids)"
@@ -77,7 +82,8 @@
         <div slot="connectionInfo" slot-scope="text, record" class="connection-info-cell">
           <div class="connection-info-content">
             <div class="connection-name">
-              <a-button type="link" @click="handleUpdate(record, undefined)" class="connection-name-link">
+              <a-button type="link" @click="handleUpdate(record, undefined)"
+                        class="connection-name-link">
                 {{ record.name || '未命名连接' }}
               </a-button>
             </div>
@@ -98,26 +104,33 @@
 
         <div slot="dataDirection" slot-scope="text, record" class="data-direction-cell">
           <div class="direction-info">
-            <span class="direction-icon">{{ getDataDirectionSymbol(record.dataDirection || record.direction) }}</span>
-            <span class="direction-text">{{ getDataDirectionText(record.dataDirection || record.direction) }}</span>
+            <span class="direction-icon">{{
+                getDataDirectionSymbol(record.dataDirection || record.direction)
+              }}</span>
+            <span class="direction-text">{{
+                getDataDirectionText(record.dataDirection || record.direction)
+              }}</span>
           </div>
         </div>
 
         <div slot="status" slot-scope="text, record" class="status-cell">
-          <div :class="{ 'status-badge online': record.status === 1, 'status-badge offline': record.status !== 1 }">
+          <div
+            :class="{ 'status-badge online': record.status === 1, 'status-badge offline': record.status !== 1 }">
             <span class="status-dot"></span>
             <span class="status-text">{{ record.status === 1 ? '启用' : '禁用' }}</span>
           </div>
         </div>
 
         <span slot="operation" slot-scope="text, record" class="operation-buttons">
-          <a @click="testResource(record)" v-hasPermi="['databridge:resource:test']" class="operation-btn">
+          <a @click="testResource(record)" v-hasPermi="['databridge:resource:test']"
+             class="operation-btn">
             {{ $t('button.test') }}</a>
           <!-- <a-divider type="vertical" v-hasPermi="['databridge:resource:edit']"/>
           <a @click="handleUpdate(record, undefined)" v-hasPermi="['databridge:resource:edit']" class="operation-btn">
             {{ $t('button.edit') }} </a> -->
           <a-divider type="vertical" v-hasPermi="['databridge:resource:remove']"/>
-          <a style="color:#F53F3F" @click="handleDelete(record)" v-hasPermi="['databridge:resource:remove']"
+          <a style="color:#F53F3F" @click="handleDelete(record)"
+             v-hasPermi="['databridge:resource:remove']"
              class="operation-btn">
             {{ $t('button.delete') }}</a>
         </span>
@@ -133,7 +146,13 @@
 </template>
 
 <script>
-import {createResource, deleteResource, getResourceList, testResource, updateResource} from '@/api/databridge/resource'
+import {
+  createResource,
+  deleteResource,
+  getResourceList,
+  testResource,
+  updateResource
+} from '@/api/databridge/resource'
 import ResourceForm from './modules/ResourceForm'
 
 export default {
@@ -280,11 +299,11 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return deleteResource(ids)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success('删除成功', 3)
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success('删除成功', 3)
+          })
         },
         onCancel() {
         }
@@ -341,7 +360,9 @@ export default {
     },
     /** 格式化主机地址和端口显示 */
     formatHostPort(host, port) {
-      if (!host) return '未设置'
+      if (!host) {
+        return '未设置'
+      }
       if (!port || port === 0 || port === '0') {
         return host
       }

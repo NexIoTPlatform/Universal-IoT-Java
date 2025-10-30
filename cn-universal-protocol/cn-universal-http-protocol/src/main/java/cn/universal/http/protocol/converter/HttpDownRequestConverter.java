@@ -34,8 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * HTTP协议转换器
- * 将UnifiedDownlinkCommand转换为HttpDownRequest
+ * HTTP协议转换器 将UnifiedDownlinkCommand转换为HttpDownRequest
  *
  * @version 1.0
  * @since 2025/10/25
@@ -72,9 +71,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
     }
   }
 
-  /**
-   * 转换网关子设备请求
-   */
+  /** 转换网关子设备请求 */
   private HttpDownRequest convertGatewaySubDevice(
       UnifiedDownlinkCommand command, IoTProduct subProduct, DownlinkContext<?> context) {
     log.info(
@@ -172,9 +169,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
     return request;
   }
 
-  /**
-   * 转换普通设备请求
-   */
+  /** 转换普通设备请求 */
   private HttpDownRequest convertNormalDevice(
       UnifiedDownlinkCommand command, IoTProduct ioTProduct, DownlinkContext<?> context) {
     // 1. 创建请求对象
@@ -212,8 +207,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
       String payload = encodeFunction(command);
       request.setDownResult(payload);
       request.setPayload(payload);
-      log.debug(
-          "[HTTP转换器] 功能下发编解码完成, deviceId={}, payload={}", command.getDeviceId(), payload);
+      log.debug("[HTTP转换器] 功能下发编解码完成, deviceId={}, payload={}", command.getDeviceId(), payload);
     }
 
     // 7. 处理扩展字段
@@ -235,9 +229,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
     return request;
   }
 
-  /**
-   * 判断是否为网关子设备
-   */
+  /** 判断是否为网关子设备 */
   private boolean isGatewaySubDevice(IoTProduct product) {
     return DeviceNode.GATEWAY_SUB_DEVICE.getValue().equalsIgnoreCase(product.getDeviceNode());
   }
@@ -302,7 +294,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
     // 保存设备信息到上下文（供后续拦截器使用）
     if (request.getIoTDeviceDTO() != null) {
       context.setAttribute("deviceName", request.getIoTDeviceDTO().getDeviceName());
-      context.setAttribute("deviceStatus", request.getIoTDeviceDTO().getState());  // 使用getState()
+      context.setAttribute("deviceStatus", request.getIoTDeviceDTO().getState()); // 使用getState()
     }
   }
 }

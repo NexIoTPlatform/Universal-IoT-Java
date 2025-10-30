@@ -34,7 +34,9 @@
               :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="handleQuery"><iot-icon
                 type="icon-search"/>{{ $t('button.search') }}</a-button>
-              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
+              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{
+                  $t('button.reset')
+                }}</a-button>
               <!--              <a @click="toggleAdvanced" style="margin-left: 8px">-->
               <!--                  {{ advanced ? $t('button.collapse') : $t('button.expand') }}-->
               <!--                  <a-icon :type="advanced ? 'up' : 'down'"/>-->
@@ -48,10 +50,12 @@
     <div class="table-operations">
       <a-button type="primary" @click="addSubscribe">
         <a-icon type="plus"/>
-       {{ $t('button.edit') }}</a-button>
+        {{ $t('button.edit') }}
+      </a-button>
       <a-button type="danger" :disabled="multiple" @click="handleDelete">
         <a-icon type="delete"/>
-       {{ $t('button.delete') }}</a-button>
+        {{ $t('button.delete') }}
+      </a-button>
       <a-button
         type="primary"
         size="small"
@@ -297,14 +301,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return deleteSubscribe(that.devId, that.productKey, ids)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

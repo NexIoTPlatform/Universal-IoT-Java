@@ -20,8 +20,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * 下行日志拦截器
- * 记录下行消息的详细日志信息
+ * 下行日志拦截器 记录下行消息的详细日志信息
  *
  * @version 1.0
  * @since 2025/10/24
@@ -68,8 +67,7 @@ public class DownlinkLoggingInterceptor implements DownlinkInterceptor {
     boolean success = context.getResult() != null && context.getResult().isSuccess();
 
     log.info(
-        "[下行日志] 下行消息处理完成: protocol={}, productKey={}, deviceId={}, "
-            + "success={}, duration={}ms",
+        "[下行日志] 下行消息处理完成: protocol={}, productKey={}, deviceId={}, " + "success={}, duration={}ms",
         context.getProtocolCode(),
         context.getProductKey(),
         context.getDeviceId(),

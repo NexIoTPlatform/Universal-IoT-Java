@@ -809,7 +809,6 @@ public class NetworkServiceImpl implements INetworkService {
       throw new IoTException("TCP模块未注入，无法启动TCP网络组件");
     }
 
-
     String productKey = network.getProductKey();
     if (StrUtil.isBlank(productKey)) {
       log.error("TCP网络组件缺少productKey: {}", network.getName());
@@ -843,7 +842,6 @@ public class NetworkServiceImpl implements INetworkService {
       throw new IoTException("TCP模块未注入，无法启动TCP网络组件");
     }
 
-
     String productKey = network.getProductKey();
     if (StrUtil.isBlank(productKey)) {
       log.error("TCP网络组件缺少productKey: {}", network.getName());
@@ -875,7 +873,6 @@ public class NetworkServiceImpl implements INetworkService {
       log.error("TCP服务管理器未注入，无法启动TCP网络组件: {}", network.getName());
       throw new IoTException("TCP模块未注入，无法启动TCP网络组件");
     }
-
 
     String productKey = network.getProductKey();
     if (StrUtil.isBlank(productKey)) {

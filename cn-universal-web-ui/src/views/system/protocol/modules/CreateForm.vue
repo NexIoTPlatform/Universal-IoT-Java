@@ -54,7 +54,8 @@
         <a-row :gutter="8">
           <a-col :span="12">
             <a-form-model-item label="版本号" prop="version">
-              <a-input v-model="form.version" placeholder="请输入版本号，如：1.0.0" :disabled="submitLoading"/>
+              <a-input v-model="form.version" placeholder="请输入版本号，如：1.0.0"
+                       :disabled="submitLoading"/>
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
@@ -209,7 +210,13 @@
 </template>
 
 <script>
-import {addProtocol, allProtocol, getProtocol, messageCodec, updateProtocol} from '@/api/system/protocol'
+import {
+  addProtocol,
+  allProtocol,
+  getProtocol,
+  messageCodec,
+  updateProtocol
+} from '@/api/system/protocol'
 import FileUpload from '@/components/FileUpload'
 import CodeEditor from '@/components/CodeEditor.vue'
 import {listProduct} from '@/api/system/dev/product'

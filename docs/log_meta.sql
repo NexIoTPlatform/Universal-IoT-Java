@@ -307,7 +307,8 @@ SET
 END WHILE;
 
     -- 3. 最终提示
-SELECT CONCAT('🎉 所有分表分区新增完成！本次新增分区：', `partition_name`, '，时间范围：', `next_month`, ' ~ ',
+SELECT CONCAT('🎉 所有分表分区新增完成！本次新增分区：', `partition_name`, '，时间范围：', `next_month`,
+              ' ~ ',
               DATE_SUB(`next_next_month`, INTERVAL 1 DAY)) AS `final_result`;
 END
 //

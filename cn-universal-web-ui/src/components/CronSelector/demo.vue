@@ -5,16 +5,18 @@
 <template>
   <div class="cron-selector-demo">
     <a-card title="CronSelector 组件示例" :bordered="false">
-      
+
       <!-- 示例1: 基础使用 -->
       <a-divider orientation="left">示例1: 基础使用</a-divider>
       <a-row :gutter="16">
         <a-col :span="12">
-          <cron-selector v-model="example1.cron" @change="handleExample1Change" />
+          <cron-selector v-model="example1.cron" @change="handleExample1Change"/>
         </a-col>
         <a-col :span="12">
           <a-card size="small" title="当前配置">
-            <p>表达式: <a-tag color="green">{{ example1.cron || '未配置' }}</a-tag></p>
+            <p>表达式:
+              <a-tag color="green">{{ example1.cron || '未配置' }}</a-tag>
+            </p>
           </a-card>
         </a-col>
       </a-row>
@@ -23,15 +25,17 @@
       <a-divider orientation="left">示例2: 默认使用可视化模式</a-divider>
       <a-row :gutter="16">
         <a-col :span="12">
-          <cron-selector 
-            v-model="example2.cron" 
+          <cron-selector
+            v-model="example2.cron"
             :default-mode="'visual'"
-            @change="handleExample2Change" 
+            @change="handleExample2Change"
           />
         </a-col>
         <a-col :span="12">
           <a-card size="small" title="当前配置">
-            <p>表达式: <a-tag color="green">{{ example2.cron || '未配置' }}</a-tag></p>
+            <p>表达式:
+              <a-tag color="green">{{ example2.cron || '未配置' }}</a-tag>
+            </p>
           </a-card>
         </a-col>
       </a-row>
@@ -40,32 +44,33 @@
       <a-divider orientation="left">示例3: 在表单中使用</a-divider>
       <a-form :label-col="{ span: 4 }" :wrapper-col="{ span: 20 }">
         <a-form-item label="任务名称">
-          <a-input v-model="example3.taskName" placeholder="请输入任务名称" style="width: 300px;" />
+          <a-input v-model="example3.taskName" placeholder="请输入任务名称" style="width: 300px;"/>
         </a-form-item>
-        
+
         <a-form-item label="执行时间">
-          <cron-selector 
+          <cron-selector
             v-model="example3.cron"
             style="width: 400px;"
           />
         </a-form-item>
-        
+
         <a-form-item label="任务描述">
-          <a-textarea 
-            v-model="example3.description" 
+          <a-textarea
+            v-model="example3.description"
             placeholder="请输入任务描述"
             :rows="3"
             style="width: 400px;"
           />
         </a-form-item>
-        
+
         <a-form-item :wrapper-col="{ span: 20, offset: 4 }">
           <a-space>
             <a-button type="primary" @click="handleExample3Submit">
               保存任务
             </a-button>
             <a-button @click="handleExample3Reset">
-              {{ $t('button.reset') }} </a-button>
+              {{ $t('button.reset') }}
+            </a-button>
           </a-space>
         </a-form-item>
       </a-form>
@@ -74,7 +79,7 @@
       <a-divider orientation="left">示例4: 使用组件方法</a-divider>
       <a-row :gutter="16">
         <a-col :span="12">
-          <cron-selector 
+          <cron-selector
             ref="cronSelectorRef"
             v-model="example4.cron"
           />
@@ -88,7 +93,9 @@
         </a-col>
         <a-col :span="12">
           <a-card size="small" title="当前配置">
-            <p>表达式: <a-tag color="green">{{ example4.cron || '未配置' }}</a-tag></p>
+            <p>表达式:
+              <a-tag color="green">{{ example4.cron || '未配置' }}</a-tag>
+            </p>
           </a-card>
         </a-col>
       </a-row>
@@ -100,7 +107,7 @@
           <a-list-item-meta>
             <span slot="title">{{ item.name }}</span>
             <div slot="description">
-              <cron-selector 
+              <cron-selector
                 v-model="item.cron"
                 @change="val => handleExample5Change(index, val)"
               />
@@ -135,30 +142,30 @@ export default {
       example1: {
         cron: '0 9 * * *'
       },
-      
+
       // 示例2
       example2: {
         cron: ''
       },
-      
+
       // 示例3
       example3: {
         taskName: '',
         cron: '',
         description: ''
       },
-      
+
       // 示例4
       example4: {
         cron: ''
       },
-      
+
       // 示例5
       example5: {
         tasks: [
-          { name: '数据备份任务', cron: '0 0 * * *' },
-          { name: '日志清理任务', cron: '0 2 * * *' },
-          { name: '报表生成任务', cron: '0 9 * * 1' }
+          {name: '数据备份任务', cron: '0 0 * * *'},
+          {name: '日志清理任务', cron: '0 2 * * *'},
+          {name: '报表生成任务', cron: '0 9 * * 1'}
         ]
       }
     }
@@ -169,12 +176,12 @@ export default {
       console.log('Example 1 - Cron changed:', expression)
       this.$message.info(`表达式已更新: ${expression}`)
     },
-    
+
     // 示例2
     handleExample2Change(expression) {
       console.log('Example 2 - Cron changed:', expression)
     },
-    
+
     // 示例3
     handleExample3Submit() {
       if (!this.example3.taskName) {
@@ -185,11 +192,11 @@ export default {
         this.$message.warning('请配置执行时间')
         return
       }
-      
+
       this.$message.success('任务保存成功')
       console.log('Task submitted:', this.example3)
     },
-    
+
     handleExample3Reset() {
       this.example3 = {
         taskName: '',
@@ -198,35 +205,35 @@ export default {
       }
       this.$message.info('表单已重置')
     },
-    
+
     // 示例4
     clearExample4() {
       this.$refs.cronSelectorRef.clear()
       this.$message.info('配置已清空')
     },
-    
+
     setExample4Daily() {
       this.$refs.cronSelectorRef.setExpression('0 9 * * *')
       this.$message.success('已设置为每天上午9点执行')
     },
-    
+
     setExample4Weekly() {
       this.$refs.cronSelectorRef.setExpression('0 9 * * 1')
       this.$message.success('已设置为每周一上午9点执行')
     },
-    
+
     // 示例5
     handleExample5Change(index, expression) {
       console.log(`Task ${index} cron changed:`, expression)
     },
-    
+
     addExample5Task() {
       this.example5.tasks.push({
         name: `新任务 ${this.example5.tasks.length + 1}`,
         cron: ''
       })
     },
-    
+
     removeExample5Task(index) {
       this.example5.tasks.splice(index, 1)
       this.$message.success('任务已删除')

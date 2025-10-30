@@ -36,9 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 产品导入导出控制器
- * 专门处理产品的完整导出导入功能
- * 
+ * 产品导入导出控制器 专门处理产品的完整导出导入功能
+ *
  * @author NexIoT
  * @since 2025-10-27
  */
@@ -50,11 +49,7 @@ public class ProductImportExportController extends BaseController {
 
   @Autowired private IIoTProductService devProductService;
 
-  /**
-   * 导出产品完整包
-   * 包含产品基本信息、设备协议、网络配置、物模型等所有配置
-   * 导出后可直接在其他环境导入使用，无需额外配置
-   */
+  /** 导出产品完整包 包含产品基本信息、设备协议、网络配置、物模型等所有配置 导出后可直接在其他环境导入使用，无需额外配置 */
   @PostMapping("/export")
   @Operation(summary = "导出产品完整包", description = "导出产品及其关联的协议、网络配置、物模型等完整信息")
   @Log(title = "产品完整包导出", businessType = BusinessType.EXPORT)
@@ -62,7 +57,7 @@ public class ProductImportExportController extends BaseController {
     try {
       // 获取当前用户信息
       IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
-      
+
       // 权限控制：非管理员只能导出自己创建的产品
       query.setSelf(!iotUser.isAdmin());
       if (query.isSelf()) {
@@ -78,11 +73,11 @@ public class ProductImportExportController extends BaseController {
       // 设置响应头
       response.setContentType("application/json");
       response.setCharacterEncoding("utf-8");
-      
+
       // 生成文件名：产品导出包_时间戳.json
       String fileName = String.format("product_packages_%d.json", System.currentTimeMillis());
       response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-      
+
       // 缓存控制
       response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       response.setHeader("Pragma", "no-cache");
@@ -100,7 +95,7 @@ public class ProductImportExportController extends BaseController {
         out.write(bytes);
         out.flush();
       }
-      
+
       log.info("产品导出成功: 用户={}, 导出数量={}", iotUser.getUnionId(), packageList.size());
     } catch (Exception e) {
       log.error("产品导出失败", e);
@@ -108,11 +103,7 @@ public class ProductImportExportController extends BaseController {
     }
   }
 
-  /**
-   * 导入产品完整包
-   * 支持导入完整的产品配置，包括协议、网络、物模型等
-   * 自动处理ProductKey冲突、协议依赖等问题
-   */
+  /** 导入产品完整包 支持导入完整的产品配置，包括协议、网络、物模型等 自动处理ProductKey冲突、协议依赖等问题 */
   @PostMapping("/import")
   @Operation(summary = "导入产品完整包", description = "导入产品完整配置包，自动处理所有依赖关系")
   @Log(title = "产品完整包导入", businessType = BusinessType.IMPORT)
@@ -121,7 +112,7 @@ public class ProductImportExportController extends BaseController {
     try {
       // 获取当前用户ID
       String unionId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
-      
+
       // 读取上传的JSON文件
       String jsonContent = new String(file.getBytes(), "UTF-8");
 
@@ -135,7 +126,7 @@ public class ProductImportExportController extends BaseController {
 
       // 执行导入
       String result = devProductService.importProductPackages(packages, unionId);
-      
+
       log.info("产品导入完成: 用户={}, 导入数量={}", unionId, packages.size());
       return AjaxResult.success(result);
     } catch (Exception e) {

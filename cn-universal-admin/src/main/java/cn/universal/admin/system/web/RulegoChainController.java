@@ -133,7 +133,8 @@ public class RulegoChainController extends BaseController {
 
   @Operation(summary = "获取设计器URL")
   @GetMapping("/chain/{id}/designer")
-  public AjaxResult<String> getDesignerUrl(@PathVariable @Parameter(description = "规则链ID") Long id) {
+  public AjaxResult<String> getDesignerUrl(
+      @PathVariable @Parameter(description = "规则链ID") Long id) {
     String creatorId = loginIoTUnionUser(SecurityUtils.getUnionId()).getUnionId();
     RulegoChainVO rulegoChain = rulegoChainService.queryRulegoChainById(id, creatorId);
     String designerUrl = rulegoChainService.getDesignerUrl(rulegoChain.getRulegoId());

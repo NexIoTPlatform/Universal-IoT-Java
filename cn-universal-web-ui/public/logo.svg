@@ -28,7 +28,7 @@
   <!-- 文字部分 -->
   <g id="logo-text">
     <text x="40" y="20" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="13"
-          font-weight="600" fill="#1d2129">IoT Platform
+      font-weight="600" fill="#1d2129">IoT Platform
     </text>
   </g>
 </svg> 

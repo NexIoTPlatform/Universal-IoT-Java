@@ -120,15 +120,18 @@
       <div class="table-operations">
         <a-button type="primary" size="default" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['system:product:add']">
-          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button type="primary" size="default" @click="$refs.ImportProductForm.handleImport()"
                   v-hasPermi="['system:product:import']">
-          <a-icon type="import"/>{{ $t('button.import') }}
+          <a-icon type="import"/>
+          {{ $t('button.import') }}
         </a-button>
         <a-button type="primary" size="default" @click="handleExport"
                   v-hasPermi="['system:product:export']">
-          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>
+          {{ $t('button.export') }}
         </a-button>
         <a-button
           type="primary"
@@ -137,7 +140,8 @@
           :style="{float: 'right'}"
           @click="getList"
         >
-          <a-icon type="sync" :spin="loading"/>{{ $t('button.refresh') }}
+          <a-icon type="sync" :spin="loading"/>
+          {{ $t('button.refresh') }}
         </a-button>
         <!-- <div style="float: right" class="screen-btns">
           <span @click="toggleScreen('all')" class="screen" :class="{'selected': (!queryParam.hasDevice && !queryParam.self)}">全部</span>
@@ -266,7 +270,12 @@
 </template>
 
 <script>
-import {delProduct, getDevNumByProduct, queryProductList, updateProductState} from '@/api/system/dev/product'
+import {
+  delProduct,
+  getDevNumByProduct,
+  queryProductList,
+  updateProductState
+} from '@/api/system/dev/product'
 import request from '@/utils/request'
 import CreateForm from './modules/CreateForm'
 import ImportProductForm from '@/views/system/product/modules/ImportForm'
@@ -581,12 +590,12 @@ export default {
       console.log(row.state)
       row.state = row.state === 0 ? 1 : 0
       updateProductState(row.id, row.state)
-        .then(() => {
-          this.$message.success(text + '成功', 3)
-        })
-        .catch(function () {
-          this.$message.error(text + '异常', 3)
-        })
+      .then(() => {
+        this.$message.success(text + '成功', 3)
+      })
+      .catch(function () {
+        this.$message.error(text + '异常', 3)
+      })
     },
     cancelHandleState(row) {
     },

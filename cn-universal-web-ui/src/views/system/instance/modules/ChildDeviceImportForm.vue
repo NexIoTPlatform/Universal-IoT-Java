@@ -73,7 +73,6 @@
 import {getSubdeviceGateways} from '@/api/system/dev/product'
 import {importDevice} from '@/api/system/dev/instance'
 
-
 export default {
   name: 'ImportProductForm',
   props: {
@@ -165,9 +164,9 @@ export default {
             this.form.fileList = []
             this.$emit('ok')
           })
-            .finally(() => {
-              this.loading = false
-            })
+          .finally(() => {
+            this.loading = false
+          })
         }
       })
     },

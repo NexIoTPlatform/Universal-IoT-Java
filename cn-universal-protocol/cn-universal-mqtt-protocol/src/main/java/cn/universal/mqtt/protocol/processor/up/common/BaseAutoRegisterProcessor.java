@@ -160,7 +160,7 @@ public abstract class BaseAutoRegisterProcessor extends AbstratIoTService
 
       // 转换为UnifiedDownlinkCommand（保持所有参数）
       UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromJson(downRequest);
-      
+
       // 调用第三方平台进行注册
       R result = IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(command);
 

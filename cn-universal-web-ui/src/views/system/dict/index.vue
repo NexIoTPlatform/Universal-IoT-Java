@@ -40,7 +40,9 @@
                   <a-space>
                     <a-button type="primary" @click="handleQuery"><a-icon
                       type="search"/>{{ $t('button.search') }}</a-button>
-                    <a-button @click="resetQuery"><a-icon type="sync"/>{{ $t('button.reset') }}</a-button>
+                    <a-button @click="resetQuery"><a-icon type="sync"/>{{
+                        $t('button.reset')
+                      }}</a-button>
                     <a @click="toggleAdvanced" style="margin-left: 8px">
                       {{ advanced ? $t('button.collapse') : $t('button.expand') }}
                       <a-icon :type="advanced ? 'up' : 'down'"/>
@@ -65,11 +67,13 @@
             <a-button @click="$refs.createForm.handleUpdate(undefined, ids)" :disabled="single"
                       v-hasPermi="['system:dict:edit']">
               <a-icon type="edit"/>
-              {{ $t('button.edit') }} </a-button>
+              {{ $t('button.edit') }}
+            </a-button>
             <a-button type="danger" :disabled="multiple" @click="handleDelete"
                       v-hasPermi="['system:dict:remove']">
               <a-icon type="delete"/>
-              {{ $t('button.delete') }} </a-button>
+              {{ $t('button.delete') }}
+            </a-button>
             <a-button @click="handleExport" v-hasPermi="['system:dict:export']">
               <a-icon type="export"/>
               {{ $t('button.export') }}
@@ -310,14 +314,14 @@ export default {
         content: '当前选中字典编号为' + dictIds + '的数据',
         onOk() {
           return delType(dictIds)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

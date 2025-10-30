@@ -28,7 +28,9 @@
               :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="handleQuery"><iot-icon
                 type="icon-search"/>{{ $t('button.search') }}</a-button>
-              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
+              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{
+                  $t('button.reset')
+                }}</a-button>
             </span>
           </a-col>
         </a-row>
@@ -46,7 +48,8 @@
       </a-button>
       <a-button type="primary" @click="handleExport" v-hasPermi="['system:instance:export']">
         <iot-icon type="icon-u-export"/>
-       {{ $t('button.export') }}</a-button>
+        {{ $t('button.export') }}
+      </a-button>
       <a-button type="primary" @click="showGroup" v-hasPermi="['application:application:bind']">
         <iot-icon type="icon-u-add"/>
         按组绑定
@@ -682,15 +685,15 @@ export default {
         content: '当前选中编号为' + ids + '的设备',
         onOk() {
           return bindInstance({ids: ids, appUniqueId: appUniqueId})
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '绑定成功',
-                3
-              )
-              that.closeModel()
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '绑定成功',
+              3
+            )
+            that.closeModel()
+          })
         },
         onCancel() {
         }
@@ -713,15 +716,15 @@ export default {
           content: '确定解绑设备编号"' + row.deviceId + '"的设备',
           onOk() {
             return bindInstance({ids: ids, appUniqueId: null})
-              .then(() => {
-                that.onSelectChange([], [])
-                that.getList()
-                that.$message.success(
-                  '解绑成功',
-                  3
-                )
-                that.closeModel()
-              })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '解绑成功',
+                3
+              )
+              that.closeModel()
+            })
           },
           onCancel() {
           }

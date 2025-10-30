@@ -27,43 +27,44 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @Component
-public class SubDevicePushUPProcessor extends IoTUPPushAdapter<BaseUPRequest> implements SubDeviceMessageProcessor {
+public class SubDevicePushUPProcessor extends IoTUPPushAdapter<BaseUPRequest>
+    implements SubDeviceMessageProcessor {
 
-    @Override
-    public String getName() {
-        return "MQTT消息推送处理器";
-    }
+  @Override
+  public String getName() {
+    return "MQTT消息推送处理器";
+  }
 
-    @Override
-    public String getDescription() {
-        return "MQTT消息推送处理器";
-    }
+  @Override
+  public String getDescription() {
+    return "MQTT消息推送处理器";
+  }
 
-    @Override
-    public int getOrder() {
-        return 999;
-    }
+  @Override
+  public int getOrder() {
+    return 999;
+  }
 
-    @Override
-    public boolean supports(SubDeviceRequest request) {
-        //子设备推送，暂时不判断，直接往上抛
-        return true;
-    }
+  @Override
+  public boolean supports(SubDeviceRequest request) {
+    // 子设备推送，暂时不判断，直接往上抛
+    return true;
+  }
 
-    @Override
-    public ProcessorResult process(SubDeviceRequest request) {
-        try {
-            log.debug("[{}] 开始子设备消息处理，设备: {}", getName(), request.getDeviceId());
-            if (CollUtil.isNotEmpty(request.getUpRequestList())) {
-                doUp(request.getUpRequestList());
-            }
-            // 4. 更新处理阶段
-            request.setStage(SubDeviceRequest.ProcessingStage.COMPLETED);
-            log.debug("[{}] 子设备消息推送处理完成，设备: {}", getName(), request.getDeviceId());
-            return ProcessorResult.STOP; // 处理完成，停止后续处理
-        } catch (Exception e) {
-            log.error("[{}] 子设备消息推送处理异常，设备: {}, 异常: ", getName(), request.getDeviceId(), e);
-            return ProcessorResult.ERROR;
-        }
+  @Override
+  public ProcessorResult process(SubDeviceRequest request) {
+    try {
+      log.debug("[{}] 开始子设备消息处理，设备: {}", getName(), request.getDeviceId());
+      if (CollUtil.isNotEmpty(request.getUpRequestList())) {
+        doUp(request.getUpRequestList());
+      }
+      // 4. 更新处理阶段
+      request.setStage(SubDeviceRequest.ProcessingStage.COMPLETED);
+      log.debug("[{}] 子设备消息推送处理完成，设备: {}", getName(), request.getDeviceId());
+      return ProcessorResult.STOP; // 处理完成，停止后续处理
+    } catch (Exception e) {
+      log.error("[{}] 子设备消息推送处理异常，设备: {}, 异常: ", getName(), request.getDeviceId(), e);
+      return ProcessorResult.ERROR;
     }
+  }
 }

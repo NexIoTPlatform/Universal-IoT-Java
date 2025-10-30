@@ -258,7 +258,8 @@ export default {
 
         // 处理开关字段
         if (field.type === 'switch') {
-          newSwitchValues[field.key] = newFormData[field.key] === 1 || newFormData[field.key] === true
+          newSwitchValues[field.key] = newFormData[field.key] === 1 || newFormData[field.key]
+            === true
         }
       })
 
@@ -277,7 +278,9 @@ export default {
         }
 
         if (field.maxLength) {
-          if (!rules[field.key]) rules[field.key] = []
+          if (!rules[field.key]) {
+            rules[field.key] = []
+          }
           rules[field.key].push({
             max: field.maxLength,
             message: `${field.label}长度不能超过${field.maxLength}个字符`,
@@ -286,7 +289,9 @@ export default {
         }
 
         if (field.type === 'number') {
-          if (!rules[field.key]) rules[field.key] = []
+          if (!rules[field.key]) {
+            rules[field.key] = []
+          }
           if (field.min !== undefined) {
             rules[field.key].push({
               validator: (rule, value, callback) => {

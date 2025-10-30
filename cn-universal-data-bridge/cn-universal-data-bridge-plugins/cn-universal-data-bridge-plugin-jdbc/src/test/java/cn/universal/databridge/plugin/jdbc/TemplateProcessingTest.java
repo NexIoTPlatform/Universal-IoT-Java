@@ -22,14 +22,14 @@ public class TemplateProcessingTest {
     variables.put("productKey", "product001");
     variables.put("deviceName", "测试设备");
     variables.put("iotId", "iot001");
-     variables.put("deviceNode", IoTConstant.DeviceNode.DEVICE.toString());
+    variables.put("deviceNode", IoTConstant.DeviceNode.DEVICE.toString());
     variables.put("messageType", "PROPERTIES");
     variables.put("properties", properties);
     variables.put("data", "raw_data_content");
 
-     // 测试模板
-     String template =
-         """
+    // 测试模板
+    String template =
+        """
           {
            "deviceId": "#{deviceId}",
            "location": {
@@ -91,10 +91,10 @@ public class TemplateProcessingTest {
     variables.put("properties", properties);
     variables.put("data", "raw_data_content");
 
-     // 测试模板
-     String template =
-         "INSERT INTO device_data(device_id,product_key,device_name,iot_id,device_node,message_type,csq,code,temperature,properties,raw_data) "
-             + "VALUES(#{deviceId},#{productKey},#{deviceName},#{iotId},#{deviceNode},#{messageType},#{properties.csq},#{properties.code},#{properties.temperature},#{properties},#{data});";
+    // 测试模板
+    String template =
+        "INSERT INTO device_data(device_id,product_key,device_name,iot_id,device_node,message_type,csq,code,temperature,properties,raw_data) "
+            + "VALUES(#{deviceId},#{productKey},#{deviceName},#{iotId},#{deviceNode},#{messageType},#{properties.csq},#{properties.code},#{properties.temperature},#{properties},#{data});";
 
     // 创建插件实例进行测试
     DefaultJdbcOutPlugin plugin = new DefaultJdbcOutPlugin();
@@ -141,8 +141,8 @@ public class TemplateProcessingTest {
     variables.put("deviceId", "device001");
     variables.put("properties", properties);
 
-     String template =
-         "INSERT INTO test_table(csq,code,temperature) VALUES(#{properties.csq},#{properties.code},#{properties.temperature});";
+    String template =
+        "INSERT INTO test_table(csq,code,temperature) VALUES(#{properties.csq},#{properties.code},#{properties.temperature});";
 
     DefaultJdbcOutPlugin plugin = new DefaultJdbcOutPlugin();
 
@@ -178,8 +178,8 @@ public class TemplateProcessingTest {
     variables.put("deviceId", "device001");
     variables.put("properties", properties);
 
-     String template =
-         "INSERT INTO test_table(csq,non_existent) VALUES(#{properties.csq},#{properties.nonExistent});";
+    String template =
+        "INSERT INTO test_table(csq,non_existent) VALUES(#{properties.csq},#{properties.nonExistent});";
 
     DefaultJdbcOutPlugin plugin = new DefaultJdbcOutPlugin();
 

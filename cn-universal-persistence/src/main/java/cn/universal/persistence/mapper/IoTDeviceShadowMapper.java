@@ -23,23 +23,26 @@ public interface IoTDeviceShadowMapper extends BaseMapper<IoTDeviceShadow> {
 
   String getShadowMetadata(
       @Param("productKey") String productKey, @Param("deviceId") String deviceId);
-      
+
   /**
    * 批量查询设备影子
+   *
    * @param iotIds 设备ID列表
    * @return 设备影子列表
    */
   List<IoTDeviceShadow> selectByIotIds(@Param("iotIds") List<String> iotIds);
-  
+
   /**
    * 批量插入设备影子
+   *
    * @param shadows 设备影子列表
    * @return 插入数量
    */
   int batchInsert(@Param("shadows") List<IoTDeviceShadow> shadows);
-  
+
   /**
    * 批量更新设备影子
+   *
    * @param shadows 设备影子列表
    * @return 更新数量
    */

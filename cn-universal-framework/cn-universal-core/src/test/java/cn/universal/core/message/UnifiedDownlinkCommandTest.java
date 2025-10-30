@@ -1,4 +1,4 @@
-///*
+/// *
 // *
 // * Copyright (c) 2025, NexIoT. All Rights Reserved.
 // *
@@ -10,25 +10,25 @@
 // *
 // */
 //
-//package cn.universal.core.message;
+// package cn.universal.core.message;
 //
-//import cn.hutool.json.JSONObject;
-//import cn.hutool.json.JSONUtil;
-//import cn.universal.common.constant.IoTConstant.DownCmd;
-//import org.junit.Test;
+// import cn.hutool.json.JSONObject;
+// import cn.hutool.json.JSONUtil;
+// import cn.universal.common.constant.IoTConstant.DownCmd;
+// import org.junit.Test;
 //
-//import java.util.HashMap;
-//import java.util.Map;
+// import java.util.HashMap;
+// import java.util.Map;
 //
-//import static org.junit.Assert.*;
+// import static org.junit.Assert.*;
 //
-///**
+/// **
 // * UnifiedDownlinkCommand 单元测试
 // *
 // * @version 1.0
 // * @since 2025/10/25
 // */
-//public class UnifiedDownlinkCommandTest {
+// public class UnifiedDownlinkCommandTest {
 //
 //  @Test
 //  public void testFromJson() {
@@ -54,7 +54,8 @@
 //  public void testFromString() {
 //    // 准备JSON字符串
 //    String jsonString =
-//        "{\"productKey\":\"test-product-002\",\"deviceId\":\"test-device-002\",\"cmd\":\"DEV_FUNCTION\",\"function\":{\"messageType\":\"FUNCTIONS\",\"function\":\"turnOn\",\"data\":{\"switch\":true}}}";
+//
+// "{\"productKey\":\"test-product-002\",\"deviceId\":\"test-device-002\",\"cmd\":\"DEV_FUNCTION\",\"function\":{\"messageType\":\"FUNCTIONS\",\"function\":\"turnOn\",\"data\":{\"switch\":true}}}";
 //
 //    // 执行转换
 //    UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromString(jsonString);
@@ -266,7 +267,8 @@
 //  public void testFromJson_WithExtensions() {
 //    // 测试包含扩展字段的JSON转换
 //    String jsonString =
-//        "{\"productKey\":\"test-product-013\",\"deviceId\":\"test-device-013\",\"cmd\":\"DEV_ADD\",\"data\":{\"imei\":\"123456789\",\"location\":\"Beijing\"}}";
+//
+// "{\"productKey\":\"test-product-013\",\"deviceId\":\"test-device-013\",\"cmd\":\"DEV_ADD\",\"data\":{\"imei\":\"123456789\",\"location\":\"Beijing\"}}";
 //
 //    UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromString(jsonString);
 //
@@ -347,4 +349,4 @@
 //    assertTrue(str.contains("DEV_ADD"));
 //    assertTrue(str.contains("msg-001"));
 //  }
-//}
+// }

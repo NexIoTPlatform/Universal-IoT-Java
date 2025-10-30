@@ -5,7 +5,10 @@ import Layout from 'ant-design-vue/es/layout'
 
 import PropTypes from 'ant-design-vue/es/_util/vue-types'
 import BaseMenu from './components/RouteMenu/BaseMenu'
-import {defaultRenderLogoAntTitle, SiderMenuProps} from './components/SiderMenu/SiderMenu'
+import {
+  defaultRenderLogoAntTitle,
+  SiderMenuProps
+} from './components/SiderMenu/SiderMenu'
 import GlobalHeader, {GlobalHeaderProps} from './components/GlobalHeader'
 import {VueFragment} from './components'
 import {isFun} from './utils/util'

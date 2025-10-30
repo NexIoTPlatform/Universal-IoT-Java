@@ -1,6 +1,7 @@
 <!-- eslint-disable -->
 <template>
-  <div style="width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column;">
+  <div
+    style="width: 100vw; height: 100vh; background: #000; display: flex; flex-direction: column;">
     <!-- 顶部控制栏 -->
     <div
       style="padding: 12px 16px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); color: #fff; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
@@ -30,7 +31,8 @@
           </a-select-option>
         </a-select>
 
-        <a-select size="small" v-model="form.streamId" style="width: 100px;" :disabled="form.type !== 1">
+        <a-select size="small" v-model="form.streamId" style="width: 100px;"
+                  :disabled="form.type !== 1">
           <a-select-option :value="0">
             <a-icon type="mobile" style="margin-right: 4px;"/>
             标清
@@ -47,7 +49,8 @@
           <a-select-option value="rtmp">RTMP</a-select-option>
         </a-select>
 
-        <a-select size="small" v-model="form.recordType" style="width: 120px;" :disabled="form.type !== 2">
+        <a-select size="small" v-model="form.recordType" style="width: 120px;"
+                  :disabled="form.type !== 2">
           <a-select-option value="cloud">云存储</a-select-option>
           <a-select-option value="localRecord">本地存储</a-select-option>
         </a-select>
@@ -55,7 +58,8 @@
         <a-input size="small" v-model="form.code" placeholder="验证码"
                  style="width: 120px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);"/>
 
-        <a-button size="small" type="primary" @click="handleInit" style="background: #1890ff; border-color: #1890ff;">
+        <a-button size="small" type="primary" @click="handleInit"
+                  style="background: #1890ff; border-color: #1890ff;">
           <a-icon type="play-circle" style="margin-right: 4px;"/>
           初始化
         </a-button>
@@ -64,7 +68,8 @@
 
     <div ref="container" :id="containerId"
          style="flex: 1; background: #000; display: flex; align-items: center; justify-content: center;">
-      <video v-if="!isSdkMode" ref="video" style="width: 100%; height: 100%; background: #000;" controls autoplay
+      <video v-if="!isSdkMode" ref="video" style="width: 100%; height: 100%; background: #000;"
+             controls autoplay
              playsinline></video>
     </div>
 
@@ -73,16 +78,20 @@
       style="padding: 12px 16px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); color: #fff; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; box-shadow: 0 -2px 8px rgba(0,0,0,0.3);">
       <!-- 基础播放控制 -->
       <div style="display: flex; align-items: center; gap: 6px; margin-right: 16px;">
-        <a-button size="small" @click="handlePlay" style="background: #52c41a; border-color: #52c41a; color: #fff;">
+        <a-button size="small" @click="handlePlay"
+                  style="background: #52c41a; border-color: #52c41a; color: #fff;">
           <a-icon type="play-circle"/>
         </a-button>
-        <a-button size="small" @click="handlePause" style="background: #faad14; border-color: #faad14; color: #fff;">
+        <a-button size="small" @click="handlePause"
+                  style="background: #faad14; border-color: #faad14; color: #fff;">
           <a-icon type="pause-circle"/>
         </a-button>
-        <a-button size="small" @click="handleStop" style="background: #ff4d4f; border-color: #ff4d4f; color: #fff;">
+        <a-button size="small" @click="handleStop"
+                  style="background: #ff4d4f; border-color: #ff4d4f; color: #fff;">
           <a-icon type="stop"/>
         </a-button>
-        <a-button size="small" @click="handleStart" style="background: #1890ff; border-color: #1890ff; color: #fff;">
+        <a-button size="small" @click="handleStart"
+                  style="background: #1890ff; border-color: #1890ff; color: #fff;">
           <a-icon type="caret-right"/>
         </a-button>
       </div>
@@ -97,7 +106,8 @@
                   style="background: #eb2f96; border-color: #eb2f96; color: #fff;">
           <a-icon type="mute"/>
         </a-button>
-        <a-button size="small" @click="toggleMuted" style="background: #13c2c2; border-color: #13c2c2; color: #fff;">
+        <a-button size="small" @click="toggleMuted"
+                  style="background: #13c2c2; border-color: #13c2c2; color: #fff;">
           <a-icon type="audio"/>
         </a-button>
       </div>
@@ -112,7 +122,8 @@
                   style="background: #a0d911; border-color: #a0d911; color: #fff;">
           <a-icon type="video-camera"/>
         </a-button>
-        <a-button size="small" @click="handleStopTalk" style="background: #f5222d; border-color: #f5222d; color: #fff;">
+        <a-button size="small" @click="handleStopTalk"
+                  style="background: #f5222d; border-color: #f5222d; color: #fff;">
           <a-icon type="phone"/>
         </a-button>
       </div>
@@ -127,7 +138,8 @@
                   style="background: #722ed1; border-color: #722ed1; color: #fff;">
           <a-icon type="stop"/>
         </a-button>
-        <a-button size="small" @click="handleCapture" style="background: #13c2c2; border-color: #13c2c2; color: #fff;">
+        <a-button size="small" @click="handleCapture"
+                  style="background: #13c2c2; border-color: #13c2c2; color: #fff;">
           <a-icon type="camera"/>
         </a-button>
       </div>
@@ -142,13 +154,16 @@
                   style="background: #faad14; border-color: #faad14; color: #fff;">
           <a-icon type="fullscreen-exit"/>
         </a-button>
-        <a-button size="small" @click="zoomIn" style="background: #1890ff; border-color: #1890ff; color: #fff;">
+        <a-button size="small" @click="zoomIn"
+                  style="background: #1890ff; border-color: #1890ff; color: #fff;">
           <a-icon type="zoom-in"/>
         </a-button>
-        <a-button size="small" @click="zoomOut" style="background: #fa8c16; border-color: #fa8c16; color: #fff;">
+        <a-button size="small" @click="zoomOut"
+                  style="background: #fa8c16; border-color: #fa8c16; color: #fff;">
           <a-icon type="zoom-out"/>
         </a-button>
-        <a-button size="small" @click="resetZoom" style="background: #722ed1; border-color: #722ed1; color: #fff;">
+        <a-button size="small" @click="resetZoom"
+                  style="background: #722ed1; border-color: #722ed1; color: #fff;">
           <a-icon type="reload"/>
         </a-button>
       </div>
@@ -236,7 +251,8 @@ export default {
 
     // Prefill from query
     this.form.deviceId = query.deviceId || this.form.deviceId
-    this.form.channelId = query.channelId !== undefined ? Number(query.channelId) : this.form.channelId
+    this.form.channelId = query.channelId !== undefined ? Number(query.channelId)
+      : this.form.channelId
     this.form.token = query.token || this.form.token
     this.form.type = query.type !== undefined ? Number(query.type) : this.form.type
     this.form.streamId = query.streamId !== undefined ? Number(query.streamId) : this.form.streamId
@@ -272,7 +288,9 @@ export default {
   },
   beforeDestroy() {
     try {
-      if (this.player && this.player.destroy) this.player.destroy()
+      if (this.player && this.player.destroy) {
+        this.player.destroy()
+      }
     } catch (e) {
     }
     this.player = null
@@ -449,8 +467,11 @@ export default {
     },
     tryLoadCss(href) {
       try {
-        const existed = Array.from(document.getElementsByTagName('link')).some(l => l.href.includes(href))
-        if (existed) return
+        const existed = Array.from(document.getElementsByTagName('link')).some(
+          l => l.href.includes(href))
+        if (existed) {
+          return
+        }
         const link = document.createElement('link')
         link.rel = 'stylesheet'
         link.href = href

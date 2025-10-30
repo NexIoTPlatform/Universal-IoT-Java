@@ -152,11 +152,11 @@ export default {
 
       // 语法高亮
       jsonStr = jsonStr
-        .replace(/"([^"]+)":/g, '<span class="json-key">"$1":</span>')
-        .replace(/: "([^"]*)"/g, ': <span class="json-string">"$1"</span>')
-        .replace(/: (\d+)/g, ': <span class="json-number">$1</span>')
-        .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>')
-        .replace(/: null/g, ': <span class="json-null">null</span>')
+      .replace(/"([^"]+)":/g, '<span class="json-key">"$1":</span>')
+      .replace(/: "([^"]*)"/g, ': <span class="json-string">"$1"</span>')
+      .replace(/: (\d+)/g, ': <span class="json-number">$1</span>')
+      .replace(/: (true|false)/g, ': <span class="json-boolean">$1</span>')
+      .replace(/: null/g, ': <span class="json-null">null</span>')
 
       return jsonStr
     }

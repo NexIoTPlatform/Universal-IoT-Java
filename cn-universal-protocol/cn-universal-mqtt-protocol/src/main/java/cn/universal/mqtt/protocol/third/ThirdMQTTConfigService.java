@@ -36,7 +36,8 @@ import tk.mybatis.mapper.entity.Example;
 /**
  * MQTT配置服务
  *
- * <p>业务聚合入口，聚合Loader和Parser，统一对外暴露加载、统计、校验等接口。 不包含任何解析细节，全部委托给MqttConfigParser。 @Author gitee.com/NexIoT
+ * <p>业务聚合入口，聚合Loader和Parser，统一对外暴露加载、统计、校验等接口。 不包含任何解析细节，全部委托给MqttConfigParser。 @Author
+ * gitee.com/NexIoT
  *
  * @since 2025/1/20
  */

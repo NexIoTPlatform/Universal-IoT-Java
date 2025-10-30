@@ -53,9 +53,9 @@ const user = {
           commit('SET_TOKEN', res.access_token)
           resolve()
         })
-          .catch(error => {
-            reject(error)
-          })
+        .catch(error => {
+          reject(error)
+        })
       })
     },
 

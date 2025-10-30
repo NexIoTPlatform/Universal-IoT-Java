@@ -120,7 +120,8 @@
 - **文档地址
   **：[https://nexiotplatform.github.io/universal-iot-docs/](https://nexiotplatform.github.io/universal-iot-docs/)
 - **在线演示**：[http://iot.192886.xyz:81/](http://iot.192886.xyz:81/)
-- **调试IDE**：[http://iot.192886.xyz:81/magic/debug/index.html](http://iot.192886.xyz:81/magic/debug/index.html)
+- **调试IDE
+  **：[http://iot.192886.xyz:81/magic/debug/index.html](http://iot.192886.xyz:81/magic/debug/index.html)
 
 ---
 

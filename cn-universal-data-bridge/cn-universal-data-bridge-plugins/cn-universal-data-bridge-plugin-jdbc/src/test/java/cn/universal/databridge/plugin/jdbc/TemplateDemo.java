@@ -29,10 +29,10 @@ public class TemplateDemo {
     variables.put("properties", properties);
 
     // 测试模板
-    String template = 
-        "Device: #{deviceId}, Product: #{productKey}, Name: #{deviceName}, " +
-        "CSQ: #{properties.csq}, Code: #{properties.code}, " +
-        "City: #{properties.location.city}, Country: #{properties.location.country}";
+    String template =
+        "Device: #{deviceId}, Product: #{productKey}, Name: #{deviceName}, "
+            + "CSQ: #{properties.csq}, Code: #{properties.code}, "
+            + "City: #{properties.location.city}, Country: #{properties.location.country}";
 
     System.out.println("原始模板:");
     System.out.println(template);
@@ -41,29 +41,31 @@ public class TemplateDemo {
     try {
       // 1. 通用模板处理
       System.out.println("1. 通用模板处理 (AbstractDataBridgePlugin):");
-      AbstractDataBridgePlugin genericPlugin = new AbstractDataBridgePlugin() {
-          @Override
-          public PluginInfo getPluginInfo() {
+      AbstractDataBridgePlugin genericPlugin =
+          new AbstractDataBridgePlugin() {
+            @Override
+            public PluginInfo getPluginInfo() {
               return null;
-          }
+            }
 
-          @Override
-          public Boolean testConnection(ResourceConnection connection) {
+            @Override
+            public Boolean testConnection(ResourceConnection connection) {
               return null;
-          }
+            }
 
-          @Override
-          public Boolean validateConfig(DataBridgeConfig config) {
+            @Override
+            public Boolean validateConfig(DataBridgeConfig config) {
               return null;
-          }
+            }
 
-          @Override
-          public List<SourceScope> getSupportedSourceScopes() {
+            @Override
+            public List<SourceScope> getSupportedSourceScopes() {
               return List.of();
-          }
-      };
-      java.lang.reflect.Method genericMethod = 
-          AbstractDataBridgePlugin.class.getDeclaredMethod("processTemplate", String.class, Map.class);
+            }
+          };
+      java.lang.reflect.Method genericMethod =
+          AbstractDataBridgePlugin.class.getDeclaredMethod(
+              "processTemplate", String.class, Map.class);
       genericMethod.setAccessible(true);
       String genericResult = (String) genericMethod.invoke(genericPlugin, template, variables);
       System.out.println("结果: " + genericResult);
@@ -73,7 +75,7 @@ public class TemplateDemo {
       // 2. JDBC专用模板处理
       System.out.println("2. JDBC专用模板处理 (DefaultJdbcOutPlugin):");
       DefaultJdbcOutPlugin jdbcPlugin = new DefaultJdbcOutPlugin();
-      java.lang.reflect.Method jdbcMethod = 
+      java.lang.reflect.Method jdbcMethod =
           DefaultJdbcOutPlugin.class.getDeclaredMethod("processTemplate", String.class, Map.class);
       jdbcMethod.setAccessible(true);
       String jdbcResult = (String) jdbcMethod.invoke(jdbcPlugin, template, variables);
@@ -102,7 +104,8 @@ public class TemplateDemo {
       System.out.println("- 文本模板: Device #{deviceId} is online");
       System.out.println();
       System.out.println("JDBC实现适用于:");
-      System.out.println("- SQL模板: INSERT INTO devices(id, name) VALUES(#{deviceId}, #{deviceName})");
+      System.out.println(
+          "- SQL模板: INSERT INTO devices(id, name) VALUES(#{deviceId}, #{deviceName})");
       System.out.println("- 需要SQL注入防护的场景");
       System.out.println();
 

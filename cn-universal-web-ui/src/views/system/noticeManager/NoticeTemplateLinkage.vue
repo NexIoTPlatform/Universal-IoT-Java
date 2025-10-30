@@ -35,15 +35,18 @@
       <div class="table-operations">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['rule:linkage:add']">
-          <a-icon type="plus"/>{{ $t('button.add') }}
+          <a-icon type="plus"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button type="primary" :disabled="single" @click="handleEditTable"
                   v-hasPermi="['rule:linkage:edit']">
-          <a-icon type="edit"/>{{ $t('button.edit') }}
+          <a-icon type="edit"/>
+          {{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['rule:linkage:remove']">
-          <a-icon type="delete"/>{{ $t('button.delete') }}
+          <a-icon type="delete"/>
+          {{ $t('button.delete') }}
         </a-button>
         <a-button
           type="dashed"

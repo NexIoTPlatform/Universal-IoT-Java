@@ -133,11 +133,11 @@ export default {
         if (valid) {
           this.registering = true
           register(this.form)
-            .then(res => this.registerSuccess(res))
-            .catch(err => this.requestFailed(err))
-            .finally(() => {
-              this.registering = false
-            })
+          .then(res => this.registerSuccess(res))
+          .catch(err => this.requestFailed(err))
+          .finally(() => {
+            this.registering = false
+          })
         } else {
           setTimeout(() => {
             this.registering = false

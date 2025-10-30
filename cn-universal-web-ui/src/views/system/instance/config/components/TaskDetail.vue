@@ -236,13 +236,13 @@ export default {
       }
       this.loading = true
       queryTaskById(params)
-        .then(res => {
-          this.list = res.rows
-          this.total = res.total
-        })
-        .finally(() => {
-          this.loading = false
-        })
+      .then(res => {
+        this.list = res.rows
+        this.total = res.total
+      })
+      .finally(() => {
+        this.loading = false
+      })
     },
     onShowSizeChange(current, pageSize) {
       this.queryParam.pageSize = pageSize

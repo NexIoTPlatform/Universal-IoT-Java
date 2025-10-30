@@ -90,10 +90,12 @@
               <a-space>
                 <a-button type="primary" @click="handleQuery">
                   <a-icon type="search"/>
-                 {{ $t('button.query') }} </a-button>
+                  {{ $t('button.query') }}
+                </a-button>
                 <a-button @click="resetQuery">
                   <a-icon type="reload"/>
-                 {{ $t('button.reset') }} </a-button>
+                  {{ $t('button.reset') }}
+                </a-button>
               </a-space>
             </a-form-item>
           </a-form>
@@ -108,11 +110,13 @@
             <a-button size="small" @click="handleUpdate" :disabled="single"
                       v-hasPermi="['notice:template:edit']">
               <a-icon type="edit"/>
-              {{ $t('button.edit') }} </a-button>
+              {{ $t('button.edit') }}
+            </a-button>
             <a-button size="small" @click="handleBatchDelete" :disabled="multiple" danger
                       v-hasPermi="['notice:template:del']">
               <a-icon type="delete"/>
-              {{ $t('button.delete') }} </a-button>
+              {{ $t('button.delete') }}
+            </a-button>
             <a-button size="small" @click="handleBatchEnable" :disabled="multiple"
                       v-hasPermi="['notice:template:edit']">
               <a-icon type="check-circle"/>
@@ -658,11 +662,11 @@ export default {
         onOk: () => {
           const ids = this.selectedRows.map(item => item.id)
           return deleteNoticeTemplate(ids.join(','))
-            .then(() => {
-              this.$message.success('批量删除成功')
-              this.onSelectChange([], [])
-              this.getList()
-            })
+          .then(() => {
+            this.$message.success('批量删除成功')
+            this.onSelectChange([], [])
+            this.getList()
+          })
         }
       })
     },
@@ -679,10 +683,10 @@ export default {
         onOk: () => {
           const ids = this.selectedRows.map(item => item.id)
           return enableNoticeTemplate(ids)
-            .then(() => {
-              this.$message.success('批量启用成功')
-              this.getList()
-            })
+          .then(() => {
+            this.$message.success('批量启用成功')
+            this.getList()
+          })
         }
       })
     },
@@ -699,10 +703,10 @@ export default {
         onOk: () => {
           const ids = this.selectedRows.map(item => item.id)
           return disableNoticeTemplate(ids)
-            .then(() => {
-              this.$message.success('批量停用成功')
-              this.getList()
-            })
+          .then(() => {
+            this.$message.success('批量停用成功')
+            this.getList()
+          })
         }
       })
     },
@@ -741,7 +745,7 @@ export default {
         // 从后端获取最新的模板数据
         console.log('正在获取模板最新数据，ID:', templateId)
         const response = await getNoticeTemplate(templateId)
-        
+
         if (response && response.code === 0) {
           this.formData = {...response.data}
           console.log('获取到最新模板数据:', this.formData)

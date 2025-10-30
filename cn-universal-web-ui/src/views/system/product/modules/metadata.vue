@@ -347,7 +347,12 @@
 </template>
 
 <script>
-import {getEventsList, getFunctionsList, getPropertiesList, metadataDelete} from '@/api/system/dev/product'
+import {
+  getEventsList,
+  getFunctionsList,
+  getPropertiesList,
+  metadataDelete
+} from '@/api/system/dev/product'
 import PropertiesForm from './PropertiesForm'
 import FunctionForm from './FunctionForm'
 import EventForm from './EventForm'
@@ -754,19 +759,19 @@ export default {
         content: '当前选中的标识为: ' + row.id,
         onOk() {
           return metadataDelete(data)
-            .then(res => {
-              if (type === 'properties') {
-                that.getList()
-              } else if (type === 'events') {
-                that.getEventsList()
-              } else if (type === 'functions') {
-                that.getFunctionsList()
-              }
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(res => {
+            if (type === 'properties') {
+              that.getList()
+            } else if (type === 'events') {
+              that.getEventsList()
+            } else if (type === 'functions') {
+              that.getFunctionsList()
+            }
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 /**
  * MQTT配置解析器
  *
- * <p>负责将Network对象解析为MqttProductConfig，包含所有字段映射、类型转换、主题解析等。 工具方法集中，便于维护和单元测试。 @Author gitee.com/NexIoT
+ * <p>负责将Network对象解析为MqttProductConfig，包含所有字段映射、类型转换、主题解析等。 工具方法集中，便于维护和单元测试。 @Author
+ * gitee.com/NexIoT
  *
  * @since 2025/1/20
  */

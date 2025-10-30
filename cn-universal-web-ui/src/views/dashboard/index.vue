@@ -17,7 +17,10 @@
             <CountTo :endVal="dashboardData.totalDevices" class="count-animation"/>
           </div>
           <div class="card-label">{{ $t('dashboard.total.devices') }}</div>
-          <div class="card-sublabel">{{ dashboardData.totalDevices }} {{ $t('dashboard.devices.unit') }}</div>
+          <div class="card-sublabel">{{ dashboardData.totalDevices }} {{
+              $t('dashboard.devices.unit')
+            }}
+          </div>
         </div>
         <div class="card-glow"></div>
       </div>
@@ -37,7 +40,10 @@
             <CountTo :endVal="dashboardData.onlineDevices" class="count-animation"/>
           </div>
           <div class="card-label">{{ $t('dashboard.online.devices') }}</div>
-          <div class="card-sublabel">{{ dashboardData.onlineDevices }} {{ $t('dashboard.active.unit') }}</div>
+          <div class="card-sublabel">{{ dashboardData.onlineDevices }} {{
+              $t('dashboard.active.unit')
+            }}
+          </div>
         </div>
         <div class="card-glow"></div>
       </div>
@@ -57,7 +63,10 @@
             <CountTo :endVal="dashboardData.offlineDevices" class="count-animation"/>
           </div>
           <div class="card-label">{{ $t('dashboard.offline.devices') }}</div>
-          <div class="card-sublabel">{{ dashboardData.offlineDevices }} {{ $t('dashboard.inactive.unit') }}</div>
+          <div class="card-sublabel">{{ dashboardData.offlineDevices }} {{
+              $t('dashboard.inactive.unit')
+            }}
+          </div>
         </div>
         <div class="card-glow"></div>
       </div>
@@ -77,7 +86,10 @@
             <CountTo :endVal="dashboardData.onlineRate" :decimals="1" class="count-animation"/>
           </div>
           <div class="card-label">{{ $t('dashboard.online.rate') }}</div>
-          <div class="card-sublabel">{{ dashboardData.onlineRate }}{{ $t('dashboard.percent.unit') }} {{ $t('dashboard.online.devices') }}</div>
+          <div class="card-sublabel">{{ dashboardData.onlineRate }}{{
+              $t('dashboard.percent.unit')
+            }} {{ $t('dashboard.online.devices') }}
+          </div>
         </div>
         <div class="card-glow"></div>
       </div>

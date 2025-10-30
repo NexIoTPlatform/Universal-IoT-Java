@@ -24,7 +24,7 @@ const AUTO_FILL_FIELD_CONFIG = {
     source: 'deviceNo',
     fallback: null
   },
-  
+
   // 配置信息类字段 - 优先从配置中读取，否则使用 deviceNo
   meterNo: {
     priority: 2,
@@ -131,7 +131,8 @@ export function getConfigFieldDisplayName(fieldName) {
  * @param {Array} excludeFields 需要排除的字段列表
  * @returns {Object|null} 解析后的配置信息对象，解析失败返回null
  */
-export function parseDeviceConfig(configStr, includeFields = [], excludeFields = []) {
+export function parseDeviceConfig(configStr, includeFields = [],
+  excludeFields = []) {
   if (!configStr) {
     return null
   }
@@ -154,7 +155,8 @@ export function parseDeviceConfig(configStr, includeFields = [], excludeFields =
       }
 
       // 检查配置中是否存在该字段且有值
-      if (config[fieldName] !== undefined && config[fieldName] !== null && config[fieldName] !== '') {
+      if (config[fieldName] !== undefined && config[fieldName] !== null
+        && config[fieldName] !== '') {
         const displayName = getConfigFieldDisplayName(fieldName)
         keyConfigs[displayName] = config[fieldName]
       }
@@ -295,7 +297,7 @@ export function addCustomConfigMapping(customMapping) {
  * @returns {Object} 自动填充字段配置
  */
 export function getAutoFillFieldConfig() {
-  return { ...AUTO_FILL_FIELD_CONFIG }
+  return {...AUTO_FILL_FIELD_CONFIG}
 }
 
 /**
@@ -342,12 +344,12 @@ export function getAutoFillValue(fieldName, deviceNo, configStr) {
     try {
       const config = JSON.parse(configStr)
       const value = config[fieldName]
-      
+
       // 如果配置中有值，则返回配置值
       if (value !== undefined && value !== null && value !== '') {
         return value
       }
-      
+
       // 否则使用回退策略
       return fieldConfig.fallback === 'deviceNo' ? deviceNo : null
     } catch (e) {
@@ -368,14 +370,14 @@ export function getAutoFillValue(fieldName, deviceNo, configStr) {
  */
 export function getAutoFillValues(fieldNames, deviceNo, configStr) {
   const result = {}
-  
+
   fieldNames.forEach(fieldName => {
     const value = getAutoFillValue(fieldName, deviceNo, configStr)
     if (value !== null) {
       result[fieldName] = value
     }
   })
-  
+
   return result
 }
 
@@ -392,7 +394,7 @@ export function autoFillFromParams(params, deviceNo, configStr) {
   }
 
   const result = {}
-  
+
   params.forEach(param => {
     if (param.id && isAutoFillField(param.id)) {
       const value = getAutoFillValue(param.id, deviceNo, configStr)
@@ -401,7 +403,7 @@ export function autoFillFromParams(params, deviceNo, configStr) {
       }
     }
   })
-  
+
   return result
 }
 

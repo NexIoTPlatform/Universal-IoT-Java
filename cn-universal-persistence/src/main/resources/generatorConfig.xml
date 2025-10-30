@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE generatorConfiguration
-        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
-        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+  "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <!-- mvn mybatis-generator:generate 生成命令 -->
 <generatorConfiguration>
-    <properties resource="application.properties"/>
-    <context id="Mysql" targetRuntime="MyBatis3Simple" defaultModelType="flat">
-        <property name="javaFileEncoding" value="UTF-8"/>
-        <property name="beginningDelimiter" value="`"/>
-        <property name="endingDelimiter" value="`"/>
-        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
-            <property name="mappers" value="cn.universal.persistence.common.BaseMapper"/>
-        </plugin>
-        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+  <properties resource="application.properties"/>
+  <context id="Mysql" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+    <property name="javaFileEncoding" value="UTF-8"/>
+    <property name="beginningDelimiter" value="`"/>
+    <property name="endingDelimiter" value="`"/>
+    <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+      <property name="mappers" value="cn.universal.persistence.common.BaseMapper"/>
+    </plugin>
+    <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
 
-        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:13309/univ?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=false"
-                        userId="univ" password="xxx">
-        </jdbcConnection>
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+      connectionURL="jdbc:mysql://127.0.0.1:13309/univ?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=GMT%2B8&amp;useSSL=false"
+      userId="univ" password="xxx">
+    </jdbcConnection>
 
-        <!--生成PO类的位置 -->
-        <javaModelGenerator targetPackage="cn.universal.persistence.entity"
-                            targetProject="src/main/java"/>
-        <!-- xml映射文件生成的位置 -->
-        <sqlMapGenerator targetPackage="mybatis" targetProject="src/main/resources"/>
-        <!-- mapper映射文件生成的位置 -->
-        <javaClientGenerator targetPackage="cn.universal.persistence.mapper"
-                             targetProject="src/main/java"
-                             type="XMLMAPPER"/>
-        <!-- 指定数据库表 -->
+    <!--生成PO类的位置 -->
+    <javaModelGenerator targetPackage="cn.universal.persistence.entity"
+      targetProject="src/main/java"/>
+    <!-- xml映射文件生成的位置 -->
+    <sqlMapGenerator targetPackage="mybatis" targetProject="src/main/resources"/>
+    <!-- mapper映射文件生成的位置 -->
+    <javaClientGenerator targetPackage="cn.universal.persistence.mapper"
+      targetProject="src/main/java"
+      type="XMLMAPPER"/>
+    <!-- 指定数据库表 -->
 
-        <table tableName="check_product_device" domainObjectName="CheckProductDevice"
-               enableCountByExample="false"
-               enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
+    <table tableName="check_product_device" domainObjectName="CheckProductDevice"
+      enableCountByExample="false"
+      enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false"
+      selectByExampleQueryId="false"></table>
 
 
-    </context>
+  </context>
 </generatorConfiguration>

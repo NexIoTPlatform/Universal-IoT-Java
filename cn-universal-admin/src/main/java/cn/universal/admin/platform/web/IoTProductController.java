@@ -45,7 +45,6 @@ import cn.universal.persistence.entity.admin.SysDictData;
 import cn.universal.persistence.entity.bo.IoTProductBO;
 import cn.universal.persistence.entity.bo.IoTProductImportBO;
 import cn.universal.persistence.entity.vo.IoTDeviceModelVO;
-import cn.universal.persistence.entity.vo.IoTProductExportVO;
 import cn.universal.persistence.entity.vo.IoTProductVO;
 import cn.universal.persistence.mapper.IoTProductMapper;
 import cn.universal.persistence.page.TableDataInfo;
@@ -573,8 +572,9 @@ public class IoTProductController extends BaseController {
 
   /**
    * 导出设备产品列表
-   * @deprecated 请使用 ProductImportExportController.exportProductPackages() 代替
-   * 该接口仅保留用于向后兼容，建议使用 /admin/v1/product/transfer/export
+   *
+   * @deprecated 请使用 ProductImportExportController.exportProductPackages() 代替 该接口仅保留用于向后兼容，建议使用
+   *     /admin/v1/product/transfer/export
    */
   @Deprecated
   @PostMapping("/export")
@@ -590,17 +590,17 @@ public class IoTProductController extends BaseController {
     }
 
     // 使用新的导出包方法
-    List<cn.universal.persistence.entity.dto.ProductExportPackageDTO> packageList = 
+    List<cn.universal.persistence.entity.dto.ProductExportPackageDTO> packageList =
         devProductService.exportProductPackages(query);
 
     // 设置响应头为文件下载格式
     response.setContentType("application/json");
     response.setCharacterEncoding("utf-8");
-    
+
     // 生成文件名：产品导出_时间戳.json
     String fileName = String.format("products_export_%d.json", System.currentTimeMillis());
     response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-    
+
     // 添加缓存控制头，防止浏览器缓存
     response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
     response.setHeader("Pragma", "no-cache");
@@ -629,8 +629,9 @@ public class IoTProductController extends BaseController {
 
   /**
    * 批量导入产品
-   * @deprecated 请使用 ProductImportExportController.importProductPackages() 代替
-   * 该接口仅保留用于向后兼容，建议使用 /admin/v1/product/transfer/import
+   *
+   * @deprecated 请使用 ProductImportExportController.importProductPackages() 代替 该接口仅保留用于向后兼容，建议使用
+   *     /admin/v1/product/transfer/import
    */
   @Deprecated
   @PostMapping("/import")
@@ -645,7 +646,8 @@ public class IoTProductController extends BaseController {
       // 解析JSON数据 - 尝试解析为新格式（完整包）
       try {
         List<cn.universal.persistence.entity.dto.ProductExportPackageDTO> packages =
-            JSONUtil.toList(jsonContent, cn.universal.persistence.entity.dto.ProductExportPackageDTO.class);
+            JSONUtil.toList(
+                jsonContent, cn.universal.persistence.entity.dto.ProductExportPackageDTO.class);
 
         if (packages != null && !packages.isEmpty()) {
           // 使用新的导入方法

@@ -55,7 +55,7 @@ public class DingTalkNoticeSendChannel extends AbstractNoticeSendChannel {
         String signedUrl = webhook + "&timestamp=" + timestamp + "&sign=" + sign;
         webhook = signedUrl;
       }
-      logger.info("开始发送钉钉,url={},key={},content={}", webhook,secret, content);
+      logger.info("开始发送钉钉,url={},key={},content={}", webhook, secret, content);
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType(MediaType.APPLICATION_JSON);
       HttpEntity<String> request = new HttpEntity<>(message.toString(), headers);

@@ -24,7 +24,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,14 +32,15 @@ import org.springframework.web.context.request.RequestContextHolder;
  * 虚拟线程配置 - Spring Boot 3.5 + JDK 21 新特性
  *
  * <p>虚拟线程优势：
+ *
  * <ul>
- *   <li>轻量级：可创建数百万个虚拟线程</li>
- *   <li>高性能：I/O密集型任务性能大幅提升</li>
- *   <li>简化编程：无需手动管理线程池</li>
- *   <li>适合IoT场景：大量并发连接处理</li>
+ *   <li>轻量级：可创建数百万个虚拟线程
+ *   <li>高性能：I/O密集型任务性能大幅提升
+ *   <li>简化编程：无需手动管理线程池
+ *   <li>适合IoT场景：大量并发连接处理
  * </ul>
  *
- * <p><b>注意：</b>@EnableAsync 已在主启动类中全局启用，此处无需重复配置</p>
+ * <p><b>注意：</b>@EnableAsync 已在主启动类中全局启用，此处无需重复配置
  */
 @Slf4j
 @Configuration

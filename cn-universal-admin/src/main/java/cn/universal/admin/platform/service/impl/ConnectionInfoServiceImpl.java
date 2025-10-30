@@ -214,7 +214,7 @@ public class ConnectionInfoServiceImpl implements ConnectionInfoService {
         .passthroughTopics(passthroughTopics)
         .build();
   }
-    
+
   /** 构建订阅主题信息 */
   private ConnectionInfoDTO.TopicInfo buildSubscribeTopics(JSONObject config, String productKey) {
     String subscribe = config.getStr("subscribeTopics");

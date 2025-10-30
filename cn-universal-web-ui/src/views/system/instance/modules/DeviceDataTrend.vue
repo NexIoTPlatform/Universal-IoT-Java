@@ -22,7 +22,10 @@
                 <a-range-picker v-model="createTimeRange" show-time
                                 style="width: 100%; margin-top: 8px;"/>
                 <div class="picker-actions">
-                  <a-button type="primary" size="small" @click="submit">{{ $t('button.confirm') }}</a-button>
+                  <a-button type="primary" size="small" @click="submit">{{
+                      $t('button.confirm')
+                    }}
+                  </a-button>
                   <a-button size="small" @click="hide">{{ $t('button.cancel') }}</a-button>
                 </div>
               </div>

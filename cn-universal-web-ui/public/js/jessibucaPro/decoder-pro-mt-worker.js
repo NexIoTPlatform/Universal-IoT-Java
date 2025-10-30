@@ -593,7 +593,7 @@ var Module = (() => {
         resolve: function () {
           var resolvedPath = "", resolvedAbsolute = false;
           for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute;
-               i--) {
+            i--) {
             var path = i >= 0 ? arguments[i] : FS.cwd();
             if (typeof path != "string") {
               throw new TypeError("Arguments to path.resolve must be strings")
@@ -1236,11 +1236,11 @@ var Module = (() => {
         }
       };
       var FS_createDataFile = (parent, name, fileData, canRead, canWrite,
-                               canOwn) => FS.createDataFile(parent, name, fileData, canRead, canWrite,
+        canOwn) => FS.createDataFile(parent, name, fileData, canRead, canWrite,
         canOwn);
       var preloadPlugins = Module["preloadPlugins"] || [];
       var FS_handledByPreloadPlugin = (byteArray, fullname, finish,
-                                       onerror) => {
+        onerror) => {
         if (typeof Browser != "undefined") {
           Browser.init();
         }
@@ -1257,7 +1257,7 @@ var Module = (() => {
         return handled
       };
       var FS_createPreloadedFile = (parent, name, url, canRead, canWrite,
-                                    onload, onerror, dontCreateFile, canOwn, preFinish) => {
+        onload, onerror, dontCreateFile, canOwn, preFinish) => {
         var fullname = name ? PATH_FS.resolve(PATH.join2(parent, name))
           : parent;
         var dep = getUniqueRunDependency(`cp ${fullname}`);
@@ -2488,7 +2488,7 @@ var Module = (() => {
             if (typeof data == "string") {
               var arr = new Array(data.length);
               for (var i = 0, len = data.length; i < len;
-                   ++i) {
+                ++i) {
                 arr[i] = data.charCodeAt(i);
               }
               data = arr
@@ -3265,7 +3265,7 @@ var Module = (() => {
       }
 
       var __embind_register_bigint = (primitiveType, name, size, minRange,
-                                      maxRange) => {
+        maxRange) => {
       };
       var embind_init_charCodes = () => {
         var codes = new Array(256);
@@ -3295,7 +3295,7 @@ var Module = (() => {
         throw new InternalError(message)
       };
       var whenDependentTypesAreResolved = (myTypes, dependentTypes,
-                                           getTypeConverters) => {
+        getTypeConverters) => {
         myTypes.forEach(function (type) {
           typeDependencies[type] = dependentTypes
         });
@@ -3704,7 +3704,7 @@ var Module = (() => {
       };
 
       function RegisteredClass(name, constructor, instancePrototype,
-                               rawDestructor, baseClass, getActualType, upcast, downcast) {
+        rawDestructor, baseClass, getActualType, upcast, downcast) {
         this.name = name;
         this.constructor = constructor;
         this.instancePrototype = instancePrototype;
@@ -3872,8 +3872,8 @@ var Module = (() => {
       };
 
       function RegisteredPointer(name, registeredClass, isReference, isConst,
-                                 isSmartPointer, pointeeType, sharingPolicy, rawGetPointee,
-                                 rawConstructor, rawShare, rawDestructor) {
+        isSmartPointer, pointeeType, sharingPolicy, rawGetPointee,
+        rawConstructor, rawShare, rawDestructor) {
         this.name = name;
         this.registeredClass = registeredClass;
         this.isReference = isReference;
@@ -3999,9 +3999,9 @@ var Module = (() => {
           `${message}: ` + unboundTypes.map(getTypeName).join([", "]))
       };
       var __embind_register_class = (rawType, rawPointerType,
-                                     rawConstPointerType, baseClassRawType, getActualTypeSignature,
-                                     getActualType, upcastSignature, upcast, downcastSignature, downcast,
-                                     name, destructorSignature, rawDestructor) => {
+        rawConstPointerType, baseClassRawType, getActualTypeSignature,
+        getActualType, upcastSignature, upcast, downcastSignature, downcast,
+        name, destructorSignature, rawDestructor) => {
         name = readLatin1String(name);
         getActualType = embind__requireFunction(getActualTypeSignature,
           getActualType);
@@ -4103,7 +4103,7 @@ var Module = (() => {
       }
 
       function craftInvokerFunction(humanName, argTypes, classType,
-                                    cppInvokerFunc, cppTargetFunc, isAsync) {
+        cppInvokerFunc, cppTargetFunc, isAsync) {
         var argCount = argTypes.length;
         if (argCount < 2) {
           throwBindingError(
@@ -4178,7 +4178,7 @@ var Module = (() => {
       }
 
       var __embind_register_class_constructor = (rawClassType, argCount,
-                                                 rawArgTypesAddr, invokerSignature, invoker, rawConstructor) => {
+        rawArgTypesAddr, invokerSignature, invoker, rawConstructor) => {
         var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
         invoker = embind__requireFunction(invokerSignature, invoker);
         whenDependentTypesAreResolved([], [rawClassType], function (classType) {
@@ -4209,8 +4209,8 @@ var Module = (() => {
         })
       };
       var __embind_register_class_function = (rawClassType, methodName,
-                                              argCount, rawArgTypesAddr, invokerSignature, rawInvoker, context,
-                                              isPureVirtual, isAsync) => {
+        argCount, rawArgTypesAddr, invokerSignature, rawInvoker, context,
+        isPureVirtual, isAsync) => {
         var rawArgTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
         methodName = readLatin1String(methodName);
         rawInvoker = embind__requireFunction(invokerSignature, rawInvoker);
@@ -4288,7 +4288,7 @@ var Module = (() => {
       var count_emval_handles = () => {
         var count = 0;
         for (var i = emval_handles.reserved; i < emval_handles.allocated.length;
-             ++i) {
+          ++i) {
           if (emval_handles.allocated[i] !== undefined) {
             ++count
           }
@@ -4395,7 +4395,7 @@ var Module = (() => {
         }
       };
       var __embind_register_integer = (primitiveType, name, size, minRange,
-                                       maxRange) => {
+        maxRange) => {
         name = readLatin1String(name);
         if (maxRange === -1) {
           maxRange = 4294967295
@@ -4746,7 +4746,7 @@ var Module = (() => {
       };
       Module["checkMailbox"] = checkMailbox;
       var __emscripten_notify_mailbox_postmessage = (targetThreadId,
-                                                     currThreadId, mainThreadId) => {
+        currThreadId, mainThreadId) => {
         if (targetThreadId == currThreadId) {
           setTimeout(() => checkMailbox())
         } else if (ENVIRONMENT_IS_PTHREAD) {
@@ -4782,7 +4782,7 @@ var Module = (() => {
       };
       var proxiedJSCallArgs = [];
       var __emscripten_receive_on_main_thread_js = (index, callingThread,
-                                                    numCallArgs, args) => {
+        numCallArgs, args) => {
         proxiedJSCallArgs.length = numCallArgs;
         var b = args >> 3;
         for (var i = 0; i < numCallArgs; i++) {
@@ -5272,14 +5272,14 @@ var Module = (() => {
       var ___getTypeName = a0 => (___getTypeName = wasmExports["X"])(a0);
       var __embind_initialize_bindings = Module["__embind_initialize_bindings"] = () => (__embind_initialize_bindings = Module["__embind_initialize_bindings"] = wasmExports["Y"])();
       var __emscripten_thread_init = Module["__emscripten_thread_init"] = (a0,
-                                                                           a1, a2, a3, a4,
-                                                                           a5) => (__emscripten_thread_init = Module["__emscripten_thread_init"] = wasmExports["Z"])(
+        a1, a2, a3, a4,
+        a5) => (__emscripten_thread_init = Module["__emscripten_thread_init"] = wasmExports["Z"])(
         a0, a1, a2, a3, a4, a5);
       var __emscripten_thread_crashed = Module["__emscripten_thread_crashed"] = () => (__emscripten_thread_crashed = Module["__emscripten_thread_crashed"] = wasmExports["_"])();
       var _emscripten_main_thread_process_queued_calls = () => (_emscripten_main_thread_process_queued_calls = wasmExports["emscripten_main_thread_process_queued_calls"])();
       var _emscripten_main_runtime_thread_id = () => (_emscripten_main_runtime_thread_id = wasmExports["emscripten_main_runtime_thread_id"])();
       var __emscripten_run_on_main_thread_js = (a0, a1, a2,
-                                                a3) => (__emscripten_run_on_main_thread_js = wasmExports["$"])(a0, a1,
+        a3) => (__emscripten_run_on_main_thread_js = wasmExports["$"])(a0, a1,
         a2, a3);
       var __emscripten_thread_free_data = a0 => (__emscripten_thread_free_data = wasmExports["aa"])(
         a0);
@@ -5287,14 +5287,14 @@ var Module = (() => {
         a0);
       var __emscripten_check_mailbox = Module["__emscripten_check_mailbox"] = () => (__emscripten_check_mailbox = Module["__emscripten_check_mailbox"] = wasmExports["ca"])();
       var _emscripten_stack_set_limits = (a0,
-                                          a1) => (_emscripten_stack_set_limits = wasmExports["da"])(a0, a1);
+        a1) => (_emscripten_stack_set_limits = wasmExports["da"])(a0, a1);
       var stackSave = () => (stackSave = wasmExports["ea"])();
       var stackRestore = a0 => (stackRestore = wasmExports["fa"])(a0);
       var stackAlloc = a0 => (stackAlloc = wasmExports["ga"])(a0);
       var ___cxa_is_pointer_type = a0 => (___cxa_is_pointer_type = wasmExports["ha"])(
         a0);
       var dynCall_jiji = Module["dynCall_jiji"] = (a0, a1, a2, a3,
-                                                   a4) => (dynCall_jiji = Module["dynCall_jiji"] = wasmExports["ia"])(a0,
+        a4) => (dynCall_jiji = Module["dynCall_jiji"] = wasmExports["ia"])(a0,
         a1, a2, a3, a4);
       var _ff_h264_cabac_tables = Module["_ff_h264_cabac_tables"] = 111845;
       Module["keepRuntimeAlive"] = keepRuntimeAlive;

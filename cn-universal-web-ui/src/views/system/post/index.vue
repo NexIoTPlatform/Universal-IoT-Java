@@ -32,7 +32,9 @@
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons"
                     :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{ $t('button.search') }}</a-button>
+                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{
+                    $t('button.search')
+                  }}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon
                   type="reload"/>{{ $t('button.reset') }}</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
@@ -52,19 +54,23 @@
           <a-button type="primary" @click="$refs.createForm.handleAdd()"
                     v-hasPermi="['system:post:add']">
             <a-icon type="plus"/>
-            {{ $t('button.add') }}</a-button>
+            {{ $t('button.add') }}
+          </a-button>
           <a-button type="primary" :disabled="single"
                     @click="$refs.createForm.handleUpdate(undefined, ids)"
                     v-hasPermi="['system:post:edit']" ghost>
             <a-icon type="edit"/>
-            {{ $t('button.edit') }}</a-button>
+            {{ $t('button.edit') }}
+          </a-button>
           <a-button type="danger" :disabled="multiple" @click="handleDelete"
                     v-hasPermi="['system:post:remove']" ghost>
             <a-icon type="delete"/>
-            {{ $t('button.delete') }}</a-button>
+            {{ $t('button.delete') }}
+          </a-button>
           <a-button @click="handleExport" v-hasPermi="['system:post:export']">
             <a-icon type="export"/>
-            {{ $t('button.export') }}</a-button>
+            {{ $t('button.export') }}
+          </a-button>
         </a-space>
         <a-button
           type="dashed"
@@ -271,14 +277,14 @@ export default {
         content: '当前选中编号为' + postIds + '的数据',
         onOk() {
           return delPost(postIds)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

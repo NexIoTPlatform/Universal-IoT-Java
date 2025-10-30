@@ -194,13 +194,13 @@ export default {
     /** 强退按钮操作 */
     confirmHandleForceLogout(row) {
       forceLogout(row.tokenId)
-        .then(() => {
-          this.getList()
-          this.$message.success(
-            '已强退',
-            3
-          )
-        }).catch(function () {
+      .then(() => {
+        this.getList()
+        this.$message.success(
+          '已强退',
+          3
+        )
+      }).catch(function () {
         this.$message.error(
           '发生异常',
           3

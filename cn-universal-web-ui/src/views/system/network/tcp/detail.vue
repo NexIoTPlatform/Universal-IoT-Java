@@ -41,7 +41,8 @@
             配置信息
             <a-button v-if="!editing" type="link" size="small" style="float:right;"
                       v-hasPermi="['network:tcp:edit']"
-                      @click="editing = true">{{ $t('button.edit') }} </a-button>
+                      @click="editing = true">{{ $t('button.edit') }}
+            </a-button>
           </div>
           <template v-if="!editing">
             <a-descriptions :column="1" size="default">
@@ -89,7 +90,8 @@
                 </a-col>
               </a-row>
               <div style="margin-top:16px;text-align:right;">
-                <a-button type="link" size="small" v-hasPermi="['network:tcp:edit']" @click="handleSaveConfig">保存
+                <a-button type="link" size="small" v-hasPermi="['network:tcp:edit']"
+                          @click="handleSaveConfig">保存
                 </a-button>
                 <a-button type="link" size="small" style="margin-left:8px;" @click="cancelEdit">
                   取消
@@ -211,7 +213,8 @@
         }}</pre>
       <div style="text-align:right;margin-top:16px;">
         <a-button @click="previewVisible=false">{{ $t('button.cancel') }}</a-button>
-        <a-button type="primary" style="margin-left:8px;" v-hasPermi="['network:tcp:edit']" @click="confirmSaveConfig">{{ $t('button.confirm') }}提交
+        <a-button type="primary" style="margin-left:8px;" v-hasPermi="['network:tcp:edit']"
+                  @click="confirmSaveConfig">{{ $t('button.confirm') }}提交
         </a-button>
       </div>
     </a-modal>
@@ -219,7 +222,13 @@
 </template>
 
 <script>
-import {getNetwork, restartNetwork, startNetwork, stopNetwork, updateNetwork} from '@/api/system/network'
+import {
+  getNetwork,
+  restartNetwork,
+  startNetwork,
+  stopNetwork,
+  updateNetwork
+} from '@/api/system/network'
 import {getDictMap, getDicts} from '@/api/system/dict/data'
 import * as echarts from 'echarts'
 

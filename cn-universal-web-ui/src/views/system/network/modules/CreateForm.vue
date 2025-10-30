@@ -287,7 +287,8 @@ export default {
   },
   computed: {
     isTCP() {
-      return this.form.type === 'TCP_CLIENT' || this.form.type === 'TCP_SERVER' || this.form.type === 'UDP'
+      return this.form.type === 'TCP_CLIENT' || this.form.type === 'TCP_SERVER' || this.form.type
+        === 'UDP'
     },
     isMQTT() {
       return this.form.type === 'MQTT_CLIENT' || this.form.type === 'MQTT_SERVER'
@@ -314,14 +315,14 @@ export default {
     getSubmitPermissions() {
       // 根据网络类型和操作类型返回相应的权限标识
       const isAdd = this.formType === 1
-      
+
       // 判断是 MQTT 还是 TCP/UDP
       if (this.isMQTT) {
         return [isAdd ? 'network:mqtt:add' : 'network:mqtt:edit']
       } else if (this.isTCP) {
         return [isAdd ? 'network:tcp:add' : 'network:tcp:edit']
       }
-      
+
       // 默认返回 TCP 权限
       return [isAdd ? 'network:tcp:add' : 'network:tcp:edit']
     },

@@ -33,15 +33,18 @@
       <!-- 操作 -->
       <div class="table-operations">
         <a-button type="primary" @click="openForm()" v-hasPermi="['network:cert:add']">
-          <a-icon type="plus"/>{{ $t('button.add') }}
+          <a-icon type="plus"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleBatchDelete"
                   v-hasPermi="['network:cert:delete']">
-          <a-icon type="delete"/>{{ $t('button.delete') }}
+          <a-icon type="delete"/>
+          {{ $t('button.delete') }}
         </a-button>
         <a-button type="primary" size="small" :loading="loading" :style="{ float: 'right' }"
                   @click="getList">
-          <a-icon type="sync" :spin="loading"/>{{ $t('button.sync') }}
+          <a-icon type="sync" :spin="loading"/>
+          {{ $t('button.sync') }}
         </a-button>
       </div>
       <certificate-form ref="createForm" :visible.sync="formVisible" :record="currentRecord"
@@ -84,7 +87,9 @@
         <span slot="operation" slot-scope="text, record">
           <div class="operation-buttons">
             <a-button type="link" icon="edit" @click="openForm(record)"
-                      v-hasPermi="['network:cert:edit']" class="operation-btn">{{ $t('button.edit') }}</a-button>
+                      v-hasPermi="['network:cert:edit']" class="operation-btn">{{
+                $t('button.edit')
+              }}</a-button>
             <a-button
               v-if="hasPermission('network:cert:delete')"
               type="link"

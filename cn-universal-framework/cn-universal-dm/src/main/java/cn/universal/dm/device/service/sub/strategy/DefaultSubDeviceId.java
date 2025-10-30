@@ -52,7 +52,7 @@ public class DefaultSubDeviceId implements SubDeviceIdGeneration {
   public String getSubDeviceProductKey(
       String gwProductKey, String gwDeviceId, SubDevice subDevice) {
     // 如果编解码有，直接返回
-    if (subDevice != null && subDevice.getProductKey()!=null) {
+    if (subDevice != null && subDevice.getProductKey() != null) {
       return subDevice.getProductKey();
     }
     return "";

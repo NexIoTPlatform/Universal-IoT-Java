@@ -4,15 +4,18 @@
     <div class="action-bar">
       <div class="left-actions">
         <a-button type="primary" @click="handleAdd" v-hasPermi="['notice:channel:add']">
-          <a-icon type="plus"/>{{ $t('button.add') }}
+          <a-icon type="plus"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button :disabled="!selectedRowKeys.length" @click="handleEdit"
                   v-hasPermi="['notice:channel:edit']">
-          <a-icon type="edit"/>{{ $t('button.edit') }}
+          <a-icon type="edit"/>
+          {{ $t('button.edit') }}
         </a-button>
         <a-button :disabled="!selectedRowKeys.length" @click="handleDelete"
                   v-hasPermi="['notice:channel:del']">
-          <a-icon type="delete"/>{{ $t('button.delete') }}
+          <a-icon type="delete"/>
+          {{ $t('button.delete') }}
         </a-button>
       </div>
       <div class="right-actions">
@@ -95,11 +98,13 @@
           <a-button type="link" size="small" @click.stop="handleEdit(item)"
                     v-hasPermi="['notice:channel:edit']">
             <a-icon type="edit"/>
-            {{ $t('button.edit') }}</a-button>
+            {{ $t('button.edit') }}
+          </a-button>
           <a-button type="link" size="small" @click.stop="handleDelete(item)"
                     v-hasPermi="['notice:channel:del']">
             <a-icon type="delete"/>
-            {{ $t('button.delete') }}</a-button>
+            {{ $t('button.delete') }}
+          </a-button>
         </div>
       </div>
     </div>

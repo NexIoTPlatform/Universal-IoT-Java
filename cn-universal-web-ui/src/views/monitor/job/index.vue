@@ -51,7 +51,8 @@
       <div class="table-operations">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['monitor:job:add']">
-          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button
           type="primary"
@@ -59,14 +60,17 @@
           @click="$refs.createForm.handleUpdate(undefined, ids)"
           v-hasPermi="['monitor:job:edit']"
         >
-          <iot-icon type="icon-u-edit"/>{{ $t('button.edit') }}
+          <iot-icon type="icon-u-edit"/>
+          {{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['monitor:job:remove']">
-          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>
+          {{ $t('button.delete') }}
         </a-button>
         <a-button type="primary" @click="handleExport" v-hasPermi="['monitor:job:export']">
-          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>
+          {{ $t('button.export') }}
         </a-button>
         <a-button type="dashed" @click="handleJobLog" v-hasPermi="['monitor:job:query']">
           <a-icon type="snippets"/>
@@ -330,24 +334,24 @@ export default {
       const text = row.status === '1' ? '启用' : '停用'
       row.status = row.status === '0' ? '1' : '0'
       changeJobStatus(row.jobId, row.status)
-        .then(() => {
-          this.$message.success(text + '成功', 3)
-        })
-        .catch(function () {
-          this.$message.error(text + '发生异常', 3)
-        })
+      .then(() => {
+        this.$message.success(text + '成功', 3)
+      })
+      .catch(function () {
+        this.$message.error(text + '发生异常', 3)
+      })
     },
     cancelHandleStatus(row) {
     },
     /* 立即执行一次 */
     confirmHandleRun(row) {
       runJob(row.jobId, row.jobGroup)
-        .then(() => {
-          this.$message.success('执行成功', 3)
-        })
-        .catch(function () {
-          this.$message.error('发生异常', 3)
-        })
+      .then(() => {
+        this.$message.success('执行成功', 3)
+      })
+      .catch(function () {
+        this.$message.error('发生异常', 3)
+      })
     },
     cancelHandleRun(row) {
     },

@@ -53,7 +53,8 @@
         <div class="video-panel">
           <div class="video-container" ref="videoContainer">
             <!-- ImouPlayer 播放器 -->
-            <div v-if="playerVisible" ref="playerContainer" :id="playerContainerId" class="imou-player-container">
+            <div v-if="playerVisible" ref="playerContainer" :id="playerContainerId"
+                 class="imou-player-container">
               <!-- ImouPlayer 将在这里初始化 -->
             </div>
 
@@ -74,7 +75,8 @@
               <!-- 码流类型选择 -->
               <div class="stream-selector">
                 <label class="control-label">码流:</label>
-                <a-radio-group v-model="previewOptions.streamType" @change="onStreamTypeChange" size="small"
+                <a-radio-group v-model="previewOptions.streamType" @change="onStreamTypeChange"
+                               size="small"
                                class="stream-radio-group">
                   <a-radio-button value="main" class="stream-option">
                     <a-icon type="video-camera"/>
@@ -94,7 +96,8 @@
 
                 <div class="channel-selector">
                   <label class="control-label">通道:</label>
-                  <a-select v-model="previewOptions.channelId" @change="onChannelChange" size="small"
+                  <a-select v-model="previewOptions.channelId" @change="onChannelChange"
+                            size="small"
                             class="channel-select">
                     <a-select-option
                       v-for="channel in parsedConfiguration.channelList"
@@ -135,7 +138,8 @@
               </a-button>
               <a-button size="small" @click="handleStop">
                 <a-icon type="stop"/>
-                {{ $t('button.stop') }} </a-button>
+                {{ $t('button.stop') }}
+              </a-button>
 
               <!-- 分隔线 -->
               <a-divider type="vertical"/>
@@ -145,7 +149,8 @@
                 <a-icon type="camera"/>
                 截图
               </a-button>
-              <a-button size="small" @click="toggleRecord" :type="isRecording ? 'danger' : 'default'">
+              <a-button size="small" @click="toggleRecord"
+                        :type="isRecording ? 'danger' : 'default'">
                 <a-icon :type="isRecording ? 'pause-circle' : 'video-camera'"/>
                 {{ isRecording ? '停止录制' : '开始录制' }}
               </a-button>
@@ -693,7 +698,9 @@ export default {
       })
 
       const handleDrag = (e) => {
-        if (!isDragging) return
+        if (!isDragging) {
+          return
+        }
 
         const deltaX = e.clientX - startX
         const deltaY = e.clientY - startY
@@ -743,7 +750,9 @@ export default {
       })
 
       const handleResize = (e) => {
-        if (!isResizing) return
+        if (!isResizing) {
+          return
+        }
 
         const deltaX = e.clientX - startX
         const deltaY = e.clientY - startY

@@ -75,19 +75,23 @@
       <div class="table-operations">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['system:instance:add']">
-          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>
+          {{ $t('button.add') }}
         </a-button>
         <a-button type="primary" :disabled="single"
                   @click="$refs.createForm.handleUpdate(undefined, ids)"
                   v-hasPermi="['system:instance:edit']">
-          <iot-icon type="icon-u-edit"/>{{ $t('button.edit') }}
+          <iot-icon type="icon-u-edit"/>
+          {{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['system:instance:remove']">
-          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>
+          {{ $t('button.delete') }}
         </a-button>
         <a-button type="primary" @click="handleExport" v-hasPermi="['system:instance:export']">
-          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>
+          {{ $t('button.export') }}
         </a-button>
         <a-button type="primary" size="small" :loading="loading" :style="{ float: 'right' }"
                   @click="getList">
@@ -106,7 +110,8 @@
                      v-if="getConfigInfo(record.configuration, record.deviceNode)">
             <template slot="content">
               <div class="config-popover">
-                <div v-for="(value, key) in getConfigInfo(record.configuration, record.deviceNode)" :key="key"
+                <div v-for="(value, key) in getConfigInfo(record.configuration, record.deviceNode)"
+                     :key="key"
                      class="config-popover-item">
                   <span class="config-popover-key">{{ key }}:</span>
                   <span class="config-popover-value">{{ value }}</span>
@@ -141,7 +146,8 @@
         <div slot="productInfo" slot-scope="text, record" class="product-info-cell">
           <div class="product-name">
             {{ record.productName || '未知产品' }}
-            <device-type-badge :type="record.deviceNode" :text="getDeviceTypeText(record.deviceNode)"/>
+            <device-type-badge :type="record.deviceNode"
+                               :text="getDeviceTypeText(record.deviceNode)"/>
           </div>
           <div class="product-key">{{ record.productKey }}</div>
         </div>
@@ -396,14 +402,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return delInstance(ids)
-            .then(() => {
-              that.onSelectChange([], [])
-              that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
-            })
+          .then(() => {
+            that.onSelectChange([], [])
+            that.getList()
+            that.$message.success(
+              '删除成功',
+              3
+            )
+          })
         },
         onCancel() {
         }

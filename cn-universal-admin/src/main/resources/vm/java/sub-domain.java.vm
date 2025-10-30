@@ -15,31 +15,31 @@ import com.ruoyi.common.annotation.Excel;
 @Data
 public class ${subClassName} extends
 
-        BaseEntity {
-            private static final long serialVersionUID = 1L;
+    BaseEntity {
+      private static final long serialVersionUID = 1L;
 
-            #foreach ($column in $subTable.columns)
-                #if(!$table.isSuperColumn($column.javaField))
-                    /** $column.columnComment */
-                    #if($column.list)
-                        #set($parentheseIndex=$column.columnComment.indexOf("（"))
-                        #if($parentheseIndex != -1)
-                            #set($comment=$column.columnComment.substring(0, $parentheseIndex))
-                        #else
-                            #set($comment=$column.columnComment)
-                        #end
-                        #if($parentheseIndex != -1)
-                        @Excel(name = "${comment}" , readConverterExp = "$column.readConverterExp()" )
-                        #elseif($column.javaType == 'Date')
-                        @JsonFormat(pattern = "yyyy-MM-dd" )
-                        @Excel(name = "${comment}" , width = 30, dateFormat = "yyyy-MM-dd" )
-                        #else
-                        @Excel(name = "${comment}" )
-                        #end
+        #foreach ($column in $subTable.columns)
+            #if(!$table.isSuperColumn($column.javaField))
+              /** $column.columnComment */
+                #if($column.list)
+                    #set($parentheseIndex=$column.columnComment.indexOf("（"))
+                    #if($parentheseIndex != -1)
+                        #set($comment=$column.columnComment.substring(0, $parentheseIndex))
+                    #else
+                        #set($comment=$column.columnComment)
                     #end
-                private $column.javaType $column.javaField;
-
+                    #if($parentheseIndex != -1)
+                    @Excel(name = "${comment}", readConverterExp = "$column.readConverterExp()")
+                    #elseif($column.javaType == 'Date')
+                    @JsonFormat(pattern = "yyyy-MM-dd")
+                    @Excel(name = "${comment}", width = 30, dateFormat = "yyyy-MM-dd")
+                    #else
+                    @Excel(name = "${comment}")
+                    #end
                 #end
-            #end
+            private $column.javaType $column.javaField;
 
-        }
+            #end
+        #end
+
+    }

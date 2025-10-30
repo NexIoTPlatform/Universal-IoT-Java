@@ -41,6 +41,7 @@ public class IoTDeviceProtocolBO implements Serializable {
   private Boolean decode;
   private Boolean needBs4Decode;
   private String example;
+
   /** 创建时间 */
   private Long createTime;
 

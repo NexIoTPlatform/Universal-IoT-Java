@@ -453,32 +453,32 @@ export default {
       console.log('configration = ', this.configration)
       console.log('value event = ', value)
       console.log('option event = ', option)
-      
+
       // 重置表单，保留功能选择
       this.functionFrom = {
         function: value
       }
-      
+
       if (value !== undefined && value !== null) {
         this.metaData.functions.forEach(item => {
           if (item.id === value) {
             console.log('item.id = ', item.id)
             // 初始化参数项
             this.functionParams = item.inputs
-            
+
             // 使用 deviceConfig.js 的自动填充功能
             const autoFilledValues = autoFillFromParams(
               this.functionParams,
               this.deviceNo,
               this.configration
             )
-            
+
             // 合并自动填充的值到表单
             this.functionFrom = {
               ...this.functionFrom,
               ...autoFilledValues
             }
-            
+
             console.log('this.functionFrom = ', this.functionFrom, this.functionParams)
           }
         })

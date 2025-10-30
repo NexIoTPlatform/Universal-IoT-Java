@@ -377,26 +377,26 @@ export default {
 
         // 直接使用接口返回的协议数据，转换为下拉选项格式
         this.thirdPlatforms = Object.keys(protocols)
-          .map(key => {
-            const protocol = protocols[key]
-            return {
-              dictValue: protocol.code,
-              dictLabel: protocol.name,
-              enabled: protocol.available,
-              status: protocol.status,
-              description: protocol.description,
-              vendor: protocol.vendor,
-              category: protocol.category,
-              isCore: protocol.isCore
-            }
-          })
-          .filter(protocol => protocol.enabled) // 只显示可用的协议
+        .map(key => {
+          const protocol = protocols[key]
+          return {
+            dictValue: protocol.code,
+            dictLabel: protocol.name,
+            enabled: protocol.available,
+            status: protocol.status,
+            description: protocol.description,
+            vendor: protocol.vendor,
+            category: protocol.category,
+            isCore: protocol.isCore
+          }
+        })
+        .filter(protocol => protocol.enabled) // 只显示可用的协议
       }
     }).catch(error => {
       console.error('获取协议状态失败:', error)
       // 如果接口失败，使用默认数据作为备份
       const dictArray2 = ['third_platform']
-      const renderThirdPlatform = ['ctaiot', 'mqtt',  'http', 'tcp','udp']
+      const renderThirdPlatform = ['ctaiot', 'mqtt', 'http', 'tcp', 'udp']
       this.getDictMap(dictArray2).then(res => {
         this.thirdPlatforms = res.data['third_platform'].filter(function (value, index, arr) {
           return renderThirdPlatform.indexOf(value.dictValue) !== -1

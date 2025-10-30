@@ -53,7 +53,8 @@
               <div class="form-help-text">建议使用有意义的名称，便于后续管理</div>
             </a-form-model-item>
 
-            <a-form-model-item label="数据方向" prop="dataDirection" required class="form-item-large">
+            <a-form-model-item label="数据方向" prop="dataDirection" required
+                               class="form-item-large">
               <div class="direction-cards">
                 <div
                   class="direction-card"
@@ -119,7 +120,8 @@
                 class="resource-type-select"
               >
                 <!-- 数据库类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.databases).length > 0" label="数据库">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.databases).length > 0"
+                                    label="数据库">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.databases"
                     :key="key"
@@ -131,7 +133,8 @@
                 </a-select-opt-group>
 
                 <!-- 消息队列类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.messageQueues).length > 0" label="消息队列">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.messageQueues).length > 0"
+                                    label="消息队列">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.messageQueues"
                     :key="key"
@@ -143,7 +146,8 @@
                 </a-select-opt-group>
 
                 <!-- 时序数据库类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.timeSeries).length > 0" label="时序数据库">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.timeSeries).length > 0"
+                                    label="时序数据库">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.timeSeries"
                     :key="key"
@@ -155,7 +159,8 @@
                 </a-select-opt-group>
 
                 <!-- 搜索引擎类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.searchEngines).length > 0" label="搜索引擎">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.searchEngines).length > 0"
+                                    label="搜索引擎">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.searchEngines"
                     :key="key"
@@ -167,7 +172,8 @@
                 </a-select-opt-group>
 
                 <!-- 云平台类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.cloudPlatforms).length > 0" label="云平台">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.cloudPlatforms).length > 0"
+                                    label="云平台">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.cloudPlatforms"
                     :key="key"
@@ -179,7 +185,8 @@
                 </a-select-opt-group>
 
                 <!-- 其他类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.others).length > 0" label="其他">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.others).length > 0"
+                                    label="其他">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.others"
                     :key="key"
@@ -581,9 +588,13 @@ export default {
   computed: {
     // 核心连接字段（主机、端口、用户名、密码等）
     coreConnectionFields() {
-      if (!this.dynamicFields || this.dynamicFields.length === 0) return []
+      if (!this.dynamicFields || this.dynamicFields.length === 0) {
+        return []
+      }
 
-      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName', 'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey', 'instanceId', 'projectId', 'appId', 'appSecret']
+      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName',
+        'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey',
+        'instanceId', 'projectId', 'appId', 'appSecret']
 
       return this.dynamicFields.filter(field =>
         coreFields.includes(field.field) && field.config && field.config.required
@@ -592,9 +603,13 @@ export default {
 
     // 高级配置字段（非核心字段）
     advancedFields() {
-      if (!this.dynamicFields || this.dynamicFields.length === 0) return []
+      if (!this.dynamicFields || this.dynamicFields.length === 0) {
+        return []
+      }
 
-      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName', 'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey', 'instanceId', 'projectId', 'appId', 'appSecret']
+      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName',
+        'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey',
+        'instanceId', 'projectId', 'appId', 'appSecret']
 
       return this.dynamicFields.filter(field =>
         !coreFields.includes(field.field) || (field.config && !field.config.required)
@@ -630,7 +645,8 @@ export default {
               this.form.dynamicConfig = extraConfigObj.dynamicConfig
               // 移除dynamicConfig，保留其他扩展配置
               delete extraConfigObj.dynamicConfig
-              this.form.extraConfig = Object.keys(extraConfigObj).length > 0 ? JSON.stringify(extraConfigObj) : ''
+              this.form.extraConfig = Object.keys(extraConfigObj).length > 0 ? JSON.stringify(
+                extraConfigObj) : ''
             } else {
               // 新格式：直接是动态配置 {host: ..., port: ..., ...}
               // 将extraConfig作为dynamicConfig
@@ -718,9 +734,10 @@ export default {
       this.handleDirectionChange()
     },
 
-
     getDirectionMessage() {
-      if (!this.form.dataDirection) return ''
+      if (!this.form.dataDirection) {
+        return ''
+      }
 
       const messages = {
         'INPUT': '数据输入模式：此资源的数据将导入到IoT平台',
@@ -732,7 +749,9 @@ export default {
     },
 
     getDirectionType() {
-      if (!this.form.dataDirection) return 'info'
+      if (!this.form.dataDirection) {
+        return 'info'
+      }
 
       const types = {
         'INPUT': 'processing',
@@ -859,7 +878,8 @@ export default {
           'REDIS': 'Redis缓存'
         },
         inputTypes: ['ALIYUN_IOT', 'TENCENT_IOT', 'MYSQL', 'KAFKA', 'MQTT'],
-        outputTypes: ['IOTDB', 'INFLUXDB', 'ELASTICSEARCH', 'MYSQL', 'KAFKA', 'MQTT', 'HTTP', 'REDIS'],
+        outputTypes: ['IOTDB', 'INFLUXDB', 'ELASTICSEARCH', 'MYSQL', 'KAFKA', 'MQTT', 'HTTP',
+          'REDIS'],
         bidirectionalTypes: ['MYSQL', 'KAFKA', 'MQTT', 'HTTP', 'REDIS']
       }
     },
@@ -1112,7 +1132,8 @@ export default {
             configExists: !!(field && field.config),
             hasDefault: !!(field && field.config && field.config.default !== undefined),
             dynamicConfigExists: !!this.form.dynamicConfig,
-            alreadySet: !!(field && field.field && this.form.dynamicConfig && this.form.dynamicConfig[field.field])
+            alreadySet: !!(field && field.field && this.form.dynamicConfig
+              && this.form.dynamicConfig[field.field])
           })
         }
       })

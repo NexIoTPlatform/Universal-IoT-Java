@@ -1,95 +1,95 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>cn-universal-framework</artifactId>
-        <groupId>cn.universal.iot</groupId>
-        <version>1.5-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <artifactId>cn-universal-framework</artifactId>
+    <groupId>cn.universal.iot</groupId>
+    <version>1.5-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cn-universal-rocketmq</artifactId>
+  <artifactId>cn-universal-rocketmq</artifactId>
 
-    <!-- 配置为可选模块，不参与打包 -->
-    <packaging>jar</packaging>
+  <!-- 配置为可选模块，不参与打包 -->
+  <packaging>jar</packaging>
 
-    <properties>
-        <!-- 标记为可选模块 -->
-        <optional.module>true</optional.module>
-    </properties>
+  <properties>
+    <!-- 标记为可选模块 -->
+    <optional.module>true</optional.module>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <artifactId>cn-universal-persistence</artifactId>
-            <groupId>cn.universal.iot</groupId>
-            <version>${project.version}</version>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <artifactId>cn-universal-persistence</artifactId>
+      <groupId>cn.universal.iot</groupId>
+      <version>${project.version}</version>
+    </dependency>
 
-        <!-- RocketMQ依赖，标记为可选 -->
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-spring-boot-starter</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-tools</artifactId>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.tomcat</groupId>
-                    <artifactId>annotations-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+    <!-- RocketMQ依赖，标记为可选 -->
+    <dependency>
+      <groupId>org.apache.rocketmq</groupId>
+      <artifactId>rocketmq-spring-boot-starter</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.rocketmq</groupId>
+      <artifactId>rocketmq-tools</artifactId>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-classic</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>ch.qos.logback</groupId>
+          <artifactId>logback-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.tomcat</groupId>
+          <artifactId>annotations-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <artifactId>cn-universal-core</artifactId>
-            <groupId>cn.universal.iot</groupId>
-            <version>${project.version}</version>
-        </dependency>
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <artifactId>cn-universal-core</artifactId>
+      <groupId>cn.universal.iot</groupId>
+      <version>${project.version}</version>
+    </dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+    </dependency>
 
-    </dependencies>
+  </dependencies>
 
-    <!-- 配置构建插件，跳过打包 -->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                </configuration>
-            </plugin>
-            <!-- 跳过JAR打包 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+  <!-- 配置构建插件，跳过打包 -->
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>21</source>
+          <target>21</target>
+        </configuration>
+      </plugin>
+      <!-- 跳过JAR打包 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
