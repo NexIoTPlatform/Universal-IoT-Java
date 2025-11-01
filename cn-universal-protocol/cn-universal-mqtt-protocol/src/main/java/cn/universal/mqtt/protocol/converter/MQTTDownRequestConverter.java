@@ -74,11 +74,21 @@ public class MQTTDownRequestConverter extends AbstratIoTService
   private MQTTDownRequest convertGatewaySubDevice(
       UnifiedDownlinkCommand command, IoTProduct subProduct, DownlinkContext<?> context) {
     log.info(
-        "[MQTT转换器] 检测到网关子设备, productKey={}, deviceId={}",
+        "[MQTT转换器] 检测到网关子设备, productKey={}, deviceId={}, cmd={}",
         command.getProductKey(),
-        command.getDeviceId());
+        command.getDeviceId(),
+        command.getCmd());
 
-    // 1. 加载子设备信息
+    // 1. 判断是否需要网关代理
+    boolean needGatewayProxy = isNeedGatewayProxy(command.getCmd());
+
+    if (!needGatewayProxy) {
+      // 对于不需要网关代理的命令（如DEV_ADD等设备管理命令），直接使用子设备信息
+      log.info("[MQTT转换器] 命令{}不需要网关代理，直接使用子设备信息", command.getCmd());
+      return convertSubDeviceDirectly(command, subProduct, context);
+    }
+
+    // 2. 加载子设备信息（需要网关代理时必须存在）
     IoTDeviceDTO subDevice =
         getIoTDeviceDTO(
             IoTDeviceQuery.builder()
@@ -87,12 +97,23 @@ public class MQTTDownRequestConverter extends AbstratIoTService
                 .iotId(command.getIotId())
                 .build());
 
-    if (subDevice == null && command.getCmd() != DownCmd.DEV_ADD) {
+    if (subDevice == null) {
       throw new IllegalArgumentException(
           "子设备不存在: productKey=" + command.getProductKey() + ", deviceId=" + command.getDeviceId());
     }
 
-    // 2. 使用子设备的ProductKey执行编解码
+    // 3. 验证网关绑定信息
+    if (StrUtil.isBlank(subDevice.getGwProductKey())
+        || StrUtil.isBlank(subDevice.getExtDeviceId())) {
+      throw new IllegalArgumentException(
+          "网关子设备缺少网关绑定信息: gwProductKey="
+              + subDevice.getGwProductKey()
+              + ", extDeviceId="
+              + subDevice.getExtDeviceId()
+              + ", 请先完成子设备与网关的绑定");
+    }
+
+    // 4. 使用子设备的ProductKey执行编解码
     String payload = null;
     if (DownCmd.DEV_FUNCTION.equals(command.getCmd())
         && CollectionUtil.isNotEmpty(command.getFunction())) {
@@ -107,21 +128,13 @@ public class MQTTDownRequestConverter extends AbstratIoTService
       }
     }
 
-    // 3. 查询网关设备信息
-    if (StrUtil.isBlank(subDevice.getGwProductKey())
-        || StrUtil.isBlank(subDevice.getExtDeviceId())) {
-      throw new IllegalArgumentException(
-          "网关子设备缺少网关信息: gwProductKey="
-              + subDevice.getGwProductKey()
-              + ", extDeviceId="
-              + subDevice.getExtDeviceId());
-    }
-
+    // 5. 查询网关产品信息
     IoTProduct gatewayProduct = getProduct(subDevice.getGwProductKey());
     if (gatewayProduct == null) {
       throw new IllegalArgumentException("网关产品不存在: " + subDevice.getGwProductKey());
     }
 
+    // 6. 查询网关设备信息
     IoTDeviceDTO gatewayDevice =
         getIoTDeviceDTO(
             IoTDeviceQuery.builder()
@@ -137,7 +150,7 @@ public class MQTTDownRequestConverter extends AbstratIoTService
               + subDevice.getExtDeviceId());
     }
 
-    // 4. 构建请求对象（使用网关设备的配置）
+    // 7. 构建请求对象（通过网关代理）
     MQTTDownRequest request = new MQTTDownRequest();
     BeanUtil.copyProperties(command, request, "extensions", "metadata");
 
@@ -156,17 +169,17 @@ public class MQTTDownRequestConverter extends AbstratIoTService
     request.setSubProductKey(command.getProductKey());
     request.setIsGatewayProxy(true);
 
-    // 5. 设置网关的配置信息
+    // 8. 设置网关的配置信息
     DownCommonData downCommonData = new DownCommonData();
     downCommonData.setConfiguration(parseProductConfigurationSafely(gatewayProduct));
     request.setDownCommonData(downCommonData);
 
-    // 6. 处理扩展字段
+    // 9. 处理扩展字段
     if (command.getExtensions() != null && !command.getExtensions().isEmpty()) {
       request.setData(JSONUtil.parseObj(command.getExtensions()));
     }
 
-    // 7. 设置消息ID
+    // 10. 设置消息ID
     if (StrUtil.isBlank(request.getMsgId())) {
       request.setMsgId(generateMsgId());
     }
@@ -175,6 +188,88 @@ public class MQTTDownRequestConverter extends AbstratIoTService
         "[MQTT转换器] 网关子设备转换完成, 将使用网关设备通信: gatewayDeviceId={}, subDeviceId={}",
         gatewayDevice.getDeviceId(),
         subDevice.getDeviceId());
+
+    return request;
+  }
+
+  /**
+   * 判断命令是否需要网关代理
+   * @param cmd 下行命令
+   * @return true-需要网关代理, false-直接使用子设备信息
+   */
+  private boolean isNeedGatewayProxy(DownCmd cmd) {
+    if (cmd == null) {
+      return false;
+    }
+
+    // 设备管理类命令不需要网关代理，直接操作子设备
+    return switch (cmd) {
+      case DEV_ADD, DEV_ADDS,          // 设备新增
+           DEV_DEL, DEVICE_DELETE,     // 设备删除
+           DEV_UPDATE, DEVICE_UPDATE   // 设备更新
+          -> false;
+      // 其他命令（功能调用、状态查询等）需要通过网关代理
+      default -> true;
+    };
+  }
+
+  /**
+   * 直接使用子设备信息转换（不需要网关代理的场景）
+   * @param command 下行命令
+   * @param subProduct 子设备产品信息
+   * @param context 下行上下文
+   * @return MQTT下行请求
+   */
+  private MQTTDownRequest convertSubDeviceDirectly(
+      UnifiedDownlinkCommand command, IoTProduct subProduct, DownlinkContext<?> context) {
+
+    // 1. 创建请求对象
+    MQTTDownRequest request = new MQTTDownRequest();
+    BeanUtil.copyProperties(command, request, "extensions", "metadata");
+
+    // 2. 设置子设备产品信息
+    request.setIoTProduct(subProduct);
+
+    // 3. 尝试加载子设备信息（DEV_ADD时可能不存在）
+    IoTDeviceDTO subDevice = null;
+    if (command.getCmd() != DownCmd.DEV_ADD && command.getCmd() != DownCmd.DEV_ADDS) {
+      subDevice = getIoTDeviceDTO(
+          IoTDeviceQuery.builder()
+              .productKey(command.getProductKey())
+              .deviceId(command.getDeviceId())
+              .iotId(command.getIotId())
+              .build());
+
+      if (subDevice == null) {
+        throw new IllegalArgumentException(
+            "子设备不存在: productKey=" + command.getProductKey() + ", deviceId=" + command.getDeviceId());
+      }
+    }
+    request.setIoTDeviceDTO(subDevice);
+
+    // 4. 设置子设备的配置信息
+    DownCommonData downCommonData = new DownCommonData();
+    downCommonData.setConfiguration(parseProductConfigurationSafely(subProduct));
+    request.setDownCommonData(downCommonData);
+
+    // 5. 处理扩展字段
+    if (command.getExtensions() != null && !command.getExtensions().isEmpty()) {
+      request.setData(JSONUtil.parseObj(command.getExtensions()));
+    }
+
+    // 6. 设置消息ID
+    if (StrUtil.isBlank(request.getMsgId())) {
+      request.setMsgId(generateMsgId());
+    }
+
+    // 7. 标记为子设备（但不通过网关代理）
+    request.setIsGatewayProxy(false);
+
+    log.info(
+        "[MQTT转换器] 子设备直接转换完成（无需网关代理）: productKey={}, deviceId={}, cmd={}",
+        command.getProductKey(),
+        command.getDeviceId(),
+        command.getCmd());
 
     return request;
   }
