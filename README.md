@@ -196,13 +196,14 @@
 
 ### 🎯 功能深度展示
 
-|                                          |                                         | 
-|------------------------------------------|-----------------------------------------|
-| ![设备管理](/__MACOSX/shot/1026/devices.png) | ![系统配置](/__MACOSX/shot/1026/zt.png)     |
-| ![视频监控](/__MACOSX/shot/1018/video.jpg)   | ![设备管理](/__MACOSX/shot/1026/zhuatu.png) |
-| ![数据管理1](/__MACOSX/shot/1018/d1.jpg)     | ![数据管理2](/__MACOSX/shot/1018/d2.jpg)    |
-| ![运维管理](/__MACOSX/shot/1018/yz.jpg)      | ![网络管理](/__MACOSX/shot/1018/net.jpg)    |
-| ![报警管理](/__MACOSX/shot/1026/tongzhi.png) | ![数据采集](/__MACOSX/shot/1018/cj.jpg)     |
+|                                          |                                                 | 
+|------------------------------------------|-------------------------------------------------|
+| ![设备管理](/__MACOSX/shot/1026/devices.png) | ![系统配置](/__MACOSX/shot/1026/zt.png)             |
+| ![视频监控](/__MACOSX/shot/1026/video.png)   | ![设备管理](/__MACOSX/shot/1026/jietu.png)          |
+| ![数据管理1](/__MACOSX/shot/1026/d1.png)     | ![数据管理2](/__MACOSX/shot/1026/d2.png)            |
+| ![运维管理](/__MACOSX/shot/1026/xieyi.png)   | ![网络管理](/__MACOSX/shot/1026/net.png)            |
+| ![报警管理](/__MACOSX/shot/1026/notice.png)  | ![数据采集](/__MACOSX/shot/1026/notice-log.png)     |
+| ![联动](/__MACOSX/shot/1026/liandong.png)  | ![数据采集](/__MACOSX/shot/1026/product-detail.png) |
 
 ## 📝 更新日志
 
