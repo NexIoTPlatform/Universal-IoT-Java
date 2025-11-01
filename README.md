@@ -109,11 +109,11 @@
 
 ### 📊 支持设备类型
 
-|                                                 |                                            | 
-|-------------------------------------------------|--------------------------------------------|
-| ![电表设备](/__MACOSX/shot/1018/dianbiap.png)       | ![摄像头](/__MACOSX/shot/1018/lechen.png)     | 
-| ![网关DTU](/__MACOSX/shot/1018/1760431601441.jpg) | ![水浸设备](/__MACOSX/shot/1018/wenshidu.jpg)  | 
-| ![声光报警器](/__MACOSX/shot/1026/device-sgbjq.png)  | ![水浸设备](/__MACOSX/shot/1026/device-sj.jpg) |
+|                                                |                                            | 
+|------------------------------------------------|--------------------------------------------|
+| ![电表设备](/__MACOSX/shot/1018/dianbiap.png)      | ![摄像头](/__MACOSX/shot/1018/lechen.png)     | 
+| ![网关DTU](/__MACOSX/shot/1018/dtu.jpg)          | ![水浸设备](/__MACOSX/shot/1018/wenshidu.jpg)  | 
+| ![声光报警器](/__MACOSX/shot/1026/device-sgbjq.png) | ![水浸设备](/__MACOSX/shot/1026/device-sj.jpg) |
 
 ### 📡 天翼物联AI接入教程
 
