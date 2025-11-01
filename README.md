@@ -115,44 +115,6 @@
 | ![网关DTU](/__MACOSX/shot/1018/dtu.jpg)          | ![水浸设备](/__MACOSX/shot/1018/wenshidu.jpg)  | 
 | ![声光报警器](/__MACOSX/shot/1026/device-sgbjq.png) | ![水浸设备](/__MACOSX/shot/1026/device-sj.jpg) |
 
-### 📡 天翼物联AI接入教程
-
-#### 🌊 NB水浸传感器
-
-1. **【手把手实战：水浸传感器开箱：初见与硬件解析】**
-    -
-    📺 [B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：设备开箱、硬件介绍、AI智能识别功能测试
-
-2. **【手把手实战：NexIoT接入Ctwing参数配置】**
-    -
-    📺 [B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：天翼物联平台参数配置、智能设备注册流程
-
-3. **【手把手实战：NB水浸传感器CTWing接入全流程】**
-    -
-    📺 [B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：外置驱动的完整设备接入流程，从智能配置到数据上报
-
-### 🔌 TCP直连AI接入教程
-
-#### ⚡ DL/T645电表
-
-1. **【NexIoT开源】手把手实战：DL/T645电表TCP直连接入】**
-    -
-    📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：TCP协议解析、设备直连配置、智能数据解析
-
-2. **【NexIoT开源】手把手实战：产品创建与SNI解读】**
-    -
-    📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：创建流程、智能SNI设备标识解析、AI协议调试
-
-3. **【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
-    -
-    📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：数据流介绍、智能调试IDE的编写和调试、645电表的AI解析
-
 #### ⚡ 接入成果展示
 
 ![接入成果动态](__MACOSX/shot/dianbiao.gif)
@@ -208,6 +170,46 @@
 ### 🎯 移动端/小程序
 
 ![app](__MACOSX/shot/1026/app.jpg)
+
+
+### 📡 天翼物联AI接入教程
+
+#### 🌊 NB水浸传感器
+
+1. **【手把手实战：水浸传感器开箱：初见与硬件解析】**
+   -
+   📺 [B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：设备开箱、硬件介绍、AI智能识别功能测试
+
+2. **【手把手实战：NexIoT接入Ctwing参数配置】**
+   -
+   📺 [B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：天翼物联平台参数配置、智能设备注册流程
+
+3. **【手把手实战：NB水浸传感器CTWing接入全流程】**
+   -
+   📺 [B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：外置驱动的完整设备接入流程，从智能配置到数据上报
+
+### 🔌 TCP直连AI接入教程
+
+#### ⚡ DL/T645电表
+
+1. **【NexIoT开源】手把手实战：DL/T645电表TCP直连接入】**
+   -
+   📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：TCP协议解析、设备直连配置、智能数据解析
+
+2. **【NexIoT开源】手把手实战：产品创建与SNI解读】**
+   -
+   📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：创建流程、智能SNI设备标识解析、AI协议调试
+
+3. **【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
+   -
+   📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
+    - 📝 内容：数据流介绍、智能调试IDE的编写和调试、645电表的AI解析
+
 
 ## 📝 更新日志
 
