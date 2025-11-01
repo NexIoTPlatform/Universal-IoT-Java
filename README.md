@@ -171,32 +171,38 @@
 
 ### 🖥️ 智能化功能展示
 
-#### 🌐 国际双语支持
-
-![img.png](__MACOSX/shot/1018/en.png)
-
-#### 🌐 驱动的天翼产品接入
+#### 🌐 天翼产品接入
 
 ![天翼产品接入](__MACOSX/shot/99.gif)
+
+
+#### 📺 产品一览图
+
+![产品一览图](__MACOSX/shot/1026/products.png)
+
+#### 🔄 网关接入各种不同子设备(DTU、Modbus)
+
+![子设备](__MACOSX/shot/1026/gw.png)
+
+#### 🛠️ 所有协议可视化管理和在线调试
+
+![协议管理与IDE](__MACOSX/shot/54.png)
 
 #### 🔄 流程编排引擎
 
 ![流程编排](__MACOSX/shot/53.png)
 
-#### 🛠️ 协议统一管理与智能IDE
 
-![协议管理与IDE](__MACOSX/shot/54.png)
 
 ### 🎯 功能深度展示
 
-|                                         |                                      | 
-|-----------------------------------------|--------------------------------------|
-| ![产品管理](/__MACOSX/shot/1018/pd.jpg)     | ![设备管理](/__MACOSX/shot/1018/sb.jpg)  |
-| ![视频监控](/__MACOSX/shot/1018/video.jpg)  | ![网络管理](/__MACOSX/shot/1018/net.jpg) |
-| ![数据管理1](/__MACOSX/shot/1018/d1.jpg)    | ![数据管理2](/__MACOSX/shot/1018/d2.jpg) |
-| ![运维管理](/__MACOSX/shot/1018/yz.jpg)     | ![设备状态](/__MACOSX/shot/1018/zsb.jpg) |
-| ![设备面板](/__MACOSX/shot/1018/zsb-pb.jpg) | ![系统配置](/__MACOSX/shot/1018/zt.jpg)  |
-| ![报警管理](/__MACOSX/shot/1018/bjm.jpg)    | ![数据采集](/__MACOSX/shot/1018/cj.jpg)  |
+|                                          |                                         | 
+|------------------------------------------|-----------------------------------------|
+| ![设备管理](/__MACOSX/shot/1018/sb.jpg)      |![系统配置](/__MACOSX/shot/1018/zt.jpg)  |
+| ![视频监控](/__MACOSX/shot/1018/video.jpg)   |  ![设备管理](/__MACOSX/shot/1026/zhuatu.png)  |
+| ![数据管理1](/__MACOSX/shot/1018/d1.jpg)     | ![数据管理2](/__MACOSX/shot/1018/d2.jpg)    |
+| ![运维管理](/__MACOSX/shot/1018/yz.jpg)      |  ![网络管理](/__MACOSX/shot/1018/net.jpg)     |
+| ![报警管理](/__MACOSX/shot/1026/tongzhi.png) | ![数据采集](/__MACOSX/shot/1018/cj.jpg)     |
 
 ## 📝 更新日志
 
