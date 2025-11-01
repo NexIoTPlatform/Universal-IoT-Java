@@ -204,6 +204,7 @@
 | ![运维管理](/__MACOSX/shot/1026/xieyi.png)   | ![网络管理](/__MACOSX/shot/1026/net.png)            |
 | ![报警管理](/__MACOSX/shot/1026/notice.png)  | ![数据采集](/__MACOSX/shot/1026/notice-log.png)     |
 | ![联动](/__MACOSX/shot/1026/liandong.png)  | ![数据采集](/__MACOSX/shot/1026/product-detail.png) |
+![app](__MACOSX/shot/1026/app.jpg)
 
 ## 📝 更新日志
 
