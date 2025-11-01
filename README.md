@@ -178,7 +178,7 @@
 
 #### 📺 产品一览图
 
-![产品一览图](__MACOSX/shot/1026/products.png)
+![产品一览图](__MACOSX/shot/1026/product.png)
 
 #### 🔄 网关接入各种不同子设备(DTU、Modbus)
 
@@ -186,7 +186,7 @@
 
 #### 🛠️ 所有协议可视化管理和在线调试
 
-![协议管理与IDE](__MACOSX/shot/54.png)
+![协议管理与IDE](__MACOSX/shot/1026/ide.png)
 
 #### 🔄 流程编排引擎
 
@@ -198,10 +198,10 @@
 
 |                                          |                                         | 
 |------------------------------------------|-----------------------------------------|
-| ![设备管理](/__MACOSX/shot/1018/sb.jpg)      |![系统配置](/__MACOSX/shot/1018/zt.jpg)  |
-| ![视频监控](/__MACOSX/shot/1018/video.jpg)   |  ![设备管理](/__MACOSX/shot/1026/zhuatu.png)  |
+| ![设备管理](/__MACOSX/shot/1026/devices.png) | ![系统配置](/__MACOSX/shot/1026/zt.png)     |
+| ![视频监控](/__MACOSX/shot/1018/video.jpg)   | ![设备管理](/__MACOSX/shot/1026/zhuatu.png) |
 | ![数据管理1](/__MACOSX/shot/1018/d1.jpg)     | ![数据管理2](/__MACOSX/shot/1018/d2.jpg)    |
-| ![运维管理](/__MACOSX/shot/1018/yz.jpg)      |  ![网络管理](/__MACOSX/shot/1018/net.jpg)     |
+| ![运维管理](/__MACOSX/shot/1018/yz.jpg)      | ![网络管理](/__MACOSX/shot/1018/net.jpg)    |
 | ![报警管理](/__MACOSX/shot/1026/tongzhi.png) | ![数据采集](/__MACOSX/shot/1018/cj.jpg)     |
 
 ## 📝 更新日志
