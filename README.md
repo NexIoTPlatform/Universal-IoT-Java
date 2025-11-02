@@ -161,7 +161,7 @@
 |                                          |                                                 | 
 |------------------------------------------|-------------------------------------------------|
 | ![设备管理](/__MACOSX/shot/1026/devices.png) | ![系统配置](/__MACOSX/shot/1026/zt.png)             |
-| ![视频监控](/__MACOSX/shot/1026/video.png)   | ![设备管理](/__MACOSX/shot/1026/jietu.png)          |
+| ![视频监控](/__MACOSX/shot/1026/video.png)   | ![设备管理](/__MACOSX/shot/1026/zhuapai.png)        |
 | ![数据管理1](/__MACOSX/shot/1026/d1.png)     | ![数据管理2](/__MACOSX/shot/1026/d2.png)            |
 | ![运维管理](/__MACOSX/shot/1026/xieyi.png)   | ![网络管理](/__MACOSX/shot/1026/net.png)            |
 | ![报警管理](/__MACOSX/shot/1026/notice.png)  | ![数据采集](/__MACOSX/shot/1026/notice-log.png)     |
