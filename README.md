@@ -107,13 +107,16 @@
 
 ## 📸 实战案例与视频教程
 
-### 📊 支持设备类型
+### 📊 已对接设备案例（仅展示部分）
 
-|                                                |                                            | 
-|------------------------------------------------|--------------------------------------------|
-| ![电表设备](/__MACOSX/shot/1018/dianbiap.png)      | ![摄像头](/__MACOSX/shot/1018/lechen.png)     | 
-| ![网关DTU](/__MACOSX/shot/1018/dtu.jpg)          | ![水浸设备](/__MACOSX/shot/1018/wenshidu.jpg)  | 
+|                                                |                                           | 
+|------------------------------------------------|-------------------------------------------|
+| ![电表设备](/__MACOSX/shot/1018/dianbiap.png)      | ![摄像头](/__MACOSX/shot/1018/lechen.png)    | 
+| ![网关DTU](/__MACOSX/shot/1018/dtu.jpg)          | ![水浸设备](/__MACOSX/shot/1018/111.jpg)      | 
 | ![声光报警器](/__MACOSX/shot/1026/device-sgbjq.png) | ![水浸设备](/__MACOSX/shot/1026/device-sj.jpg) |
+| ![4G定位器](/__MACOSX/shot/1018/4gcz.png)         | ![水浸设备](/__MACOSX/shot/1018/4gcz2.png)    |
+
+
 
 #### ⚡ 接入成果展示
 
@@ -166,6 +169,13 @@
 | ![运维管理](/__MACOSX/shot/1026/xieyi.png)   | ![网络管理](/__MACOSX/shot/1026/net.png)            |
 | ![报警管理](/__MACOSX/shot/1026/notice.png)  | ![数据采集](/__MACOSX/shot/1026/notice-log.png)     |
 | ![联动](/__MACOSX/shot/1026/liandong.png)  | ![数据采集](/__MACOSX/shot/1026/product-detail.png) |
+
+### 🎯 wvp-GB28281-wvp+海康ISC+大华ICC
+
+|                                        |                                        | 
+|----------------------------------------|----------------------------------------|
+| ![平台实例](/__MACOSX/shot/1109/pt.png)    | ![录像](/__MACOSX/shot/1109/luxiang.png) |
+| ![实时](/__MACOSX/shot/1109/yunduan.png) | ![录像](/__MACOSX/shot/1109/play.png)    |
 
 ### 🎯 移动端/小程序
 
