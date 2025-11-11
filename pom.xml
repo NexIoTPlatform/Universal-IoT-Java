@@ -31,7 +31,6 @@
     <!-- <module>cn-universal-service</module> -->
     <module>cn-universal-persistence</module>
     <module>cn-universal-plugins</module>
-    <module>cn-universal-visual-rule</module>
     <module>cn-universal-data-bridge</module>
   </modules>
   <packaging>pom</packaging>
