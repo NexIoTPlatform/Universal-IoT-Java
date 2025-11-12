@@ -22,10 +22,9 @@ services:
       - MQTT_CFG_HOST_OUT=${MQTT_HOST_OUT:-tcp://127.0.0.1:1883}
       - MQTT_CFG_EMQX_HEADER_KEY=${EMQX_HEADER_KEY:-universal-emqx}
       - MQTT_CFG_EMQX_HEADER_VALUE=${EMQX_HEADER_VALUE:-d41d8cd98f00b204e9800998ecf8427e}
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker,prod
       - RUN_MODE=docker
       - LOGGING_FILE_PATH=/app/logs
-      - LOGGING_FILE_NAME=/app/logs/cn-universal-web.log
       - SERVER_PORT=9092
       - SERVER_HTTP2_ENABLED=false
       - JAVA_TOOL_OPTIONS=-Dio.netty.native.workdir=/app/logs

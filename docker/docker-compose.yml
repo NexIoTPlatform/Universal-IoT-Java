@@ -36,8 +36,7 @@ services:
       # 应用配置
       - SPRING_PROFILES_ACTIVE=docker
       - RUN_MODE=docker
-      - LOGGING_FILE_PATH=/app/logs/cn-universal2
-      - LOGGING_FILE_NAME=/app/logs/cn-universal-web.log
+      - LOGGING_FILE_PATH=/app/logs
       - SERVER_PORT=9092
       - SERVER_HTTP2_ENABLED=false
       - JAVA_TOOL_OPTIONS=-Dio.netty.native.workdir=/app/logs

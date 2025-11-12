@@ -33,7 +33,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:9092/actuator/health || exit 1
 
 # 预创建日志目录
-RUN mkdir -p /app/logs
+RUN mkdir -p /app/logs /app/logs/global /app/logs/api /app/logs/tcp /app/logs/mqtt
 
-# 启动命令：创建日志目录，执行脚本后台启动，再跟随实际项目日志保持前台
-ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && cn-universal-web/bin/start.sh && tail -F /app/logs/cn-universal-web.log"]
+# 启动命令：创建日志目录，执行启动脚本，前台跟随 info.log 保持容器存活
+ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && /app/cn-universal-web/bin/start.sh && tail -F /app/logs/info.log"]
+ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs /app/logs/global /app/logs/api /app/logs/tcp /app/logs/mqtt && touch /app/logs/cn-universal-web.log /app/logs/all.log /app/logs/global/info.log /app/logs/global/warn.log /app/logs/global/error.log && cn-universal-web/bin/start.sh && tail -n +1 -F /app/logs/all.log /app/logs/cn-universal-web.log /app/logs/global/info.log /app/logs/global/warn.log /app/logs/global/error.log"]
