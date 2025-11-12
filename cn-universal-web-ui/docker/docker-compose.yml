@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: ${DOCKERFILE_NAME:-Dockerfile}
+    container_name: cn-universal-frontend
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    networks:
+      - webui-network
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  webui-network:
+    driver: bridge
