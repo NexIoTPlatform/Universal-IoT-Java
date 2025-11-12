@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Docker 构建脚本
 set -e
 
 echo "🚀 开始构建 Docker 镜像 (JDK 21 + MySQL 5.8 + EMQX)..."
@@ -18,29 +17,36 @@ echo "     ./build-docker.sh corretto ubuntu    # 后端 Corretto + 前端 Ubunt
 echo "     ./build-docker.sh default simple     # 后端默认 + 前端 Python 简单版"
 echo ""
 
-# 检查必要文件
-if [ ! -d "../cn-universal-web/target/cn-universal-web" ]; then
-    echo "❌ 后端构建文件不存在，请先执行 Maven 构建"
-    echo "   执行: mvn clean package -DskipTests"
-    exit 1
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+echo "🛠 检查并构建前后端产物..."
+if [ ! -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web" ]; then
+  echo "🔨 后端未构建，开始执行 Maven Reactor 构建..."
+  (
+    cd "${REPO_ROOT}"
+    mvn -q -T 1C -DskipTests -pl cn-universal-web -am install
+    mvn -q -DskipTests -pl cn-universal-web package
+  )
 fi
 
-if [ ! -d "../cn-universal-web-ui/dist" ]; then
-    echo "❌ 前端构建文件不存在，请先执行前端构建"
-    echo "   执行: cd ../cn-universal-web-ui && npm run build"
-    exit 1
+if [ ! -d "${REPO_ROOT}/cn-universal-web-ui/dist" ]; then
+  echo "🔨 前端未构建，开始执行 NPM 构建..."
+  (
+    cd "${REPO_ROOT}/cn-universal-web-ui"
+    npm ci
+    npm run build
+  )
 fi
 
-# 创建 .env 文件（如果不存在）
-if [ ! -f ".env" ]; then
-    echo "📝 创建 .env 文件..."
-    cp env.example .env
-    echo "✅ .env 文件已创建，请根据需要修改配置"
+if [ ! -f "${SCRIPT_DIR}/.env" ]; then
+  echo "📝 创建 .env 文件..."
+  cp "${SCRIPT_DIR}/env.example" "${SCRIPT_DIR}/.env"
+  echo "✅ .env 文件已创建，请根据需要修改配置"
 fi
 
-# 构建后端镜像
 echo "🔨 构建后端镜像..."
-cd ../cn-universal-web
+cd "${REPO_ROOT}/cn-universal-web"
 
 # 选择 Dockerfile 版本
 DOCKERFILE_VERSION=${1:-default}
@@ -61,11 +67,10 @@ case $DOCKERFILE_VERSION in
         ;;
 esac
 
-cd ../docker
+cd "${SCRIPT_DIR}"
 
-# 构建前端镜像
 echo "🔨 构建前端镜像..."
-cd ../cn-universal-web-ui
+cd "${REPO_ROOT}/cn-universal-web-ui"
 
 # 选择前端 Dockerfile 版本
 FRONTEND_VERSION=${2:-default}
@@ -96,7 +101,7 @@ case $FRONTEND_VERSION in
         ;;
 esac
 
-cd ..
+cd "${REPO_ROOT}"
 
 echo "✅ 镜像构建完成！"
 echo ""
