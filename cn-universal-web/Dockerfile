@@ -1,5 +1,5 @@
-# 使用 Eclipse Temurin JRE 21 作为基础镜像（更通用）
-FROM eclipse-temurin:21-jre
+# 使用本地可用的 OpenJDK 21 基础镜像，避免外网拉取失败
+FROM openjdk:21
 
 # 设置工作目录
 WORKDIR /app
@@ -35,6 +35,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
 # 预创建日志目录
 RUN mkdir -p /app/logs /app/logs/global /app/logs/api /app/logs/tcp /app/logs/mqtt
 
-# 启动命令：创建日志目录，执行启动脚本，前台跟随 info.log 保持容器存活
-ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && /app/cn-universal-web/bin/start.sh && tail -F /app/logs/info.log"]
-ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs /app/logs/global /app/logs/api /app/logs/tcp /app/logs/mqtt && touch /app/logs/cn-universal-web.log /app/logs/all.log /app/logs/global/info.log /app/logs/global/warn.log /app/logs/global/error.log && cn-universal-web/bin/start.sh && tail -n +1 -F /app/logs/all.log /app/logs/cn-universal-web.log /app/logs/global/info.log /app/logs/global/warn.log /app/logs/global/error.log"]
+# 启动命令：创建日志目录与文件，执行启动脚本，前台跟随 info.log 保持容器存活
+ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && touch /app/logs/info.log && /app/cn-universal-web/bin/start.sh && tail -n +1 -F /app/logs/info.log"]

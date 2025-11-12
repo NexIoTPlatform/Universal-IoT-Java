@@ -38,6 +38,11 @@ if [ ! -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web" ]; then
   )
 fi
 
+# 确保 docker profile 配置文件存在于打包目录
+if [ -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web/config" ] && [ -f "${REPO_ROOT}/cn-universal-web/src/main/resources/application-docker.properties" ]; then
+  cp "${REPO_ROOT}/cn-universal-web/src/main/resources/application-docker.properties" "${REPO_ROOT}/cn-universal-web/target/cn-universal-web/config/application-docker.properties"
+fi
+
 if [ ! -d "${REPO_ROOT}/cn-universal-web-ui/dist" ]; then
   echo "🔨 前端未构建，开始执行 NPM 构建..."
   (

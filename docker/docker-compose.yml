@@ -49,6 +49,7 @@ services:
       - IMOULIFE_PROTOCOL_ENABLED=false
       # 兼容未打包的 local profile 配置
       - SHARD_LOG_ENABLE=true
+      - SHARD_LOGMETA_ENABLE=true
       - SPRING_APPLICATION_JSON={"server":{"port":9092},"management":{"endpoints":{"web":{"exposure":{"include":"health,info,metrics,prometheus"},"base-path":"/actuator"}}}},"shard":{"log":{"enable":true,"table":{"number":24},"virtual":{"number":8}},"logMeta":{"enable":true,"table":{"number":24},"virtual":{"number":8}}},"iot":{"register":{"auto":{"unionId":"auto_register","latitude":31.081598,"longitude":81.314141}}}}
     depends_on:
       - mysql
