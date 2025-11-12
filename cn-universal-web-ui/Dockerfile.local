@@ -1,12 +1,7 @@
-# 使用已经下载的 openjdk:21 镜像作为基础，安装 nginx
-FROM openjdk:21
+FROM nginx:alpine
 
-# 安装 nginx 和必要工具
-RUN microdnf update -y && microdnf install -y \
-    nginx \
-    curl \
-    wget \
-    && microdnf clean all
+# 安装健康检查所需工具
+RUN apk add --no-cache curl
 
 # 复制前端构建文件
 COPY dist/ /usr/share/nginx/html/
