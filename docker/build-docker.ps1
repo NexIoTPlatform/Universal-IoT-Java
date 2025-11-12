@@ -28,9 +28,19 @@ if (-not (Test-Path (Join-Path $ScriptDir ".env"))) {
   Write-Host "✅ .env 文件已创建，请根据需要修改配置"
 }
 
-# 构建后端
+# 构建后端（优先使用 tar.gz 产物）
 if (-not (Test-Path (Join-Path $RepoRoot "cn-universal-web/target/cn-universal-web"))) {
-  Write-Host "🔨 后端未构建，开始执行 Maven Reactor 构建..."
+  $tarPath = Join-Path $RepoRoot "cn-universal-web/target/cn-universal-web.tar.gz"
+  if (Test-Path $tarPath) {
+    Write-Host "📦 检测到后端产物 cn-universal-web.tar.gz，正在解压..."
+    Push-Location (Join-Path $RepoRoot "cn-universal-web/target")
+    & tar -xzf cn-universal-web.tar.gz
+    Pop-Location
+  }
+}
+
+if (-not (Test-Path (Join-Path $RepoRoot "cn-universal-web/target/cn-universal-web"))) {
+  Write-Host "🔨 未发现后端构建目录，开始执行 Maven Reactor 构建..."
   Push-Location $RepoRoot
   & mvn -q -T 1C -DskipTests -pl cn-universal-web -am install
   & mvn -q -DskipTests -pl cn-universal-web package

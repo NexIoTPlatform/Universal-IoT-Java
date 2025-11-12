@@ -21,8 +21,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 echo "🛠 检查并构建前后端产物..."
+# 优先使用已打包的 tar.gz 产物
+if [ ! -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web" ] && [ -f "${REPO_ROOT}/cn-universal-web/target/cn-universal-web.tar.gz" ]; then
+  echo "📦 检测到后端产物 cn-universal-web.tar.gz，正在解压..."
+  (
+    cd "${REPO_ROOT}/cn-universal-web/target" && tar -xzf cn-universal-web.tar.gz
+  )
+fi
+
 if [ ! -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web" ]; then
-  echo "🔨 后端未构建，开始执行 Maven Reactor 构建..."
+  echo "🔨 未发现后端构建目录，开始执行 Maven Reactor 构建..."
   (
     cd "${REPO_ROOT}"
     mvn -q -T 1C -DskipTests -pl cn-universal-web -am install

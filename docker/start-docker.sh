@@ -36,7 +36,13 @@ fi
 # 自动构建（如未构建）
 echo "🛠 检查并构建前后端..."
 
-# 构建后端（如未构建产物）
+if [ ! -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web" ] && [ -f "${REPO_ROOT}/cn-universal-web/target/cn-universal-web.tar.gz" ]; then
+  echo "📦 检测到后端产物 cn-universal-web.tar.gz，正在解压..."
+  (
+    cd "${REPO_ROOT}/cn-universal-web/target" && tar -xzf cn-universal-web.tar.gz
+  )
+fi
+
 if [ ! -d "${REPO_ROOT}/cn-universal-web/target/cn-universal-web" ]; then
   echo "🔨 后端未构建，开始执行 Maven Reactor 构建..."
   (
