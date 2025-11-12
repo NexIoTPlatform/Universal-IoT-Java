@@ -58,6 +58,16 @@
 - **缓存系统**：Redis 6.0+
 - **日志存储类型**：None(不存) / Mysql /ClickHouse / IoTDB（动态切换）
 
+
+#### 🧭 部署与启动（一键启动）
+
+- 一键启动：`docker-compose up -d`
+- 访问：
+    - 前端 `http://localhost:80`  （默认 `iot/IoTAbc2025001@`）
+    - EMQX 管理 `http://localhost:18083`（默认 `admin/public`）
+    - Adminer `http://localhost:8081`
+- 注意：如遇报错，重启`cn-universal-backend`
+
 ## 📈 正在推进
 
 ### 🚀 近期规划（roadmap)
@@ -87,13 +97,6 @@
 - **文档地址(国内)**: <http://docs.192886.xyz:81/>
 
 
-## 🧭 部署与启动（一键启动）
-
-- 一键启动：`docker-compose up -d`
-- 访问：
-  - 前端 `http://localhost:80`  （默认 `iot/IoTAbc2025001@`）
-  - EMQX 管理 `http://localhost:18083`（默认 `admin/public`）
-  - Adminer `http://localhost:8081`
 ## 📸 实战案例与视频教程
 
 ### 📊 已对接设备案例（仅展示部分）
