@@ -74,7 +74,7 @@ services:
         max-file: "3"
 
   mysql:
-    image: ${MYSQL_IMAGE:-mysql:8.0}
+    image: nexiot/mysql8:2.0
     container_name: cn-universal-mysql
     restart: unless-stopped
     environment:

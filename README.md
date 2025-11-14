@@ -16,7 +16,7 @@
 [📖 文档地址](https://nexiotplatform.github.io/universal-iot-docs/) | [🌐 在线演示](http://iot.192886.xyz:81/) | [🔧 AI调试IDE](http://iot.192886.xyz:81/magic/debug/index.html)
 
 </div>
-
+sha256:59e398ed2fda3dcdc5d880edf96e0ef137e8fcd5d181588e309b13117480ae38
 ## ✨ 平台简介
 
 **NexIoT AI物联网平台** 是一款采用创新架构设计的**真·零代码侵入**企业级物联网平台。
