@@ -154,10 +154,10 @@ sha256:59e398ed2fda3dcdc5d880edf96e0ef137e8fcd5d181588e309b13117480ae38
 |------------------------------------------|-------------------------------------------------|
 | ![设备管理](/__MACOSX/shot/1026/devices.png) | ![系统配置](/__MACOSX/shot/1026/zt.png)             |
 | ![视频监控](/__MACOSX/shot/1109/lechen.png)  | ![设备管理](/__MACOSX/shot/1026/zhuapai.png)        |
-| ![数据管理1](/__MACOSX/shot/1026/d1.png)     | ![数据管理2](/__MACOSX/shot/1026/d2.png)            |
 | ![运维管理](/__MACOSX/shot/1026/xieyi.png)   | ![网络管理](/__MACOSX/shot/1026/net.png)            |
 | ![报警管理](/__MACOSX/shot/1026/notice.png)  | ![数据采集](/__MACOSX/shot/1026/notice-log.png)     |
-| ![联动](/__MACOSX/shot/1026/liandong.png)  | ![数据采集](/__MACOSX/shot/1026/product-detail.png) |
+| ![联动](/__MACOSX/shot/1026/liandong.png)  | ![数据采集](/__MACOSX/shot/1109/product-detail.png) |
+| ![数据管理1](/__MACOSX/shot/1109/dt.png)     | ![数据管理2](/__MACOSX/shot/1026/d2.png)            |
 
 ### 🎯 wvp-GB28281-wvp+海康ISC+大华ICC
 
