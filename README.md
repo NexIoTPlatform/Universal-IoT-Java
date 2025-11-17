@@ -16,7 +16,7 @@
 [📖 文档地址](https://nexiotplatform.github.io/universal-iot-docs/) | [🌐 在线演示](http://iot.192886.xyz:81/) | [🔧 AI调试IDE](http://iot.192886.xyz:81/magic/debug/index.html)
 
 </div>
-sha256:59e398ed2fda3dcdc5d880edf96e0ef137e8fcd5d181588e309b13117480ae38
+
 ## ✨ 平台简介
 
 **NexIoT AI物联网平台** 是一款采用创新架构设计的**真·零代码侵入**企业级物联网平台。
@@ -125,11 +125,6 @@ sha256:59e398ed2fda3dcdc5d880edf96e0ef137e8fcd5d181588e309b13117480ae38
 
 ### 🖥️ 智能化功能展示
 
-#### 🌐 天翼产品接入
-
-![天翼产品接入](__MACOSX/shot/99.gif)
-
-
 #### 📺 产品一览图
 
 ![产品一览图](__MACOSX/shot/1026/product.png)
@@ -166,6 +161,12 @@ sha256:59e398ed2fda3dcdc5d880edf96e0ef137e8fcd5d181588e309b13117480ae38
 | ![平台实例](/__MACOSX/shot/1109/hlht.png) | ![国标实时](/__MACOSX/shot/1109/gbss.png)   |
 | ![录像列表](/__MACOSX/shot/1109/lxlb.png) | ![录像](/__MACOSX/shot/1109/lsbf.png)     |
 | ![设备录像](/__MACOSX/shot/1109/sblx.png) | ![设备录像回放](/__MACOSX/shot/1109/lxhf.png) |
+
+#### 🌐 天翼产品接入
+
+![天翼产品接入](__MACOSX/shot/99.gif)
+
+
 
 ### 🎯 移动端/小程序
 
