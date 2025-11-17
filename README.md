@@ -161,10 +161,11 @@ sha256:59e398ed2fda3dcdc5d880edf96e0ef137e8fcd5d181588e309b13117480ae38
 
 ### 🎯 wvp-GB28281-wvp+海康ISC+大华ICC
 
-|                                       |                                       | 
-|---------------------------------------|---------------------------------------|
-| ![平台实例](/__MACOSX/shot/1109/hlht.png) | ![国标实时](/__MACOSX/shot/1109/gbss.png) |
-| ![录像列表](/__MACOSX/shot/1109/lxlb.png) | ![录像](/__MACOSX/shot/1109/lsbf.png)   |
+|                                       |                                         | 
+|---------------------------------------|-----------------------------------------|
+| ![平台实例](/__MACOSX/shot/1109/hlht.png) | ![国标实时](/__MACOSX/shot/1109/gbss.png)   |
+| ![录像列表](/__MACOSX/shot/1109/lxlb.png) | ![录像](/__MACOSX/shot/1109/lsbf.png)     |
+| ![设备录像](/__MACOSX/shot/1109/sblx.png) | ![设备录像回放](/__MACOSX/shot/1109/lxhf.png) |
 
 ### 🎯 移动端/小程序
 
