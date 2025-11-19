@@ -91,7 +91,7 @@
 - **演示地址**: <http://iot.192886.xyz:81/>
 - **调试IDE**: <http://iot.192886.xyz:81/magic/debug/index.html>
 - **演示账号**: test
-- **演示密码**: Haha@2025
+- **演示密码**: 因全部真实设备，已禁止开放/入群获取
 - **文档地址*: <https://docs.nexiot.cc//>
 
 
