@@ -93,6 +93,7 @@
 - **演示账号**: demo
 - **演示密码**: Haha@2025!
 - **文档地址*: <https://docs.nexiot.cc//>
+- **备用地址**：<http://demo.nexiot.cc>
 
 
 ## 📸 实战案例与视频教程
