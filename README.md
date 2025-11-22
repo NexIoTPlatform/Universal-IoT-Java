@@ -5,13 +5,15 @@
 ![License](https://img.shields.io/badge/license-AGPL3.0-blue.svg)
 ![Java](https://img.shields.io/badge/Java-21-orange.svg)
 ![SpringBoot](https://img.shields.io/badge/SpringBoot-3.5-brightgreen.svg)
-![MySQL](https://img.shields.io/badge/MySQL-5.7+-blue.svg)
+![MySQL](https://img.shields.io/badge/MySQL-8.0+-blue.svg)
 ![Redis](https://img.shields.io/badge/Redis-Latest-red.svg)
+![IoTDB](https://img.shields.io/badge/IoTDB-Supported-green.svg)
+![ClickHouse](https://img.shields.io/badge/ClickHouse-Supported-yellow.svg)
 ![AI](https://img.shields.io/badge/AI-Enabled-purple.svg)
 
 ## 🎯 创新的"真·零代码侵入"物联网平台
 
-**突破传统物联网平台设计思路 · 设备驱动完全外置 · 一键导出即用 · 零代码侵入**
+> **💡 突破传统物联网平台设计思路 · 设备驱动完全外置 · 一键导出即用 · 零代码侵入**
 
 [📖 文档地址](https://nexiotplatform.github.io/universal-iot-docs/) | [🌐 在线演示](http://iot.192886.xyz:81/) | [🔧 AI调试IDE](http://iot.192886.xyz:81/magic/debug/index.html)
 
@@ -23,15 +25,15 @@
 
 ### 🎯 核心亮点
 
-**🚀 这个项目能为你做什么？**  
+> **🚀 这个项目能为你做什么？**
 
-- 首先适合中大型企业，***IoT基础能力中心，统一的设备数据接入***，想做自己产品的，做B｜G项目
-- 不再被某一个设备供应商、软件提供商卡脖子，漫天要价
-- 调试器上手简单，大学生就能上手，节省大量研发、测试、运维
-- 调试器给别人，让供应商来自主对接
-- 产品、物模型、驱动内容，一键导出，生态共建共享
-- **实时热部署**生效，0款到100款设备对接，几年都不用重启服务
-- 开源版支持集群，高可用，千百万设备，不再话下
+- 🏢 **适合中大型企业**：***IoT基础能力中心，统一的设备数据接入***，想做自己产品的，做B｜G项目
+- 🔓 **不再被卡脖子**：不再被某一个设备供应商、软件提供商卡脖子，漫天要价
+- 🎓 **上手简单**：调试器上手简单，大学生就能上手，节省大量研发、测试、运维
+- 🤝 **生态共建**：调试器给别人，让供应商来自主对接
+- 📦 **一键导出**：产品、物模型、驱动内容，一键导出，生态共建共享
+- ⚡ **实时热部署**：**实时热部署**生效，0款到100款设备对接，几年都不用重启服务
+- 🚀 **高可用集群**：开源版支持集群，高可用，千百万设备，不再话下
 
 ## 🌟 平台亮点
 
@@ -42,6 +44,7 @@
 - ✅ **可视化配置**：Web界面完成所有配置，基于浏览器的调试IDE
 - ✅ **全协议支持**：Modbus RTU/TCP、MQTT、HTTP等工业协议和物联网协议
 - ✅ **云平台对接**：天翼物联、移动OneNet等云平台集成
+- ✅ **多数据库支持**：支持 **MySQL 8.0+**、**IoTDB**、**ClickHouse** 等时序数据库
 
 ## 🏗️ 技术架构
 
@@ -54,18 +57,16 @@
 
 #### 💾 数据存储
 
-- **关系数据库**：MySQL 5.8+
-- **缓存系统**：Redis 6.0+
-- **日志存储类型**：None(不存) / Mysql /ClickHouse / IoTDB（动态切换）
-
+- **关系数据库**：**MySQL 8.0+**
+- **缓存系统**：**Redis 6.0+**
+- **时序数据库**：**IoTDB** / **ClickHouse** / MySQL / None（产品级无感动态切换）
 
 ## 🧭 部署与启动（一键启动）
 
-- 一键启动：`docker-compose up -d`
-- 访问：
-    - 前端 `http://localhost:80`  （默认 `iot/IoTAbc2025001@`）
-    - EMQX 管理 `http://localhost:18083`（默认 `admin/public`）
-    - Adminer `http://localhost:8081`
+- **一键启动**：`docker-compose up -d`
+- **访问地址**：
+  - 前端 `http://localhost:80`（默认 `iot/IoTAbc2025001@`）
+  - EMQX 管理 `http://localhost:18083`（默认 `admin/public`）
 
 ## 📈 正在推进
 
@@ -82,19 +83,18 @@
 - **🌐 生态建设**：插件市场、第三方集成、开发者社区
 - **🏭 行业方案**：智能制造、智慧城市、智慧农业等垂直解决方案
 
-
 ## 🚀 快速开始
 
 ### 🎯 演示地址
 
-- ***全部真实设备，驱动源码开放，全部透明可见！***
-- **演示地址**: <http://iot.192886.xyz:81/>
-- **调试IDE**: <http://iot.192886.xyz:81/magic/debug/index.html>
-- **演示账号**: demo
-- **演示密码**: Haha@2025!
-- **文档地址*: <https://docs.nexiot.cc//>
-- **备用地址**：<http://demo.nexiot.cc>
+> **✨ 全部真实设备，驱动源码开放，全部透明可见！**
 
+- **🌐 演示地址**：<http://iot.192886.xyz:81/>
+- **🔧 调试IDE**：<http://iot.192886.xyz:81/magic/debug/index.html>
+- **👤 演示账号**：`demo`
+- **🔑 演示密码**：`Haha@2025!`
+- **📖 文档地址**：<https://docs.nexiot.cc/>
+- **🔗 备用地址**：<http://demo.nexiot.cc>
 
 ## 📸 实战案例与视频教程
 
@@ -102,11 +102,9 @@
 
 |                                                |                                                |                                        |
 |------------------------------------------------|------------------------------------------------|----------------------------------------|
-| ![电表设备](/__MACOSX/shot/1018/dianbiap.png)      | ![摄像头](/__MACOSX/shot/1018/lechen.png)         | ![水浸设备](/__MACOSX/shot/1018/111.jpg)   | 
-| ![网关DTU](/__MACOSX/shot/1018/dtu.jpg)          | ![水浸设备](/__MACOSX/shot/1026/device-sj.jpg)     | ![SOS](/__MACOSX/shot/1109/sos.jpg)    | 
+| ![电表设备](/__MACOSX/shot/1018/dianbiap.png)      | ![摄像头](/__MACOSX/shot/1018/lechen.png)         | ![水浸设备](/__MACOSX/shot/1018/111.jpg)   |
+| ![网关DTU](/__MACOSX/shot/1018/dtu.jpg)          | ![水浸设备](/__MACOSX/shot/1026/device-sj.jpg)     | ![SOS](/__MACOSX/shot/1109/sos.jpg)    |
 | ![4G定位器](/__MACOSX/shot/1018/4gcz.png)         | ![声光报警器](/__MACOSX/shot/1026/device-sgbjq.png) | ![水浸设备](/__MACOSX/shot/1018/4gcz2.png) |
-
-
 
 #### ⚡ 接入成果展示
 
@@ -142,11 +140,9 @@
 
 ![流程编排](__MACOSX/shot/53.png)
 
-
-
 ### 🎯 功能深度展示
 
-|                                          |                                                 | 
+|                                          |                                                 |
 |------------------------------------------|-------------------------------------------------|
 | ![设备管理](/__MACOSX/shot/1026/devices.png) | ![系统配置](/__MACOSX/shot/1026/zt.png)             |
 | ![视频监控](/__MACOSX/shot/1109/lechen.png)  | ![设备管理](/__MACOSX/shot/1026/zhuapai.png)        |
@@ -157,7 +153,7 @@
 
 ### 🎯 wvp-GB28281-wvp+海康ISC+大华ICC
 
-|                                       |                                         | 
+|                                       |                                         |
 |---------------------------------------|-----------------------------------------|
 | ![平台实例](/__MACOSX/shot/1109/hlht.png) | ![国标实时](/__MACOSX/shot/1109/gbss.png)   |
 | ![录像列表](/__MACOSX/shot/1109/lxlb.png) | ![录像](/__MACOSX/shot/1109/lsbf.png)     |
@@ -167,50 +163,47 @@
 
 ![天翼产品接入](__MACOSX/shot/99.gif)
 
-
-
 ### 🎯 移动端/小程序
 
 ![app](__MACOSX/shot/1026/app.jpg)
-
 
 ### 📡 天翼物联AI接入教程
 
 #### 🌊 NB水浸传感器
 
 1. **【手把手实战：水浸传感器开箱：初见与硬件解析】**
-   -
+
    📺 [B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：设备开箱、硬件介绍、AI智能识别功能测试
+   - 📝 **内容**：设备开箱、硬件介绍、AI智能识别功能测试
 
 2. **【手把手实战：NexIoT接入Ctwing参数配置】**
-   -
+
    📺 [B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：天翼物联平台参数配置、智能设备注册流程
+   - 📝 **内容**：天翼物联平台参数配置、智能设备注册流程
 
 3. **【手把手实战：NB水浸传感器CTWing接入全流程】**
-   -
+
    📺 [B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：外置驱动的完整设备接入流程，从智能配置到数据上报
+   - 📝 **内容**：外置驱动的完整设备接入流程，从智能配置到数据上报
 
 ### 🔌 TCP直连AI接入教程
 
 #### ⚡ DL/T645电表
 
 1. **【NexIoT开源】手把手实战：DL/T645电表TCP直连接入】**
-   -
+
    📺 [B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：TCP协议解析、设备直连配置、智能数据解析
+   - 📝 **内容**：TCP协议解析、设备直连配置、智能数据解析
 
 2. **【NexIoT开源】手把手实战：产品创建与SNI解读】**
-   -
+
    📺 [B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：创建流程、智能SNI设备标识解析、AI协议调试
+   - 📝 **内容**：创建流程、智能SNI设备标识解析、AI协议调试
 
 3. **【NexIoT开源】手把手实战：如何写TCP接入的DL/T645电表解析脚本】**
-   -
+
    📺 [B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff)
-    - 📝 内容：数据流介绍、智能调试IDE的编写和调试、645电表的AI解析
+   - 📝 **内容**：数据流介绍、智能调试IDE的编写和调试、645电表的AI解析
 
 ## 📊 功能对比
 
@@ -244,18 +237,18 @@
 | **天翼物联**        | 支持与天翼物联AIOT无缝接入</br>产品管理、设备管理全部在nexiot统一管理                                                                                                                                | ❌ | ✅ |
 | **视频接入**        | 乐橙云视频接入（企业赠送）</br>GB28181视频协议支持（wvp集成内测中）</br>大华ICC和海康ISC归规划中                                                                                                             | ❌ | ✅ |
 | **集群部署**    | 支持多节点集群部署</br>支持分布式锁、负载均衡</br>支持高可用、水平扩展                                                                                                                                  | ✅ | ✅ |
-| **时序数据库**   | 支持无感动态切换日志存储方式</br>支持None(不存) / Mysql / ClickHouse / IoTDB                                                                                                                | ✅ | ✅ |
+| **时序数据库**   | 支持无感动态切换日志存储方式</br>支持None(不存) / Mysql / **ClickHouse** / **IoTDB**                                                                                                                | ✅ | ✅ |
 
 ---
 
 
-#### 📢 重要声明
+### 📢 重要声明
 
 - **自媒体转发**：欢迎转发项目信息，请遵循AGPL3.0开源协议
 - **企业授权**：商业使用需获得授权，保留企业授权信息
 - **法律追责**：如单位误用引起法律后果，保留追责责任
 
-#### 🌐 社区联系方式
+### 🌐 社区联系方式
 
 | QQ群                           | 微信                            | B站                              | 抖音                               |
 |-------------------------------|-------------------------------|---------------------------------|----------------------------------|

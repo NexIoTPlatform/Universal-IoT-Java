@@ -53,9 +53,9 @@ try { docker pull nginx:alpine | Out-Null } catch { Write-Host "⚠️ 无法拉
 
 Push-Location $ScriptDir
 if ($useDockerCompose) {
-  if ($skipFrontend) { docker compose up -d --build backend mysql redis emqx adminer } else { docker compose up -d --build }
+  if ($skipFrontend) { docker compose up -d --build backend mysql redis emqx } else { docker compose up -d --build }
 } else {
-  if ($skipFrontend) { docker-compose up -d --build backend mysql redis emqx adminer } else { docker-compose up -d --build }
+  if ($skipFrontend) { docker-compose up -d --build backend mysql redis emqx } else { docker-compose up -d --build }
 }
 Pop-Location
 
@@ -69,7 +69,6 @@ Write-Host "🌐 服务访问地址："
 Write-Host "   前端界面: http://localhost:80"
 Write-Host "   后端 API: http://localhost:9092"
 Write-Host "   EMQX 管理: http://localhost:18083 (admin/public)"
-Write-Host "   数据库管理: http://localhost:8081"
 if ($skipFrontend) { Write-Host "⚠️ 已跳过前端。后端接口: http://localhost:9092" }
 Write-Host ""
 Write-Host "📋 常用命令："

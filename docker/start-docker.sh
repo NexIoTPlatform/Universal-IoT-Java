@@ -69,7 +69,7 @@ if ! docker pull --quiet nginx:alpine >/dev/null 2>&1; then
 fi
 
 if [ "$SKIP_FRONTEND" -eq 1 ]; then
-  (cd "${SCRIPT_DIR}" && docker-compose up -d --build backend mysql redis emqx adminer)
+  (cd "${SCRIPT_DIR}" && docker-compose up -d --build backend mysql redis emqx)
 else
   (cd "${SCRIPT_DIR}" && docker-compose up -d --build)
 fi
@@ -88,7 +88,6 @@ echo "🌐 服务访问地址："
 echo "   前端界面: http://localhost:80"
 echo "   后端 API: http://localhost:9092"
 echo "   EMQX 管理: http://localhost:18083 (admin/public)"
-echo "   数据库管理: http://localhost:8081"
 echo ""
 echo "📋 常用命令："
 echo "   查看日志: (cd docker && docker-compose logs -f)"

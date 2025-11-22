@@ -158,25 +158,6 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  # 数据库管理工具 (可选)
-  adminer:
-    image: adminer
-    container_name: cn-universal-adminer
-    restart: unless-stopped
-    ports:
-      - "8081:8080"
-    environment:
-      - ADMINER_DEFAULT_SERVER=mysql
-    depends_on:
-      - mysql
-    networks:
-      - iot-network
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
 volumes:
   mysql_data:
   redis_data:

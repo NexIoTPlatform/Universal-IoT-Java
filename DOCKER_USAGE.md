@@ -37,7 +37,6 @@ cd docker
 
 - **前端界面**: http://localhost:80
 - **后端 API**: http://localhost:9092
-- **数据库管理**: http://localhost:8081 (Adminer)
 
 ## 📋 常用命令
 

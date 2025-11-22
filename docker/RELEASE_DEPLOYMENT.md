@@ -50,7 +50,6 @@
 - 访问：
   - 前端：`http://localhost:80`
   - 后端健康：`http://localhost:9092/actuator/health`
-  - Adminer：`http://localhost:8081`
 
 ## 安全与源码泄漏
 - 镜像中不包含源码：后端 Dockerfile 仅复制 `target/cn-universal-web/` 的打包产物；前端仅复制 `dist/` 与 `nginx.conf`。
