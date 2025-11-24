@@ -65,7 +65,8 @@
 
 - **一键启动**：`docker-compose up -d`
 - **访问地址**：
-  - 前端 `http://localhost:80`（默认 `iot/IoTAbc2025001@`）
+  - 后台 `http://localhost:80`（默认 `iot/IoTAbc2025001@`）
+  - IDE调试器 `http://localhost:9092/magic/debug/index.html (密码同后台）
   - EMQX 管理 `http://localhost:18083`（默认 `admin/public`）
 
 ## 📈 正在推进
