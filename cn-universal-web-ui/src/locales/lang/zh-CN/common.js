@@ -93,7 +93,7 @@ export default {
   'system.theme': '主题',
 
   // 登录页
-  'login.welcome': '欢迎登录',
+  'login.welcome': '仅供学习，商用需授权',
   'login.please.input.account': '请输入您的账户信息',
   'login.placeholder.username': '请输入用户名',
   'login.placeholder.password': '请输入密码',

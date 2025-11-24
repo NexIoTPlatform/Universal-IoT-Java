@@ -17,7 +17,7 @@
           <div class="header-icon">
             <a-icon type="rocket" theme="twoTone" :style="{ fontSize: '48px' }"/>
           </div>
-          <h2 class="header-title">{{ $t('version.new.release') || '🎉 新版本发布' }}</h2>
+          <h2 class="header-title">{{ $t('version.new.release') || '🎉 仅供学习，商业需授权！' }}</h2>
           <div class="header-version">
             <a-tag color="blue" style="font-size: 16px; padding: 4px 16px;">{{
                 currentVersion
