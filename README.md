@@ -94,8 +94,8 @@
 
 - **🌐 演示地址**：<http://demo.nexiot.cc/>
 - **🔧 调试IDE**：<http://demo.nexiot.cc/magic/debug/index.html>
-- **👤 演示账号**：`demo`
-- **🔑 演示密码**：`Haha@2025!`
+- **👤 演示账号**：`nexiot`
+- **🔑 演示密码**：`nexiot@123321`
 - **📖 文档地址**：<https://docs.nexiot.cc/>
 - **🔗 备用地址**：<http://iot.192886.xyz:81>
 
