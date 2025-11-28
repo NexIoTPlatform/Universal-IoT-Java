@@ -90,12 +90,14 @@
 
 > **✨ 全部真实设备，驱动源码开放，全部透明可见！**
 
-- **🌐 演示地址**：<http://iot.192886.xyz:81/>
-- **🔧 调试IDE**：<http://iot.192886.xyz:81/magic/debug/index.html>
+> **💎 由 [风铃云](https://www.aeoliancloud.com/cart/goodsList.htm) 独家赞助 NexIoT 在线演示服务器**
+
+- **🌐 演示地址**：<http://demo.nexiot.cc/>
+- **🔧 调试IDE**：<http://demo.nexiot.cc/magic/debug/index.html>
 - **👤 演示账号**：`demo`
 - **🔑 演示密码**：`Haha@2025!`
 - **📖 文档地址**：<https://docs.nexiot.cc/>
-- **🔗 备用地址**：<http://demo.nexiot.cc>
+- **🔗 备用地址**：<http://iot.192886.xyz:81>
 
 ## 📸 实战案例与视频教程
 
