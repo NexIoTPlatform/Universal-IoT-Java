@@ -187,7 +187,7 @@
 
 | 序号 | 教程名称 | 视频链接 |
 |:---:|:---|:---|
-| 1 | MQTT主题无法变更？NexIoT轻松适配！ | [📺 B站观看](https://www.bilibili.com/video/BV1n8U9BGED2/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
+| 1 | 任意主题Topic与全流程对接教程 | [📺 B站观看](https://www.bilibili.com/video/BV1q1UZBmEHS/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
 
 ## 📊 功能对比
 
