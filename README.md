@@ -156,32 +156,14 @@
 
 ## 📺 视频教程
 
+更多视频请关注B站和抖音
+
 ### 📚 基础入门教程
 
 | 序号 | 教程名称 | 视频链接 |
 |:---:|:---|:---|
 | 1 | 【NexIoT课程】（一）IDEA与Docker一键启动 | [📺 B站观看](https://www.bilibili.com/video/BV1WNUnBnEx5/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
 | 2 | 【NexIoT课程】（二）EMQX配置 | [📺 B站观看](https://www.bilibili.com/video/BV1MdUJB4E7k/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
-
-### 📡 天翼物联AI接入教程
-
-#### 🌊 NB水浸传感器
-
-| 序号 | 教程名称 | 视频链接 |
-|:---:|:---|:---|
-| 1 | 手把手实战：水浸传感器开箱：初见与硬件解析 | [📺 B站观看](https://www.bilibili.com/video/BV1kLY5z5EMH/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
-| 2 | 手把手实战：NexIoT接入Ctwing参数配置 | [📺 B站观看](https://www.bilibili.com/video/BV1jVY7zVEjM/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
-| 3 | 手把手实战：NB水浸传感器CTWing接入全流程 | [📺 B站观看](https://www.bilibili.com/video/BV1sJaZzBEfr/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
-
-### 🔌 TCP直连AI接入教程
-
-#### ⚡ DL/T645电表
-
-| 序号 | 教程名称 | 视频链接 |
-|:---:|:---|:---|
-| 1 | 手把手实战：DL/T645电表TCP直连接入 | [📺 B站观看](https://www.bilibili.com/video/BV1x4pBzZEVN/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
-| 2 | 手把手实战：产品创建与SNI解读 | [📺 B站观看](https://www.bilibili.com/video/BV1zSWNzoETF/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
-| 3 | 手把手实战：如何写TCP接入的DL/T645电表解析脚本 | [📺 B站观看](https://www.bilibili.com/video/BV1SAWVzwEZE/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff) |
 
 ### 📨 MQTT接入教程
 
