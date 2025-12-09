@@ -34,8 +34,7 @@
                 <a-form-item>
                   <a-button type="primary" @click="handleQuery">
                     <a-icon type="search"/>
-                    {{ $t('button.search') }}
-                  </a-button>
+                    {{ $t('button.search') }} </a-button>
                   <a-button style="margin-left: 8px" @click="resetQuery">
                     <a-icon type="reload"/>
                     重置

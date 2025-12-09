@@ -30,19 +30,19 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * 命令转换拦截器 负责将UnifiedDownlinkCommand转换为协议特定的DownRequest对象
+ * 命令转换拦截器
+ * 负责将UnifiedDownlinkCommand转换为协议特定的DownRequest对象
  *
  * <p>执行时机：MID阶段（在参数验证之后，业务处理之前）
  *
  * <p>转换流程：
- *
  * <ol>
- *   <li>检查上下文中是否存在UnifiedDownlinkCommand
- *   <li>根据协议代码查找对应的转换器
- *   <li>执行转换前的预处理（preConvert）
- *   <li>执行转换（convert）
- *   <li>执行转换后的后处理（postConvert）
- *   <li>将转换结果设置到上下文中
+ *   <li>检查上下文中是否存在UnifiedDownlinkCommand</li>
+ *   <li>根据协议代码查找对应的转换器</li>
+ *   <li>执行转换前的预处理（preConvert）</li>
+ *   <li>执行转换（convert）</li>
+ *   <li>执行转换后的后处理（postConvert）</li>
+ *   <li>将转换结果设置到上下文中</li>
  * </ol>
  *
  * @version 1.0
@@ -80,7 +80,10 @@ public class CommandConversionInterceptor implements DownlinkInterceptor {
         }
       }
 
-      log.info("命令转换拦截器初始化完成，加载转换器数量: {}，支持协议: {}", converters.size(), converterCache.keySet());
+      log.info(
+          "命令转换拦截器初始化完成，加载转换器数量: {}，支持协议: {}",
+          converters.size(),
+          converterCache.keySet());
     } else {
       log.warn("未找到任何DownRequestConverter实现，命令转换功能将不可用");
     }
@@ -139,7 +142,7 @@ public class CommandConversionInterceptor implements DownlinkInterceptor {
 
       // 6. 执行转换（使用类型安全的方式）
       @SuppressWarnings("unchecked")
-      DownRequestConverter<DownRequest> typedConverter =
+      DownRequestConverter<DownRequest> typedConverter = 
           (DownRequestConverter<DownRequest>) converter;
       DownRequest downRequest = typedConverter.convert(command, context);
       if (downRequest == null) {

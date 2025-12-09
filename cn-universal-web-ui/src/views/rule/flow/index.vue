@@ -24,8 +24,7 @@
       </div>
       <div class="table-operations">
         <a-button type="primary" v-hasPermi="['rule:flow:add']" @click="addNew">
-          <a-icon type="plus"/>
-          {{ $t('button.add') }}
+          <a-icon type="plus"/>{{ $t('button.add') }}
         </a-button>
         <a-button type="primary" size="small" :loading="loading" :style="{ float: 'right' }"
                   @click="getList">

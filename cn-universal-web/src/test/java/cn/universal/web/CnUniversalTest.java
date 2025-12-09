@@ -16,6 +16,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.CnUniversalIoTApplication;
+import cn.universal.core.metadata.DeviceMetadata;
+import cn.universal.dm.device.service.impl.IoTProductDeviceService;
 import cn.universal.dm.device.service.task.ShadowFlushScheduler;
 import cn.universal.persistence.entity.SceneLinkage;
 import cn.universal.persistence.mapper.SceneLinkageMapper;
@@ -24,19 +26,20 @@ import cn.universal.rule.model.bo.RuleBo;
 import cn.universal.rule.service.RuleService;
 import jakarta.annotation.Resource;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.logging.LogLevel;
 import org.springframework.boot.logging.LoggingSystem;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = CnUniversalIoTApplication.class)
-@Slf4j
+@ActiveProfiles("dev")
 public class CnUniversalTest {
 
   @Resource private LoggingSystem loggingSystem;
@@ -113,5 +116,13 @@ public class CnUniversalTest {
   @Test
   public void zxcvb() throws Exception {
     shadowFlushScheduler.flushDueShadows();
+  }
+
+  @Autowired private IoTProductDeviceService ioTProductDeviceService;
+
+  @Test
+  public void properties() throws Exception {
+    DeviceMetadata zxc = ioTProductDeviceService.getDeviceMetadata("Ru871cfJjhoM");
+    System.out.println(zxc.getProperties());
   }
 }

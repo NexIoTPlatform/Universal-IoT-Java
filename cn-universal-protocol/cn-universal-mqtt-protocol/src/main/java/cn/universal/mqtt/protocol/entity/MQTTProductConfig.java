@@ -154,7 +154,7 @@ public class MQTTProductConfig {
   public static class MqttTopicConfig {
 
     /** 主题模式 */
-    private String topicPattern;
+    private String topic;
 
     /** QoS级别 */
     @Builder.Default private int qos = 1;
@@ -171,14 +171,20 @@ public class MQTTProductConfig {
     /** 是否启用 */
     @Builder.Default private boolean enabled = true;
 
+    /** 关联的产品Key（可选，用于个性化topic映射） 如果未配置，将根据topic pattern和实际消息topic自动匹配提取 */
+    private String productKey;
+
+    /** 主题分类：THING_MODEL（物模型）或 PASSTHROUGH（透传） 用于第三方MQTT时，明确指定主题类型，确保消息能正确路由到对应的处理器 */
+    private cn.universal.mqtt.protocol.config.MqttConstant.TopicCategory topicCategory;
+
     /** 兼容方法，获取主题 */
     public String getTopic() {
-      return topicPattern;
+      return topic;
     }
 
     /** 兼容方法，设置主题 */
     public void setTopic(String topic) {
-      this.topicPattern = topic;
+      this.topic = topic;
     }
   }
 

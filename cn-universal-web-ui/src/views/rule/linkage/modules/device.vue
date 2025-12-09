@@ -20,9 +20,7 @@
               :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="getList"><iot-icon
                 type="icon-search"/>{{ $t('button.search') }}</a-button>
-              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{
-                  $t('button.reset')
-                }}</a-button>
+              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
             </span>
           </a-row>
         </a-form>
@@ -215,8 +213,8 @@ export default {
       const str = this.ids[0].split('^&')
       const selectedDevice = this.selectedRows[0]
       this.$emit('getDeviceInfo', {
-        'deviceId': str[0],
-        'deviceName': str[1],
+        'deviceId': str[0], 
+        'deviceName': str[1], 
         'config': str[2],
         'productKey': selectedDevice.productKey
       })

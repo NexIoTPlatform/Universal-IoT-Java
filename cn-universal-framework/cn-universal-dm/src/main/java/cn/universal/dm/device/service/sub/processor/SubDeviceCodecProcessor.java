@@ -24,6 +24,8 @@ import cn.universal.persistence.dto.IoTDeviceDTO;
 import cn.universal.persistence.entity.IoTProduct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,7 +160,7 @@ public class SubDeviceCodecProcessor extends AbstratIoTService
         if (JSONUtil.isTypeJSON(request.getPayload())) {
           jsonObject = JSONUtil.parseObj(request.getPayload());
         }
-        return List.of(buildCodecNullBean(jsonObject, request));
+        return Stream.of(buildCodecNullBean(jsonObject, request)).collect(Collectors.toList());
       }
 
     } catch (Exception e) {

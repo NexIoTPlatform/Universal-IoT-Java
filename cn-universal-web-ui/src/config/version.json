@@ -1,9 +1,42 @@
 {
-  "currentVersion": "2.0.0",
+  "currentVersion": "2.1.0",
   "changelogUrl": "https://gitee.com/NexIoT/Universal-IoT-Java/releases",
   "apiEndpoint": "",
   "checkInterval": 300000,
+  "announcement": {
+    "enabled": true,
+    "title": "🎉 NexIoT 参加 Gitee 2025 开源评选！",
+    "content": "我们的开源项目正在参加 Gitee 2025 年度开源评选活动，诚邀您为我们投票！您的每一票都是对开源事业的支持！",
+    "voteLink": "https://gitee.com/activity/2025opensource?category=industrial_software&ident=I6QN7C",
+    "voteText": "🗳️ 立即投票支持 NexIoT（成功截图凑齐10票，减免1000元）",
+    "projectLink": "https://gitee.com/NexIoT/Universal-IoT-Java",
+    "projectText": "📦 开源项目地址",
+    "notice": "💡 开源代码10月版本（v2.0.1）已更新合并，演示环境为最新实时代码！",
+    "showOnce": false
+  },
   "versions": [
+    {
+      "version": "2.1.0",
+      "type": "minor",
+      "date": "2025-11-30",
+      "title": "V2.1.0 功能增强版本",
+      "description": "JAR驱动体系完善、MQTT协议增强、地图功能优化、视频功能完善等多项功能增强",
+      "features": [
+        "🚀 JAR驱动体系完善，支持Bean和JAR类型解析器，驱动版本管理优化",
+        "🔗 MQTT协议大幅增强，支持第三方主题配置、物模型路由、透传模式",
+        "📱 设备影子功能优化，正确处理物模型rw特性，支持期望属性设置",
+        "🗺️ 地图功能全面增强，支持路径显示、轨迹合并、GPS实时更新",
+        "📹 视频功能完善，WVP国标视频集成，录像回放优化，自动播放下载",
+        "🛠️ 协议优化：JT808粘包处理、Modbus子设备冲突检测、WVP参数优化",
+        "🗄️ 数据存储优化：IoTDB版本更新、ClickHouse默认开启、重试机制优化",
+        "🎨 界面交互优化：产品详情预览、全局水印、自定义筛选、按钮禁用控制",
+        "⚙️ 配置管理增强：多环境支持、配置文件保护、SNI域名配置",
+        "🔧 系统稳定性提升：修复缓存问题、虚拟线程支持、大量bug修复",
+        "📝 功能完善：日志诊断接口、协议调试、权限管理、物模型完善"
+      ],
+      "changelog": "https://gitee.com/NexIoT/Universal-IoT-Java/releases/tag/v2.1.0",
+      "isNew": true
+    },
     {
       "version": "2.0.0",
       "type": "major",
@@ -24,7 +57,7 @@
         "🐛 修复大量已知问题，提升系统稳定性"
       ],
       "changelog": "https://gitee.com/NexIoT/Universal-IoT-Java/releases/tag/v2.0.0",
-      "isNew": true
+      "isNew": false
     }
   ]
 }

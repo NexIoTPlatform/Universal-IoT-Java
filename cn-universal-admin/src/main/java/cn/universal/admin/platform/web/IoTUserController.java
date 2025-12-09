@@ -168,12 +168,8 @@ public class IoTUserController extends BaseController {
     userbo.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
     // userbo.setPassword(user.getPassword());
     userbo.setUnionId(userbo.getUsername());
-    userbo.setRegisterFrom("admin");
     userbo.setDeleted(0);
-    if (parentUser.isAdmin()) {
-      userbo.setLicense(5000);
-      userbo.setLicenseTotalAmount(5000);
-    }
+    
     return toAjax(ioTUserService.insertUser(userbo));
   }
 

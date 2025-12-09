@@ -487,7 +487,9 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
         "supportMQTTNetwork",
         "selectDevProductV4ListNoPage",
         "countDevNumberByProductKey",
-        "iot_product_device"
+        "iot_product_device",
+        "getProductEncoderType",
+        "getProductDecoderType"
       },
       allEntries = true)
   public int updateDevProduct(IoTProduct ioTProduct) {
@@ -529,7 +531,11 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
       },
       allEntries = true)
   public int deleteDevProductByIds(String[] ids) {
-    String appUnionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
+    IoTUser iotUser = queryIotUser(SecurityUtils.getUnionId());
+    if (iotUser == null) {
+      throw new IoTException("获取用户信息异常", HttpStatus.HTTP_UNAUTHORIZED);
+    }
+    String appUnionId = iotUser.getUnionId();
     int count = 0;
     for (String id : ids) {
       IoTProduct ioTProduct = ioTProductMapper.selectDevProductById(id);
@@ -595,17 +601,22 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
         "selectDevCount",
         "supportMQTTNetwork",
         "iot_dev_product_list",
-        "getProductConfiguration"
+        "getProductConfiguration",
+        "getProductEncoderType",
+        "getProductDecoderType"
       },
       allEntries = true)
   public int updateDevProductConfig(IoTProductVO devProduct) {
-    String appUnionId = queryIotUser(SecurityUtils.getUnionId()).getUnionId();
+    IoTUser iotUser = queryIotUser(SecurityUtils.getUnionId());
+    if (iotUser == null || iotUser.getUnionId() == null) {
+      throw new IoTException("获取用户信息异常", HttpStatus.HTTP_UNAUTHORIZED);
+    }
     // 根据id获取产品信息
     IoTProduct product = ioTProductMapper.selectDevProductById(String.valueOf(devProduct.getId()));
     if (devProduct == null) {
       throw new IoTException("产品不存在");
     }
-    if (!appUnionId.equals(product.getCreatorId())) {
+    if (!iotUser.getUnionId().equals(product.getCreatorId()) && !iotUser.isAdmin()) {
       throw new IoTException("无产品权限");
     }
     // 获取新的产品配置信息
@@ -627,67 +638,6 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
           throw new IoTException(port + "端口" + "已被占用");
         }
       }
-      Network network =
-          networkMapper.selectOne(Network.builder().productKey(product.getProductKey()).build());
-      int updateCount;
-      try {
-        // 获取配置
-        JSONObject tcpConfig = new JSONObject();
-        JSONObject parserConfiguration = new JSONObject();
-        parserConfiguration.set("cert", newConfig.getStr("cert"));
-        parserConfiguration.set("key", newConfig.getStr("key"));
-        parserConfiguration.set("rootCa", newConfig.getStr("rootCa"));
-        parserConfiguration.set("delimited", newConfig.getStr("delimited"));
-        parserConfiguration.set("lineMaxLength", newConfig.getInt("lineMaxLength"));
-        parserConfiguration.set("delimitedMaxlength", newConfig.getInt("delimitedMaxlength"));
-        parserConfiguration.set("fixedLength", newConfig.getInt("fixedLength"));
-        parserConfiguration.set("byteOrderLittle", newConfig.getBool("byteOrderLittle", false));
-        parserConfiguration.set("maxFrameLength", newConfig.getInt("maxFrameLength"));
-        parserConfiguration.set("lengthFieldOffset", newConfig.getInt("lengthFieldOffset"));
-        parserConfiguration.set("lengthFieldLength", newConfig.getInt("lengthFieldLength"));
-        parserConfiguration.set("lengthAdjustment", newConfig.getInt("lengthAdjustment"));
-        parserConfiguration.set("initialBytesToStrip", newConfig.getInt("initialBytesToStrip"));
-        parserConfiguration.set("failFast", newConfig.getBool("failFast", false));
-        tcpConfig.set("parserConfiguration", parserConfiguration);
-        tcpConfig.set("ssl", newConfig.getBool("ssl", false));
-        tcpConfig.set("port", port);
-        tcpConfig.set("onlyCache", newConfig.getBool("onlyCache", false));
-        tcpConfig.set("productKey", product.getProductKey());
-        tcpConfig.set("host", newConfig.getStr("host"));
-        tcpConfig.set(IoTConstant.ALLOW_INSERT, newConfig.getBool(IoTConstant.ALLOW_INSERT, false));
-        tcpConfig.set("preStore", newConfig.getBool("preStore", false));
-        tcpConfig.set("alwaysPreDecode", newConfig.getBool("alwaysPreDecode", false));
-        tcpConfig.set("decoderType", newConfig.getStr("decoderType"));
-        tcpConfig.set("parserType", newConfig.getStr("parserType"));
-        tcpConfig.set("allIdleTime", newConfig.getInt("allIdleTime"));
-        tcpConfig.set("readerIdleTime", newConfig.getInt("readerIdleTime"));
-        tcpConfig.set("writerIdleTime", newConfig.getInt("writerIdleTime"));
-        tcpConfig.set("readTimeout", newConfig.getInt("readTimeout"));
-        tcpConfig.set("sendTimeout", newConfig.getInt("sendTimeout"));
-        tcpConfig.set("idleInterval", newConfig.getInt("idleInterval"));
-        //        if (Objects.isNull(network)) {
-        //          // 新增
-        //          updateCount = networkMapper.insert(
-        //              Network.builder().type("TCP_SERVER").productKey(product.getProductKey())
-        //                  .description("tcp_server").createDate(new Date()).createUser(appUnionId)
-        //
-        // .state(newConfig.getBool("enabled")).configuration(tcpConfig.toString()).build());
-        //        } else {
-        //          // 更新
-        //          network.setConfiguration(tcpConfig.toString());
-        //          network.setState(newConfig.getBool("enabled"));
-        //          updateCount = networkMapper.updateByPrimaryKey(network);
-        //        }
-        // 更改配置后重启tcp监听
-        //        if (updateCount > 0) {
-        // 暂时不重启
-        //          flushNettyServer(JSONUtil.toJsonStr(tcpConfig), product.getProductKey(),
-        //              TcpFlushType.reload);
-        //        }
-      } catch (Exception e) {
-        log.error("tcp网络组件配置失败", e);
-        throw new IoTException("添加失败");
-      }
     }
     // 获取旧的产品配置信息
     JSONObject oldConfig = JSONUtil.parseObj(product.getConfiguration());
@@ -703,7 +653,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
           "更新产品={},更新状态={}，更新人={}",
           devProduct.getProductKey() + devProduct.getName(),
           updateCount,
-          appUnionId);
+          iotUser.getUnionId());
     }
 
     return updateCount;
@@ -1139,6 +1089,7 @@ public class IoTProductServiceImpl extends BaseServiceImpl implements IIoTProduc
   }
 
   @Override
+  @CacheEvict(cacheNames = {"iot_product_log_store_policy"},allEntries = true)
   public int updateDevProductStoreConfig(IoTProductVO storeConfig) {
     // 获取产品信息
     IoTProduct product = ioTProductMapper.selectDevProductById(String.valueOf(storeConfig.getId()));

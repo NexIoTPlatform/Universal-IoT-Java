@@ -11,14 +11,15 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * 数据桥接自动配置类
  *
- * <p>负责自动装配数据桥接相关的组件和插件
+ * <p>负责自动装配数据桥接相关的组件和插件</p>
  *
- * <p><b>注意：</b>@EnableAsync 已在主启动类中全局启用，此处无需重复配置
+ * <p><b>注意：</b>@EnableAsync 已在主启动类中全局启用，此处无需重复配置</p>
  *
  * @author NexIoT
  * @since 1.0

@@ -21,6 +21,7 @@ import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTConstant.MessageType;
 import cn.universal.core.message.UPRequest;
 import cn.universal.core.metadata.AbstractPropertyMetadata;
+import cn.universal.core.metadata.PropertyMode;
 import cn.universal.dm.device.entity.IoTDevicePropertiesBO;
 import cn.universal.persistence.dto.IoTDeviceDTO;
 import cn.universal.persistence.dto.LogStorePolicyDTO;
@@ -67,9 +68,6 @@ public class IoTDeviceShadowService {
   @Resource private SysDictDataMapper dictDataMapper;
 
   @Resource private IoTProductDeviceService iotProductDeviceService;
-
-  // 注入优化版服务
-  @Resource private IoTDeviceShadowServiceOptimized ioTDeviceShadowServiceOptimized;
 
   @Value("${shadow.cache.enabled:true}")
   private boolean shadowCacheEnabled;
@@ -162,7 +160,7 @@ public class IoTDeviceShadowService {
     return json;
   }
 
-  private void writeShadowToCache(String iotId, Shadow shadow) {
+  public void writeShadowToCache(String iotId, Shadow shadow) {
     if (!shadowCacheEnabled || shadow == null) {
       return;
     }
@@ -239,7 +237,15 @@ public class IoTDeviceShadowService {
     LogStorePolicyDTO storePolicyDTO =
         iotProductDeviceService.getProductLogStorePolicy(ioTDeviceDTO.getProductKey());
     propertyMetadataList.stream()
-        .filter(s -> finalProperties.get(s.getId()) != null)
+        .filter(
+            s -> {
+              Object reported = finalProperties.get(s.getId());
+              Object desired = finalDesireProperties.get(s.getId());
+              if (s.getMode() != null && PropertyMode.r.name().equalsIgnoreCase(s.getMode())) {
+                return reported != null;
+              }
+              return reported != null || desired != null;
+            })
         .forEach(
             s -> {
               Object obj = finalProperties.get(s.getId());
@@ -255,8 +261,14 @@ public class IoTDeviceShadowService {
                           .getJSONObject(s.getId())
                           .getLong("timestamp")
                       : DateUtil.currentSeconds();
-              entity.setDesireValue(finalDesireProperties.get(s.getId()));
-              entity.withValue(s.getValueType(), obj);
+              Object desiredObj = finalDesireProperties.get(s.getId());
+              entity.setDesireValue(desiredObj);
+              if (desiredObj != null) {
+                entity.withDesire(s.getValueType(), desiredObj);
+              }
+              if (obj != null) {
+                entity.withValue(s.getValueType(), obj);
+              }
               entity.setPropertyName(s.getName());
               entity.setIotId(iotId);
               entity.setDeviceId(ioTDeviceDTO.getDeviceId());
@@ -268,75 +280,7 @@ public class IoTDeviceShadowService {
               }
               result.add(entity);
             });
-    result.addAll(devCommonProperties(ioTDeviceDTO));
-    return result;
-  }
-
-  /** 数据为空也返回结果 - cache first */
-  public List<IoTDevicePropertiesBO> getDevStateWithNullResult(String iotId) {
-    List<IoTDevicePropertiesBO> result = new ArrayList<>();
-    Shadow shadow = readShadowFromCache(iotId);
-    if (shadow == null) {
-      IoTDeviceShadow ioTDeviceShadow =
-          ioTDeviceShadowMapper.selectOne(IoTDeviceShadow.builder().iotId(iotId).build());
-      if (ioTDeviceShadow != null && StrUtil.isNotBlank(ioTDeviceShadow.getMetadata())) {
-        shadow = JSONUtil.toBean(ioTDeviceShadow.getMetadata(), Shadow.class);
-        writeShadowToCache(iotId, shadow);
-      } else {
-        shadow = Shadow.builder().build();
-      }
-    }
-
-    JSONObject properties =
-        shadow.getState() != null ? shadow.getState().getReported() : new JSONObject();
-    JSONObject desireProperties =
-        shadow.getState() != null ? shadow.getState().getDesired() : new JSONObject();
-
-    Map<String, Object> map = new HashMap<>();
-    map.put("iotId", iotId);
-    IoTDeviceDTO ioTDeviceDTO = ioTDeviceMapper.selectIoTDeviceBO(map);
-    if (ioTDeviceDTO == null) {
-      return result;
-    }
-    List<AbstractPropertyMetadata> propertyMetadataList =
-        ioTDeviceDTO.getDeviceMetadata().getProperties();
-    if (CollectionUtil.isEmpty(propertyMetadataList)) {
-      return result;
-    }
-    Shadow finalShadow = shadow;
-    JSONObject finalProperties = properties;
-    JSONObject finalDesireProperties = desireProperties;
-    propertyMetadataList.forEach(
-        s -> {
-          Object obj = finalProperties.get(s.getId());
-          IoTDevicePropertiesBO entity = new IoTDevicePropertiesBO();
-          if (obj != null) {
-            entity.withValue(s.getValueType(), obj);
-            entity.setTimestamp(
-                finalShadow.getMetadata() != null
-                        && finalShadow.getMetadata().getReported() != null
-                        && finalShadow.getMetadata().getReported().getJSONObject(s.getId()) != null
-                    ? finalShadow
-                        .getMetadata()
-                        .getReported()
-                        .getJSONObject(s.getId())
-                        .getLong("timestamp")
-                    : DateUtil.currentSeconds());
-          } else {
-            entity.withValue(s.getValueType(), null);
-            entity.setTimestamp(DateUtil.currentSeconds());
-          }
-          entity.setPropertyName(s.getName());
-          entity.setIotId(iotId);
-          entity.setDeviceId(ioTDeviceDTO.getDeviceId());
-          entity.setProperty(s.getId());
-          if (finalDesireProperties.get(s.getId()) != null) {
-            entity.setDesireValue(finalDesireProperties.get(s.getId()));
-            entity.setCustomized(IoTConstant.DEVICE_SHADOW_DESIRED_PROPERTY);
-          }
-          result.add(entity);
-        });
-    result.addAll(devCommonProperties(ioTDeviceDTO));
+    result.addAll(commonProperties(ioTDeviceDTO));
     return result;
   }
 
@@ -364,11 +308,11 @@ public class IoTDeviceShadowService {
   }
 
   /**
-   * 处理部分产品设备配置的表号，imei，deviceId字段
+   * imei，deviceId字段
    *
-   * <p>查看dict字段表`device_common_property`
+   * <p>dict字典表：`device_common_property`
    */
-  private List<IoTDevicePropertiesBO> devCommonProperties(IoTDeviceDTO ioTDeviceDTO) {
+  private List<IoTDevicePropertiesBO> commonProperties(IoTDeviceDTO ioTDeviceDTO) {
     List<IoTDevicePropertiesBO> result = new ArrayList<>();
     if (ioTDeviceDTO == null) {
       return result;

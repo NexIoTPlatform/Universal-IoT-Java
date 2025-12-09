@@ -15,9 +15,7 @@
         <a-button type="primary" @click="updateMetadata">
           保存
         </a-button>
-        <a-button type="dashed" style="margin-left: 10px" @click="closePanel">{{
-            $t('button.cancel')
-          }}
+        <a-button type="dashed" style="margin-left: 10px" @click="closePanel">{{ $t('button.cancel') }}
         </a-button>
       </a-row>
     </a-row>

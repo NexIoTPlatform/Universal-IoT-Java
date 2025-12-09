@@ -200,17 +200,14 @@ public class SenceIoTDeviceDownService {
     devTag.setKey("geoPoint");
     devTag.setIotId(ioTDeviceBo.getIotId());
     // 转换为UnifiedDownlinkCommand（保持所有参数）
-    UnifiedDownlinkCommand command =
-        UnifiedDownlinkCommand.fromJson(JSONUtil.parseObj(downRequest));
+    UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromJson(JSONUtil.parseObj(downRequest));
     R result = IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(command);
-    log.info("场景联动,deviceId={} function={} 返回={}", deviceId, downRequest, result);
-    JSONObject jsonObject1 = JSONUtil.parseObj(result);
-    jsonObject1.set("down", downRequest);
-    if (0 == jsonObject1.getInt("code")) {
+    log.info("场景联动,deviceId={} function={} 返回={}", deviceId, downRequest, JSONUtil.toJsonStr(result));
+    if (result!=null && result.isSuccess()) {
       return DownResult.builder().success(true).downResult(result.getData()).build();
     } else {
-      log.warn("场景联动指令下发失败，错误信息：{}", jsonObject1.getStr("msg"));
-      return DownResult.builder().success(false).downResult(jsonObject1.getStr("msg")).build();
+      log.warn("场景联动指令下发失败，错误信息：{}", result.getMsg());
+      return DownResult.builder().success(false).downResult(result.getMsg()).build();
     }
   }
 }

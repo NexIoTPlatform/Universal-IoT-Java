@@ -60,7 +60,7 @@ public class DataBridgeManager {
   @Resource private TemplateEngine templateEngine;
 
   /** 处理设备数据 */
-  @Async("dataBridgeExecutor")
+  @Async("taskExecutor")
   public void processDeviceData(List<BaseUPRequest> requests) {
     if (CollectionUtil.isEmpty(requests)) {
       return;

@@ -57,12 +57,8 @@
 
             <a-col :lg="6" :md="8" :sm="12" :xs="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="handleQuery" icon="search">{{
-                    $t('button.query')
-                  }}</a-button>
-                <a-button style="margin-left: 8px" @click="resetQuery" icon="reload">{{
-                    $t('button.reset')
-                  }}</a-button>
+                <a-button type="primary" @click="handleQuery" icon="search">{{ $t('button.query') }}</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery" icon="reload">{{ $t('button.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -74,19 +70,16 @@
         <a-space>
           <a-button type="primary" @click="$refs.createForm.handleAdd()"
                     v-hasPermi="['network:mqtt:add']" icon="plus">
-            {{ $t('button.add') }}
-          </a-button>
+            {{ $t('button.add') }}</a-button>
           <a-button
             type="danger"
             @click="handleDelete"
             v-hasPermi="['network:mqtt:remove']"
             ghost
             icon="delete">
-            {{ $t('button.delete') }}
-          </a-button>
+            {{ $t('button.delete') }}</a-button>
           <a-button @click="handleExport" v-hasPermi="['network:mqtt:export']" icon="export">
-            {{ $t('button.export') }}
-          </a-button>
+            {{ $t('button.export') }}</a-button>
         </a-space>
         <a-button
           type="dashed"
@@ -150,7 +143,7 @@
               </div>
               <div class="card-row">
                 <a-icon type="poweroff" style="margin-right:4px;"/>
-                {{ $t('common.status') }}：
+                {{$t('common.status')}}：
                 <span :class="getStatusClass(item)">
                   {{ getStatusText(item) }}
                 </span>
@@ -206,8 +199,7 @@
         @cancel="bindProductsVisible = false"
         width="600px">
         <div v-if="currentBindProducts && currentBindProducts.length > 0">
-          <div v-for="(item, index) in currentBindProducts" :key="index"
-               style="margin-bottom: 16px;">
+          <div v-for="(item, index) in currentBindProducts" :key="index" style="margin-bottom: 16px;">
             <div style="display: flex; gap: 16px;">
               <div style="flex: 1;">
                 <a-descriptions :column="1" size="small">
@@ -255,13 +247,7 @@
 </template>
 
 <script>
-import {
-  delNetwork,
-  delNetworkBatch,
-  listNetwork,
-  startNetwork,
-  stopNetwork
-} from '@/api/system/network'
+import {delNetwork, delNetworkBatch, listNetwork, startNetwork, stopNetwork} from '@/api/system/network'
 import {listProduct} from '@/api/system/dev/product'
 import CreateForm from '../modules/CreateForm'
 import {parseTime} from '@/utils/ruoyi'
@@ -360,9 +346,11 @@ export default {
       }
 
       listNetwork(params).then(response => {
-        this.list = response.rows
-        this.total = response.total
+        this.list = response.rows || []
+        this.total = response.total || 0
         this.loading = false
+        // 强制更新视图
+        this.$forceUpdate()
       }).catch(() => {
         this.loading = false
       })
@@ -417,7 +405,10 @@ export default {
         onOk: () => {
           startNetwork(row.id).then(response => {
             this.$message.success('启动成功')
-            this.getList()
+            // 延迟一下再刷新，确保后端状态已更新
+            setTimeout(() => {
+              this.getList()
+            }, 500)
           }).catch(error => {
             this.$message.error(error.msg || '启动失败')
           })
@@ -432,7 +423,10 @@ export default {
         onOk: () => {
           stopNetwork(row.id).then(response => {
             this.$message.success('停止成功')
-            this.getList()
+            // 延迟一下再刷新，确保后端状态已更新
+            setTimeout(() => {
+              this.getList()
+            }, 500)
           }).catch(error => {
             this.$message.error(error.msg || '停止失败')
           })
@@ -566,9 +560,7 @@ export default {
     },
     /** 检查MQTT配置是否完整 */
     isMqttConfigured(item) {
-      if (!item.configuration) {
-        return false
-      }
+      if (!item.configuration) return false
       try {
         const config = typeof item.configuration === 'string'
           ? JSON.parse(item.configuration)
@@ -600,9 +592,7 @@ export default {
     },
     /** 获取产品图片 */
     getProductImage(item) {
-      if (!item.photoUrl) {
-        return null
-      }
+      if (!item.photoUrl) return null
 
       // 如果是字符串，尝试解析JSON
       if (typeof item.photoUrl === 'string') {

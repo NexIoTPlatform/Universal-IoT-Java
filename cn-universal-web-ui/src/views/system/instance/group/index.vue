@@ -57,18 +57,15 @@
                 <div class="header-actions">
                   <a-button type="primary" icon="plus" @click="bindInstance"
                             :disabled="groupId === 0 || groupId === '0'" size="small">
-                    {{ $t('button.bind.device') }}
-                  </a-button>
+                    {{ $t('button.bind.device') }} </a-button>
                   <a-button type="danger" icon="disconnect" :disabled="selectedRowKeys.length == 0"
                             @click="unBinds"
                             size="small" class="unbind-btn">
-                    {{ $t('button.bulk.unbind') }}
-                  </a-button>
+                    {{ $t('button.bulk.unbind') }} </a-button>
                   <a-button icon="reload" @click="resetDevice"
                             :disabled="groupId === 0 || groupId === '0'"
                             size="small">
-                    {{ $t('button.refresh') }}
-                  </a-button>
+                    {{ $t('button.refresh') }} </a-button>
                 </div>
               </div>
 
@@ -134,13 +131,7 @@
 </template>
 
 <script>
-import {
-  delDevByGroupId,
-  delGroup,
-  deviceListByGroupId,
-  getGroup,
-  listGroup
-} from '@/api/system/dev/devGroup'
+import {delDevByGroupId, delGroup, deviceListByGroupId, getGroup, listGroup} from '@/api/system/dev/devGroup'
 import GroupForm from '../modules/GroupForm'
 import allIcon from '@/core/icons'
 import BindGroup from '../modules/BindGroup'
@@ -323,17 +314,17 @@ export default {
         content: '当前选中组名为' + that.groupName + '的数据',
         onOk() {
           return delGroup(that.groupId)
-          .then(() => {
-            that.groupId = 0
-            that.groupName = ''
-            that.leven = 0
-            that.resetDetail()
-            that.getGroupList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.groupId = 0
+              that.groupName = ''
+              that.leven = 0
+              that.resetDetail()
+              that.getGroupList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -397,13 +388,13 @@ export default {
         content: '确定要解绑"' + b.deviceId + '"设备吗?',
         onOk() {
           return delDevByGroupId(that.groupId, b.iotId)
-          .then(() => {
-            that.getDeviceList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.getDeviceList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -418,21 +409,21 @@ export default {
         content: '确定要批量解绑设备吗?',
         onOk() {
           return delDevByGroupId(that.groupId, that.ids)
-          .then(() => {
-            that.getDeviceList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          }).finally(() => {
-            that.selectedRowKeys = []
-            that.selectedRows = []
-            // 非单个禁用
-            that.single = true
-            // 非多个禁用
-            that.multiple = true
-            that.ids = []
-          })
+            .then(() => {
+              that.getDeviceList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            }).finally(() => {
+              that.selectedRowKeys = []
+              that.selectedRows = []
+              // 非单个禁用
+              that.single = true
+              // 非多个禁用
+              that.multiple = true
+              that.ids = []
+            })
         },
         onCancel() {
         }

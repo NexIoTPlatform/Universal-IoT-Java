@@ -34,10 +34,7 @@
         <a-input v-model="form.remark" placeholder="备注"/>
       </a-form-item>
       <a-form-item :wrapper-col="{span:16, offset:6}">
-        <a-button type="primary" @click="handleSubmit" :loading="loading">{{
-            $t('button.save')
-          }}
-        </a-button>
+        <a-button type="primary" @click="handleSubmit" :loading="loading">{{ $t('button.save') }}</a-button>
         <a-button style="margin-left:12px;" @click="close">{{ $t('button.cancel') }}</a-button>
       </a-form-item>
     </a-form>

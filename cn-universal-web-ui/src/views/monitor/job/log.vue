@@ -58,16 +58,14 @@
       <div class="table-operations">
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['monitor:job:remove']">
-          <iot-icon type="icon-u-del"/>
-          {{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
         </a-button>
         <a-button type="danger" @click="handleClean" v-hasPermi="['monitor:job:remove']">
           <iot-icon type="icon-u-del"/>
           清空
         </a-button>
         <a-button type="primary" @click="handleExport" v-hasPermi="['monitor:job:export']">
-          <iot-icon type="icon-u-export"/>
-          {{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
         </a-button>
         <a-button
           type="dashed"
@@ -277,14 +275,14 @@ export default {
         content: '当前选中日志编号为' + jobLogIds + '的数据',
         onOk() {
           return delJobLog(jobLogIds)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -298,14 +296,14 @@ export default {
         content: '此操作将会清空所有调度日志数据项',
         onOk() {
           return cleanJobLog()
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '清空成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '清空成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

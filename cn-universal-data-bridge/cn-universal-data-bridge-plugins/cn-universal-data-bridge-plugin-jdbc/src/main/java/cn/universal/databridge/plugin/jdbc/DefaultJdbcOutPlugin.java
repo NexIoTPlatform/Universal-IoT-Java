@@ -106,22 +106,37 @@ public class DefaultJdbcOutPlugin extends AbstractDataOutputPlugin {
       BaseUPRequest request,
       DataBridgeConfig config,
       ResourceConnection connection) {
-
     try {
-      // 获取数据源
-      DataSource dataSource = connectionManager.getOrCreateDataSource(connection);
+      javax.sql.DataSource dataSource = connectionManager.getOrCreateDataSource(connection);
+      org.springframework.jdbc.core.JdbcTemplate jdbcTemplate = new org.springframework.jdbc.core.JdbcTemplate(dataSource);
 
-      // 使用Spring的JdbcTemplate执行SQL
-      JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-      jdbcTemplate.update(templateResult);
+      // 构建变量并进行参数化模板解析（避免引号问题，兼容多方言）
+      java.util.Map<String, Object> variables = buildTemplateVariables(request, parseConfig(config));
+      cn.universal.databridge.engine.ParamTemplateEngine engine = new cn.universal.databridge.engine.ParamTemplateEngine();
+      cn.universal.databridge.engine.SqlDialectAdapter adapter = getAdapter(connection.getType());
+      cn.universal.databridge.engine.ParamSql ps = engine.process(config.getTemplate(), variables, adapter);
 
+      jdbcTemplate.update(ps.getSql(), ps.getParams().toArray());
     } catch (Exception e) {
       log.error("执行SQL失败: {} - {}", templateResult, e.getMessage());
-
-      // 清除可能损坏的连接池
       connectionManager.removeDataSource(connection);
-
       throw new RuntimeException("SQL执行失败: " + e.getMessage(), e);
+    }
+  }
+
+  private cn.universal.databridge.engine.SqlDialectAdapter getAdapter(cn.universal.databridge.entity.ResourceConnection.ResourceType type) {
+    switch (type) {
+      case MYSQL:
+      case H2:
+        return new cn.universal.databridge.engine.dialect.MySqlDialectAdapter();
+      case POSTGRESQL:
+        return new cn.universal.databridge.engine.dialect.PostgresDialectAdapter();
+      case ORACLE:
+        return new cn.universal.databridge.engine.dialect.OracleDialectAdapter();
+      case SQLSERVER:
+        return new cn.universal.databridge.engine.dialect.SqlServerDialectAdapter();
+      default:
+        return new cn.universal.databridge.engine.dialect.MySqlDialectAdapter();
     }
   }
 
@@ -162,6 +177,7 @@ public class DefaultJdbcOutPlugin extends AbstractDataOutputPlugin {
   }
 
   // 使用正则表达式匹配所有 #{...} 占位符，支持嵌套属性
+  // 智能处理引号，兼容MySQL和PostgreSQL
   protected String processTemplate(String template, Map<String, Object> variables) {
     if (template == null || template.trim().isEmpty()) {
       log.warn("模板为空，无法处理");
@@ -174,7 +190,25 @@ public class DefaultJdbcOutPlugin extends AbstractDataOutputPlugin {
     while (matcher.find()) {
       String paramPath = matcher.group(1); // 获取变量路径，如 "properties.csq"
       Object value = getNestedValue(variables, paramPath);
-      String sqlValue = SqlValueConverter.convertToSqlJsonValue(value);
+      
+      // 检测占位符在模板中的上下文，判断是否已经在引号内
+      int start = matcher.start();
+      int end = matcher.end();
+      boolean inSingleQuotes = isInQuotes(template, start, end, '\'');
+      boolean inDoubleQuotes = isInQuotes(template, start, end, '"');
+      
+      String sqlValue;
+      if (inSingleQuotes) {
+        // 如果已经在单引号内，只替换值，不添加引号，但需要转义单引号
+        sqlValue = convertValueForQuotedContext(value, true);
+      } else if (inDoubleQuotes) {
+        // 如果已经在双引号内，只替换值，不添加引号，但需要转义双引号
+        sqlValue = convertValueForQuotedContext(value, false);
+      } else {
+        // 如果不在引号内，使用标准的SQL值转换（添加引号）
+        sqlValue = SqlValueConverter.convertToSqlValue(value);
+      }
+      
       matcher.appendReplacement(sb, java.util.regex.Matcher.quoteReplacement(sqlValue));
     }
     matcher.appendTail(sb);
@@ -182,4 +216,88 @@ public class DefaultJdbcOutPlugin extends AbstractDataOutputPlugin {
 
     return result;
   }
+
+  /**
+   * 检测占位符是否在引号内
+   * @param template 模板字符串
+   * @param start 占位符开始位置
+   * @param end 占位符结束位置
+   * @param quoteChar 引号字符（' 或 "）
+   * @return 是否在引号内
+   */
+  private boolean isInQuotes(String template, int start, int end, char quoteChar) {
+    // 向前查找最近的未转义引号
+    int quoteBefore = -1;
+    for (int i = start - 1; i >= 0; i--) {
+      if (template.charAt(i) == quoteChar) {
+        // 检查是否被转义（考虑连续的反斜杠）
+        int backslashCount = 0;
+        for (int j = i - 1; j >= 0 && template.charAt(j) == '\\'; j--) {
+          backslashCount++;
+        }
+        // 如果反斜杠数量是偶数，说明引号未被转义
+        if (backslashCount % 2 == 0) {
+          quoteBefore = i;
+          break;
+        }
+      }
+    }
+    
+    if (quoteBefore == -1) {
+      return false;
+    }
+    
+    // 向后查找匹配的未转义引号
+    int quoteAfter = -1;
+    for (int i = end; i < template.length(); i++) {
+      if (template.charAt(i) == quoteChar) {
+        // 检查是否被转义
+        int backslashCount = 0;
+        for (int j = i - 1; j >= 0 && template.charAt(j) == '\\'; j--) {
+          backslashCount++;
+        }
+        // 如果反斜杠数量是偶数，说明引号未被转义
+        if (backslashCount % 2 == 0) {
+          quoteAfter = i;
+          break;
+        }
+      }
+    }
+    
+    // 如果找到了匹配的引号对，说明在引号内
+    return quoteAfter != -1 && quoteBefore < start && quoteAfter >= end;
+  }
+
+  /**
+   * 为已在引号内的上下文转换值
+   * @param value 要转换的值
+   * @param isSingleQuote 是否是单引号上下文
+   * @return 转换后的值（不包含引号，但已转义）
+   */
+  private String convertValueForQuotedContext(Object value, boolean isSingleQuote) {
+    if (value == null) {
+      return "NULL";
+    }
+    
+    String quoteChar = isSingleQuote ? "'" : "\"";
+    String escapeChar = isSingleQuote ? "''" : "\\\"";
+    
+    if (value instanceof String) {
+      String strValue = (String) value;
+      // 转义引号
+      return strValue.replace(quoteChar, escapeChar);
+    } else if (value instanceof Number || value instanceof Boolean) {
+      // 数字和布尔类型直接转换
+      return value.toString();
+    } else if (value instanceof java.util.Date) {
+      // 日期类型转换为SQL标准格式
+      return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value);
+    } else {
+      // 其他类型：转为JSON字符串并转义引号
+      String jsonValue = cn.hutool.json.JSONUtil.toJsonStr(value);
+      return jsonValue.replace(quoteChar, escapeChar);
+    }
+  }
+
+
 }

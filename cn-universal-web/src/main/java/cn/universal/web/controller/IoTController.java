@@ -120,15 +120,15 @@ public class IoTController extends BaseApiController {
       @PathVariable("productKey") String productKey, @RequestBody String downRequest) {
     try {
       // 使用统一命令对象
-      UnifiedDownlinkCommand command =
-          UnifiedDownlinkCommand.fromString(downRequest)
-              .withProductKey(productKey)
-              .withAppUnionId(iotUnionId())
-              .withApplicationId(iotApplicationId())
-              .withCmd(DownCmd.DEV_ADD); // 确保指令类型正确
+      UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromString(downRequest)
+          .withProductKey(productKey)
+          .withAppUnionId(iotUnionId())
+          .withApplicationId(iotApplicationId())
+          .withCmd(DownCmd.DEV_ADD); // 确保指令类型正确
 
       // 参数验证
-      if (command.getDeviceId() != null && command.getDeviceId().matches(".*[\\^&*~@#$%()/].*")) {
+      if (command.getDeviceId() != null 
+          && command.getDeviceId().matches(".*[\\^&*~@#$%()/].*")) {
         return R.error(
             IoTErrorCode.DEV_ADD_DEVICE_ERROR.getCode(),
             IoTErrorCode.DEV_ADD_DEVICE_ERROR.getName());
@@ -178,7 +178,7 @@ public class IoTController extends BaseApiController {
   public R deleteIoTDevice(@PathVariable("iotId") String iotId) {
     try {
       log.info("删除设备,用户标识={},iotId={}", iotUnionId(), iotId);
-
+      
       IoTDeviceDTO ioTDeviceDTO = iotDeviceService.selectDevInstanceBO(iotId);
       if (ioTDeviceDTO == null) {
         return R.error(IoTErrorCode.DEV_NOT_FIND.getCode(), IoTErrorCode.DEV_NOT_FIND.getName());
@@ -186,16 +186,15 @@ public class IoTController extends BaseApiController {
       checkDevSelf(iotId);
 
       // 使用统一命令对象
-      UnifiedDownlinkCommand command =
-          UnifiedDownlinkCommand.builder()
-              .productKey(ioTDeviceDTO.getProductKey())
-              .deviceId(ioTDeviceDTO.getDeviceId())
-              .iotId(iotId)
-              .cmd(DownCmd.DEV_DEL)
-              .appUnionId(iotUnionId())
-              .applicationId(iotApplicationId())
-              .build()
-              .validate();
+      UnifiedDownlinkCommand command = UnifiedDownlinkCommand.builder()
+          .productKey(ioTDeviceDTO.getProductKey())
+          .deviceId(ioTDeviceDTO.getDeviceId())
+          .iotId(iotId)
+          .cmd(DownCmd.DEV_DEL)
+          .appUnionId(iotUnionId())
+          .applicationId(iotApplicationId())
+          .build()
+          .validate();
 
       IoTProduct ioTProduct = iotProductDeviceService.getProduct(ioTDeviceDTO.getProductKey());
       return IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(command);
@@ -268,7 +267,7 @@ public class IoTController extends BaseApiController {
     try {
       log.info("设备功能下发，用户={},iotId={} data={} ", iotUnionId(), iotId, function);
       checkDevSelf(iotId);
-
+      
       // 查询设备信息
       Map<String, Object> map = new HashMap<>();
       map.put("iotId", iotId);
@@ -294,18 +293,17 @@ public class IoTController extends BaseApiController {
       }
 
       // 使用统一命令对象
-      UnifiedDownlinkCommand command =
-          UnifiedDownlinkCommand.builder()
-              .productKey(ioTDeviceDTO.getProductKey())
-              .deviceId(ioTDeviceDTO.getDeviceId())
-              .iotId(iotId)
-              .cmd(DownCmd.DEV_FUNCTION)
-              .function(jsonObject) // 设置功能参数
-              .appUnionId(iotUnionId())
-              .applicationId(iotApplicationId())
-              .build()
-              .withSource("web-api") // 标记来源
-              .validate();
+      UnifiedDownlinkCommand command = UnifiedDownlinkCommand.builder()
+          .productKey(ioTDeviceDTO.getProductKey())
+          .deviceId(ioTDeviceDTO.getDeviceId())
+          .iotId(iotId)
+          .cmd(DownCmd.DEV_FUNCTION)
+          .function(jsonObject) // 设置功能参数
+          .appUnionId(iotUnionId())
+          .applicationId(iotApplicationId())
+          .build()
+          .withSource("web-api") // 标记来源
+          .validate();
 
       IoTProduct ioTProduct = iotProductDeviceService.getProduct(ioTDeviceDTO.getProductKey());
       return IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(command);

@@ -147,6 +147,8 @@ public class IoTDevice implements Serializable {
 
   @Transient private String deviceNode;
 
+  @Transient private String thirdPlatform;
+
   /** 纬度 */
   @Excel(name = "纬度")
   private transient String latitude;

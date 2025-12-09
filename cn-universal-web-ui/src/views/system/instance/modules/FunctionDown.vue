@@ -171,30 +171,57 @@
         </a-button>
       </div>
       <div class="log-content">
-        <div
-          v-for="(line, idx) in parsedLogLines"
-          :key="idx"
-          class="log-line"
-          :class="{
-            'log-success': line.status === 'success',
-            'log-fail': line.status === 'fail'
-          }"
-        >
-          <div>
-            <span class="log-time">{{ line.time }}</span>
-            <span class="log-action">{{ line.action }}</span>
-            <span class="log-result">{{ line.result }}</span>
+        <div v-for="(log, idx) in logList" :key="idx" class="log-item">
+          <div class="log-header" @click="toggleLog(idx)">
+            <a-icon :type="log.collapsed ? 'down' : 'up'" class="log-collapse-icon" />
+            <span class="log-time">{{ log.time }}</span>
+            <span class="log-action">{{ log.action }}</span>
           </div>
-          <div v-if="line.params" class="log-params-block">
-            <span class="log-params-label">参数: </span>
-            <span class="log-params-content">{{ line.params }}</span>
-          </div>
-          <div v-if="line.resultDetail" class="log-result-block">
-            <span class="log-result-label">结果: </span>
-            <span class="log-result-content">{{ line.resultDetail }}</span>
+          <div v-show="!log.collapsed">
+            <div v-if="log.params" class="log-block log-block-params">
+              <div class="log-label log-label-params">请求参数</div>
+              <div class="log-json-text log-json-params">{{ formatJsonString(log.params) }}</div>
+            </div>
+            <div v-if="log.response" class="log-block log-block-response">
+              <div class="log-label log-label-response">响应结果</div>
+              <!-- 如果响应包含图片URL -->
+              <div v-if="log.response.imgUrl && log.response.url" class="log-image-preview">
+                <div class="image-wrapper">
+                  <img 
+                    v-if="!log.imageError"
+                    :src="log.imageSrc || log.response.url" 
+                    alt="响应图片" 
+                    @error="handleImageError($event, idx)" 
+                    @load="handleImageLoad($event, idx)" 
+                  />
+                  <div v-if="log.imageLoading" class="image-loading">
+                    <a-spin size="small" /> 图片处理中，请稍候...
+                  </div>
+                  <div v-if="!log.imageError && !log.imageLoading" class="image-actions">
+                    <a-button type="link" size="small" @click.stop="downloadFile(log.response.url)">
+                      <a-icon type="download" /> 下载图片
+                    </a-button>
+                  </div>
+                  <div v-if="log.imageError" class="image-error">
+                    <a-icon type="exclamation-circle" /> 图片加载失败，后台处理中，请稍后刷新
+                  </div>
+                </div>
+              </div>
+              <!-- 如果响应包含文件URL -->
+              <div v-else-if="log.response.fileUrl" class="log-file-download">
+                <a-button type="primary" size="small" @click.stop="downloadFile(log.response.url || log.response.fileUrl)">
+                  <a-icon type="download" /> 下载文件
+                </a-button>
+                <span class="file-url">{{ log.response.url || log.response.fileUrl }}</span>
+              </div>
+              <!-- 普通文本显示 -->
+              <div v-else>
+                <div class="log-json-text log-json-response">{{ formatJsonString(log.response) }}</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div v-if="!parsedLogLines.length" class="log-empty">暂无日志</div>
+        <div v-if="!logList.length" class="log-empty">暂无日志</div>
       </div>
     </div>
   </div>
@@ -243,37 +270,9 @@ export default {
     JsonViewer
   },
   computed: {
-    parsedLogLines() {
-      if (!this.message) {
-        return [];
-      }
-      const lines = this.message.split('\n').filter(Boolean);
-      const result = [];
-      for (let i = 0; i < lines.length; i += 2) {
-        const opLine = lines[i];
-        const resLine = lines[i + 1] || '';
-        const timeMatch = opLine.match(/^\[(.*?)\]/);
-        const time = timeMatch ? timeMatch[1] : '';
-        let status = '';
-        if (opLine.includes('成功')) {
-          status = 'success';
-        }
-        if (opLine.includes('失败')) {
-          status = 'fail';
-        }
-        const actionMatch = opLine.match(/功能下发\[(.*?)\]/) || opLine.match(/功能调用\[(.*?)\]/);
-        const action = actionMatch ? actionMatch[1] : '';
-        const resultMatch = opLine.match(/成功|失败/);
-        const resultText = resultMatch ? resultMatch[0] : '';
-        const paramsMatch = opLine.match(/参数: (\{.*\})/) || opLine.match(/下发参数: (\{.*\})/);
-        const params = paramsMatch ? paramsMatch[1] : '';
-        const resultDetailMatch = resLine.match(/结果: (.*)$/) || resLine.match(/下发结果: (.*)$/)
-          || resLine.match(/调用结果: (.*)$/);
-        const resultDetail = resultDetailMatch ? resultDetailMatch[1] : resLine.replace(
-          /^\[.*?\]\s*/, '');
-        result.push({time, status, action, result: resultText, params, resultDetail});
-      }
-      return result;
+    // 日志列表（使用新的数据结构，不再解析字符串）
+    logList() {
+      return this.logs || []
     }
   },
   watch: {
@@ -288,10 +287,8 @@ export default {
   },
   data() {
     return {
-      // message
-      messageCopy: '',
-      // message
-      message: '',
+      // 日志列表（新的数据结构）
+      logs: [],
       // 是否显示弹出层
       open: false,
       // 提交状态
@@ -344,101 +341,287 @@ export default {
     },
     // 清除日志
     clearMessage() {
-      this.message = ''
-      this.messageCopy = ''
+      this.logs = []
+    },
+    
+    // 过滤掉 null 值的辅助函数
+    removeNullValues(obj) {
+      if (obj === null || obj === undefined) {
+        return obj
+      }
+      if (Array.isArray(obj)) {
+        return obj.map(item => this.removeNullValues(item))
+      }
+      if (typeof obj === 'object') {
+        const result = {}
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key) && obj[key] !== null) {
+            result[key] = this.removeNullValues(obj[key])
+          }
+        }
+        return result
+      }
+      return obj
+    },
+    
+    // 简化参数显示，只保留 function 对象
+    simplifyParams(params) {
+      if (!params || typeof params !== 'object') {
+        return params
+      }
+      // 如果参数有 function 字段，只返回 function 对象
+      if (params.function && typeof params.function === 'object') {
+        return this.removeNullValues(params.function)
+      }
+      return this.removeNullValues(params)
+    },
+    
+    // 处理响应，检查是否需要显示图片或下载文件
+    processResponse(response) {
+      if (!response || typeof response !== 'object') {
+        return response
+      }
+      
+      const processed = this.removeNullValues(response)
+      
+      // 不自动打开或下载，只在界面上显示预览和下载按钮
+      return processed
+    },
+    
+    // 下载文件
+    downloadFile(url) {
+      if (!url) return
+      
+      const link = document.createElement('a')
+      link.href = url
+      link.download = ''
+      link.target = '_blank'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    },
+    
+    // 在新标签页打开图片
+    openImageInNewTab(url) {
+      if (!url) return
+      window.open(url, '_blank')
+    },
+    
+    // 图片加载错误处理（带重试机制）
+    handleImageError(event, index) {
+      const log = this.logs[index]
+      if (!log || !log.response || !log.response.url) return
+      
+      // 如果重试次数未达到上限，延迟重试
+      const retryCount = log.imageRetryCount || 0
+      const maxRetries = 5 // 最多重试5次
+      const retryDelay = (retryCount + 1) * 2000 // 递增延迟：2s, 4s, 6s, 8s, 10s
+      
+      if (retryCount < maxRetries) {
+        // 设置重试次数和加载状态
+        this.$set(log, 'imageRetryCount', retryCount + 1)
+        this.$set(log, 'imageLoading', true)
+        this.$set(log, 'imageError', false)
+        
+        // 延迟重试，添加时间戳避免缓存
+        setTimeout(() => {
+          if (this.logs[index] && this.logs[index].response && this.logs[index].response.url) {
+            const url = this.logs[index].response.url
+            const separator = url.includes('?') ? '&' : '?'
+            this.$set(this.logs[index], 'imageSrc', `${url}${separator}_t=${Date.now()}`)
+          }
+        }, retryDelay)
+      } else {
+        // 超过重试次数，显示错误
+        this.$set(log, 'imageError', true)
+        this.$set(log, 'imageLoading', false)
+        if (event.target) {
+          event.target.style.display = 'none'
+        }
+      }
+    },
+    
+    // 图片加载成功
+    handleImageLoad(event, index) {
+      const log = this.logs[index]
+      if (log) {
+        this.$set(log, 'imageError', false)
+        this.$set(log, 'imageLoading', false)
+      }
+    },
+    
+    // 添加日志条目（新消息放在前面）
+    addLog(action, params, response) {
+      // 简化参数显示，只保留 function 对象
+      const simplifiedParams = this.simplifyParams(params)
+      
+      // 处理响应，检查图片和文件
+      const processedResponse = this.processResponse(response)
+      
+      // 将其他日志折叠，新日志展开
+      this.logs.forEach(log => {
+        log.collapsed = true
+      })
+      
+      // 使用 unshift 将新消息添加到数组前面，默认展开
+      const logEntry = {
+        time: this.formatDate(new Date()),
+        action: action,
+        params: simplifiedParams,
+        response: processedResponse,
+        collapsed: false,  // 最新消息默认展开
+        imageError: false,  // 图片加载错误标志
+        imageLoading: false,  // 图片加载中标志
+        imageRetryCount: 0,  // 图片重试次数
+        imageSrc: null  // 图片源（带时间戳避免缓存）
+      }
+      
+      // 如果响应包含图片URL，延迟加载图片（给后台处理时间）
+      if (processedResponse && processedResponse.imgUrl && processedResponse.url) {
+        logEntry.imageLoading = true
+        // 延迟1秒后开始加载图片，给后台处理时间
+        setTimeout(() => {
+          const logIndex = this.logs.findIndex(l => l === logEntry)
+          if (logIndex !== -1 && this.logs[logIndex]) {
+            const url = this.logs[logIndex].response.url
+            const separator = url.includes('?') ? '&' : '?'
+            this.$set(this.logs[logIndex], 'imageSrc', `${url}${separator}_t=${Date.now()}`)
+          }
+        }, 1000)
+      }
+      
+      this.logs.unshift(logEntry)
+      
+      // 自动滚动到顶部（因为新消息在前面）
+      this.$nextTick(() => {
+        const logContent = this.$el?.querySelector('.log-content')
+        if (logContent) {
+          logContent.scrollTop = 0
+        }
+      })
+    },
+    
+    // 切换日志折叠状态
+    toggleLog(index) {
+      if (this.logs[index]) {
+        this.logs[index].collapsed = !this.logs[index].collapsed
+      }
+    },
+    
+    // 格式化JSON为压缩字符串
+    formatJsonString(obj) {
+      if (!obj) return ''
+      try {
+        return JSON.stringify(obj)
+      } catch (e) {
+        return String(obj)
+      }
+    },
+    
+    // 构建请求数据
+    buildRequestData() {
+      const keyArray = Object.keys(this.functionFrom)
+      const keyValue = Object.values(this.functionFrom)
+      const data = {}
+      
+      // 提取参数数据（排除 function 字段）
+      for (let i = 0; i < keyArray.length; i++) {
+        if (keyArray[i] === 'function') {
+          continue
+        }
+        data[keyArray[i]] = keyValue[i]
+      }
+      
+      // 构建请求数据
+      const formData = {
+        appUnionId: this.$store.state.user.name,
+        productKey: this.productKey,
+        deviceId: this.deviceNo,
+        cmd: 'DEV_FUNCTION',
+        function: {
+          messageType: 'FUNCTIONS',
+          serviceType: this.serviceType,
+          function: this.functionFrom.function,
+          data: data
+        }
+      }
+      
+      // 获取功能名称和 source
+      let functionName = ''
+      for (let i = 0; i < this.metaData.functions.length; i++) {
+        if (this.metaData.functions[i].id === this.functionFrom.function) {
+          formData.function.source = this.metaData.functions[i].source
+          functionName = this.metaData.functions[i].name
+          break
+        }
+      }
+      
+      return {
+        formData,
+        functionName,
+        params: {
+          deviceId: this.deviceNo,
+          cmd: 'DEV_FUNCTION',
+          function: formData.function
+        }
+      }
     },
     // 功能下发
     functonDown() {
-      console.log('this.functionFrom = ', this.functionFrom)
       this.$refs.functionForm.validate(valid => {
-        if (valid) {
-          this.submitting = true
-          console.log('this.functionFrom success = ', this.functionFrom)
-          const formData = {}
-          const formDataPy = {}
-          formData.appUnionId = this.$store.state.user.name
-          formData.productKey = this.productKey
-          formData.deviceId = this.deviceNo
-          formData.cmd = 'DEV_FUNCTION'
-          formDataPy.deviceId = this.deviceNo
-          formDataPy.cmd = 'DEV_FUNCTION'
-          const keyArray = Object.keys(this.functionFrom)
-          const keyValue = Object.values(this.functionFrom)
-          const data = {}
-          for (let i = 0; i < keyArray.length; i++) {
-            if (keyArray[i] === 'function') {
-              continue
-            }
-            data[keyArray[i]] = keyValue[i]
-          }
-          formData.function = {
-            messageType: 'FUNCTIONS',
-            serviceType: this.serviceType,
-            function: this.functionFrom.function,
-            data: data
-          }
-          formDataPy.function = formData.function
-          console.log('formData success = ', formData)
-          let fun = ''
-          for (let i = 0; i < this.metaData.functions.length; i++) {
-            if (this.metaData.functions[i].id === this.functionFrom.function) {
-              formData.function.source = this.metaData.functions[i].source
-              fun = this.metaData.functions[i].name
-              break
-            }
-          }
-          functionDown(this.productKey, formData).then(res => {
-            console.log('res = ', res)
-            if (this.messageCopy === '') {
-              this.messageCopy = this.messageCopy + '[' + this.formatDate(new Date()) + '] 功能下发['
-                + fun + ']: ' + '下发成功' + '[下发参数: ' + JSON.stringify(formDataPy) + ']'
-              this.messageCopy = this.messageCopy + '\n' + '[' + this.formatDate(new Date())
-                + '] 下发结果: ' + JSON.stringify(res.data)
-            } else {
-              this.messageCopy = this.messageCopy + '\n' + '[' + this.formatDate(new Date())
-                + '] 功能下发[' + fun + ']: ' + '下发成功' + '[下发参数: ' + JSON.stringify(
-                  formDataPy) + ']'
-              this.messageCopy = this.messageCopy + '\n' + '[' + this.formatDate(new Date())
-                + '] 下发结果: ' + JSON.stringify(res.data)
-            }
-            this.message = '\n' + this.messageCopy + '\n'
-            this.$message.success(
-              '下发成功',
-              3
-            )
-            this.submitting = false
-          }).catch(reason => {
-            // 兼容处理：reason 可能是字符串（被拦截器处理过）或者是原始错误对象
-            let errorMsg = ''
-            if (typeof reason === 'string') {
-              // 如果是字符串，说明被 request.js 拦截器处理过
-              errorMsg = reason
-            } else if (reason && reason.response && reason.response.data) {
-              // 如果是原始错误对象
-              errorMsg = reason.response.data.msg || reason.message || '下发失败'
-            } else {
-              // 其他情况
-              errorMsg = reason.message || reason.toString() || '下发失败'
-            }
-
-            if (this.messageCopy === '') {
-              this.messageCopy = this.messageCopy + '[' + this.formatDate(new Date()) + '] 功能下发['
-                + fun + ']: ' + '下发失败' + '[下发参数: ' + JSON.stringify(formDataPy) + ']'
-              this.messageCopy = this.messageCopy + '\n' + '[' + this.formatDate(new Date())
-                + '] 下发结果: ' + errorMsg
-            } else {
-              this.messageCopy = this.messageCopy + '\n' + '[' + this.formatDate(new Date())
-                + '] 功能下发[' + fun + ']: ' + '下发失败' + '[下发参数: ' + JSON.stringify(
-                  formDataPy) + ']'
-              this.messageCopy = this.messageCopy + '\n' + '[' + this.formatDate(new Date())
-                + '] 下发结果: ' + errorMsg
-            }
-            this.message = '\n' + this.messageCopy + '\n'
-            this.submitting = false
-          })
-        } else {
+        if (!valid) {
           this.$message.error('请完善必填项')
           return false
+        }
+        
+        this.submitting = true
+        
+        try {
+          // 构建请求数据
+          const { formData, functionName, params } = this.buildRequestData()
+          
+          // 发送请求
+          functionDown(this.productKey, formData)
+            .then(res => {
+              // 添加日志
+              this.addLog(
+                `${functionName}`,
+                params,
+                res.data || res
+              )
+              this.$message.success('下发成功', 3)
+              this.submitting = false
+            })
+            .catch(reason => {
+              // 处理错误响应
+              let errorResponse = null
+              
+              if (typeof reason === 'string') {
+                errorResponse = { error: reason }
+              } else if (reason?.response?.data) {
+                errorResponse = reason.response.data
+              } else if (reason?.data) {
+                errorResponse = reason.data
+              } else {
+                errorResponse = { error: reason?.message || reason?.toString() || '下发失败' }
+              }
+              
+              const { functionName, params } = this.buildRequestData()
+              
+              // 添加日志
+              this.addLog(
+                `${functionName}`,
+                params,
+                errorResponse
+              )
+              
+              this.$message.error('下发失败', 3)
+              this.submitting = false
+            })
+        } catch (error) {
+          console.error('构建请求数据失败:', error)
+          this.$message.error('构建请求数据失败')
+          this.submitting = false
         }
       })
     },
@@ -450,36 +633,30 @@ export default {
         this.sourceShow = false
       }
       this.serviceType = undefined
-      console.log('configration = ', this.configration)
-      console.log('value event = ', value)
-      console.log('option event = ', option)
-
+      
       // 重置表单，保留功能选择
       this.functionFrom = {
         function: value
       }
-
+      
       if (value !== undefined && value !== null) {
         this.metaData.functions.forEach(item => {
           if (item.id === value) {
-            console.log('item.id = ', item.id)
             // 初始化参数项
             this.functionParams = item.inputs
-
+            
             // 使用 deviceConfig.js 的自动填充功能
             const autoFilledValues = autoFillFromParams(
               this.functionParams,
               this.deviceNo,
               this.configration
             )
-
+            
             // 合并自动填充的值到表单
             this.functionFrom = {
               ...this.functionFrom,
               ...autoFilledValues
             }
-
-            console.log('this.functionFrom = ', this.functionFrom, this.functionParams)
           }
         })
       } else {
@@ -493,9 +670,6 @@ export default {
     },
     // 初始化数据
     initData() {
-      console.log('metaData event = ', this.metaData)
-      console.log('metaData productKey = ', this.productKey)
-      console.log('metaData deviceNo = ', this.deviceNo)
       this.functionParams = []
       this.clearMessage()
       this.functionFrom = {
@@ -652,67 +826,110 @@ export default {
 
 .log-content {
   flex: 1;
-  padding: 16px 20px;
+  padding: 12px 16px;
   overflow-y: auto;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.4;
+  background: #fff;
 }
 
-.log-line {
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
-  word-break: break-all;
+.log-item {
+  margin-bottom: 0;
+  padding: 4px 0;
+  border-bottom: 1px solid #e8e8e8;
 }
 
-.log-line:last-child {
+.log-item:last-child {
   border-bottom: none;
 }
 
+.log-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.2;
+}
+
+.log-collapse-icon {
+  font-size: 10px;
+  color: #8c8c8c;
+  flex-shrink: 0;
+  margin-right: 0;
+}
+
 .log-time {
-  color: #999;
-  min-width: 90px;
+  color: #8c8c8c;
+  font-size: 10px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  flex-shrink: 0;
+  min-width: 150px;
+  white-space: nowrap;
+  font-weight: normal;
 }
 
 .log-action {
-  color: #333;
-  font-weight: bold;
+  color: #262626;
+  font-size: 11px;
+  flex: 1;
+  margin-left: 0;
+  font-weight: normal;
 }
 
-.log-result {
-  margin-left: 4px;
-}
-
-.log-success .log-result {
-  color: #52c41a;
-  font-weight: bold;
-}
-
-.log-fail .log-result {
-  color: #f5222d;
-  font-weight: bold;
-}
-
-.log-params-block, .log-result-block {
-  margin-left: 12px;
+.log-block {
   margin-top: 4px;
+}
+
+.log-block:first-of-type {
+  margin-top: 0;
+}
+
+.log-label {
   font-size: 12px;
-  white-space: pre-wrap;
-  word-break: break-all;
-  padding: 4px 8px;
-  background: #f8f9fa;
-  border-radius: 4px;
+  color: #595959;
+  margin-bottom: 2px;
+  font-weight: normal;
 }
 
-.log-params-label, .log-result-label {
-  color: #666;
-  font-weight: 500;
-}
-
-.log-params-content, .log-result-content {
-  color: #333;
+.log-json-text {
+  font-size: 12px;
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  color: #333;
+  padding: 6px 10px;
+  border-radius: 2px;
+  word-break: break-all;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+/* 参数样式 - 蓝色系 */
+.log-label-params {
+  color: #1890ff;
+}
+
+.log-json-params {
+  background: #e6f7ff;
+}
+
+/* 结果样式 - 绿色系 */
+.log-label-response {
+  color: #52c41a;
+}
+
+.log-json-response {
+  background: #f6ffed;
+}
+
+.log-block ::v-deep .jv-container {
+  margin: 0;
+}
+
+.log-block ::v-deep .jv-container .jv-code {
+  padding: 4px 8px;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .log-empty {
@@ -720,6 +937,69 @@ export default {
   text-align: center;
   padding: 40px 0;
   font-size: 14px;
+}
+
+.log-image-preview {
+  margin-top: 4px;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.image-wrapper img {
+  max-width: 500px;
+  max-height: 400px;
+  display: block;
+}
+
+.image-actions {
+  margin-top: 4px;
+  display: flex;
+  gap: 16px;
+}
+
+.image-actions .ant-btn-link {
+  padding: 0;
+  height: auto;
+  font-size: 12px;
+}
+
+.image-loading {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.image-error {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.log-file-download {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.file-url {
+  flex: 1;
+  font-size: 12px;
+  color: #595959;
+  word-break: break-all;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 

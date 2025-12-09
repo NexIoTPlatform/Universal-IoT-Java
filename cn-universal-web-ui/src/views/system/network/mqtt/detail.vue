@@ -1,243 +1,435 @@
 <template>
-  <div class="mqtt-detail-page minimal">
-    <div class="mqtt-detail-header">
-      <div class="mqtt-detail-title">
-        MQTT网络组件详情
-        <a-tag :color="networkInfo.state ? 'green' : 'red'"
-               style="margin-left:16px;vertical-align:middle;">
-          {{ networkInfo.state ? '运行中' : '已停止' }}
-        </a-tag>
-      </div>
-      <a-button type="default" icon="arrow-left" style="margin: 16px 0 0 0;"
-                @click="$router.back()">返回上一页
-      </a-button>
-    </div>
-    <a-row :gutter="32" style="margin-top:24px;">
-      <a-col :span="11">
-        <a-card :bordered="false" class="minimal-card" :bodyStyle="{ padding: '20px 24px' }">
-          <a-descriptions :column="1" size="default">
-            <a-descriptions-item label="组件名称">{{ networkInfo.name }}</a-descriptions-item>
-            <a-descriptions-item label="MQTT类型">
-              <template v-if="networkInfo.type === 'MQTT_CLIENT'">MQTT客户端</template>
-              <template v-else-if="networkInfo.type === 'MQTT_SERVER'">MQTT服务端</template>
-              <template v-else>{{ networkInfo.type }}</template>
-            </a-descriptions-item>
-            <a-descriptions-item label="唯一标识">{{ networkInfo.unionId }}</a-descriptions-item>
-            <a-descriptions-item label="产品Key">{{ networkInfo.productKey }}</a-descriptions-item>
-            <a-descriptions-item :label="$t('time.create')">{{
-                parseTime(networkInfo.createDate)
-              }}
-            </a-descriptions-item>
-            <a-descriptions-item label="描述">{{
-                networkInfo.description || '暂无描述'
-              }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-card>
-
-        <a-card :bordered="false" class="minimal-card"
-                :bodyStyle="{ padding: '20px 24px', marginTop: '16px' }">
-          <div class="mqtt-detail-section-title">
-            配置信息
-            <a-button v-if="!editing" type="link" size="small" style="float:right;"
-                      @click="editing = true">{{ $t('button.edit') }}
-            </a-button>
+  <div class="app-container">
+    <a-card :bordered="false">
+      <div class="page-header">
+        <div class="header-left">
+          <a-button type="text" icon="left" @click="$router.back()" class="back-btn" />
+          <div class="page-title">
+            <h1>{{ networkInfo.name || 'MQTT网络组件' }}</h1>
           </div>
-          <template v-if="!editing">
-            <a-descriptions :column="1" size="default">
-              <a-descriptions-item v-for="field in configFields" :key="field.key" v-if="!field.hide"
-                                   :label="field.label">
-                {{ renderReadValue(field) }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </template>
+          <a-tag :color="networkInfo.running ? 'green' : 'red'" style="margin-left: 12px;">
+            {{ networkInfo.running ? '运行中' : '已停止' }}
+          </a-tag>
+        </div>
+        <div class="header-right">
+          <a-button 
+            v-if="!editing" 
+            type="primary" 
+            icon="edit" 
+            @click="startEdit" 
+            v-hasPermi="['network:mqtt:edit']">
+            编辑配置
+          </a-button>
           <template v-else>
-            <a-form :model="formData" layout="horizontal" label-col="{ style: { width: '120px' } }"
-                    wrapper-col="{ style: { width: '320px' } }">
-              <a-row :gutter="0">
-                <a-col :span="24" v-for="field in configFields" :key="field.key" v-if="!field.hide">
-                  <a-form-item :label="field.label">
-                    <template v-if="field.type === 'int'">
-                      <a-input-number v-model="formData[field.key]" :placeholder="field.remark"
-                                      style="width:100%" :step="1" :precision="0"/>
-                    </template>
-                    <template v-else-if="field.type === 'json'">
-                      <a-textarea v-model="formData[field.key]" :placeholder="field.remark"
-                                  auto-size/>
-                    </template>
-                    <template v-else-if="field.type === 'file'">
-                      <a-upload v-model="formData[field.key]" :show-upload-list="false"/>
-                    </template>
-                    <template v-else-if="field.type === 'select'">
-                      <a-select v-model="formData[field.key]" :placeholder="field.remark">
-                        <a-select-option v-for="opt in field.options" :key="opt.value"
-                                         :value="opt.value">{{ opt.label }}
-                        </a-select-option>
-                      </a-select>
-                    </template>
-                    <template v-else-if="field.type === 'boolean'">
-                      <a-select v-model="formData[field.key]" :placeholder="field.remark">
-                        <a-select-option v-for="opt in field.options" :key="opt.value"
-                                         :value="opt.value">{{ opt.label }}
-                        </a-select-option>
-                      </a-select>
-                    </template>
-                    <template v-else>
-                      <a-input v-model="formData[field.key]" :placeholder="field.remark"/>
-                    </template>
-                  </a-form-item>
-                </a-col>
-              </a-row>
-              <div style="margin-top:16px;text-align:right;">
-                <a-button type="link" size="small" @click="handleSaveConfig">{{
-                    $t('button.save')
-                  }}
-                </a-button>
-                <a-button type="link" size="small" style="margin-left:8px;" @click="cancelEdit">
-                  取消
-                </a-button>
-              </div>
-            </a-form>
+            <a-button @click="cancelEdit" style="margin-right: 8px;">取消</a-button>
+            <a-button type="primary" @click="handleSaveAll" :loading="saving" v-hasPermi="['network:mqtt:edit']">
+              保存配置
+            </a-button>
           </template>
-        </a-card>
-      </a-col>
-      <a-col :span="13">
-        <!-- 主要监测区域 -->
-        <a-card :bordered="false" class="minimal-card monitor-card strong"
-                :bodyStyle="{ padding: '20px 24px' }">
-          <div class="monitor-title">主要监测</div>
-          <div class="monitor-stats-row">
-            <div class="stat-block">
-              <a-icon type="cluster" class="stat-icon cluster"/>
-              <span class="stat-label">集群节点</span>
-              <span class="stat-value">{{ monitorData.cluster.online }}/{{
-                  monitorData.cluster.total
-                }}</span>
-            </div>
-            <div class="stat-block">
-              <a-icon type="team" class="stat-icon device"/>
-              <span class="stat-label">活跃连接</span>
-              <span class="stat-value">{{ monitorData.device.active }}</span>
-            </div>
-            <div class="stat-block">
-              <a-icon type="message" class="stat-icon message"/>
-              <span class="stat-label">消息QPS</span>
-              <span class="stat-value">{{ monitorData.message.qps }}</span>
-            </div>
-            <div class="stat-block">
-              <a-icon type="warning" class="stat-icon alert"/>
-              <span class="stat-label">异常节点</span>
-              <span class="stat-value">{{ monitorData.cluster.abnormal }}</span>
-            </div>
-            <div class="stat-block">
-              <a-icon type="tags" class="stat-icon topic"/>
-              <span class="stat-label">主题数量</span>
-              <span class="stat-value">{{ monitorData.topic.count }}</span>
-            </div>
-          </div>
-        </a-card>
-
-        <!-- MQTT订阅主题信息 -->
-        <a-card :bordered="false" class="minimal-card"
-                :bodyStyle="{ padding: '20px 24px', marginTop: '16px' }">
-          <div class="mqtt-detail-section-title">
-            <a-icon type="message" style="margin-right: 8px; color: #1890ff;"/>
-            MQTT订阅主题
-            <a-tooltip title="${productKey} 和 ${deviceId} 分别替换为productKey和deviceId">
-              <a-icon type="question-circle"
-                      style="margin-left: 8px; color: #999; cursor: pointer;"/>
-            </a-tooltip>
-          </div>
-
-          <!-- 物模型主题 -->
-          <div class="topic-section">
-            <div class="topic-category">
-              <a-icon type="appstore" style="color: #1890ff; margin-right: 6px;"/>
-              <span class="topic-category-title">物模型主题</span>
-            </div>
-            <div class="topic-list">
-              <div class="topic-item">
-                <div class="topic-label">属性上报</div>
-                <div class="topic-value">$thing/up/property/${productKey}/${deviceId}</div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">事件上报</div>
-                <div class="topic-value">$thing/up/event/${productKey}/${deviceId}</div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">指令发布</div>
-                <div class="topic-value">$thing/down/${productKey}/${deviceId}</div>
-              </div>
-            </div>
-          </div>
-          <!-- 透传主题 -->
-          <div class="topic-section">
-            <div class="topic-category">
-              <a-icon type="swap" style="color: #fa8c16; margin-right: 6px;"/>
-              <span class="topic-category-title">透传主题</span>
-            </div>
-            <div class="topic-list">
-              <div class="topic-item">
-                <div class="topic-label">数据上报</div>
-                <div class="topic-value">$thing/up/${productKey}/${deviceId}</div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">指令发布</div>
-                <div class="topic-value">$thing/down/${productKey}/${deviceId}</div>
-              </div>
-            </div>
-          </div>
-          <!-- 系统级别主题 -->
-          <div class="topic-section">
-            <div class="topic-category">
-              <a-icon type="setting" style="color: #52c41a; margin-right: 6px;"/>
-              <span class="topic-category-title">系统级别主题（未实现）</span>
-            </div>
-            <div class="topic-list">
-              <div class="topic-item">
-                <div class="topic-label">OTA上报</div>
-                <div class="topic-value">$ota/report/${productKey}/${deviceId}</div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">OTA下发</div>
-                <div class="topic-value">$ota/update/${productKey}/${deviceId}</div>
-              </div>
-            </div>
-          </div>
-
-        </a-card>
-      </a-col>
-    </a-row>
-    <a-modal v-model="previewVisible" title="请确认即将提交的配置JSON" :footer="null" width="600px">
-      <pre
-        style="background:#f6f6f6;padding:16px;border-radius:4px;max-height:400px;overflow:auto;">{{
-          previewJson
-        }}</pre>
-      <div style="text-align:right;margin-top:16px;">
-        <a-button @click="previewVisible=false">{{ $t('button.cancel') }}</a-button>
-        <a-button type="primary" style="margin-left:8px;" @click="confirmSaveConfig">确认提交
-        </a-button>
+        </div>
       </div>
-    </a-modal>
+      
+      <a-spin :spinning="loading" tip="Loading...">
+        <!-- 自定义标签页导航 -->
+        <div class="custom-tabs-container">
+          <div class="custom-tabs-nav">
+            <div class="custom-tab-item" :class="{ active: activeTab === '1' }" @click="switchTab('1')">
+              <a-icon type="info-circle" style="margin-right: 6px;" />
+              基础配置
+            </div>
+            <div class="custom-tab-item" :class="{ active: activeTab === '2' }" @click="switchTab('2')">
+              <a-icon type="api" style="margin-right: 6px;" />
+              主题订阅
+            </div>
+            <div class="custom-tab-item" :class="{ active: activeTab === '3' }" @click="switchTab('3')">
+              <a-icon type="setting" style="margin-right: 6px;" />
+              高级设置
+            </div>
+          </div>
+
+          <!-- 标签页内容 -->
+          <div class="custom-tab-content">
+            <!-- 基础配置（合并基础信息和连接配置） -->
+            <div v-show="activeTab === '1'" class="tab-pane">
+              <div class="device-basic-info">
+                <div class="basic-info-header">
+                  <h3>基础配置</h3>
+                  <a-button v-if="!editing" type="link" size="small" @click="startEdit" v-hasPermi="['network:mqtt:edit']">
+                    <a-icon type="edit" /> 编辑
+                  </a-button>
+                </div>
+                
+                <!-- 基础信息部分 -->
+                <div class="info-section">
+                  <div class="section-subtitle">基础信息</div>
+                  <div class="basic-info-grid compact-grid">
+                    <div class="info-item">
+                      <span class="info-label">组件类型</span>
+                      <a-tag color="blue">
+                        <template v-if="networkInfo.type === 'MQTT_CLIENT'">MQTT客户端</template>
+                        <template v-else-if="networkInfo.type === 'MQTT_SERVER'">MQTT服务端</template>
+                        <template v-else>{{ networkInfo.type }}</template>
+                      </a-tag>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">创建时间</span>
+                      <span class="info-value">{{ parseTime(networkInfo.createDate) }}</span>
+                    </div>
+                    <div class="info-item info-item-full">
+                      <span class="info-label">唯一标识</span>
+                      <div class="info-value-group">
+                        <span class="info-value code">{{ networkInfo.unionId }}</span>
+                        <a-button type="text" size="small" class="copy-action-btn" @click.stop="copyToClipboard(networkInfo.unionId)" title="复制">
+                          <a-icon type="copy"/>
+                        </a-button>
+                      </div>
+                    </div>
+                    <div class="info-item info-item-full" v-if="networkInfo.description">
+                      <span class="info-label">描述信息</span>
+                      <span class="info-value">{{ networkInfo.description }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 连接配置部分 -->
+                <div class="info-section" style="margin-top: 24px;">
+                  <div class="section-subtitle">连接配置</div>
+                  <template v-if="!editing">
+                    <div class="basic-info-grid compact-grid">
+                      <div class="info-item" v-for="field in connectionFields" :key="field.key" v-if="!field.hide">
+                        <span class="info-label">{{ field.label }}</span>
+                        <span class="info-value">{{ renderReadValue(field) }}</span>
+                      </div>
+                    </div>
+                  </template>
+                  
+                  <template v-else>
+                    <a-form :model="formData" layout="vertical">
+                      <a-row :gutter="[16, 0]">
+                        <a-col :span="12" v-for="field in connectionFields" :key="field.key" v-if="!field.hide">
+                          <a-form-item :label="field.label" :required="field.required">
+                            <a-input
+                              v-if="field.type === 'string' && field.key !== 'password'"
+                              v-model="formData[field.key]"
+                              :placeholder="field.remark"
+                            />
+                            <a-input-password
+                              v-else-if="field.key === 'password'"
+                              v-model="formData[field.key]"
+                              :placeholder="field.remark"
+                            />
+                            <a-input-number
+                              v-else-if="field.type === 'int'"
+                              v-model="formData[field.key]"
+                              :placeholder="field.remark"
+                              style="width:100%"
+                              :step="1"
+                              :precision="0"
+                              :min="field.min"
+                              :max="field.max"
+                            />
+                            <a-select
+                              v-else-if="field.type === 'select'"
+                              v-model="formData[field.key]"
+                              :placeholder="field.remark"
+                            >
+                              <a-select-option v-for="opt in field.options" :key="opt.value" :value="opt.value">
+                                {{ opt.label }}
+                              </a-select-option>
+                            </a-select>
+                            <a-switch
+                              v-else-if="field.type === 'boolean'"
+                              v-model="formData[field.key]"
+                            />
+                          </a-form-item>
+                        </a-col>
+                      </a-row>
+                    </a-form>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- 主题订阅 -->
+            <div v-show="activeTab === '2'" class="tab-pane">
+              <div class="device-basic-info">
+                <div class="basic-info-header">
+                  <h3>主题订阅配置</h3>
+                  <a-button v-if="!editing" type="link" size="small" @click="startEdit" v-hasPermi="['network:mqtt:edit']">
+                    <a-icon type="edit" /> 编辑
+                  </a-button>
+                </div>
+
+                <!-- 已绑定产品 -->
+                <div class="bound-products-section">
+                  <div class="section-title">
+                    <a-icon type="appstore" style="color: #1890ff; margin-right: 8px;" />
+                    <span>已绑定产品</span>
+                    <a-tag color="blue" style="margin-left: 8px;">
+                      {{ (networkInfo.bindMqttServerProducts && networkInfo.bindMqttServerProducts.length) || 0 }}个
+                    </a-tag>
+                  </div>
+                  <div v-if="networkInfo.bindMqttServerProducts && networkInfo.bindMqttServerProducts.length > 0" class="product-tags">
+                    <a-tag 
+                      v-for="product in networkInfo.bindMqttServerProducts" 
+                      :key="product.productKey" 
+                      color="blue" 
+                      style="margin: 4px; padding: 4px 12px; font-size: 13px;">
+                      {{ product.name }} ({{ product.productKey }})
+                    </a-tag>
+                  </div>
+                  <div v-else class="empty-tip-small">
+                    <span style="color: #8c8c8c;">暂无绑定产品</span>
+                  </div>
+                </div>
+
+                <!-- 主题模式测试工具（仅编辑模式） -->
+                <!-- <div v-if="editing" class="topic-tester-section"> -->
+                <div class="topic-tester-section">
+
+                  <div class="section-title">
+                    <a-icon type="experiment" style="color: #52c41a; margin-right: 8px;" />
+                    <span>主题模式测试工具</span>
+                    <a-tooltip title="输入实际topic测试是否匹配配置的模式">
+                      <a-icon type="question-circle" style="color: #999; margin-left: 8px; cursor: pointer;" />
+                    </a-tooltip>
+                  </div>
+                  <div class="tester-content">
+                    <a-input 
+                      v-model="testTopic" 
+                      placeholder="输入实际topic进行测试，例如: $third/up/device1/data"
+                      @pressEnter="testTopicMatch"
+                      style="margin-bottom: 12px;">
+                      <a-button slot="addonAfter" type="primary" @click="testTopicMatch">测试匹配</a-button>
+                    </a-input>
+                    <div v-if="testResult" class="test-result" :class="{ 'test-success': testResult.matched, 'test-fail': !testResult.matched }">
+                      <a-icon :type="testResult.matched ? 'check-circle' : 'close-circle'" />
+                      <span>{{ testResult.message }}</span>
+                      <span v-if="testResult.matched && testResult.productKey" class="matched-product">
+                        匹配产品: {{ getProductName(testResult.productKey) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 主题映射配置 -->
+                <div class="topic-mapping-section">
+                  <div class="section-title">
+                    <a-icon type="link" style="color: #fa8c16; margin-right: 8px;" />
+                    <span>主题映射配置</span>
+                    <a-tooltip title="配置订阅主题与产品的映射关系，用于消息路由。留空产品时将根据实际消息topic自动匹配productKey">
+                      <a-icon type="question-circle" style="color: #999; margin-left: 8px; cursor: pointer;" />
+                    </a-tooltip>
+                    <a-button 
+                      v-if="editing" 
+                      type="primary" 
+                      icon="plus" 
+                      size="small" 
+                      @click="handleAddTopicMapping" 
+                      style="margin-left: auto;"
+                      v-hasPermi="['network:mqtt:edit']">
+                      添加主题
+                    </a-button>
+                  </div>
+
+                  <template v-if="!editing">
+                    <a-table 
+                      :columns="topicMappingColumns" 
+                      :dataSource="topicMappings" 
+                      :pagination="false"
+                      size="middle"
+                      :rowKey="(record, index) => index"
+                      style="margin-top: 16px;">
+                      <template slot="qos" slot-scope="text">
+                        <a-tag :color="getQosColor(text)">
+                          {{ text !== null && text !== undefined ? String(text) : '-' }}
+                        </a-tag>
+                      </template>
+                      <template slot="topicCategory" slot-scope="text">
+                        <a-tag :color="text === 'THING_MODEL' ? 'blue' : text === 'PASSTHROUGH' ? 'green' : 'default'">
+                          {{ text === 'THING_MODEL' ? '物模型' : text === 'PASSTHROUGH' ? '透传' : '未配置' }}
+                        </a-tag>
+                      </template>
+                      <template slot="productKey" slot-scope="text, record">
+                        <span v-if="text" class="product-name">{{ getProductName(text) }}</span>
+                        <span v-else class="text-muted">自动匹配</span>
+                      </template>
+                      <template slot="enabled" slot-scope="text">
+                        <a-tag :color="text ? 'green' : 'red'">{{ text ? '启用' : '禁用' }}</a-tag>
+                      </template>
+                    </a-table>
+                    <div v-if="topicMappings.length === 0" class="empty-tip">
+                      <a-empty description="暂无主题映射配置" :image="false" />
+                    </div>
+                  </template>
+
+                  <template v-else>
+                    <a-table 
+                      :columns="topicMappingEditColumns" 
+                      :dataSource="topicMappings" 
+                      :pagination="false"
+                      size="middle"
+                      :rowKey="(record, index) => index"
+                      style="margin-top: 16px;">
+                      <template slot="topicPattern" slot-scope="text, record, index">
+                        <a-input 
+                          v-model="record.topicPattern" 
+                          placeholder="例如: $third/up/# 或 device/+/data" 
+                          @blur="validateTopicPattern(record, index)">
+                          <template slot="suffix">
+                            <a-tooltip title="支持MQTT通配符：+ 匹配单级， # 匹配多级">
+                              <a-icon type="question-circle" style="color: #999;" />
+                            </a-tooltip>
+                          </template>
+                        </a-input>
+                        <div v-if="record.topicError" class="field-error">{{ record.topicError }}</div>
+                      </template>
+                      <template slot="qos" slot-scope="text, record, index">
+                        <a-select v-model="record.qos" style="width: 100%">
+                          <a-select-option :value="0">0 - 最多一次</a-select-option>
+                          <a-select-option :value="1">1 - 至少一次（推荐）</a-select-option>
+                          <a-select-option :value="2">2 - 仅一次</a-select-option>
+                        </a-select>
+                      </template>
+                      <template slot="topicCategory" slot-scope="text, record, index">
+                        <div class="select-with-tooltip">
+                          <a-select 
+                            v-model="record.topicCategory" 
+                            placeholder="请选择主题类型（必选）"
+                            style="flex: 1;"
+                            :required="true">
+                            <a-select-option value="THING_MODEL">物模型</a-select-option>
+                            <a-select-option value="PASSTHROUGH">透传</a-select-option>
+                          </a-select>
+                          <a-tooltip title="物模型：标准JSON格式；透传：需要编解码处理">
+                            <a-icon type="info-circle" class="tooltip-icon" />
+                          </a-tooltip>
+                        </div>
+                      </template>
+                      <template slot="productKey" slot-scope="text, record, index">
+                        <div class="select-with-tooltip">
+                          <a-select 
+                            v-model="record.productKey" 
+                            placeholder="选择产品（留空则自动匹配）"
+                            allowClear
+                            showSearch
+                            :filterOption="filterProductOption"
+                            style="flex: 1;"
+                            :notFoundContent="(!networkInfo.bindMqttServerProducts || networkInfo.bindMqttServerProducts.length === 0) ? '暂无绑定产品' : undefined">
+                            <template v-if="networkInfo.bindMqttServerProducts && networkInfo.bindMqttServerProducts.length > 0">
+                              <a-select-option 
+                                v-for="product in networkInfo.bindMqttServerProducts" 
+                                :key="product.productKey" 
+                                :value="product.productKey">
+                                {{ product.name }} ({{ product.productKey }})
+                              </a-select-option>
+                            </template>
+                            <template v-else>
+                              <a-select-option disabled value="">
+                                暂无绑定产品，留空将自动匹配
+                              </a-select-option>
+                            </template>
+                          </a-select>
+                          <a-tooltip v-if="!record.productKey" title="留空时将根据实际消息topic自动匹配productKey">
+                            <a-icon type="info-circle" class="tooltip-icon" />
+                          </a-tooltip>
+                        </div>
+                      </template>
+                      <template slot="enabled" slot-scope="text, record, index">
+                        <a-switch v-model="record.enabled" />
+                      </template>
+                      <template slot="action" slot-scope="text, record, index">
+                        <a-button type="link" size="small" danger @click="handleDeleteTopicMapping(index)">
+                          <a-icon type="delete" /> 删除
+                        </a-button>
+                      </template>
+                    </a-table>
+                    <div v-if="topicMappings.length === 0" class="empty-tip">
+                      <a-button type="dashed" icon="plus" @click="handleAddTopicMapping" block>
+                        添加第一个主题映射
+                      </a-button>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- 高级设置 -->
+            <div v-show="activeTab === '3'" class="tab-pane">
+              <div class="device-basic-info">
+                <div class="basic-info-header">
+                  <h3>高级设置</h3>
+                  <a-button v-if="!editing" type="link" size="small" @click="startEdit" v-hasPermi="['network:mqtt:edit']">
+                    <a-icon type="edit" /> 编辑
+                  </a-button>
+                </div>
+                
+                <template v-if="!editing">
+                  <div class="basic-info-grid">
+                    <div class="info-item" v-for="field in advancedFields" :key="field.key" v-if="!field.hide">
+                      <span class="info-label">{{ field.label }}</span>
+                      <span class="info-value">{{ renderReadValue(field) }}</span>
+                    </div>
+                  </div>
+                </template>
+                
+                <template v-else>
+                  <a-form :model="formData" layout="vertical">
+                    <a-row :gutter="16">
+                      <a-col :span="8" v-for="field in advancedFields" :key="field.key" v-if="!field.hide">
+                        <a-form-item :label="field.label">
+                          <a-input
+                            v-if="field.type === 'string'"
+                            v-model="formData[field.key]"
+                            :placeholder="field.remark"
+                          />
+                          <a-input-number
+                            v-else-if="field.type === 'int'"
+                            v-model="formData[field.key]"
+                            :placeholder="field.remark"
+                            style="width:100%"
+                            :step="1"
+                            :precision="0"
+                            :min="field.min"
+                            :max="field.max"
+                          />
+                          <a-select
+                            v-else-if="field.type === 'select'"
+                            v-model="formData[field.key]"
+                            :placeholder="field.remark"
+                          >
+                            <a-select-option v-for="opt in field.options" :key="opt.value" :value="opt.value">
+                              {{ opt.label }}
+                            </a-select-option>
+                          </a-select>
+                          <a-switch
+                            v-else-if="field.type === 'boolean'"
+                            v-model="formData[field.key]"
+                          />
+                        </a-form-item>
+                      </a-col>
+                    </a-row>
+                  </a-form>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a-spin>
+    </a-card>
   </div>
 </template>
 
 <script>
-import {
-  getNetwork,
-  restartNetwork,
-  startNetwork,
-  stopNetwork,
-  updateNetwork
-} from '@/api/system/network'
+import {getNetwork, updateNetwork} from '@/api/system/network'
 import {getDictMap, getDicts} from '@/api/system/dict/data'
-import * as echarts from 'echarts'
 
 export default {
   name: 'MqttNetworkDetail',
   data() {
     return {
       loading: false,
+      saving: false,
       networkInfo: {
         id: undefined,
         type: undefined,
@@ -247,95 +439,53 @@ export default {
         description: undefined,
         configuration: '{}',
         state: false,
-        createDate: undefined
+        running: false,
+        createDate: undefined,
+        bindMqttServerProducts: []
       },
       configFields: [],
       formData: {},
-      editing: false,
-      previewVisible: false,
-      previewJson: '',
       formDataBackup: {},
-      healthData: {
-        connected: false,
-        responseTime: null,
-        errorRate: 0,
-        packetLoss: 0,
-        lastCheckTime: null,
-        uptime: null
-      },
-      monitorData: {
-        cluster: {
-          total: 5,
-          online: 4,
-          abnormal: 1,
-          nodes: [
-            {name: '节点1', status: 'online'},
-            {name: '节点2', status: 'online'},
-            {name: '节点3', status: 'abnormal'},
-            {name: '节点4', status: 'online'},
-            {name: '节点5', status: 'online'}
-          ]
-        },
-        device: {active: 128},
-        topic: {count: 42},
-        region: {
-          barData: [
-            {name: '浙江', value: 30},
-            {name: '江苏', value: 10},
-            {name: '北京', value: 8},
-            {name: '上海', value: 7},
-            {name: '广东', value: 5}
-          ]
-        },
-        message: {qps: 560}
-      }
+      editing: false,
+      activeTab: '1',
+      editingTopicMapping: false,
+      topicMappings: [],
+      topicMappingsBackup: [],
+      testTopic: '',
+      testResult: null,
+      topicMappingColumns: [
+        { title: '主题模式', dataIndex: 'topicPattern', key: 'topicPattern', width: '30%' },
+        { title: '数据类型', dataIndex: 'topicCategory', key: 'topicCategory', width: '15%', scopedSlots: { customRender: 'topicCategory' } },
+        { title: 'QoS', dataIndex: 'qos', key: 'qos', width: '10%', scopedSlots: { customRender: 'qos' } },
+        { title: '关联产品', dataIndex: 'productKey', key: 'productKey', width: '25%', scopedSlots: { customRender: 'productKey' } },
+        { title: '状态', dataIndex: 'enabled', key: 'enabled', width: '10%', scopedSlots: { customRender: 'enabled' } }
+      ],
+      topicMappingEditColumns: [
+        { title: '订阅主题', dataIndex: 'topicPattern', key: 'topicPattern', width: '28%', scopedSlots: { customRender: 'topicPattern' } },
+        { title: '数据类型', dataIndex: 'topicCategory', key: 'topicCategory', width: '15%', scopedSlots: { customRender: 'topicCategory' } },
+        { title: 'QoS', dataIndex: 'qos', key: 'qos', width: '10%', scopedSlots: { customRender: 'qos' } },
+        { title: '关联产品', dataIndex: 'productKey', key: 'productKey', width: '27%', scopedSlots: { customRender: 'productKey' } },
+        { title: '启用', dataIndex: 'enabled', key: 'enabled', width: '10%', scopedSlots: { customRender: 'enabled' } },
+        { title: '操作', key: 'action', width: '10%', scopedSlots: { customRender: 'action' } }
+      ]
     }
   },
   computed: {
-    formattedConfig() {
-      try {
-        const config = JSON.parse(this.networkInfo.configuration)
-        return JSON.stringify(config, null, 2)
-      } catch (error) {
-        return this.networkInfo.configuration
-      }
+    connectionFields() {
+      return this.configFields.filter(f => 
+        !f.hide && ['host', 'port', 'username', 'password', 'clientIdPrefix', 'connectTimeout'].includes(f.key)
+      )
     },
-    configCardExtra() {
-      if (!this.editing) {
-        return this.$createElement('a-button', {
-          props: {type: 'link', size: 'small'},
-          on: {
-            click: () => {
-              this.editing = true
-            }
-          },
-          attrs: {icon: 'edit'},
-          style: {float: 'right', padding: '0 8px'}
-        }, '编辑')
-      } else {
-        return this.$createElement('span', [
-          this.$createElement('a-button', {
-            props: {type: 'link', size: 'small'},
-            on: {click: this.handleSaveConfig},
-            style: {padding: '0 8px'}
-          }, '保存'),
-          this.$createElement('a-button', {
-            style: {marginLeft: '8px', padding: '0 8px'},
-            props: {size: 'small', type: 'link'},
-            on: {click: this.cancelEdit}
-          }, '取消')
-        ])
-      }
+    advancedFields() {
+      return this.configFields.filter(f => 
+        !f.hide && !['host', 'port', 'username', 'password', 'clientIdPrefix', 'connectTimeout', 'subscribeTopics'].includes(f.key)
+      )
     }
   },
   created() {
     this.getNetworkDetail()
   },
-  mounted() {
-    this.initRegionBarChart()
-  },
   methods: {
-    /** 获取MQTT网络组件详情 */
     getNetworkDetail() {
       const id = this.$route.params.id
       if (!id) {
@@ -346,77 +496,136 @@ export default {
       this.loading = true
       getNetwork(id).then(async response => {
         this.networkInfo = response.data
+        if (!this.networkInfo.bindMqttServerProducts) {
+          this.networkInfo.bindMqttServerProducts = []
+        }
         this.loading = false
         await this.loadConfigFields()
+        this.loadTopicMappings()
       }).catch(() => {
         this.loading = false
         this.goBack()
       })
     },
-    /** 编辑 */
-    handleEdit() {
-      this.$router.push(`/system/network/mqtt/edit/${this.networkInfo.id}`)
+    startEdit() {
+      this.editing = true
+      this.formDataBackup = JSON.parse(JSON.stringify(this.formData))
+      this.topicMappingsBackup = JSON.parse(JSON.stringify(this.topicMappings))
     },
-    /** 启动/停止 */
-    handleToggleState() {
-      const action = this.networkInfo.state ? '停止' : '启动'
-      this.$confirm({
-        title: '确认操作',
-        content: `确定要${action}MQTT网络组件"${this.networkInfo.name}"吗？`,
-        onOk: () => {
-          const api = this.networkInfo.state ? stopNetwork : startNetwork
-          api(this.networkInfo.id).then(response => {
-            this.$message.success(`${action}成功`)
-            this.getNetworkDetail()
-          })
+    cancelEdit() {
+      this.editing = false
+      this.formData = JSON.parse(JSON.stringify(this.formDataBackup))
+      this.topicMappings = JSON.parse(JSON.stringify(this.topicMappingsBackup))
+      this.testTopic = ''
+      this.testResult = null
+    },
+    switchTab(tab) {
+      this.activeTab = tab
+    },
+    handleSaveAll() {
+      // 验证主题配置
+      for (let i = 0; i < this.topicMappings.length; i++) {
+        const mapping = this.topicMappings[i]
+        if (!mapping.topicPattern || mapping.topicPattern.trim() === '') {
+          this.$message.error(`第${i + 1}行的主题模式不能为空`)
+          this.activeTab = '2'
+          return
         }
-      })
-    },
-    /** 重启 */
-    handleRestart() {
-      this.$confirm({
-        title: '确认操作',
-        content: `确定要重启MQTT网络组件"${this.networkInfo.name}"吗？`,
-        onOk: () => {
-          restartNetwork(this.networkInfo.id).then(response => {
-            this.$message.success('重启成功')
-            this.getNetworkDetail()
-          })
+        // 验证主题类型必选
+        if (!mapping.topicCategory) {
+          this.$message.error(`第${i + 1}行的主题类型不能为空，请选择物模型或透传`)
+          this.activeTab = '2'
+          return
         }
-      })
-    },
-    /** 复制配置 */
-    copyConfig() {
-      navigator.clipboard.writeText(this.formattedConfig).then(() => {
-        this.$message.success('配置已复制到剪贴板')
-      }).catch(() => {
-        this.$message.error('复制失败')
-      })
-    },
-    /** 下载配置 */
-    downloadConfig() {
-      const blob = new Blob([this.formattedConfig], {type: 'application/json'})
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${this.networkInfo.name}_config.json`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
-      this.$message.success('配置已下载')
-    },
-    /** 返回 */
-    goBack() {
-      this.$router.go(-1)
-    },
-    /** 通用配置值获取方法 */
-    getConfigValue(item, key, defaultValue = '未配置') {
+      }
+
+      this.saving = true
       try {
-        const config = JSON.parse(item.configuration)
-        return config[key] || defaultValue
+        const config = {...this.formData}
+        const subscribeTopics = this.topicMappings.map(mapping => {
+          const item = {
+            topicPattern: mapping.topicPattern.trim(),
+            qos: mapping.qos,
+            enabled: mapping.enabled
+          }
+          if (mapping.productKey) {
+            item.productKey = mapping.productKey
+          }
+          if (mapping.topicCategory) {
+            item.topicCategory = mapping.topicCategory
+          }
+          return item
+        })
+        config.subscribeTopics = subscribeTopics
+
+        updateNetwork({
+          id: this.networkInfo.id,
+          type: this.networkInfo.type,
+          unionId: this.networkInfo.unionId,
+          productKey: this.networkInfo.productKey,
+          name: this.networkInfo.name,
+          description: this.networkInfo.description,
+          configuration: JSON.stringify(config)
+        }).then(() => {
+          this.$message.success('配置保存成功')
+          this.editing = false
+          this.getNetworkDetail()
+        }).catch(() => {
+          this.$message.error('保存失败')
+        }).finally(() => {
+          this.saving = false
+        })
       } catch (error) {
-        return '配置错误'
+        console.error('保存配置失败:', error)
+        this.$message.error('保存失败: ' + error.message)
+        this.saving = false
+      }
+    },
+    testTopicMatch() {
+      if (!this.testTopic || !this.testTopic.trim()) {
+        this.$message.warning('请输入要测试的topic')
+        return
+      }
+      const topic = this.testTopic.trim()
+      let matched = false
+      let matchedProductKey = null
+      let matchedPattern = null
+
+      for (const mapping of this.topicMappings) {
+        if (!mapping.enabled || !mapping.topicPattern) continue
+        if (this.matchesTopicPattern(topic, mapping.topicPattern)) {
+          matched = true
+          matchedPattern = mapping.topicPattern
+          if (mapping.productKey) {
+            matchedProductKey = mapping.productKey
+          }
+          break
+        }
+      }
+
+      if (matched) {
+        this.testResult = {
+          matched: true,
+          message: `匹配成功！匹配模式: ${matchedPattern}`,
+          productKey: matchedProductKey
+        }
+      } else {
+        this.testResult = {
+          matched: false,
+          message: '未匹配任何主题模式'
+        }
+      }
+    },
+    matchesTopicPattern(topic, pattern) {
+      const regex = pattern
+        .replace(/\//g, '\\/')
+        .replace(/\+/g, '[^/]+')
+        .replace(/#/g, '.*')
+        .replace(/\$/g, '\\$')
+      try {
+        return new RegExp(`^${regex}$`).test(topic)
+      } catch (e) {
+        return false
       }
     },
     async loadConfigFields() {
@@ -439,15 +648,18 @@ export default {
           type: meta.type || 'string',
           hide: meta.hide === 'true',
           options: [],
-          default: meta.default
+          default: meta.default,
+          required: meta.required === 'true',
+          min: meta.min,
+          max: meta.max,
+          fullWidth: meta.fullWidth === 'true',
+          help: meta.help
         }
-        // select类型需要请求url对应的字典
         if (field.type === 'select' && meta.url) {
           const dictRes = await getDicts(meta.url)
           field.options = (dictRes.data || []).map(
             opt => ({label: opt.dictLabel, value: opt.dictValue}))
         }
-        // boolean类型固定是/否
         if (field.type === 'boolean') {
           field.options = [
             {label: '是', value: true},
@@ -466,12 +678,17 @@ export default {
         this.$set(this.formData, f.key,
           val !== undefined ? val : f.default !== undefined ? f.default : '')
       })
-      console.log('configFields:', this.configFields)
-      // 备份初始值用于取消恢复
       this.formDataBackup = JSON.parse(JSON.stringify(this.formData))
     },
     renderReadValue(field) {
       const val = this.formData[field.key]
+      // 密码字段显示为掩码
+      if (field.key === 'password' || field.key.toLowerCase().includes('password')) {
+        if (val && val.trim()) {
+          return '••••••••'
+        }
+        return '未配置'
+      }
       if (field.type === 'boolean') {
         return val === true || val === 'true' ? '是' : '否'
       }
@@ -479,515 +696,501 @@ export default {
         const opt = field.options.find(o => o.value === val)
         return opt ? opt.label : val
       }
-      return val
+      return val || '未配置'
     },
-    handleSaveConfig() {
-      this.previewJson = JSON.stringify(this.formData, null, 2)
-      this.previewVisible = true
-    },
-    confirmSaveConfig() {
-      this.previewVisible = false
-      // 修正select/boolean类型字段的值类型
-      this.configFields.forEach(field => {
-        if ((field.type === 'select' || field.type === 'boolean') && field.options
-          && field.options.length) {
-          const val = this.formData[field.key]
-          // 统一转为option.value的类型
-          const match = field.options.find(opt => opt.value === val)
-          if (match) {
-            this.formData[field.key] = match.value
-          }
+    loadTopicMappings() {
+      try {
+        const config = JSON.parse(this.networkInfo.configuration || '{}')
+        const subscribeTopics = config.subscribeTopics
+        
+        if (!subscribeTopics) {
+          this.topicMappings = []
+          return
         }
-      })
-      updateNetwork({
-        id: this.networkInfo.id,
-        type: this.networkInfo.type,
-        unionId: this.networkInfo.unionId,
-        productKey: this.networkInfo.productKey,
-        name: this.networkInfo.name,
-        description: this.networkInfo.description,
-        configuration: JSON.stringify(this.formData)
-      }).then(() => {
-        this.$message.success('配置保存成功')
-        this.editing = false
-        this.getNetworkDetail()
-      }).catch(() => {
-        this.$message.error('保存失败')
-      })
-    },
-    cancelEdit() {
-      // 恢复编辑前的值
-      this.formData = JSON.parse(JSON.stringify(this.formDataBackup))
-      this.editing = false
-    },
-    initRegionBarChart() {
-      if (!this.$refs.regionBarChart) {
-        return
+        
+        if (typeof subscribeTopics === 'string') {
+          this.topicMappings = subscribeTopics.split(/[,;]/).map(topic => ({
+            topicPattern: topic.trim(),
+            qos: config.qos || 0,
+            enabled: true,
+            productKey: null,
+            topicCategory: null,
+            topicError: null
+          })).filter(item => item.topicPattern)
+        } else if (Array.isArray(subscribeTopics)) {
+          this.topicMappings = subscribeTopics.map(item => {
+            if (typeof item === 'string') {
+              return {
+                topicPattern: item,
+                qos: config.qos || 0,
+                enabled: true,
+                productKey: null,
+                topicCategory: null,
+                topicError: null
+              }
+            } else {
+              return {
+                topicPattern: item.topicPattern || item.topic || '',
+                qos: item.qos !== undefined ? item.qos : (config.qos || 0),
+                enabled: item.enabled !== undefined ? item.enabled : true,
+                productKey: item.productKey || null,
+                topicCategory: item.topicCategory || null,
+                topicError: null
+              }
+            }
+          }).filter(item => item.topicPattern)
+        } else {
+          this.topicMappings = []
+        }
+        
+        this.topicMappingsBackup = JSON.parse(JSON.stringify(this.topicMappings))
+      } catch (error) {
+        console.error('加载主题映射配置失败:', error)
+        this.topicMappings = []
+        this.topicMappingsBackup = []
       }
-      const chart = echarts.init(this.$refs.regionBarChart)
-      const data = this.monitorData.region.barData
-      chart.setOption({
-        grid: {left: 40, right: 20, top: 20, bottom: 20},
-        xAxis: {
-          type: 'category',
-          data: data.map(i => i.name),
-          axisLine: {lineStyle: {color: '#e0e0e0'}},
-          axisLabel: {color: '#666', fontSize: 13}
-        },
-        yAxis: {
-          type: 'value',
-          axisLine: {show: false},
-          axisLabel: {color: '#666', fontSize: 13},
-          splitLine: {lineStyle: {color: '#f0f0f0'}}
-        },
-        series: [{
-          data: data.map(i => i.value),
-          type: 'bar',
-          barWidth: 32,
-          itemStyle: {color: '#1890ff', borderRadius: [4, 4, 0, 0]}
-        }]
+    },
+    handleAddTopicMapping() {
+      this.topicMappings.push({
+        topicPattern: '',
+        qos: 1,
+        enabled: true,
+        productKey: null,
+        topicCategory: null,
+        topicError: null
       })
+    },
+    handleDeleteTopicMapping(index) {
+      this.topicMappings.splice(index, 1)
+    },
+    validateTopicPattern(record, index) {
+      if (!record.topicPattern || record.topicPattern.trim() === '') {
+        this.$set(record, 'topicError', '主题模式不能为空')
+        return false
+      }
+      const pattern = record.topicPattern.trim()
+      if (pattern.includes('##') || pattern.includes('++')) {
+        this.$set(record, 'topicError', '主题模式格式错误')
+        return false
+      }
+      this.$set(record, 'topicError', null)
+      return true
+    },
+    getProductName(productKey) {
+      if (!this.networkInfo.bindMqttServerProducts) {
+        return productKey
+      }
+      const product = this.networkInfo.bindMqttServerProducts.find(p => p.productKey === productKey)
+      return product ? `${product.name} (${productKey})` : productKey
+    },
+    getQosColor(qos) {
+      if (qos === 0) {
+        return 'orange'
+      } else if (qos === 1) {
+        return 'blue'
+      } else if (qos === 2) {
+        return 'green'
+      }
+      return 'default'
+    },
+    filterProductOption(input, option) {
+      const text = option.componentOptions.children[0].text
+      return text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+    },
+    copyToClipboard(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          this.$message.success('已复制到剪贴板')
+        }).catch(() => {
+          this.fallbackCopyTextToClipboard(text)
+        })
+      } else {
+        this.fallbackCopyTextToClipboard(text)
+      }
+    },
+    fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        this.$message.success('已复制到剪贴板')
+      } catch (err) {
+        this.$message.error('复制失败')
+      }
+      document.body.removeChild(textArea)
+    },
+    goBack() {
+      this.$router.go(-1)
+    },
+    parseTime(time) {
+      if (!time) return '-'
+      return new Date(time).toLocaleString('zh-CN')
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.mqtt-detail-page.minimal {
-  background: #fff;
-  padding: 0 32px 32px 32px;
+/* 页面容器样式 */
+.app-container {
+  background: #ffffff;
 }
 
-.mqtt-detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 24px;
-}
-
-.mqtt-detail-title {
-  font-size: 20px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-}
-
-.mqtt-detail-actions {
-  display: flex;
-  align-items: center;
-}
-
-.minimal-card {
+.ant-card {
+  background: #ffffff;
+  border: none;
   box-shadow: none;
-  border-radius: 0;
-  background: #fafbfc;
-  margin-bottom: 0;
 }
 
-.mqtt-detail-section-title {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 12px;
-}
-
-.health-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.health-metric-row {
+/* 页面头部样式 */
+.page-header {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  color: #222;
+  align-items: center;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8eaed;
 }
 
-.monitor-section {
+.header-left {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  align-items: center;
+  gap: 16px;
 }
 
-.monitor-block {
-  margin-bottom: 0;
-}
-
-.monitor-title {
-  font-size: 15px;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #222;
-}
-
-.monitor-row {
+.header-right {
   display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #444;
-  margin-bottom: 2px;
+  align-items: center;
 }
 
-.monitor-dashboard {
-  width: 100%;
-}
-
-.monitor-card {
-  background: #fff;
+.back-btn {
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px 0 rgba(24, 144, 255, 0.06);
-  margin-bottom: 0;
-  min-height: 180px;
-}
-
-.monitor-card.strong {
-  border-left: 4px solid #1890ff;
-}
-
-.monitor-chart-row {
-  margin-bottom: 8px;
-}
-
-.monitor-stats-row {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 32px;
-  margin-top: 8px;
-  flex-wrap: wrap;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #64748b;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #1966ff;
+    color: #1966ff;
+    transform: scale(1.05);
+  }
 }
 
-.stat-block {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-right: 16px;
-}
-
-.stat-icon {
+.page-title h1 {
+  margin: 0;
   font-size: 20px;
-  vertical-align: middle;
+  font-weight: 600;
+  color: #262626;
+  line-height: 1.2;
 }
 
-.stat-icon.cluster {
+/* 自定义标签页样式 */
+.custom-tabs-container {
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+.custom-tabs-nav {
+  display: flex;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.custom-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-tab-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: fit-content;
+  border-right: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.custom-tab-item:last-child {
+  border-right: none;
+}
+
+.custom-tab-item:hover {
+  background: #e6f7ff;
   color: #1890ff;
 }
 
-.stat-icon.online {
-  color: #52c41a;
+.custom-tab-item.active {
+  background: #ffffff;
+  color: #1890ff;
+  border-bottom: 2px solid #1890ff;
+  margin-bottom: -1px;
 }
 
-.stat-icon.alert {
-  color: #faad14;
+.custom-tab-content {
+  min-height: 500px;
+  background: #fff;
 }
 
-.stat-icon.device {
-  color: #13c2c2;
+.tab-pane {
+  padding: 10px;
 }
 
-.stat-icon.message {
-  color: #722ed1;
-}
-
-.stat-icon.topic {
-  color: #eb2f96;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #666;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
-  margin-left: 2px;
-}
-
-.monitor-pie-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.mini-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 13px;
-}
-
-.dashboard-monitor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
-}
-
-.monitor-chart {
-  width: 100%;
-  height: 180px;
+/* 设备信息页面样式 */
+.device-basic-info {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 16px;
   margin-bottom: 16px;
 }
 
-.monitor-list {
-  font-size: 13px;
-  color: #888;
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-}
-
-.mqtt-monitor-card {
-  max-width: 900px;
-  margin: 0 auto;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(24, 144, 255, 0.08);
-  padding: 32px 40px;
-}
-
-.status-overview {
+.basic-info-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
 }
 
-.status-item {
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  color: #222;
-  gap: 8px;
+.basic-info-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
 }
 
-.status-item.running {
-  color: #52c41a;
+.basic-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
-.trend-section {
-  display: flex;
-  gap: 32px;
+.compact-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 24px;
+}
+
+.info-section {
   margin-bottom: 16px;
 }
 
-.trend-chart {
-  flex: 1;
-  height: 120px;
-}
-
-.distribution-section {
-  display: flex;
-  gap: 32px;
-  margin-top: 16px;
-}
-
-.map-chart, .type-chart {
-  width: 320px;
-  height: 180px;
-}
-
-.region-bar-chart {
-  width: 320px;
-  height: 180px;
-}
-
-.mini-monitor-card {
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.06);
-  padding: 20px 28px;
-  min-height: 120px;
-  margin-bottom: 0;
-}
-
-.mini-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.mini-status-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.mini-label {
-  font-size: 15px;
-  color: #52c41a;
-  font-weight: 500;
-}
-
-.mini-metrics-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  align-items: center;
-}
-
-.mini-metric {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+.section-subtitle {
   font-size: 14px;
-  color: #444;
-}
-
-.mini-icon {
-  font-size: 18px;
-  vertical-align: middle;
-}
-
-.mini-icon.running {
-  color: #52c41a;
-}
-
-.mini-icon.alert {
-  color: #faad14;
-}
-
-.mini-value {
-  font-size: 16px;
   font-weight: 600;
-  color: #222;
-  margin-left: 2px;
-}
-
-/* MQTT订阅主题样式 */
-.topic-section {
-  margin-bottom: 20px;
-}
-
-.topic-section:last-child {
-  margin-bottom: 0;
-}
-
-.topic-category {
-  display: flex;
-  align-items: center;
+  color: #595959;
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.topic-category-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
-.topic-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.topic-item {
+.info-item {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 8px 0;
+}
+
+.info-item-full {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  min-width: 90px;
+  width: 90px;
+  font-size: 13px;
+  color: #8c8c8c;
+  margin-right: 12px;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.info-value-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.info-value {
+  font-size: 13px;
+  color: #262626;
+  line-height: 1.4;
+  
+  &.code {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    color: #1890ff;
+  }
+  
+  &.highlight {
+    color: #1890ff;
+    font-weight: 500;
+  }
+}
+
+.copy-action-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8c8c8c;
+  background: transparent;
+  border: none;
+  transition: all 0.2s ease;
+  font-size: 10px;
+  margin-left: 2px;
+  flex-shrink: 0;
+}
+
+.copy-action-btn:hover {
+  color: #1890ff;
+  background: #f0f8ff;
+}
+
+/* 表单操作按钮 */
+.form-actions {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+  text-align: right;
+}
+
+/* 已绑定产品区域 */
+.bound-products-section {
+  margin-bottom: 24px;
+  padding: 16px;
   background: #fafafa;
   border-radius: 6px;
-  border-left: 3px solid #1890ff;
-  transition: all 0.2s;
-}
-
-.topic-item:hover {
-  background: #f0f8ff;
-  border-left-color: #40a9ff;
-}
-
-.topic-label {
-  font-size: 13px;
-  color: #666;
-  min-width: 80px;
-  margin-right: 12px;
-}
-
-.topic-value {
-  font-size: 13px;
-  color: #1890ff;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  background: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
   border: 1px solid #e8e8e8;
-  flex: 1;
-  word-break: break-all;
-  position: relative;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.empty-tip-small {
+  margin-top: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+/* 主题测试工具区域 */
+.topic-tester-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f6ffed;
+  border-radius: 6px;
+  border: 1px solid #b7eb8f;
+}
+
+.tester-content {
+  margin-top: 12px;
+}
+
+.test-result {
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-top: 12px;
+  
+  &.test-success {
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    color: #52c41a;
+  }
+  
+  &.test-fail {
+    background: #fff2f0;
+    border: 1px solid #ffccc7;
+    color: #ff4d4f;
+  }
+  
+  .matched-product {
+    margin-left: auto;
+    font-size: 12px;
+    color: #1890ff;
+    font-weight: 500;
+  }
+}
+
+/* 主题映射配置区域 */
+.topic-mapping-section {
+  margin-top: 24px;
+}
+
+.product-name {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.text-muted {
+  color: #8c8c8c;
+  font-style: italic;
+}
+
+.product-tip {
+  margin-top: 4px;
+}
+
+.field-error {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.empty-tip {
+  text-align: center;
+  padding: 40px;
+  color: #8c8c8c;
+}
+
+.select-with-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.tooltip-icon {
+  color: #999;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.topic-value:hover {
-  border-color: #40a9ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
-}
-
-.topic-value::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(24, 144, 255, 0.05) 50%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.topic-value:hover::before {
-  opacity: 1;
+  flex-shrink: 0;
+  margin-left: 2px;
 }
 </style>
-
-<svg style="display:none;">
-<symbol id="icon-cluster" viewBox="0 0 1024 1024">
-  <circle cx="512" cy="512" r="400" fill="#e6f7ff"/>
-  <circle cx="512" cy="512" r="320" fill="#91d5ff"/>
-  <circle cx="512" cy="512" r="160" fill="#1890ff"/>
-</symbol>
-<symbol id="icon-online" viewBox="0 0 1024 1024">
-  <circle cx="512" cy="512" r="400" fill="#f6ffed"/>
-  <circle cx="512" cy="512" r="320" fill="#b7eb8f"/>
-  <circle cx="512" cy="512" r="160" fill="#52c41a"/>
-</symbol>
-<symbol id="icon-alert" viewBox="0 0 1024 1024">
-  <circle cx="512" cy="512" r="400" fill="#fffbe6"/>
-  <circle cx="512" cy="512" r="320" fill="#ffe58f"/>
-  <circle cx="512" cy="512" r="160" fill="#faad14"/>
-</symbol>
-<symbol id="icon-device" viewBox="0 0 1024 1024">
-  <rect x="192" y="192" width="640" height="640" rx="80" fill="#e6f7ff"/>
-  <rect x="272" y="272" width="480" height="480" rx="60" fill="#91d5ff"/>
-  <rect x="352" y="352" width="320" height="320" rx="40" fill="#1890ff"/>
-</symbol>
-<symbol id="icon-active" viewBox="0 0 1024 1024">
-  <rect x="192" y="192" width="640" height="640" rx="80" fill="#f6ffed"/>
-  <rect x="272" y="272" width="480" height="480" rx="60" fill="#b7eb8f"/>
-  <rect x="352" y="352" width="320" height="320" rx="40" fill="#52c41a"/>
-</symbol>
-<symbol id="icon-offline" viewBox="0 0 1024 1024">
-  <rect x="192" y="192" width="640" height="640" rx="80" fill="#fff1f0"/>
-  <rect x="272" y="272" width="480" height="480" rx="60" fill="#ffccc7"/>
-  <rect x="352" y="352" width="320" height="320" rx="40" fill="#ff4d4f"/>
-</symbol>
-<symbol id="icon-message" viewBox="0 0 1024 1024">
-  <ellipse cx="512" cy="512" rx="400" ry="320" fill="#f0f5ff"/>
-  <ellipse cx="512" cy="512" rx="320" ry="240" fill="#adc6ff"/>
-  <ellipse cx="512" cy="512" rx="160" ry="120" fill="#2f54eb"/>
-</symbol>
-<symbol id="icon-qps" viewBox="0 0 1024 1024">
-  <ellipse cx="512" cy="512" rx="400" ry="320" fill="#e6fffb"/>
-  <ellipse cx="512" cy="512" rx="320" ry="240" fill="#87e8de"/>
-  <ellipse cx="512" cy="512" rx="160" ry="120" fill="#13c2c2"/>
-</symbol>
-<symbol id="icon-backlog" viewBox="0 0 1024 1024">
-  <ellipse cx="512" cy="512" rx="400" ry="320" fill="#fff0f6"/>
-  <ellipse cx="512" cy="512" rx="320" ry="240" fill="#ffadd2"/>
-  <ellipse cx="512" cy="512" rx="160" ry="120" fill="#eb2f96"/>
-</symbol>
-</svg>

@@ -23,7 +23,7 @@
                 not-found-content="无可配置的产品"
                 @search="handleSearch"
                 @change="handleChange"
-                @focus="handleSearch"
+                @focus="handleFocus"
                 :disabled="formType===2 || productType || submitLoading"
               >
                 <a-select-option
@@ -54,8 +54,7 @@
         <a-row :gutter="8">
           <a-col :span="12">
             <a-form-model-item label="版本号" prop="version">
-              <a-input v-model="form.version" placeholder="请输入版本号，如：1.0.0"
-                       :disabled="submitLoading"/>
+              <a-input v-model="form.version" placeholder="请输入版本号，如：1.0.0" :disabled="submitLoading"/>
             </a-form-model-item>
           </a-col>
           <a-col :span="12">
@@ -210,16 +209,9 @@
 </template>
 
 <script>
-import {
-  addProtocol,
-  allProtocol,
-  getProtocol,
-  messageCodec,
-  updateProtocol
-} from '@/api/system/protocol'
+import {addProtocol, allProtocol, getProtocol, listProductsWithoutProtocol, messageCodec, updateProtocol} from '@/api/system/protocol'
 import FileUpload from '@/components/FileUpload'
 import CodeEditor from '@/components/CodeEditor.vue'
-import {listProduct} from '@/api/system/dev/product'
 
 export default {
   name: 'CreateForm',
@@ -265,6 +257,8 @@ export default {
       formTitle: '',
       productOptions: [],
       data: [],
+      parentUnionId: this.$store.state.user.parentUnionId,
+      searchTimer: null, // 搜索防抖定时器
       form: {
         id: undefined,
         payload: undefined,
@@ -419,17 +413,42 @@ var decode = payload => {
       this.reset()
       this.open = false
     },
-    filterProduct() {
-      listProduct(null).then((response) => {
-        this.productOptions = response.rows.filter(
-          (i) => (this.parentUnionId === i.creatorId || this.$store.state.user.name
-            === i.creatorId)).map((i) => {
-          return {label: i.name, value: i.productKey}
-        })
-        allProtocol().then(res => {
-          const data = res.data
-          this.productOptions = this.productOptions.filter(o => data.indexOf(o.value) < 0)
-        })
+    filterProduct(searchKey) {
+      // 使用新的后端接口，直接查询未创建协议且归属人为当前用户的产品
+      listProductsWithoutProtocol(searchKey).then((response) => {
+        if (response.code === 0 && response.data) {
+          // 将产品列表转换为选项格式
+          this.productOptions = response.data.map((i) => {
+            return {label: i.name, value: i.productKey}
+          })
+          // 更新显示的数据（不触发新的请求）
+          this.updateDisplayData(searchKey || '')
+        } else {
+          this.productOptions = []
+          this.data = []
+          if (response.msg) {
+            this.$message.warning(response.msg)
+          }
+        }
+      }).catch(err => {
+        console.error('获取产品列表失败:', err)
+        this.$message.error('获取产品列表失败')
+        this.productOptions = []
+        this.data = []
+      })
+    },
+    updateDisplayData(searchKey) {
+      // 只更新显示数据，不触发后端请求
+      this.data = []
+      this.productOptions.forEach(i => {
+        if (
+          searchKey === '' ||
+          searchKey === undefined ||
+          (i.label && i.label.toLowerCase().indexOf(searchKey.toLowerCase()) > -1) ||
+          (i.value && i.value.toLowerCase().indexOf(searchKey.toLowerCase()) > -1)
+        ) {
+          this.data.push({value: i.value || i.productKey, label: i.label || i.name})
+        }
       })
     },
     cancel() {
@@ -444,6 +463,11 @@ var decode = payload => {
       window.open(this.form.url)
     },
     reset() {
+      // 清除搜索定时器
+      if (this.searchTimer) {
+        clearTimeout(this.searchTimer)
+        this.searchTimer = null
+      }
       this.productType = false
       this.formType = 1
       this.type = undefined
@@ -471,17 +495,21 @@ var decode = payload => {
       }
     },
     handleSearch(val) {
-      this.data = []
-      this.productOptions.forEach(i => {
-        if (
-          val === '' ||
-          val === undefined ||
-          (i.label && i.label.toLowerCase().indexOf(val.toLowerCase()) > -1) ||
-          (i.value && i.value.toLowerCase().indexOf(val.toLowerCase()) > -1)
-        ) {
-          this.data.push({value: i.value || i.productKey, label: i.label || i.name})
-        }
-      })
+      // 清除之前的定时器
+      if (this.searchTimer) {
+        clearTimeout(this.searchTimer)
+      }
+      // 防抖处理：用户停止输入 500ms 后才请求
+      this.searchTimer = setTimeout(() => {
+        const searchKey = val || ''
+        this.filterProduct(searchKey)
+      }, 500)
+    },
+    handleFocus() {
+      // 聚焦时，如果产品列表为空，才加载
+      if (this.productOptions.length === 0) {
+        this.filterProduct('')
+      }
     },
     handleChange(val) {
       this.form.id = val
@@ -490,11 +518,13 @@ var decode = payload => {
           this.productName = i.label
         }
       })
-      this.handleSearch(val)
+      // 选择后不需要重新搜索
     },
     handleAdd(row) {
       this.reset()
       this.formType = 1
+      // 打开抽屉时重新加载产品列表，确保包含最新创建的产品
+      this.filterProduct()
       this.open = true
       this.formTitle = '添加'
     },
@@ -574,10 +604,22 @@ var decode = payload => {
       })
     },
     handleDrawerVisibleChange(val) {
-      if (val && (this.type === 'jscript' || this.type === 'magic-script')) {
-        this.$nextTick(() => {
-          window.dispatchEvent(new Event('resize'))
-        })
+      if (val) {
+        // 抽屉打开时，如果是添加模式，重新加载产品列表
+        if (this.formType === 1 && !this.productType) {
+          this.filterProduct('')
+        }
+        if (this.type === 'jscript' || this.type === 'magic-script') {
+          this.$nextTick(() => {
+            window.dispatchEvent(new Event('resize'))
+          })
+        }
+      } else {
+        // 抽屉关闭时，清除定时器
+        if (this.searchTimer) {
+          clearTimeout(this.searchTimer)
+          this.searchTimer = null
+        }
       }
     },
     onCodeEditorInput(value) {

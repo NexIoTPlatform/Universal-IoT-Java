@@ -382,4 +382,54 @@ public class IoTProductDeviceService {
     }
     return JSONUtil.parseObj(product.getConfiguration());
   }
+
+  /**
+   * 获取产品的解码类型（从产品配置的 configuration 字段）
+   *
+   * @param productKey 产品Key
+   * @return 解码类型（HEX/STRING），默认 STRING
+   */
+  @Cacheable(
+      cacheNames = "getProductDecoderType",
+      key = "#productKey",
+      unless = "#result == null")
+  public String getProductDecoderType(String productKey) {
+    if (StrUtil.isBlank(productKey)) {
+      return "STRING";
+    }
+    try {
+      JSONObject config = getProductConfiguration(productKey);
+      if (config != null) {
+        return config.getStr("decoderType", "STRING");
+      }
+    } catch (Exception e) {
+      log.warn("获取产品decoderType失败: productKey={}", productKey, e);
+    }
+    return "STRING";
+  }
+
+  /**
+   * 获取产品的编码类型（从产品配置的 configuration 字段）
+   *
+   * @param productKey 产品Key
+   * @return 编码类型（HEX/STRING），默认 STRING
+   */
+  @Cacheable(
+      cacheNames = "getProductEncoderType",
+      key = "#productKey",
+      unless = "#result == null")
+  public String getProductEncoderType(String productKey) {
+    if (StrUtil.isBlank(productKey)) {
+      return "STRING";
+    }
+    try {
+      JSONObject config = getProductConfiguration(productKey);
+      if (config != null) {
+        return config.getStr("encoderType", "STRING");
+      }
+    } catch (Exception e) {
+      log.warn("获取产品encoderType失败: productKey={}", productKey, e);
+    }
+    return "STRING";
+  }
 }

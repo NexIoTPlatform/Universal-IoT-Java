@@ -88,8 +88,7 @@ public class NoticeServiceImpl implements NoticeService {
             .findFirst()
             .orElseThrow(
                 () -> new IllegalArgumentException("不支持的通知类型:" + channelConfig.getChannelType()));
-    String content =
-        NoticeTemplateUtil.replaceNestedParams(template.getContent(), request.getParams());
+    String content = NoticeTemplateUtil.replaceNestedParams(template.getContent(), request.getParams());
     String mergedReceivers =
         mergeReceivers(template.getReceivers(), request.getReceivers(), request.getParams());
     if (!StringUtils.hasText(mergedReceivers)) {
@@ -112,6 +111,12 @@ public class NoticeServiceImpl implements NoticeService {
     record.setReceivers(ctx.mergedReceivers);
     record.setParams(JSONUtil.toJsonStr(request.getParams()));
     record.setSendTime(new Date());
+    // 设置创建者：优先使用请求中的创建者，否则使用模板的创建者
+    String creator = request.getCreator();
+    if (creator == null || creator.isEmpty()) {
+      creator = ctx.template.getCreator();
+    }
+    record.setCreator(creator);
     return record;
   }
 

@@ -7,24 +7,20 @@
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="DeviceId">
-                <a-input v-model="queryParam.deviceId" placeholder="请输入设备SN"
-                         @keyup.enter="handleQuery"
+                <a-input v-model="queryParam.deviceId" placeholder="请输入设备SN" @keyup.enter="handleQuery"
                          allow-clear/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item :label="$t('device.name')">
-                <a-input v-model="queryParam.deviceName" placeholder="请输入设备名称"
-                         @keyup.enter="handleQuery"
+                <a-input v-model="queryParam.deviceName" placeholder="请输入设备名称" @keyup.enter="handleQuery"
                          allow-clear/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item :label="$t('device.onlineStatus')">
-                <a-select placeholder="请选择" v-model="queryParam.state" style="width: 100%"
-                          allow-clear>
-                  <a-select-option v-for="(d, index) in stateOptions" :key="index"
-                                   :value="d.dictValue">{{
+                <a-select placeholder="请选择" v-model="queryParam.state" style="width: 100%" allow-clear>
+                  <a-select-option v-for="(d, index) in stateOptions" :key="index" :value="d.dictValue">{{
                       d.dictLabel
                     }}
                   </a-select-option>
@@ -38,29 +34,23 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <span class="table-page-search-submitButtons"
-                    :style="{ float: 'right', overflow: 'hidden' }">
-                <a-button type="primary" @click="handleQuery"><iot-icon type="icon-search"/>{{
-                    $t('button.search')
-                  }}</a-button>
-                <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon
-                  type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
+              <span class="table-page-search-submitButtons" :style="{ float: 'right', overflow: 'hidden' }">
+                <a-button type="primary" @click="handleQuery"><iot-icon type="icon-search"/>{{ $t('button.search') }}</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
         </a-form>
       </div>
 
-      <a-table :loading="loading" :size="tableSize" rowKey="id" :columns="columns"
-               :data-source="list"
+      <a-table :loading="loading" :size="tableSize" rowKey="id" :columns="columns" :data-source="list"
                :pagination="false">
         <div slot="deviceInfo" slot-scope="text, record" class="device-info-cell">
           <a-popover placement="rightTop" trigger="hover" :title="'设备配置信息'"
                      v-if="getConfigInfo(record.configuration)">
             <template slot="content">
               <div class="config-popover">
-                <div v-for="(value, key) in getConfigInfo(record.configuration)" :key="key"
-                     class="config-popover-item">
+                <div v-for="(value, key) in getConfigInfo(record.configuration)" :key="key" class="config-popover-item">
                   <span class="config-popover-key">{{ key }}:</span>
                   <span class="config-popover-value">{{ value }}</span>
                 </div>
@@ -68,10 +58,7 @@
             </template>
             <div class="device-info-content">
               <div class="device-name">
-                <a-button type="link" class="device-name-link">{{
-                    record.deviceName || '未命名设备'
-                  }}
-                </a-button>
+                <a-button type="link" class="device-name-link">{{ record.deviceName || '未命名设备' }}</a-button>
               </div>
               <div class="device-id">{{ record.deviceId }}</div>
               <div v-if="record.iotId" class="iot-id">{{ record.iotId }}</div>
@@ -79,10 +66,7 @@
           </a-popover>
           <div v-else class="device-info-content">
             <div class="device-name">
-              <a-button type="link" class="device-name-link">{{
-                  record.deviceName || '未命名设备'
-                }}
-              </a-button>
+              <a-button type="link" class="device-name-link">{{ record.deviceName || '未命名设备' }}</a-button>
             </div>
             <div class="device-id">{{ record.deviceId }}</div>
             <div v-if="record.iotId" class="iot-id">{{ record.iotId }}</div>
@@ -97,8 +81,7 @@
         </div>
 
         <div slot="state" slot-scope="text, record" class="state-cell">
-          <div
-            :class="{ 'status-badge online': record.state, 'status-badge offline': !record.state }">
+          <div :class="{ 'status-badge online': record.state, 'status-badge offline': !record.state }">
             <span class="status-dot"></span>
             <span class="status-text">{{ stateFormat(record) }}</span>
           </div>
@@ -116,19 +99,15 @@
           <a-divider type="vertical" v-hasPermi="['video:ezviz:live', 'video:ezviz:playback']"/>
           <a @click="openPlayback(record)"
              v-hasPermi="['video:ezviz:playback']"
-             class="operation-btn"><iot-icon type="icon-file-video"/>{{
-              $t('button.playback')
-            }} </a>
+             class="operation-btn"><iot-icon type="icon-file-video"/>{{ $t('button.playback') }} </a>
         </span>
       </a-table>
-      <a-pagination class="ant-table-pagination" show-size-changer show-quick-jumper
-                    :current="queryParam.pageNum"
+      <a-pagination class="ant-table-pagination" show-size-changer show-quick-jumper :current="queryParam.pageNum"
                     :total="total" :page-size="queryParam.pageSize" :showTotal="t => `共 ${t} 条`"
                     @showSizeChange="onShowSizeChange" @change="changeSize"/>
     </a-card>
 
-    <a-modal :visible="playerVisible" :footer="null" width="960px" :destroyOnClose="true"
-             @cancel="handleClosePlayer">
+    <a-modal :visible="playerVisible" :footer="null" width="960px" :destroyOnClose="true" @cancel="handleClosePlayer">
       <div ref="playerContainer" style="width: 100%; height: 540px; background: #000;"></div>
     </a-modal>
   </page-header-wrapper>
@@ -172,13 +151,7 @@ export default {
           width: '22%',
           align: 'left'
         },
-        {
-          title: this.$t('device.status'),
-          dataIndex: 'state',
-          scopedSlots: {customRender: 'state'},
-          width: '12%',
-          align: 'center'
-        },
+        {title: this.$t('device.status'), dataIndex: 'state', scopedSlots: {customRender: 'state'}, width: '12%', align: 'center'},
         {
           title: this.$t('device.communicationStatus'),
           dataIndex: 'onlineTime',
@@ -186,13 +159,7 @@ export default {
           width: '18%',
           align: 'center'
         },
-        {
-          title: this.$t('user.operation'),
-          dataIndex: 'operation',
-          scopedSlots: {customRender: 'operation'},
-          width: '20%',
-          align: 'center'
-        }
+        {title: this.$t('user.operation'), dataIndex: 'operation', scopedSlots: {customRender: 'operation'}, width: '20%', align: 'center'}
       ],
       playerVisible: false,
       currentDevice: null,
@@ -212,15 +179,9 @@ export default {
     getList() {
       this.loading = true
       const params = {...this.queryParam}
-      if (params.deviceName) {
-        params.deviceName = params.deviceName.trim()
-      }
-      if (params.deviceId) {
-        params.deviceId = params.deviceId.trim()
-      }
-      if (params.tags) {
-        params.tags = params.tags.trim()
-      }
+      if (params.deviceName) params.deviceName = params.deviceName.trim()
+      if (params.deviceId) params.deviceId = params.deviceId.trim()
+      if (params.tags) params.tags = params.tags.trim()
       listInstanceByPlatform(params).then(res => {
         const rows = (res.rows || []).map(r => this.normalizeRow(r))
         this.list = rows
@@ -271,18 +232,10 @@ export default {
       try {
         const config = JSON.parse(configStr)
         const keyConfigs = {}
-        if (config.iccid) {
-          keyConfigs['ICCID'] = config.iccid
-        }
-        if (config.meterNo) {
-          keyConfigs['表号'] = config.meterNo
-        }
-        if (config.imei) {
-          keyConfigs['IMEI'] = config.imei
-        }
-        if (config.version) {
-          keyConfigs['版本'] = config.version
-        }
+        if (config.iccid) keyConfigs['ICCID'] = config.iccid
+        if (config.meterNo) keyConfigs['表号'] = config.meterNo
+        if (config.imei) keyConfigs['IMEI'] = config.imei
+        if (config.version) keyConfigs['版本'] = config.version
         return Object.keys(keyConfigs).length > 0 ? keyConfigs : null
       } catch (e) {
         return null
@@ -296,8 +249,7 @@ export default {
       return getTimeAgo(timestamp)
     },
     async ensureEzvizSdk() {
-      const sdkUrl = process.env.VUE_APP_EZVIZ_SDK_URL
-        || 'https://open.ys7.com/sdk/js/1.5/ezuikit.js'
+      const sdkUrl = process.env.VUE_APP_EZVIZ_SDK_URL || 'https://open.ys7.com/sdk/js/1.5/ezuikit.js'
       if (!window.EZUIKit) {
         await loadExternalScript(sdkUrl)
       }
@@ -347,9 +299,7 @@ export default {
     },
     destroyPlayer() {
       try {
-        if (this.player && this.player.stop) {
-          this.player.stop()
-        }
+        if (this.player && this.player.stop) this.player.stop()
         this.player = null
       } catch (e) {
       }

@@ -32,8 +32,7 @@
                 label="参数键名"
                 prop="ext1Id"
                 :rules="{required: true , message: '参数键名不能为空', trigger: 'blur'}">
-                <a-input v-model="form.ext1Id" placeholder="如：appKey、securityCode"
-                         class="param-input"/>
+                <a-input v-model="form.ext1Id" placeholder="如：appKey、securityCode" class="param-input"/>
               </a-form-model-item>
             </a-tooltip>
           </a-col>
@@ -46,8 +45,7 @@
                 label="显示名称"
                 prop="ext1Name"
                 :rules="{required: true , message: '显示名称不能为空', trigger: 'blur'}">
-                <a-input v-model="form.ext1Name" placeholder="如：安全码、API密钥"
-                         class="param-input"/>
+                <a-input v-model="form.ext1Name" placeholder="如：安全码、API密钥" class="param-input"/>
               </a-form-model-item>
             </a-tooltip>
           </a-col>
@@ -60,16 +58,12 @@
                 label="参数说明"
                 prop="ext1Des"
                 :rules="{required: true , message: '参数说明不能为空', trigger: 'blur'}">
-                <a-input v-model="form.ext1Des" placeholder="如：设备机身二维码上的安全码"
-                         class="param-input"/>
+                <a-input v-model="form.ext1Des" placeholder="如：设备机身二维码上的安全码" class="param-input"/>
               </a-form-model-item>
             </a-tooltip>
           </a-col>
           <a-col :span="4" style="margin-top: 44px">
-            <a-button type="primary" @click="deleteParams(index)">{{
-                $t('button.delete')
-              }}
-            </a-button>
+            <a-button type="primary" @click="deleteParams(index)">{{ $t('button.delete') }}</a-button>
           </a-col>
         </a-row>
         <a-row v-if="index === 1" :key="index">
@@ -113,10 +107,7 @@
             </a-tooltip>
           </a-col>
           <a-col :span="4" style="margin-top: 44px">
-            <a-button type="primary" @click="deleteParams(index)">{{
-                $t('button.delete')
-              }}
-            </a-button>
+            <a-button type="primary" @click="deleteParams(index)">{{ $t('button.delete') }}</a-button>
           </a-col>
         </a-row>
         <a-row v-if="index === 2" :key="index">
@@ -160,10 +151,7 @@
             </a-tooltip>
           </a-col>
           <a-col :span="4" style="margin-top: 44px">
-            <a-button type="primary" @click="deleteParams(index)">{{
-                $t('button.delete')
-              }}
-            </a-button>
+            <a-button type="primary" @click="deleteParams(index)">{{ $t('button.delete') }}</a-button>
           </a-col>
         </a-row>
         <a-row v-if="index === 3" :key="index">
@@ -207,10 +195,7 @@
             </a-tooltip>
           </a-col>
           <a-col :span="4" style="margin-top: 44px">
-            <a-button type="primary" @click="deleteParams(index)">{{
-                $t('button.delete')
-              }}
-            </a-button>
+            <a-button type="primary" @click="deleteParams(index)">{{ $t('button.delete') }}</a-button>
           </a-col>
         </a-row>
       </template>

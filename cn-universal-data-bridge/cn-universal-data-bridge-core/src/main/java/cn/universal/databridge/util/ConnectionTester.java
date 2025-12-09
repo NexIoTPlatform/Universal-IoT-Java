@@ -59,6 +59,14 @@ public class ConnectionTester {
       switch (connection.getType()) {
         case MYSQL:
           return testMySQLConnection(connection);
+        case POSTGRESQL:
+          return testPostgreSQLConnection(connection);
+        case H2:
+          return testH2Connection(connection);
+        case ORACLE:
+          return testOracleConnection(connection);
+        case SQLSERVER:
+          return testSQLServerConnection(connection);
         case KAFKA:
           return testKafkaConnection(connection);
         case MQTT:
@@ -109,6 +117,92 @@ public class ConnectionTester {
     } catch (SQLException e) {
       log.error("MySQL连接测试失败", e);
       return ConnectionTestResult.failure("MySQL连接失败: " + e.getMessage());
+    }
+  }
+
+  /** 测试PostgreSQL连接 */
+  private ConnectionTestResult testPostgreSQLConnection(ResourceConnection connection) {
+    try {
+      String jdbcUrl =
+          String.format(
+              "jdbc:postgresql://%s:%d/%s",
+              connection.getHost(), connection.getPort(), connection.getDatabaseName());
+
+      try (SimpleDataSource dataSource =
+          new SimpleDataSource(jdbcUrl, connection.getUsername(), connection.getPassword())) {
+        try (Connection conn = dataSource.getConnection()) {
+          conn.createStatement().executeQuery("SELECT 1");
+          return ConnectionTestResult.success("PostgreSQL连接测试成功");
+        }
+      }
+    } catch (SQLException e) {
+      log.error("PostgreSQL连接测试失败", e);
+      return ConnectionTestResult.failure("PostgreSQL连接失败: " + e.getMessage());
+    }
+  }
+
+  /** 测试H2连接 */
+  private ConnectionTestResult testH2Connection(ResourceConnection connection) {
+    try {
+      String jdbcUrl =
+          String.format(
+              "jdbc:h2:tcp://%s:%d/%s",
+              connection.getHost(), connection.getPort(), connection.getDatabaseName());
+
+      try (SimpleDataSource dataSource =
+          new SimpleDataSource(jdbcUrl, connection.getUsername(), connection.getPassword())) {
+        try (Connection conn = dataSource.getConnection()) {
+          conn.createStatement().executeQuery("SELECT 1");
+          return ConnectionTestResult.success("H2连接测试成功");
+        }
+      }
+    } catch (SQLException e) {
+      log.error("H2连接测试失败", e);
+      return ConnectionTestResult.failure("H2连接失败: " + e.getMessage());
+    }
+  }
+
+  /** 测试Oracle连接 */
+  private ConnectionTestResult testOracleConnection(ResourceConnection connection) {
+    try {
+      // Oracle使用SID或Service Name
+      String jdbcUrl =
+          String.format(
+              "jdbc:oracle:thin:@%s:%d:%s",
+              connection.getHost(), connection.getPort(), connection.getDatabaseName());
+
+      try (SimpleDataSource dataSource =
+          new SimpleDataSource(jdbcUrl, connection.getUsername(), connection.getPassword())) {
+        try (Connection conn = dataSource.getConnection()) {
+          conn.createStatement().executeQuery("SELECT 1 FROM DUAL");
+          return ConnectionTestResult.success("Oracle连接测试成功");
+        }
+      }
+    } catch (SQLException e) {
+      log.error("Oracle连接测试失败", e);
+      return ConnectionTestResult.failure("Oracle连接失败: " + e.getMessage());
+    }
+  }
+
+  /** 测试SQL Server连接 */
+  private ConnectionTestResult testSQLServerConnection(ResourceConnection connection) {
+    try {
+      // SQL Server连接URL，添加encrypt=false和trustServerCertificate=true以避免SSL证书验证问题
+      String jdbcUrl =
+          String.format(
+              "jdbc:sqlserver://%s:%d;databaseName=%s;encrypt=false;trustServerCertificate=true;characterEncoding=UTF-8",
+              connection.getHost(), connection.getPort(), connection.getDatabaseName());
+
+      try (SimpleDataSource dataSource =
+          new SimpleDataSource(jdbcUrl, connection.getUsername(), connection.getPassword())) {
+        try (Connection conn = dataSource.getConnection()) {
+          conn.createStatement().executeQuery("SELECT 1");
+          return ConnectionTestResult.success("SQL Server连接测试成功");
+        }
+      }
+    } catch (SQLException e) {
+      log.error("SQL Server连接测试失败", e);
+      return ConnectionTestResult.failure("SQL Server连接失败: " + e.getMessage());
     }
   }
 

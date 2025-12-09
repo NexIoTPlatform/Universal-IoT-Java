@@ -122,6 +122,7 @@ export default {
   'device.detail': 'Device Detail',
   'device.list': 'Device List',
   'device.management': 'Device Management',
+  'device.deviceGroup': 'Device Group',
 
   // 产品相关
   'product.name': 'Product Name',
@@ -170,6 +171,7 @@ export default {
   'template.disabled': 'Disabled Templates',
   'template.content': 'Template Content',
   'template.enabled': 'Enabled Templates',
+
 
   // 平台特性
   'platform.feature.multi.protocol': 'Multi-Protocol Access',
@@ -362,6 +364,7 @@ export default {
   'common.status': 'Status',
   'common.running.status': 'Running Status',
   'common.port': 'Port',
+
 
   'compound.deviceNameDeviceId': 'Device Name/DeviceId',
   'compound.productProductKey': 'Product/ProductKey',

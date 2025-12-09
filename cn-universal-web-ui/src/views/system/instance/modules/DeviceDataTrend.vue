@@ -22,10 +22,7 @@
                 <a-range-picker v-model="createTimeRange" show-time
                                 style="width: 100%; margin-top: 8px;"/>
                 <div class="picker-actions">
-                  <a-button type="primary" size="small" @click="submit">{{
-                      $t('button.confirm')
-                    }}
-                  </a-button>
+                  <a-button type="primary" size="small" @click="submit">{{ $t('button.confirm') }}</a-button>
                   <a-button size="small" @click="hide">{{ $t('button.cancel') }}</a-button>
                 </div>
               </div>
@@ -519,7 +516,7 @@ export default {
         }
         if (val === 1) {
           // 1小时
-          pageSize = 2000
+          pageSize = 500
           this.queryParams.beginCreateTime = parseInt(
             new Date().setHours(new Date().getHours() - 1) / 1000)
           this.queryParams.endCreateTime = parseInt(new Date().getTime() / 1000)
@@ -527,7 +524,7 @@ export default {
           params.endCreateTime = parseInt(new Date().getTime() / 1000)
         } else if (val === 2) {
           // 24小时
-          pageSize = 5000
+          pageSize = 2000
           this.queryParams.beginCreateTime = parseInt(
             new Date().setDate((new Date().getDate() - 1)) / 1000)
           this.queryParams.endCreateTime = parseInt(new Date().getTime() / 1000)
@@ -535,7 +532,7 @@ export default {
           params.endCreateTime = parseInt(new Date().getTime() / 1000)
         } else if (val === 3) {
           // 7天
-          pageSize = 10000
+          pageSize = 5000
           this.queryParams.beginCreateTime = parseInt(
             new Date().setDate((new Date().getDate() - 7)) / 1000)
           this.queryParams.endCreateTime = parseInt(new Date().getTime() / 1000)
@@ -543,7 +540,7 @@ export default {
           params.endCreateTime = parseInt(new Date().getTime() / 1000)
         } else if (val === 4) {
           // 15天
-          pageSize = 20000
+          pageSize = 10000
           this.queryParams.beginCreateTime = parseInt(
             new Date().setDate((new Date().getDate() - 15)) / 1000)
           this.queryParams.endCreateTime = parseInt(new Date().getTime() / 1000)
@@ -563,7 +560,7 @@ export default {
           const logsArray = response.list
           if (this.type === 'PROPERTIES') {
             // 扩展数字类型判断，支持更多数字类型
-            const numericTypes = ['int', 'double', 'float', 'number', 'long', 'short', 'byte',
+            const numericTypes = ['ist', 'double', 'float', 'number', 'long', 'short', 'byte',
               'decimal', 'numeric']
             if (numericTypes.includes(this.lookData.type) ||
               (typeof this.lookData.type === 'string' && this.lookData.type.toLowerCase().includes(

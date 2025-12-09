@@ -38,9 +38,7 @@
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span class="table-page-search-submitButtons"
                     :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{
-                    $t('button.search')
-                  }}</a-button>
+                <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{ $t('button.search') }}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon
                   type="reload"/>{{ $t('button.reset') }}</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
@@ -61,23 +59,19 @@
           <a-button type="primary" @click="$refs.createForm.handleAdd()"
                     v-hasPermi="['system:role:add']">
             <a-icon type="plus"/>
-            {{ $t('button.add') }}
-          </a-button>
+            {{ $t('button.add') }}</a-button>
           <a-button type="primary" :disabled="single"
                     @click="$refs.createForm.handleUpdate(undefined,ids)"
                     v-hasPermi="['system:role:edit']" ghost>
             <a-icon type="edit"/>
-            {{ $t('button.edit') }}
-          </a-button>
+            {{ $t('button.edit') }}</a-button>
           <a-button type="danger" :disabled="multiple" @click="handleDelete"
                     v-hasPermi="['system:role:remove']" ghost>
             <a-icon type="delete"/>
-            {{ $t('button.delete') }}
-          </a-button>
+            {{ $t('button.delete') }}</a-button>
           <a-button @click="handleExport" v-hasPermi="['system:role:export']">
             <a-icon type="export"/>
-            {{ $t('button.export') }}
-          </a-button>
+            {{ $t('button.export') }}</a-button>
         </a-space>
         <a-button
           type="dashed"
@@ -299,12 +293,12 @@ export default {
       const text = row.status === '1' ? '启用' : '停用'
       row.status = row.status === '0' ? '1' : '0'
       changeRoleStatus(row.roleId, row.status)
-      .then(() => {
-        this.$message.success(
-          text + '成功',
-          3
-        )
-      }).catch(function () {
+        .then(() => {
+          this.$message.success(
+            text + '成功',
+            3
+          )
+        }).catch(function () {
         this.$message.error(
           text + '异常',
           3
@@ -322,14 +316,14 @@ export default {
         content: '当前选中编号为' + roleIds + '的数据',
         onOk() {
           return delRole(roleIds)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

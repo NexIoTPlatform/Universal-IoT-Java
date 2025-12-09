@@ -275,10 +275,7 @@ public class DashboardService {
       }
 
       long offlineDevices = totalDevices - onlineDevices;
-      double onlineRate =
-          totalDevices > 0
-              ? Math.round((double) onlineDevices / totalDevices * 100 * 100.0) / 100.0
-              : 0.0;
+      double onlineRate = totalDevices > 0 ? Math.round((double) onlineDevices / totalDevices * 100 * 100.0) / 100.0 : 0.0;
 
       deviceStats.put("totalDevices", totalDevices);
       deviceStats.put("onlineDevices", onlineDevices);
@@ -319,10 +316,7 @@ public class DashboardService {
       }
 
       long offlineDevices = totalDevices - onlineDevices;
-      double onlineRate =
-          totalDevices > 0
-              ? Math.round((double) onlineDevices / totalDevices * 100 * 100.0) / 100.0
-              : 0.0;
+      double onlineRate = totalDevices > 0 ? Math.round((double) onlineDevices / totalDevices * 100 * 100.0) / 100.0 : 0.0;
 
       deviceStats.put("totalDevices", totalDevices);
       deviceStats.put("onlineDevices", onlineDevices);
@@ -402,10 +396,7 @@ public class DashboardService {
       long onlineDevices = ioTDeviceMapper.countOnlineDevices();
 
       long offlineDevices = totalDevices - onlineDevices;
-      double onlineRate =
-          totalDevices > 0
-              ? Math.round((double) onlineDevices / totalDevices * 100 * 100.0) / 100.0
-              : 0.0;
+      double onlineRate = totalDevices > 0 ? Math.round((double) onlineDevices / totalDevices * 100 * 100.0) / 100.0 : 0.0;
 
       deviceStats.put("totalDevices", totalDevices);
       deviceStats.put("onlineDevices", onlineDevices);

@@ -23,53 +23,35 @@ import java.util.stream.Stream;
 
 /** IoT常量 */
 public interface IoTConstant {
+  // 如果开启了主动注册，但是没有写编解码或者返回为null，那么把消息丢给设备默认设备Id,便于调试
+  String NEXIOT_DEBUG_DEVICE_ID = "nexiotDebugDeviceId";
+  /* 设置物模型期望属性 */
+  String SET_DEVICE_DESIRED_PROPERTIES = "setDeviceDesiredProperties";
   /*发送直通第三方平台*/
   String DOWN_TO_THIRD_PLATFORM = "downToThirdPlatform";
-  String CURRENT_INSTANCE_ID = "instanceId";
-  public final String CERT_DEFAULT_KEY = "default-tcp";
-  public final String HTTP_UP_BLACK_LIST = "httpUpBlackList";
-  public final String FENCE_DELAY_SIGN = "fenceDelaySign";
-  public final String FENCE_TRIGGER_SIGN = "fenceTriggerSign";
+  String CERT_DEFAULT_KEY = "default-tcp";
+  String FENCE_DELAY_SIGN = "fenceDelaySign";
+  String FENCE_TRIGGER_SIGN = "fenceTriggerSign";
 
-  public final String EXCLUSIVE_FIRST_LOGIN = "exclusiveFirstLogin";
-  public final String EXCLUSIVE_LOGIN = "exclusiveLogin";
-  public final String EXCLUSIVE_LOGIN_TOKEN = "exclusiveLoginToken";
+  String EXCLUSIVE_FIRST_LOGIN = "exclusiveFirstLogin";
+  String EXCLUSIVE_LOGIN = "exclusiveLogin";
+  String EXCLUSIVE_LOGIN_TOKEN = "exclusiveLoginToken";
 
-  public final String TCP_STANDARD_PRODUCT_KEY = "standardTcpProduct";
-  public final String TCP_FUNCTION = "tcpFunction";
-  public final String MSG_ID = "msgId";
-  public final String PRE_STORE_FUNCTION = "preStoreFunction";
+  String LOG_META_SHARD_PROPERTY_DELETE_SIGN = "logMetaShardPropertyDeleteSign";
 
-  public final String LOG_META_PROPERTY_DELETE_SIGN = "logMetaPropertyDeleteSign";
-  public final String LOG_META_SHARD_PROPERTY_DELETE_SIGN = "logMetaShardPropertyDeleteSign";
-
-  public final String LOG_META_EVENT_DELETE_SIGN = "logMetaEventDeleteSign";
-  public final String LOG_META_SHARD_EVENT_DELETE_SIGN = "logMetaShardEventDeleteSign";
+  String LOG_META_SHARD_EVENT_DELETE_SIGN = "logMetaShardEventDeleteSign";
 
   String MAGIC_REDIS_SIGN = "magicRedisSign:";
   // Redis Key 常量
-  final String DEVICE_ROUTES_KEY = "tcp:device:routes";
-  final String INSTANCE_DEVICES_KEY_PREFIX = "tcp:instance:devices:";
-
-  /** tcp设备指令下行的mqtt消息标识 */
-  public final String TCP_DOWN_MQTT_TOPIC_SIGN = "tcpDownMqttSign";
-
-  public final String TCP_ROUTE_PREFIX = "tcp:route:";
-  public final String TCP_DEVICE_DEL_SIGN = "tcpDeviceDelSign";
-  public final String TCP_SERVER_CODEC_ERROR_PREFIX = "tcpCodecErr:";
-  public final String TCP_SERVER_IP_BLACK_LIST_PREFIX = "tcpServerIpBlackListPrefix:";
-  public final String TCP_ERROR_MONITOR = "tcpErrorMonitor";
-
-  public final String HIK_TOKEN_APPLICATION = "hikTokenApplication";
-  public final String DH_TOKEN_APPLICATION = "dhTokenApplication";
-
-  public final Pattern pattern =
-      Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{8,30}$");
+  String DEVICE_ROUTES_KEY = "tcp:device:routes";
+  String INSTANCE_DEVICES_KEY_PREFIX = "tcp:instance:devices:";
+  String TCP_ERROR_MONITOR = "tcpErrorMonitor";
+  Pattern pattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).{8,30}$");
 
   /** REDIS KEY */
-  public final String REDIS_STORE_COMMAND = "storeCommand";
+  String REDIS_STORE_COMMAND = "storeCommand";
 
-  public final String REDIS_REPLY_COMMAND = "replyCommand";
+  String REDIS_REPLY_COMMAND = "replyCommand";
 
   /** 是否是定位设备 */
   String IS_GPS_PRODUCT = "isGps";
@@ -82,50 +64,50 @@ public interface IoTConstant {
    *
    * <p>设备公共字段，下发可能要用到的，deivceId,imei,meterNo
    */
-  public final String DEVICE_SHADOW_CUSTOMIZED_PROPERTY = "device_common_property";
+  String DEVICE_SHADOW_CUSTOMIZED_PROPERTY = "device_common_property";
 
-  public final String DEVICE_SHADOW_DESIRED_PROPERTY = "device_desired_property";
+  String DEVICE_SHADOW_DESIRED_PROPERTY = "device_desired_property";
 
   /** 默认离线阈值1440分钟（24小时） */
-  public final int DEFAULT_OFFLINE_THRESHOLD_VALUE = 24 * 60;
+  int DEFAULT_OFFLINE_THRESHOLD_VALUE = 24 * 60;
 
-  public final String DEFAULT_OFFLINE_THRESHOLD = "offlineThreshold";
+  String DEFAULT_OFFLINE_THRESHOLD = "offlineThreshold";
 
   /** 日志最大存储时间，单位天 */
-  public final int DEFAULT_LOG_MAX_STORAGE_TIME = 100;
+  int DEFAULT_LOG_MAX_STORAGE_TIME = 100;
 
-  public final String DEFAULT_LOG_MAX_STORAGE = "logMaxStorage";
-  public final Integer NORMAL = 0;
-  public final Integer UN_NORMAL = 1;
+  String DEFAULT_LOG_MAX_STORAGE = "logMaxStorage";
+  Integer NORMAL = 0;
+  Integer UN_NORMAL = 1;
 
   /***
    * 设备订阅最大数量
    */
-  public final int MAX_DEV_MSG_SUBSCRIBE_NUM = 5;
+  int MAX_DEV_MSG_SUBSCRIBE_NUM = 5;
 
   /** http请求超时时间 */
-  public final Integer HTTP_TIME_OUT = 8000;
+  Integer HTTP_TIME_OUT = 8000;
 
-  public final String HTTP_HEADER_APP = "cn-universal-APP";
-  public final String HTTP_HEADER_AUTH = "univ-AUTH";
-  public final String HTTP_HEADER_TIME = "univ-TIME";
+  String HTTP_HEADER_APP = "cn-universal-APP";
+  String HTTP_HEADER_AUTH = "univ-AUTH";
+  String HTTP_HEADER_TIME = "univ-TIME";
 
   /** 不解析，直接透传 */
-  public final String DATA_PASS_THROUGH = "passThrough";
+  String DATA_PASS_THROUGH = "passThrough";
 
   /** 中台上行带上原始串 */
-  public final String REQUIRE_PAYLOAD = "requirePayload";
+  String REQUIRE_PAYLOAD = "requirePayload";
 
   /** iot_device_log_metadata单属性最大存储10条 */
-  public final Integer maxStorage = 10;
+  Integer maxStorage = 10;
 
   /** 超时120s */
-  public final Integer HTTP_AUTH_TIMEOUT = 120;
+  Integer HTTP_AUTH_TIMEOUT = 120;
 
   /** UTC时区+8 */
-  public final String HTTP_UTC_8 = "+8";
+  String HTTP_UTC_8 = "+8";
 
-  public static final String TRACE_ID = "traceId";
+  String TRACE_ID = "traceId";
 
   static final String defaultMetadata =
       """
@@ -139,11 +121,14 @@ public interface IoTConstant {
     tcp,
     udp,
     mqtt,
-    http
+    http,
+    wvp,
+    ics,
+    icc
   }
 
   /** 非设备真实上报事件 */
-  Set<String> DevNotReallyReportEvent =
+  Set<String> notDeviceDataReportEvent =
       Stream.of("create", "offline", "enable", "disable", "delete", "update")
           .collect(Collectors.toCollection(HashSet::new));
 
@@ -408,7 +393,7 @@ public interface IoTConstant {
   }
 
   /** 设备订阅 */
-  public static enum DeviceSubscribe {
+  enum DeviceSubscribe {
     PRODUCT,
 
     DEVICE;
@@ -436,7 +421,15 @@ public interface IoTConstant {
     /** 网关 */
     GATEWAY,
     /** 网关子设备 */
-    GATEWAY_SUB_DEVICE;
+    GATEWAY_SUB_DEVICE,
+    /** 视频平台实例作为网关 */
+    VIDEO_GATEWAY,
+    /** 物理视频设备（IPC/NVR） */
+    VIDEO_DEVICE,
+    /** 视频通道（GB28181通道/设备通道） */
+    VIDEO_CHANNEL,
+    /** 非视频传感器设备（门禁、一卡通等） */
+    SENSOR_DEVICE;
 
     private DeviceNode() {}
 

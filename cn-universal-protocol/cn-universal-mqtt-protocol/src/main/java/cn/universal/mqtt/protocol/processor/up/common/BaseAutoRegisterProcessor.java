@@ -16,6 +16,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.constant.IoTConstant;
+import cn.universal.common.constant.IoTConstant.DownCmd;
 import cn.universal.common.domain.R;
 import cn.universal.core.message.UnifiedDownlinkCommand;
 import cn.universal.core.service.IoTDownlFactory;
@@ -160,7 +161,7 @@ public abstract class BaseAutoRegisterProcessor extends AbstratIoTService
 
       // 转换为UnifiedDownlinkCommand（保持所有参数）
       UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromJson(downRequest);
-
+      
       // 调用第三方平台进行注册
       R result = IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(command);
 
@@ -192,7 +193,7 @@ public abstract class BaseAutoRegisterProcessor extends AbstratIoTService
     downRequest.set("appUnionId", unionId);
     downRequest.set("productKey", ioTProduct.getProductKey());
     downRequest.set("deviceId", deviceId);
-    downRequest.set("cmd", "dev_add");
+    downRequest.set("cmd", DownCmd.DEV_ADD.name());
 
     JSONObject deviceData = new JSONObject();
     deviceData.set("deviceName", deviceId);

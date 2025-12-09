@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="52px" height="45px" viewBox="0 0 52 45" version="1.1"
-  xmlns="http://www.w3.org/2000/svg"
-  xmlns:xlink="http://www.w3.org/1999/xlink">
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
     <filter x="-9.4%" y="-6.2%" width="118.8%" height="122.5%" filterUnits="objectBoundingBox"
-      id="filter-1">
+            id="filter-1">
       <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
       <feGaussianBlur stdDeviation="1" in="shadowOffsetOuter1"
-        result="shadowBlurOuter1"></feGaussianBlur>
+                      result="shadowBlurOuter1"></feGaussianBlur>
       <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.15 0" type="matrix"
-        in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
+                     in="shadowBlurOuter1" result="shadowMatrixOuter1"></feColorMatrix>
       <feMerge>
         <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
         <feMergeNode in="SourceGraphic"></feMergeNode>
@@ -17,12 +17,12 @@
     </filter>
     <rect id="path-2" x="0" y="0" width="48" height="40" rx="4"></rect>
     <filter x="-4.2%" y="-2.5%" width="108.3%" height="110.0%" filterUnits="objectBoundingBox"
-      id="filter-4">
+            id="filter-4">
       <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
       <feGaussianBlur stdDeviation="0.5" in="shadowOffsetOuter1"
-        result="shadowBlurOuter1"></feGaussianBlur>
+                      result="shadowBlurOuter1"></feGaussianBlur>
       <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.1 0" type="matrix"
-        in="shadowBlurOuter1"></feColorMatrix>
+                     in="shadowBlurOuter1"></feColorMatrix>
     </filter>
   </defs>
   <g id="配置面板" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -37,9 +37,9 @@
             <use fill="#F7F8FA " fill-rule="evenodd" xlink:href="#path-2"></use>
           </g>
           <rect id="Rectangle-18" fill="#FFFFFF" mask="url(#mask-3)" x="0" y="0" width="16"
-            height="40"></rect>
+                height="40"></rect>
           <rect id="Rectangle-11" fill="#FFFFFF" mask="url(#mask-3)" x="0" y="0" width="48"
-            height="10"></rect>
+                height="10"></rect>
         </g>
       </g>
     </g>

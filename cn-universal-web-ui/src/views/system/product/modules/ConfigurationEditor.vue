@@ -440,8 +440,7 @@ export default {
       this.previewVisible = false
       const rawForm = this.currentEditType === 'publicConfiguration' ? this.publicConfigForm
         : this.privateConfigForm
-      const metaArray = this.currentEditType === 'publicConfiguration'
-        ? this.enhancedPublicConfigurationArray
+      const metaArray = this.currentEditType === 'publicConfiguration' ? this.enhancedPublicConfigurationArray
         : this.enhancedConfigurationArray
       const formData = this.normalizeFormData(metaArray, rawForm)
       updateConfig({
@@ -470,8 +469,7 @@ export default {
       Object.keys(formObj).forEach(key => {
         const type = metaMap[key]
         const value = formObj[key]
-        if (value === '' || value === undefined || value === null) {
-          result[key] = value
+        if (value === '') {
           return
         }
         if (type === 'boolean') {
@@ -669,4 +667,4 @@ export default {
     }
   }
 }
-</style> 
+</style>

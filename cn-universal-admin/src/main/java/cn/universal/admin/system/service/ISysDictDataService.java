@@ -80,6 +80,7 @@ public interface ISysDictDataService {
    */
   Map<String, Object> selectDictDataByTypes(String[] dictType);
 
+
   /**
    * 根据label标签，查找白名单
    *

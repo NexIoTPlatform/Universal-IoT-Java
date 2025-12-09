@@ -55,11 +55,6 @@
               Kafka
               <span v-if="!getPushMethodSupport('Kafka')" class="dev-tag">(开发中)</span>
             </a-select-option>
-            <!-- <a-select-option value="MQTT" :disabled="!getPushMethodSupport('MQTT')">
-              <a-icon type="wifi"/>
-              MQTT
-              <span v-if="!getPushMethodSupport('MQTT')" class="dev-tag">(开发中)</span>
-            </a-select-option> -->
             <a-select-option value="JDBC" :disabled="!getPushMethodSupport('JDBC')">
               <a-icon type="database"/>
               JDBC插入
@@ -194,26 +189,6 @@
               </template>
             </template>
 
-            <!-- MQTT配置 -->
-            <template v-if="pushMethod==='MQTT'">
-              <template v-for="field in getPushFields('MQTT')">
-                <a-form-model-item
-                  :key="field.dictValue"
-                  :label="field.dictLabel"
-                  :prop="getFieldProp(field.dictValue, 'MQTT')"
-                >
-                  <a-input
-                    v-model="form[getFieldPath(field.dictValue, 'MQTT')]"
-                    :placeholder="`请输入${field.dictLabel}`"
-                    size="large"
-                    class="form-input"
-                  >
-                    <a-icon slot="prefix" :type="getFieldIcon(field.dictValue)"/>
-                  </a-input>
-                </a-form-model-item>
-              </template>
-            </template>
-
             <!-- JDBC配置 -->
             <template v-if="pushMethod==='JDBC'">
               <template v-for="field in getPushFields('JDBC')">
@@ -284,12 +259,7 @@
 </template>
 
 <script>
-import {
-  addApplication,
-  checkUrl,
-  getApplication,
-  updateApplication
-} from '@/api/application/application'
+import {addApplication, checkUrl, getApplication, updateApplication} from '@/api/application/application'
 
 export default {
   name: 'CreateForm',
@@ -453,10 +423,6 @@ export default {
           bootstrapServers: '',
           topic: ''
         },
-        mqtt: {
-          url: '',
-          topic: ''
-        },
         jdbc: {
           type: 'mysql',
           url: '',
@@ -538,19 +504,6 @@ export default {
         })
       }
 
-      if (this.pushMethod === 'MQTT' && this.getPushMethodSupport('MQTT')) {
-        // 保留原有配置，避免覆盖 enable 和 support 等字段
-        if (!config.mqtt) {
-          config.mqtt = {}
-        }
-        this.getPushFields('MQTT').forEach(field => {
-          const value = this.form[this.getFieldPath(field.dictValue, 'MQTT')]
-          if (value !== undefined && value !== null && value !== '') {
-            config.mqtt[field.dictValue] = value
-          }
-        })
-      }
-
       if (this.pushMethod === 'JDBC' && this.getPushMethodSupport('JDBC')) {
         // 保留原有配置，避免覆盖 enable 和 support 等字段
         if (!config.jdbc) {
@@ -611,14 +564,6 @@ export default {
             const value = config.kafka[field.dictValue]
             if (value !== undefined) {
               this.form[this.getFieldPath(field.dictValue, 'Kafka')] = value
-            }
-          })
-        } else if (config.mqtt && Object.keys(config.mqtt).length > 0) {
-          this.pushMethod = 'MQTT'
-          this.getPushFields('MQTT').forEach(field => {
-            const value = config.mqtt[field.dictValue]
-            if (value !== undefined) {
-              this.form[this.getFieldPath(field.dictValue, 'MQTT')] = value
             }
           })
         } else if (config.jdbc && Object.keys(config.jdbc).length > 0) {

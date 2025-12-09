@@ -21,18 +21,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /** 文件上传Factory @Author Lion Li */
 public class OssFactory {
-  //
-  //    private static ISysConfigService sysConfigService;
-  //
-  //    static {
-  //      OssFactory.sysConfigService = SpringUtils.getBean(ISysConfigService.class);
-  //    }
+//
+//    private static ISysConfigService sysConfigService;
+//
+//    static {
+//      OssFactory.sysConfigService = SpringUtils.getBean(ISysConfigService.class);
+//    }
 
   private static final Map<String, ICloudStorageService> SERVICES = new ConcurrentHashMap<>();
 
   public static ICloudStorageService instance() {
-    //        String type =
-    // sysConfigService.selectConfigByKey(CloudConstant.CLOUD_STORAGE_CONFIG_KEY);
+//        String type = sysConfigService.selectConfigByKey(CloudConstant.CLOUD_STORAGE_CONFIG_KEY);
     return instance("qiniu");
   }
 

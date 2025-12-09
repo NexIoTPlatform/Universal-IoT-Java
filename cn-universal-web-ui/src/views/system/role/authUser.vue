@@ -37,8 +37,7 @@
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="cancelAuthUserAll"
                   v-hasPermi="['system:role:remove']">
-          <iot-icon type="icon-u-del"/>
-          {{ $t('button.cancel') }}批量授权
+          <iot-icon type="icon-u-del"/>{{ $t('button.cancel') }}批量授权
         </a-button>
         <a-button type="primary" @click="back">
           <iot-icon type="icon-u-edit"/>
@@ -253,14 +252,14 @@ export default {
             roleId: roleId
           }
           return authUserCancel(param)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '取消授权成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '取消授权成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -278,14 +277,14 @@ export default {
             unionIds: that.unionIds
           }
           return authUserCancelAll(param)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '取消授权成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '取消授权成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

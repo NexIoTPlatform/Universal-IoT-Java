@@ -6,12 +6,14 @@ import cn.universal.manager.notice.dto.NoticeChannelDTO;
 import cn.universal.manager.notice.model.NoticeChannel;
 import cn.universal.manager.notice.service.NoticeChannelService;
 import cn.universal.manager.notice.util.JsonDesensitizationUtil;
+import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.security.BaseController;
 import cn.universal.security.utils.SecurityUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,8 +42,18 @@ public class NoticeChannelController extends BaseController {
       @RequestParam(defaultValue = "10") Integer pageSize,
       @RequestParam(required = false) String name,
       @RequestParam(required = false) String channelType) {
+    IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+    String currentUser = SecurityUtils.getUnionId();
+    
     startPage();
     List<NoticeChannel> list = noticeChannelService.search(name, channelType, null);
+    
+    // 如果不是管理员，只显示该用户创建的渠道
+    if (!iotUser.isAdmin()) {
+      list = list.stream()
+          .filter(channel -> currentUser.equals(channel.getCreator()))
+          .collect(Collectors.toList());
+    }
 
     List<NoticeChannelDTO> dtoList =
         list.stream()
@@ -82,6 +94,15 @@ public class NoticeChannelController extends BaseController {
       if (channel == null) {
         return null;
       }
+      
+      String currentUser = SecurityUtils.getUnionId();
+      IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+      
+      // 如果不是管理员且不是创建者，无权限访问
+      if (!iotUser.isAdmin() && !currentUser.equals(channel.getCreator())) {
+        return null;
+      }
+      
       NoticeChannelDTO dto = new NoticeChannelDTO();
       dto.setId(channel.getId());
       dto.setName(channel.getName());
@@ -107,14 +128,37 @@ public class NoticeChannelController extends BaseController {
   @PostMapping("/save")
   public Map<String, Object> save(@RequestBody NoticeChannelDTO channelDTO) {
     try {
+      String currentUser = SecurityUtils.getUnionId();
+      IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+      
+      NoticeChannel existingChannel = null;
+      // 如果是修改操作，检查权限
+      if (channelDTO.getId() != null) {
+        existingChannel = noticeChannelService.getById(channelDTO.getId());
+        if (existingChannel == null) {
+          return Map.of("code", 1, "msg", "渠道不存在");
+        }
+        // 如果不是管理员且不是创建者，无权限修改
+        if (!iotUser.isAdmin() && !currentUser.equals(existingChannel.getCreator())) {
+          return Map.of("code", 1, "msg", "无权限修改该渠道");
+        }
+      }
+      
       NoticeChannel channel = new NoticeChannel();
       channel.setId(channelDTO.getId());
       channel.setName(channelDTO.getName());
       channel.setChannelType(channelDTO.getChannelType());
       channel.setStatus(channelDTO.getStatus());
       channel.setRemark(channelDTO.getRemark());
-      channel.setCreator(SecurityUtils.getUnionId());
-      channel.setCreateTime(channelDTO.getCreateTime());
+      
+      // 如果是新增，设置创建者；如果是修改，保持原有创建者
+      if (channelDTO.getId() == null) {
+        channel.setCreator(currentUser);
+      } else if (existingChannel != null) {
+        channel.setCreator(existingChannel.getCreator());
+        channel.setCreateTime(existingChannel.getCreateTime());
+      }
+      
       channel.setUpdateTime(channelDTO.getUpdateTime());
       // 将config对象转换为JSON字符串
       if (channelDTO.getConfig() != null) {
@@ -135,6 +179,19 @@ public class NoticeChannelController extends BaseController {
   public Map<String, Object> delete(@RequestBody List<Long> ids) {
     try {
       if (ids != null && !ids.isEmpty()) {
+        String currentUser = SecurityUtils.getUnionId();
+        IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+        
+        // 如果不是管理员，检查是否有权限删除
+        if (!iotUser.isAdmin()) {
+          for (Long id : ids) {
+            NoticeChannel channel = noticeChannelService.getById(id);
+            if (channel != null && !currentUser.equals(channel.getCreator())) {
+              return Map.of("code", 1, "msg", "无权限删除该渠道");
+            }
+          }
+        }
+        
         noticeChannelService.deleteBatch(ids);
         return Map.of("code", 0, "msg", "删除成功");
       } else {

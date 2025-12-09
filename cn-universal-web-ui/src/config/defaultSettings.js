@@ -25,6 +25,17 @@ export default {
     locale: true
   },
   title: 'NexIoT',
+  // 侧边栏标题配置
+  siderMenu: {
+    // 收缩状态下的标题（仅英文）
+    collapsedTitle: 'NexIoT',
+    // 展开状态下的标题（默认仅英文）
+    expandedTitle: 'NexIoT',
+    // 宽屏时显示的标题（中文+英文）
+    wideScreenTitle: '奈科斯 NexIoT',
+    // 宽屏断点宽度（单位：px），大于等于此宽度时显示 wideScreenTitle
+    wideScreenBreakpoint: 1280
+  },
   pwa: false,
   iconfontUrl: '',
   production: process.env.NODE_ENV === 'production'
@@ -38,5 +49,29 @@ export default {
   fixSiderbar: false,
   multiTab: true,
   hideHintAlert: true,
-  hideCopyButton: false
+  hideCopyButton: false,
+  // 全局水印配置
+  watermark: {
+    // 是否启用水印功能
+    enabled: true,
+    // 自定义水印文本（会自动追加到登录用户名后面，作为第二行显示）
+    // 示例：如果用户名为 "admin"，customText 为 "内部系统"，则水印显示为：
+    // 第一行：admin
+    // 第二行：内部系统
+    // customText: '学校公益免费，商用请联系outlookfil',
+    customText: '全部为真实设备，演示环境需爱护，请勿进行破坏性 / 违规操作！',
+    // 字体大小（单位：px）
+    fontSize: 16,
+    // 字体颜色（RGBA格式，建议透明度在0.05-0.15之间，值越小越淡）
+    fontColor: 'rgba(0, 0, 0, 0.08)',
+    // 字体族（支持系统字体或Web字体）
+    fontFamily: 'Arial, sans-serif',
+    // 水印间距 [水平间距, 垂直间距]（单位：px）
+    // 值越大，水印越稀疏，对页面内容干扰越小
+    gap: [300, 500],
+    // 水印旋转角度（单位：度，负数表示逆时针旋转）
+    rotate: -10,
+    // 水印层级（z-index值，确保水印在最上层但不遮挡交互元素）
+    zIndex: 9999
+  }
 }

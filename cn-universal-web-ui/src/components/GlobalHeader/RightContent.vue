@@ -14,10 +14,10 @@
         <a-icon type="book" @click="toDoc" :style="{ fontSize: '20px' }"/>
       </a-tooltip>
       <screenfull/>
-      <notice-icon/>
-      <version-log/>
+      <notice-icon />
+      <version-log />
       <!-- 国际化开关 -->
-      <select-lang :class="prefixCls"/>
+      <select-lang :class="prefixCls" />
       <avatar-dropdown :menu="showMenu" :current-user="currentUser"/>
     </a-space>
   </div>
@@ -75,7 +75,7 @@ export default {
   data() {
     return {
       showMenu: true,
-      docUrl: 'http://docs.192886.xyz:81/',
+      docUrl: 'https://docs.nexiot.cc/',
       gitee: 'https://gitee.com/NexIoT/Universal-IoT-Java'
     }
   },

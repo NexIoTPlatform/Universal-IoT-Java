@@ -156,25 +156,18 @@ class RulegoApiClientHutoolTest {
       assertNotNull(response, "响应不应为null");
       System.out.println("响应成功: " + response.getSuccess());
       System.out.println("响应消息: " + response.getMessage());
-      System.out.println(
-          "规则链数量: "
-              + (response.getData() != null && response.getData().getData() != null
-                  ? response.getData().getData().size()
-                  : 0));
+      System.out.println("规则链数量: " + (response.getData() != null && response.getData().getData() != null ? response.getData().getData().size() : 0));
 
       // 基本验证
       assertTrue(response.getSuccess(), "获取列表应该成功");
       assertNotNull(response.getData(), "规则链列表不应为null");
 
       // 输出前几个规则链信息
-      if (response.getData() != null
-          && response.getData().getData() != null
-          && !response.getData().getData().isEmpty()) {
+      if (response.getData() != null && response.getData().getData() != null && !response.getData().getData().isEmpty()) {
         System.out.println("前3个规则链信息:");
         response.getData().getData().stream()
             .limit(3)
-            .forEach(
-                chain -> System.out.println("  - " + chain.getName() + " (" + chain.getId() + ")"));
+            .forEach(chain -> System.out.println("  - " + chain.getName() + " (" + chain.getId() + ")"));
       }
 
       System.out.println("✅ 获取规则链列表测试通过");
@@ -299,8 +292,7 @@ class RulegoApiClientHutoolTest {
       System.out.println("保存DSL内容长度: " + dsl.length());
 
       // 调用真实的API保存DSL
-      RulegoApiResponse<RulegoChainResponse> response =
-          rulegoApiClient.saveChainDsl(TEST_CHAIN_ID, dsl);
+      RulegoApiResponse<RulegoChainResponse> response = rulegoApiClient.saveChainDsl(TEST_CHAIN_ID, dsl);
 
       // 验证响应
       assertNotNull(response, "响应不应为null");
@@ -342,8 +334,7 @@ class RulegoApiClientHutoolTest {
 
       // 部署规则链
       System.out.println("开始部署规则链...");
-      RulegoApiResponse<RulegoSuccessResponse> deployResponse =
-          rulegoApiClient.deployChain(TEST_CHAIN_ID);
+      RulegoApiResponse<RulegoSuccessResponse> deployResponse = rulegoApiClient.deployChain(TEST_CHAIN_ID);
 
       assertNotNull(deployResponse, "部署响应不应为null");
       System.out.println("部署成功: " + deployResponse.getSuccess());
@@ -356,8 +347,7 @@ class RulegoApiClientHutoolTest {
 
       // 停止规则链
       System.out.println("开始停止规则链...");
-      RulegoApiResponse<RulegoSuccessResponse> stopResponse =
-          rulegoApiClient.stopChain(TEST_CHAIN_ID);
+      RulegoApiResponse<RulegoSuccessResponse> stopResponse = rulegoApiClient.stopChain(TEST_CHAIN_ID);
 
       assertNotNull(stopResponse, "停止响应不应为null");
       System.out.println("停止成功: " + stopResponse.getSuccess());
@@ -397,21 +387,18 @@ class RulegoApiClientHutoolTest {
       // 准备触发数据
       RulegoTriggerRequest triggerRequest = new RulegoTriggerRequest();
       triggerRequest.setChainId(TEST_CHAIN_ID);
-      triggerRequest.setData(
-          "{\"test\": \"Hutool测试数据\", \"timestamp\": " + System.currentTimeMillis() + "}");
+      triggerRequest.setData("{\"test\": \"Hutool测试数据\", \"timestamp\": " + System.currentTimeMillis() + "}");
 
       System.out.println("触发数据: " + triggerRequest.getData());
 
       // 调用真实的API触发规则链
-      RulegoApiResponse<RulegoTriggerResponse> response =
-          rulegoApiClient.triggerChainSync(triggerRequest);
+      RulegoApiResponse<RulegoTriggerResponse> response = rulegoApiClient.triggerChainSync(triggerRequest);
 
       // 验证响应
       assertNotNull(response, "响应不应为null");
       System.out.println("响应成功: " + response.getSuccess());
       System.out.println("响应消息: " + response.getMessage());
-      System.out.println(
-          "执行ID: " + (response.getData() != null ? response.getData().getExecutionId() : "null"));
+      System.out.println("执行ID: " + (response.getData() != null ? response.getData().getExecutionId() : "null"));
 
       // 基本验证
       assertTrue(response.getSuccess(), "触发应该成功");
@@ -447,8 +434,7 @@ class RulegoApiClientHutoolTest {
       Thread.sleep(1000);
 
       // 调用真实的API删除规则链
-      RulegoApiResponse<RulegoSuccessResponse> response =
-          rulegoApiClient.deleteChain(TEST_CHAIN_ID);
+      RulegoApiResponse<RulegoSuccessResponse> response = rulegoApiClient.deleteChain(TEST_CHAIN_ID);
 
       // 验证响应
       assertNotNull(response, "响应不应为null");
@@ -514,8 +500,7 @@ class RulegoApiClientHutoolTest {
       createRequest.setDescription("用于完整流程测试的规则链");
       createRequest.setRoot(false);
 
-      RulegoApiResponse<RulegoSuccessResponse> createResponse =
-          rulegoApiClient.saveChainInfo(createRequest);
+      RulegoApiResponse<RulegoSuccessResponse> createResponse = rulegoApiClient.saveChainInfo(createRequest);
       assertTrue(createResponse.getSuccess(), "创建规则链应该成功");
       System.out.println("✅ 创建规则链成功");
 
@@ -528,14 +513,11 @@ class RulegoApiClientHutoolTest {
       assertTrue(listResponse.getSuccess(), "获取列表应该成功");
       System.out.println(
           "✅ 获取规则链列表成功，数量: "
-              + (listResponse.getData() != null && listResponse.getData().getData() != null
-                  ? listResponse.getData().getData().size()
-                  : 0));
+              + (listResponse.getData() != null && listResponse.getData().getData() != null ? listResponse.getData().getData().size() : 0));
 
       // 3. 获取规则链详情
       System.out.println("3. 获取规则链详情...");
-      RulegoApiResponse<RulegoChainInfo> detailResponse =
-          rulegoApiClient.getChainDetail(TEST_CHAIN_ID);
+      RulegoApiResponse<RulegoChainInfo> detailResponse = rulegoApiClient.getChainDetail(TEST_CHAIN_ID);
       assertTrue(detailResponse.getSuccess(), "获取详情应该成功");
       System.out.println("✅ 获取规则链详情成功");
       if (detailResponse.getData() != null) {
@@ -548,8 +530,7 @@ class RulegoApiClientHutoolTest {
       System.out.println("4. 保存DSL...");
       String dsl =
           "{\"nodes\":[{\"id\":\"start\",\"type\":\"start\",\"name\":\"开始节点\"}],\"edges\":[]}";
-      RulegoApiResponse<RulegoChainResponse> dslResponse =
-          rulegoApiClient.saveChainDsl(TEST_CHAIN_ID, dsl);
+      RulegoApiResponse<RulegoChainResponse> dslResponse = rulegoApiClient.saveChainDsl(TEST_CHAIN_ID, dsl);
       assertTrue(dslResponse.getSuccess(), "保存DSL应该成功");
       System.out.println("✅ 保存DSL成功");
 
@@ -558,14 +539,13 @@ class RulegoApiClientHutoolTest {
 
       // 5. 部署规则链
       System.out.println("5. 部署规则链...");
-      RulegoApiResponse<RulegoSuccessResponse> deployResponse =
-          rulegoApiClient.deployChain(TEST_CHAIN_ID);
-
+      RulegoApiResponse<RulegoSuccessResponse> deployResponse = rulegoApiClient.deployChain(TEST_CHAIN_ID);
+      
       // 输出详细的部署响应信息
       System.out.println("部署响应详情:");
       System.out.println("  - 成功状态: " + deployResponse.getSuccess());
       System.out.println("  - 响应消息: " + deployResponse.getMessage());
-
+      
       assertTrue(deployResponse.getSuccess(), "部署应该成功");
       System.out.println("✅ 部署规则链成功");
 
@@ -578,8 +558,7 @@ class RulegoApiClientHutoolTest {
       triggerRequest.setChainId(TEST_CHAIN_ID);
       triggerRequest.setData("{\"test\": \"完整流程测试\"}");
 
-      RulegoApiResponse<RulegoTriggerResponse> triggerResponse =
-          rulegoApiClient.triggerChainSync(triggerRequest);
+      RulegoApiResponse<RulegoTriggerResponse> triggerResponse = rulegoApiClient.triggerChainSync(triggerRequest);
       assertTrue(triggerResponse.getSuccess(), "触发应该成功");
       System.out.println("✅ 触发规则链成功");
 
@@ -588,8 +567,7 @@ class RulegoApiClientHutoolTest {
 
       // 7. 停止规则链
       System.out.println("7. 停止规则链...");
-      RulegoApiResponse<RulegoSuccessResponse> stopResponse =
-          rulegoApiClient.stopChain(TEST_CHAIN_ID);
+      RulegoApiResponse<RulegoSuccessResponse> stopResponse = rulegoApiClient.stopChain(TEST_CHAIN_ID);
       assertTrue(stopResponse.getSuccess(), "停止应该成功");
       System.out.println("✅ 停止规则链成功");
 
@@ -598,8 +576,7 @@ class RulegoApiClientHutoolTest {
 
       // 8. 删除规则链
       System.out.println("8. 删除规则链...");
-      RulegoApiResponse<RulegoSuccessResponse> deleteResponse =
-          rulegoApiClient.deleteChain(TEST_CHAIN_ID);
+      RulegoApiResponse<RulegoSuccessResponse> deleteResponse = rulegoApiClient.deleteChain(TEST_CHAIN_ID);
       assertTrue(deleteResponse.getSuccess(), "删除应该成功");
       System.out.println("✅ 删除规则链成功");
 

@@ -115,7 +115,7 @@ public class HTTPUniversalCodecService implements HTTPProtocolCodecLoader, IHTTP
 
   /** 使用统一编解码服务的preDecode方法 */
   public UPRequest preDecode(String productKey, String payload) {
-    return codecService.preDecode(productKey, payload);
+    return codecService.preDecode(productKey, payload,null);
   }
 
   /** 使用统一编解码服务的通用codec方法 */

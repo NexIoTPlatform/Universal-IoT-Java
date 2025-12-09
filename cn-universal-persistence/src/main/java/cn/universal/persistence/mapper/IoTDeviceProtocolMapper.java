@@ -14,6 +14,7 @@ package cn.universal.persistence.mapper;
 
 import cn.universal.persistence.common.BaseMapper;
 import cn.universal.persistence.entity.IoTDeviceProtocol;
+import cn.universal.persistence.entity.IoTProduct;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -77,4 +78,14 @@ public interface IoTDeviceProtocolMapper extends BaseMapper<IoTDeviceProtocol> {
   public int deleteDevProtocolByIds(String[] ids);
 
   IoTDeviceProtocol selectDevProtocolByProductKey(@Param("productKey") String productKey);
+
+  /**
+   * 查询未创建协议的产品列表（归属人为当前用户）
+   *
+   * @param unionId 用户unionId
+   * @param searchKey 搜索关键词（产品名称或productKey）
+   * @return 产品列表
+   */
+  List<IoTProduct> selectProductsWithoutProtocol(
+      @Param("unionId") String unionId, @Param("searchKey") String searchKey);
 }

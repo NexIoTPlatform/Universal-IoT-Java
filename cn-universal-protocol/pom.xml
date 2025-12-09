@@ -15,5 +15,27 @@
     <!-- 设备插件 -->
     <module>cn-universal-mqtt-protocol</module>
     <module>cn-universal-http-protocol</module>
+    <!-- 视频平台协议子模块 -->
+    <module>cn-wvp-protocol</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <!-- 不保留方法参数名 -->
+          <parameters>true</parameters>
+          <!-- 不生成调试信息 -->
+          <debug>false</debug>
+          <!-- 不生成行号信息 -->
+          <debuglevel>none</debuglevel>
+          <!-- 优化字节码 -->
+          <optimize>true</optimize>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project> 

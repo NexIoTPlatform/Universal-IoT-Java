@@ -45,6 +45,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2023/05/19 19:28
  */
 @Slf4j
+
 public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
     implements ProtocolCodecLoader, ProtocolCodecSupport, ProtocolCodecWrapper {
 
@@ -292,6 +293,7 @@ public class ProtocolCodecMagic extends ProtocolCodecSupportWrapper
           magicPreDecoderProvider.get(protocolDecodeRequest.getDefinition().getProvider());
       MagicScriptContext context = new MagicScriptContext();
       context.set("payload", protocolDecodeRequest.getPayload());
+      context.set("context", protocolDecodeRequest.getContext());
       Object result = magicScript.execute(context);
       return str(result);
     } catch (Exception e) {

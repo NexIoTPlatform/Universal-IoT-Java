@@ -15,7 +15,7 @@
     <div class="notice-detail" v-if="form.noticeContent" v-html="form.noticeContent" v-highlight>
     </div>
     <div v-else style="text-align: center; padding: 40px; color: #999;">
-      <a-icon type="info-circle" style="font-size: 24px; margin-bottom: 16px;"/>
+      <a-icon type="info-circle" style="font-size: 24px; margin-bottom: 16px;" />
       <p>暂无通知内容</p>
       <p style="font-size: 12px; margin-top: 8px;">通知ID: {{ form.noticeId || '未知' }}</p>
       <p style="font-size: 12px; margin-top: 4px;">表单数据: {{ JSON.stringify(form) }}</p>
@@ -86,9 +86,7 @@ export default {
     },
     // 公告类型字典翻译
     typeFormat(noticeType) {
-      if (!noticeType) {
-        return '未知类型'
-      }
+      if (!noticeType) return '未知类型'
       return this.selectDictLabel(this.typeOptions, noticeType)
     }
   }

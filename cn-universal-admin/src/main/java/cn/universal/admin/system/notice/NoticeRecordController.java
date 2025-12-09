@@ -2,8 +2,10 @@ package cn.universal.admin.system.notice;
 
 import cn.universal.manager.notice.model.NoticeSendRecord;
 import cn.universal.manager.notice.service.NoticeRecordService;
+import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.page.TableDataInfo;
 import cn.universal.security.BaseController;
+import cn.universal.security.utils.SecurityUtils;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +30,15 @@ public class NoticeRecordController extends BaseController {
       @RequestParam(required = false) String keyword,
       @RequestParam(required = false) String type,
       @RequestParam(required = false) String status) {
+    IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+    String currentUser = SecurityUtils.getUnionId();
+    
+    // 如果不是管理员，只显示该用户创建的记录
+    String creator = iotUser.isAdmin() ? null : currentUser;
+    
     startPage();
-    List<NoticeSendRecord> list = recordService.search(keyword, type, status);
+    List<NoticeSendRecord> list = recordService.search(keyword, type, status, creator);
+    
     return getDataTable(list);
   }
 }

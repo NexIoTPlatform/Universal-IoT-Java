@@ -22,7 +22,7 @@ const request = axios.create({
 const errorHandler = (error) => {
   let errorMessage = error.message
   const requestUrl = error.config?.url || ''
-
+  
   if (requestUrl.indexOf('/oauth/token') !== -1) {
     errorMessage = error.response.data.error_description
   } else {
@@ -60,8 +60,7 @@ const errorHandler = (error) => {
     // 如果有响应数据，优先使用响应中的错误信息
     if (error.response && error.response.data) {
       const responseData = error.response.data
-      const responseMsg = responseData.msg || responseData.message
-        || responseData.error
+      const responseMsg = responseData.msg || responseData.message || responseData.error
       if (responseMsg) {
         errorMessage = responseMsg
       }
@@ -74,10 +73,10 @@ const errorHandler = (error) => {
 
     // 显示错误通知（排除登录接口）
     if (requestUrl !== '/login' && requestUrl.indexOf('/oauth/token') === -1) {
-      notification.error({
-        message: "系统异常",
+      notification.warn({
+        message: "业务异常",
         description: errorMessage,
-        duration: 5
+        duration: 2
       })
     }
   }
@@ -197,37 +196,37 @@ export function download(url, params, filename) {
     }
   })
   return request
-  .post(url, qs.stringify(params, {indices: false}), {
-    responseType: 'blob'
-  })
-  .then(async (data) => {
-    // 检查文件名扩展名，如果是.json，则按JSON处理
-    if (filename && filename.toLowerCase().endsWith('.json')) {
-      // 对于JSON文件，直接保存为JSON格式
-      const blob = new Blob([data], {type: 'application/json'})
-      saveAs(blob, filename)
-      message.success('下载成功')
-    } else {
-      // 对于其他文件类型，使用blobValidate检查
-      const isBlob = await blobValidate(data)
-      if (isBlob) {
-        const blob = new Blob([data])
+    .post(url, qs.stringify(params, {indices: false}), {
+      responseType: 'blob'
+    })
+    .then(async (data) => {
+      // 检查文件名扩展名，如果是.json，则按JSON处理
+      if (filename && filename.toLowerCase().endsWith('.json')) {
+        // 对于JSON文件，直接保存为JSON格式
+        const blob = new Blob([data], {type: 'application/json'})
         saveAs(blob, filename)
         message.success('下载成功')
       } else {
-        const resText = await data.text()
-        const rspObj = JSON.parse(resText)
-        const errMsg = errorCode[rspObj.code] || rspObj.msg
-          || errorCode['default']
-        message.error(errMsg)
+        // 对于其他文件类型，使用blobValidate检查
+        const isBlob = await blobValidate(data)
+        if (isBlob) {
+          const blob = new Blob([data])
+          saveAs(blob, filename)
+          message.success('下载成功')
+        } else {
+          const resText = await data.text()
+          const rspObj = JSON.parse(resText)
+          const errMsg = errorCode[rspObj.code] || rspObj.msg
+            || errorCode['default']
+          message.error(errMsg)
+        }
       }
-    }
-    notification.close(notificationKey)
-  })
-  .catch((r) => {
-    message.error('下载文件出现错误，请联系管理员！')
-    notification.close(notificationKey)
-  })
+      notification.close(notificationKey)
+    })
+    .catch((r) => {
+      message.error('下载文件出现错误，请联系管理员！')
+      notification.close(notificationKey)
+    })
 }
 
 export default request

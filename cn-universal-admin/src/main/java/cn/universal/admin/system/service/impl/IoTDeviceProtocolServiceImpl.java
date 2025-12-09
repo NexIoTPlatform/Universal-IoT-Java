@@ -32,6 +32,7 @@ import cn.universal.core.protocol.magic.ProtocolCodecMagic;
 import cn.universal.dm.device.service.impl.IoTCacheRemoveService;
 import cn.universal.ossm.service.ISysOssService;
 import cn.universal.persistence.entity.IoTDeviceProtocol;
+import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.bo.IoTDeviceProtocolBO;
 import cn.universal.persistence.mapper.IoTDeviceProtocolMapper;
@@ -279,5 +280,17 @@ public class IoTDeviceProtocolServiceImpl extends BaseServiceImpl
       allEntries = true)
   public int deleteDevProtocolById(String id) {
     return ioTDeviceProtocolMapper.deleteDevProtocolById(id);
+  }
+
+  /**
+   * 查询未创建协议的产品列表（归属人为当前用户）
+   *
+   * @param unionId 用户unionId
+   * @param searchKey 搜索关键词（产品名称或productKey）
+   * @return 产品列表
+   */
+  @Override
+  public List<IoTProduct> selectProductsWithoutProtocol(String unionId, String searchKey) {
+    return ioTDeviceProtocolMapper.selectProductsWithoutProtocol(unionId, searchKey);
   }
 }

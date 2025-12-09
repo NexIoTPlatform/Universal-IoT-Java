@@ -16,7 +16,8 @@ import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * SQL值转换工具类 提供将Java对象转换为SQL安全格式的通用方法
+ * SQL值转换工具类
+ * 提供将Java对象转换为SQL安全格式的通用方法
  *
  * @author gitee.com/NexIoT
  * @version 1.0
@@ -26,8 +27,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SqlValueConverter {
 
   /**
-   * 将变量值转换为SQL安全格式 1. 字符串类型：添加单引号，转义内部单引号 2. 数字/布尔类型：直接转换为字符串 3. null：转换为SQL的NULL关键字 4.
-   * 日期类型：转换为SQL标准格式 5. 其他类型：转为JSON字符串
+   * 将变量值转换为SQL安全格式
+   * 1. 字符串类型：添加单引号，转义内部单引号
+   * 2. 数字/布尔类型：直接转换为字符串
+   * 3. null：转换为SQL的NULL关键字
+   * 4. 日期类型：转换为SQL标准格式
+   * 5. 其他类型：转为JSON字符串
    *
    * @param value 要转换的值
    * @return SQL安全格式的字符串
@@ -36,7 +41,7 @@ public class SqlValueConverter {
     if (value == null) {
       return "NULL";
     }
-
+    
     if (value instanceof String) {
       // 转义单引号（防止SQL注入和语法错误）
       String strValue = (String) value;
@@ -64,7 +69,7 @@ public class SqlValueConverter {
     if (values == null) {
       return new String[0];
     }
-
+    
     String[] result = new String[values.length];
     for (int i = 0; i < values.length; i++) {
       result[i] = convertToSqlValue(values[i]);
@@ -73,7 +78,8 @@ public class SqlValueConverter {
   }
 
   /**
-   * 将变量值转换为SQL安全格式（JSON字符串专用） 使用双引号包围JSON字符串，避免单引号冲突
+   * 将变量值转换为SQL安全格式（JSON字符串专用）
+   * 使用双引号包围JSON字符串，避免单引号冲突
    *
    * @param value 要转换的值
    * @return SQL安全格式的字符串
@@ -82,7 +88,7 @@ public class SqlValueConverter {
     if (value == null) {
       return "NULL";
     }
-
+    
     if (value instanceof String) {
       // JSON字符串：使用双引号包围，转义内部双引号
       String strValue = (String) value;
@@ -110,12 +116,12 @@ public class SqlValueConverter {
     if (value == null) {
       return false;
     }
-
+    
     if (value instanceof String) {
       String strValue = (String) value;
       return strValue.contains("'") || strValue.contains("\\") || strValue.contains("\"");
     }
-
+    
     return !(value instanceof Number || value instanceof Boolean);
   }
 }

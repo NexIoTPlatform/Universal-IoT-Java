@@ -47,7 +47,8 @@ public class HttpDownService extends AbstractDownService<HttpDownRequest> implem
   }
 
   /**
-   * @deprecated 该方法已废弃，请使用HttpDownRequestConverter进行转换 保留此方法仅为了兼容遗留代码
+   * @deprecated 该方法已废弃，请使用HttpDownRequestConverter进行转换
+   * 保留此方法仅为了兼容遗留代码
    */
   @Deprecated
   @Override
@@ -71,7 +72,7 @@ public class HttpDownService extends AbstractDownService<HttpDownRequest> implem
     try {
       // 从上下文获取已转换好的请求对象（由Converter自动转换）
       HttpDownRequest downRequest = (HttpDownRequest) context.getDownRequest();
-
+      
       if (downRequest == null) {
         return R.error("请求对象为空，请检查Converter配置");
       }

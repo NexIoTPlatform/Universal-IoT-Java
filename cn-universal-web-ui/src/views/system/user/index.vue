@@ -8,8 +8,7 @@
             <a-row :gutter="48">
               <a-col :md="8" :sm="24">
                 <a-form-item :label="$t('user.username')">
-                  <a-input v-model="queryParam.username"
-                           :placeholder="$t('user.placeholder.username')"
+                  <a-input v-model="queryParam.username" :placeholder="$t('user.placeholder.username')"
                            @keyup.enter="handleQuery" allow-clear/>
                 </a-form-item>
               </a-col>
@@ -57,9 +56,7 @@
                   <a-space>
                     <a-button type="primary" @click="handleQuery"><a-icon
                       type="search"/>{{ $t('button.search') }}</a-button>
-                    <a-button @click="resetQuery"><a-icon type="sync"/>{{
-                        $t('button.reset')
-                      }}</a-button>
+                    <a-button @click="resetQuery"><a-icon type="sync"/>{{ $t('button.reset') }}</a-button>
                     <a @click="toggleAdvanced">
                       {{ advanced ? $t('button.collapse') : $t('button.expand') }}
                       <a-icon :type="advanced ? 'up' : 'down'"/>
@@ -364,12 +361,12 @@ export default {
         username: row.username
       }
       changeUserStatus(data)
-      .then(() => {
-        this.$message.success(text + this.$t('common.success'), 3)
-      })
-      .catch(function () {
-        this.$message.error(text + this.$t('common.error'), 3)
-      })
+        .then(() => {
+          this.$message.success(text + this.$t('common.success'), 3)
+        })
+        .catch(function () {
+          this.$message.error(text + this.$t('common.error'), 3)
+        })
     },
     cancelHandleStatus(row) {
     },

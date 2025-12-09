@@ -68,7 +68,10 @@ public class UPRequest extends Request implements Serializable {
   /** 时间 */
   private Long time;
 
-  /** /** 是否是debug上报 */
+  /** 时间戳字符串 */
+  private String ts;
+
+  /** 是否是debug上报 */
   private transient boolean debug;
 
   /** 空的编解码 */

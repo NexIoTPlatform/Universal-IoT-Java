@@ -40,13 +40,13 @@ public class IoTDeviceAutoInsertIntercept implements IoTDownWrapper {
   @Resource private IoTDeviceMapper ioTDeviceMapper;
   @Resource private SupportMapAreasMapper supportMapAreasMapper;
 
-  @Value("${iot.register.auto.unionId}")
+  @Value("${iot.register.auto.unionId:auto_register}")
   private String autoRegister;
 
-  @Value("${iot.register.auto.latitude}")
+  @Value("${iot.register.auto.latitude:31.081598}")
   private String latitude;
 
-  @Value("${iot.register.auto.longitude}")
+  @Value("${iot.register.auto.longitude:81.314141}")
   private String longitude;
 
   @Override

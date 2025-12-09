@@ -58,8 +58,7 @@
       <div v-if="connectionInfo" class="current-connection-display">
         <div class="current-connection-header">
           <div class="connection-status">
-            <a-icon :type="getCurrentConnectionIcon()"
-                    :style="{ color: getCurrentConnectionColor() }"/>
+            <a-icon :type="getCurrentConnectionIcon()" :style="{ color: getCurrentConnectionColor() }"/>
             <span class="status-text">{{ getCurrentConnectionTitle() }}</span>
             <a-badge v-if="currentConnectionMode === 'network'"
                      :status="connectionInfo.network.state ? 'success' : 'default'"
@@ -77,7 +76,7 @@
               {{ getCurrentConnectionInfo().host || '未配置' }}
             </a-descriptions-item>
             <a-descriptions-item label="端口">
-              {{ getCurrentConnectionInfo().port || '未配置' }}
+              {{ getCurrentConnectionInfo().port || '' }}
             </a-descriptions-item>
             <a-descriptions-item v-if="getCurrentConnectionInfo().username" label="用户名">
               {{ getCurrentConnectionInfo().username }}
@@ -101,45 +100,55 @@
             </div>
 
             <div class="topics-content">
-              <div v-if="getCurrentTopics().thingTopics" class="topic-category">
-                <a-icon type="appstore" style="color: #1890ff; margin-right: 4px;"/>
-                <span class="category-title">物模型主题</span>
-              </div>
-              <div v-if="getCurrentTopics().thingTopics" class="topic-list">
-                <div class="topic-item">
-                  <span class="topic-label">属性上报：</span>
-                  <span class="topic-value">{{ getCurrentTopics().thingTopics.propertyUp }}</span>
-                  <span class="topic-note">（设备发布）</span>
+              <template v-if="getCurrentTopics() && getCurrentTopics().thingTopics">
+                <div class="topic-category">
+                  <a-icon type="appstore" style="color: #1890ff; margin-right: 4px;"/>
+                  <span class="category-title">物模型主题</span>
                 </div>
-                <div class="topic-item">
-                  <span class="topic-label">事件上报：</span>
-                  <span class="topic-value">{{ getCurrentTopics().thingTopics.eventUp }}</span>
-                  <span class="topic-note">（设备发布）</span>
+                <div class="topic-list">
+                  <div v-if="getCurrentTopics().thingTopics.propertyUp" class="topic-item">
+                    <span class="topic-label">属性上报：</span>
+                    <span class="topic-value">{{ getCurrentTopics().thingTopics.propertyUp }}</span>
+                    <span class="topic-note">（设备发布）</span>
+                  </div>
+                  <div v-if="getCurrentTopics().thingTopics.eventUp" class="topic-item">
+                    <span class="topic-label">事件上报：</span>
+                    <span class="topic-value">{{ getCurrentTopics().thingTopics.eventUp }}</span>
+                    <span class="topic-note">（设备发布）</span>
+                  </div>
+                  <div v-if="getCurrentTopics().thingTopics.commandDown" class="topic-item">
+                    <span class="topic-label">指令发布：</span>
+                    <span class="topic-value">{{ getCurrentTopics().thingTopics.commandDown }}</span>
+                    <span class="topic-note">（设备订阅）</span>
+                  </div>
                 </div>
-                <div class="topic-item">
-                  <span class="topic-label">指令发布：</span>
-                  <span class="topic-value">{{ getCurrentTopics().thingTopics.commandDown }}</span>
-                  <span class="topic-note">（设备订阅）</span>
-                </div>
-              </div>
+              </template>
 
-              <div v-if="getCurrentTopics().passthroughTopics" class="topic-category">
-                <a-icon type="swap" style="color: #fa8c16; margin-right: 4px;"/>
-                <span class="category-title">透传主题</span>
-              </div>
-              <div v-if="getCurrentTopics().passthroughTopics" class="topic-list">
-                <div class="topic-item">
-                  <span class="topic-label">数据上报：</span>
-                  <span class="topic-value">{{ getCurrentTopics().passthroughTopics.dataUp }}</span>
-                  <span class="topic-note">（设备发布）</span>
+              <template v-if="getCurrentTopics() && getCurrentTopics().passthroughTopics">
+                <div class="topic-category">
+                  <a-icon type="swap" style="color: #fa8c16; margin-right: 4px;"/>
+                  <span class="category-title">透传主题</span>
                 </div>
-                <div class="topic-item">
-                  <span class="topic-label">指令发布：</span>
-                  <span class="topic-value">{{
-                      getCurrentTopics().passthroughTopics.commandDown
-                    }}</span>
-                  <span class="topic-note">（设备订阅）</span>
+                <div class="topic-list">
+                  <div v-if="getCurrentTopics().passthroughTopics.dataUp" class="topic-item">
+                    <span class="topic-label">数据上报：</span>
+                    <span class="topic-value">{{ getCurrentTopics().passthroughTopics.dataUp }}</span>
+                    <span class="topic-note">（设备发布）</span>
+                  </div>
+                  <div v-if="getCurrentTopics().passthroughTopics.commandDown" class="topic-item">
+                    <span class="topic-label">指令发布：</span>
+                    <span class="topic-value">{{ getCurrentTopics().passthroughTopics.commandDown }}</span>
+                    <span class="topic-note">（设备订阅）</span>
+                  </div>
                 </div>
+              </template>
+
+              <div v-if="!getCurrentTopics() || (!getCurrentTopics().thingTopics && !getCurrentTopics().passthroughTopics)" class="empty-topics">
+                <a-empty description="暂无主题配置" :image="false" style="padding: 20px 0;">
+                  <template slot="description">
+                    <span style="color: #8c8c8c; font-size: 12px;">当前连接方式未配置主题信息</span>
+                  </template>
+                </a-empty>
               </div>
             </div>
 
@@ -153,18 +162,28 @@
               >
                 <template slot="description">
                   <div class="topic-usage-guide">
-                    <p>本项目使用EMQX作为MQTT
-                      Broker，设置了主题访问控制，仅允许访问上方列出的主题。</p>
-                    <p><strong>设备使用方式：</strong></p>
-                    <ol>
-                      <li>设备需要订阅指令发布主题（如
-                        <code>$thing/down/${productKey}/${deviceId}</code>）来接收平台下发的指令
-                      </li>
-                      <li>设备可以发布数据到上报主题（如 <code>$thing/up/property/${productKey}/${deviceId}</code>）来上报数据
-                      </li>
-                      <li>如果越权访问其他主题，设备会<code>踢出</code>连接，设置了自动重连可能会出现不断尝试重连的情况
-                      </li>
-                    </ol>
+                    <!-- 自建接入的提示 -->
+                    <template v-if="currentConnectionMode === 'network'">
+                      <p>使用自建MQTT Broker接入，主题格式由您自行配置，请注意以下重要配置要求：</p>
+                      <p><strong>MQTT Broker配置要求：</strong></p>
+                      <ol>
+                        <li><strong>必须支持MQTT 5.0共享订阅</strong>：如果使用集群部署，您的MQTT Broker必须支持MQTT 5.0的共享订阅功能（Shared Subscriptions），否则可能导致消息路由异常和集群通信问题。常见的支持MQTT 5.0的Broker包括：EMQX 5.0+、HiveMQ、VerneMQ等</li>
+                        <li><strong>账号权限配置</strong>：为设备分配的账号和密码必须拥有<strong>订阅和发布</strong>上方列出的所有主题的权限。建议在MQTT Broker中配置ACL（访问控制列表），仅允许设备访问配置的主题，禁止访问其他主题以提高安全性。如果权限不足或越权访问，设备可能会被Broker<code>踢出</code>连接</li>
+                        <li><strong>主题占位符说明</strong>：主题中的占位符会在实际使用时被替换为当前设备的设备ID和产品Key。支持两种占位符格式：<code v-pre>{{deviceId}}</code>、<code v-pre>{{productKey}}</code> 或 <code v-pre>#{deviceId}</code>、<code v-pre>#{productKey}</code>。例如，主题 <code v-pre>$third/down/tp/{{deviceId}}</code> 或 <code v-pre>$third/down/tp/#{deviceId}</code> 在实际下发时会替换为 <code>$third/down/tp/device001</code>（假设设备ID为device001）</li>
+                        <li><strong>设备使用方式</strong>：设备需要按照上方配置的主题格式进行订阅和发布。请确保设备订阅指令发布主题来接收平台下发的指令，并发布数据到上报主题来上报数据</li>
+                      </ol>
+                    </template>
+                    <!-- 平台直连的提示 -->
+                    <template v-else>
+                      <p>使用平台内置MQTT Broker（EMQX）连接，采用标准主题格式，设置了主题访问控制，仅允许访问上方列出的主题。</p>
+                      <p><strong>设备使用方式：</strong></p>
+                      <ol>
+                        <li>设备需要订阅指令发布主题（如 <code>$thing/down/${productKey}/${deviceId}</code>）来接收平台下发的指令</li>
+                        <li>设备可以发布数据到上报主题（如 <code>$thing/up/property/${productKey}/${deviceId}</code>）来上报属性数据</li>
+                        <li>设备可以发布事件到事件上报主题（如 <code>$thing/up/event/${productKey}/${deviceId}</code>）来上报事件数据</li>
+                        <li>如果设备越权访问其他主题，会被平台<code>踢出</code>连接。如果设备设置了自动重连，可能会出现不断尝试重连的情况</li>
+                      </ol>
+                    </template>
                   </div>
                 </template>
               </a-alert>
@@ -204,8 +223,7 @@
         </div>
 
         <!-- 自建接入MQTT密码 -->
-        <div v-else-if="currentConnectionMode === 'network' && passwordInfo.network.enabled"
-             class="password-section">
+        <div v-else-if="currentConnectionMode === 'network' && passwordInfo.network.enabled" class="password-section">
           <a-descriptions :column="1" size="small" bordered>
             <a-descriptions-item label="用户名">
               {{ passwordInfo.network.username }}
@@ -268,8 +286,7 @@
                     <a-button type="default" size="small" @click="viewComponentDetail">
                       查看详情
                     </a-button>
-                    <a-button type="danger" size="small" @click="unbindComponent"
-                              :loading="unbinding">
+                    <a-button type="danger" size="small" @click="unbindComponent" :loading="unbinding">
                       解绑组件
                     </a-button>
                   </a-space>
@@ -355,7 +372,7 @@
                   </div>
                   <div class="card-row">
                     <a-icon type="poweroff" style="margin-right:4px;"/>
-                    {{ $t('common.status') }}：
+                   {{$t('common.status')}}：
                     <span :class="getStatusClass(item)">
                       {{ getStatusText(item) }}
                     </span>
@@ -385,11 +402,7 @@
 
 <script>
 import {listNetwork} from '@/api/system/network'
-import {
-  getProductConnectInfo,
-  getProductMqttPassword,
-  updateProductNetworkUnionId
-} from '@/api/system/dev/product'
+import {getProductConnectInfo, getProductMqttPassword, updateProductNetworkUnionId} from '@/api/system/dev/product'
 import {parseTime} from '@/utils/ruoyi'
 
 export default {
@@ -640,7 +653,8 @@ export default {
     },
     /** 查看组件详情 */
     viewComponentDetail() {
-      if (!this.boundComponent) {
+      if (!this.boundComponent || !this.boundComponent.id) {
+        this.$message.warning('组件信息不完整，无法查看详情')
         return
       }
 
@@ -715,9 +729,7 @@ export default {
 
     /** 初始化连接模式 */
     initConnectionMode() {
-      if (!this.connectionInfo) {
-        return
-      }
+      if (!this.connectionInfo) return
 
       // 如果产品绑定了网络组件且网络组件可用，优先使用网络组件
       if (this.product.networkUnionId && this.connectionInfo.network.enabled) {
@@ -757,9 +769,7 @@ export default {
 
     /** 获取当前连接信息 */
     getCurrentConnectionInfo() {
-      if (!this.connectionInfo) {
-        return {}
-      }
+      if (!this.connectionInfo) return {}
 
       if (this.currentConnectionMode === 'network' && this.connectionInfo.network.enabled) {
         return {
@@ -784,9 +794,7 @@ export default {
 
     /** 获取当前主题信息 */
     getCurrentTopics() {
-      if (!this.connectionInfo) {
-        return null
-      }
+      if (!this.connectionInfo) return null
 
       if (this.currentConnectionMode === 'network' && this.connectionInfo.network.enabled) {
         return this.connectionInfo.network.subscribeTopics
@@ -815,8 +823,7 @@ export default {
 
     /** 获取当前连接标题 */
     getCurrentConnectionTitle() {
-      if (this.currentConnectionMode === 'network' && this.connectionInfo
-        && this.connectionInfo.network.enabled) {
+      if (this.currentConnectionMode === 'network' && this.connectionInfo && this.connectionInfo.network.enabled) {
         return `自建接入 (${this.connectionInfo.network.name})`
       } else {
         return '平台直连'
@@ -849,9 +856,7 @@ export default {
 
     /** 检查MQTT配置是否完整 */
     isMqttConfigured(item) {
-      if (!item.configuration) {
-        return false
-      }
+      if (!item.configuration) return false
       try {
         const config = typeof item.configuration === 'string'
           ? JSON.parse(item.configuration)
@@ -869,7 +874,7 @@ export default {
       } else if (this.isMqttConfigured(item)) {
         return '已停止'
       } else {
-        return '未配置'
+        return ''
       }
     },
 
@@ -884,9 +889,10 @@ export default {
       }
     },
 
-    /** 查看组件详情 */
-    viewComponentDetail(item) {
-      if (!item) {
+    /** 查看组件详情（重载方法，用于列表中的查看） */
+    viewComponentDetailFromList(item) {
+      if (!item || !item.id) {
+        this.$message.warning('组件信息不完整，无法查看详情')
         return
       }
 
@@ -1133,6 +1139,11 @@ export default {
                   border: 1px solid #b7eb8f;
                 }
               }
+            }
+
+            .empty-topics {
+              padding: 20px 0;
+              text-align: center;
             }
           }
         }

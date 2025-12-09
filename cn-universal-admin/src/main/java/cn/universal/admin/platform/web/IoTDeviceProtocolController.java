@@ -26,6 +26,7 @@ import cn.universal.common.exception.CodecException;
 import cn.universal.common.exception.IoTException;
 import cn.universal.ossm.service.ISysOssService;
 import cn.universal.persistence.entity.IoTDeviceProtocol;
+import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.bo.IoTDeviceProtocolBO;
 import cn.universal.persistence.entity.vo.IoTProtocolVO;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -57,11 +59,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/admin/v1/protocol")
 public class IoTDeviceProtocolController extends BaseController {
 
-  @Autowired private IoTDeviceProtocolService devProtocolService;
-  @Resource private IoTDeviceMessageCodecService ioTDeviceMessageCodecService;
-  @Resource private ISysOssService ossService;
+  @Autowired
+  private IoTDeviceProtocolService devProtocolService;
+  @Resource
+  private IoTDeviceMessageCodecService ioTDeviceMessageCodecService;
+  @Resource
+  private ISysOssService ossService;
 
-  /** 查询设备协议列表 */
+  /**
+   * 查询设备协议列表
+   */
   @GetMapping("/list")
   public TableDataInfo list(IoTDeviceProtocol ioTDeviceProtocol) {
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
@@ -71,7 +78,9 @@ public class IoTDeviceProtocolController extends BaseController {
     return getDataTable(list);
   }
 
-  /** 查询设备协议列表 */
+  /**
+   * 查询设备协议列表
+   */
   @GetMapping("/list/ids")
   public AjaxResult<List<String>> idList(IoTDeviceProtocol ioTDeviceProtocol) {
     IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
@@ -81,7 +90,9 @@ public class IoTDeviceProtocolController extends BaseController {
     return AjaxResult.success(list1);
   }
 
-  /** 导出设备协议列表 */
+  /**
+   * 导出设备协议列表
+   */
   @PostMapping("/export")
   @Log(title = "导出设备协议列表", businessType = BusinessType.EXPORT)
   public void export(HttpServletResponse response, IoTDeviceProtocol ioTDeviceProtocol) {
@@ -92,7 +103,9 @@ public class IoTDeviceProtocolController extends BaseController {
     util.exportExcel(response, list, "设备协议数据");
   }
 
-  /** 获取设备协议详细信息 */
+  /**
+   * 获取设备协议详细信息
+   */
   @GetMapping(value = "/{id}")
   public AjaxResult getInfo(@PathVariable("id") String id) {
     if (StrUtil.isBlank(id)) {
@@ -115,7 +128,9 @@ public class IoTDeviceProtocolController extends BaseController {
     return AjaxResult.success(devProductVO);
   }
 
-  /** 新增设备协议 */
+  /**
+   * 新增设备协议
+   */
   @PostMapping
   @Log(title = "新增设备协议", businessType = BusinessType.INSERT)
   public AjaxResult add(@RequestBody IoTDeviceProtocolBO ioTDeviceProtocolBO) {
@@ -144,7 +159,9 @@ public class IoTDeviceProtocolController extends BaseController {
     return toAjax(devProtocolService.insertDevProtocol(ioTDeviceProtocol));
   }
 
-  /** 修改设备协议 */
+  /**
+   * 修改设备协议
+   */
   @PutMapping
   @Log(title = "修改设备协议", businessType = BusinessType.UPDATE)
   public AjaxResult edit(@RequestBody IoTDeviceProtocolBO ioTDeviceProtocolBO) {
@@ -152,7 +169,9 @@ public class IoTDeviceProtocolController extends BaseController {
     return toAjax(devProtocolService.updateDevProtocol(ioTDeviceProtocolBO, iotUser));
   }
 
-  /** 删除设备协议 */
+  /**
+   * 删除设备协议
+   */
   @DeleteMapping("/{ids}")
   @Log(title = "删除设备协议", businessType = BusinessType.DELETE)
   public AjaxResult remove(@PathVariable String[] ids) {
@@ -165,7 +184,9 @@ public class IoTDeviceProtocolController extends BaseController {
     return toAjax(devProtocolService.deleteDevProtocolByIds(ids));
   }
 
-  /** 编解码测试 */
+  /**
+   * 编解码测试
+   */
   @PostMapping("/codec")
   public AjaxResult codec(@RequestBody IoTDeviceProtocolBO ioTDeviceProtocolBO) {
 
@@ -182,5 +203,24 @@ public class IoTDeviceProtocolController extends BaseController {
     } catch (CodecException e) {
       return AjaxResult.success(e.getMsg());
     }
+  }
+
+  /**
+   * 查询未创建协议的产品列表（归属人为当前用户）
+   *
+   * @param searchKey 搜索关键词（产品名称或productKey，可选）
+   * @return 产品列表
+   */
+  @GetMapping("/products/without-protocol")
+  public AjaxResult<List<IoTProduct>> getProductsWithoutProtocol(
+      @RequestParam(value = "searchKey", required = false) String searchKey) {
+    IoTUser iotUser = loginIoTUnionUser(SecurityUtils.getUnionId());
+    // 获取当前用户的unionId，如果是管理员则使用parentUnionId
+    String unionId = iotUser.isAdmin() ? iotUser.getParentUnionId() : iotUser.getUnionId();
+    if (unionId == null) {
+      unionId = iotUser.getUnionId();
+    }
+    List<IoTProduct> list = devProtocolService.selectProductsWithoutProtocol(unionId, searchKey);
+    return AjaxResult.success(list);
   }
 }

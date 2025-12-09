@@ -13,6 +13,8 @@
 package cn.universal.persistence.entity.vo;
 
 import cn.universal.persistence.entity.Network;
+import cn.universal.persistence.entity.bo.IoTProductBO;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -44,4 +46,16 @@ public class NetworkVO extends Network {
 
   /** 是否正在运行 */
   private boolean running;
+
+  /** 绑定mqtt产品数量 */
+  private int bindMqttServerProductCount;
+
+  /** 绑定的mqtt产品信息 */
+  private List<IoTProductBO> bindMqttServerProducts;
+
+  /** 绑定tcp产品数量 */
+  private int bindTcpServerProductCount;
+
+  /** 绑定的tcp产品信息 */
+  private IoTProductBO bindTcpServerProducts;
 }

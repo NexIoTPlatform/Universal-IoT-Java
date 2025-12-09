@@ -13,14 +13,20 @@
 package cn.universal.mqtt.protocol.processor.up.common;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.universal.common.constant.IoTConstant;
 import cn.universal.dm.device.service.AbstratIoTService;
+import cn.universal.mqtt.protocol.config.MqttConstant.TopicCategory;
 import cn.universal.mqtt.protocol.entity.MQTTUPRequest;
 import cn.universal.mqtt.protocol.entity.ProcessingStage;
 import cn.universal.mqtt.protocol.processor.MqttMessageProcessor;
+import cn.universal.mqtt.protocol.topic.MQTTTopicManager;
 import cn.universal.persistence.dto.IoTDeviceDTO;
 import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.query.IoTDeviceQuery;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 公共设备信息处理器基类
@@ -35,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "mqtt")
 public abstract class BaseDeviceInfoProcessor extends AbstratIoTService
     implements MqttMessageProcessor {
+
+  @Autowired private MQTTTopicManager topicManager;
 
   @Override
   public String getName() {
@@ -83,15 +91,11 @@ public abstract class BaseDeviceInfoProcessor extends AbstratIoTService
         log.error("[{}] 消息解码失败", getName());
         return ProcessorResult.ERROR;
       }
+      // 物模型
+      processTopicSpecificInfo(request);
 
       // 5. 提取基础信息
       extractBasicInfo(request);
-
-      // 6. 主题类型特定处理
-      if (!processTopicSpecificInfo(request)) {
-        log.error("[{}] 主题特定信息处理失败", getName());
-        return ProcessorResult.ERROR;
-      }
 
       // 7. 更新处理阶段
       request.setStage(ProcessingStage.DEVICE_EXTRACTED);
@@ -117,13 +121,11 @@ public abstract class BaseDeviceInfoProcessor extends AbstratIoTService
         log.warn("[{}] 主题为空", getName());
         return false;
       }
-
       // 调用子类的主题解析逻辑
       if (!parseTopicForThisType(request, topic)) {
         log.warn("[{}] 主题解析失败: {}", getName(), topic);
         return false;
       }
-
       // 验证提取的设备信息
       if (StrUtil.isBlank(request.getProductKey()) || StrUtil.isBlank(request.getDeviceId())) {
         log.warn(
@@ -158,7 +160,11 @@ public abstract class BaseDeviceInfoProcessor extends AbstratIoTService
         log.warn("[{}] 产品不存在: {}", getName(), productKey);
         return false;
       }
-
+      if (StrUtil.isNotBlank(ioTProduct.getConfiguration())
+          && JSONUtil.isTypeJSON(ioTProduct.getConfiguration())) {
+        JSONObject config = JSONUtil.parseObj(ioTProduct.getConfiguration());
+        request.setAllowInsert(config.getBool(IoTConstant.ALLOW_INSERT, true));
+      }
       request.setIoTProduct(ioTProduct);
       request.setContextValue("productInfo", ioTProduct);
 
@@ -229,16 +235,147 @@ public abstract class BaseDeviceInfoProcessor extends AbstratIoTService
     }
   }
 
+  private boolean processTopicSpecificInfo(MQTTUPRequest request) {
+    try {
+
+      String topic = request.getUpTopic();
+      if (StrUtil.isBlank(topic)) {
+        log.warn("[{}] 主题为空", getName());
+        return false;
+      }
+      // 1. 解析消息内容
+      if (parseThingModelMessage(request)) {
+        // 3. 提取物模型信息
+        extractThingModelInfo(request);
+      }
+
+      log.debug("[{}] 物模型特定信息处理完成", getName());
+      return true;
+
+    } catch (Exception e) {
+      log.error("[{}] 物模型特定信息处理异常: ", getName(), e);
+      return false;
+    }
+  }
+
+  /** 解析物模型消息内容 */
+  private boolean parseThingModelMessage(MQTTUPRequest request) {
+    try {
+      String payload = request.getPayload();
+      if (StrUtil.isBlank(payload)
+          || !TopicCategory.THING_MODEL.equals(request.getTopicCategory())) {
+        log.warn("[{}] 物模型消息内容为空", getName());
+        return false;
+      }
+      // 解析JSON消息
+      JSONObject messageJson;
+      try {
+        messageJson = JSONUtil.parseObj(payload);
+      } catch (Exception e) {
+        log.warn("[{}] 物模型消息不是有效的JSON格式: {}", getName(), payload);
+        return false;
+      }
+      request.setContextValue("messageJson", messageJson);
+      request.setContextValue("messageSize", payload.length());
+
+      log.debug("[{}] 物模型消息解析成功，大小: {}字节", getName(), payload.length());
+
+      return true;
+
+    } catch (Exception e) {
+      log.error("[{}] 物模型消息解析异常: ", getName(), e);
+      return false;
+    }
+  }
+
+  protected boolean parseTopicForThisType(MQTTUPRequest request, String topic) {
+    try {
+      // 使用TopicManager解析物模型主题
+      MQTTTopicManager.TopicInfo topicInfo = topicManager.extractTopicInfo(topic);
+
+      if (!topicInfo.isValid()) {
+        log.warn("[{}] 物模型主题格式无效: {}", getName(), topic);
+        return false;
+      }
+      // 设置设备信息
+      request.setProductKey(topicInfo.getProductKey());
+      request.setDeviceId(topicInfo.getDeviceId());
+      // 设置物模型特定上下文
+      request.setContextValue("topicInfo", topicInfo);
+      request.setContextValue("topicType", topicInfo.getTopicType());
+
+      log.debug(
+          "[{}] 物模型主题解析成功 - 类型: {}, 产品: {}, 设备: {}",
+          getName(),
+          topicInfo.getTopicType(),
+          topicInfo.getProductKey(),
+          topicInfo.getDeviceId());
+
+      return true;
+
+    } catch (Exception e) {
+      log.error("[{}] 物模型主题解析异常: ", getName(), e);
+      return false;
+    }
+  }
+
+  /** 提取物模型信息 */
+  private void extractThingModelInfo(MQTTUPRequest request) {
+    try {
+      JSONObject messageJson = (JSONObject) request.getContextValue("messageJson");
+      MQTTTopicManager.TopicInfo topicInfo =
+          (MQTTTopicManager.TopicInfo) request.getContextValue("topicInfo");
+      // 根据主题类型提取特定信息
+      switch (topicInfo.getTopicType()) {
+        case THING_PROPERTY_UP:
+          extractPropertyInfo(request, messageJson);
+          break;
+        case THING_EVENT_UP:
+          extractEventInfo(request, messageJson);
+          break;
+        case THING_DOWN:
+          extractDownstreamInfo(request, messageJson);
+          break;
+      }
+
+      // 设置处理标识
+      request.setContextValue("isThingModel", true);
+      request.setContextValue("needDecode", false); // 物模型不需要编解码
+
+      log.debug("[{}] 物模型信息提取完成 - 消息类型: {}", getName(), topicInfo.getTopicType());
+
+    } catch (Exception e) {
+      log.warn("[{}] 物模型信息提取异常: ", getName(), e);
+    }
+  }
+
+  /** 提取属性信息 */
+  private void extractPropertyInfo(MQTTUPRequest request, JSONObject messageJson) {
+    request.setProperties(messageJson);
+  }
+
+  /** 提取事件信息 */
+  private void extractEventInfo(MQTTUPRequest request, JSONObject messageJson) {
+    String event = messageJson.getStr("event");
+    if (event != null) {
+      request.setEvent(event);
+    }
+    JSONObject data = messageJson.getJSONObject("data");
+    if (data != null) {
+      request.setData(data);
+    }
+  }
+
+  /** 提取下行信息 */
+  private void extractDownstreamInfo(MQTTUPRequest request, JSONObject messageJson) {
+    // 提取下行命令信息
+    log.debug("[{}] 下行信息提取完成 - 命令: {}", getName());
+  }
+
   // ==================== 抽象方法，由子类实现 ====================
 
   /** 获取主题类型名称 */
   protected abstract String getTopicType();
-
-  /** 针对特定主题类型解析主题 */
-  protected abstract boolean parseTopicForThisType(MQTTUPRequest request, String topic);
-
-  /** 处理主题类型特定信息 */
-  protected abstract boolean processTopicSpecificInfo(MQTTUPRequest request);
 
   // ==================== 生命周期方法 ====================
 

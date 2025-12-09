@@ -66,7 +66,7 @@ public class FenceDelayConsumer extends IoTUPPushAdapter {
         JSONUtil.parseObj(ioTDeviceLog.getContent()).getJSONObject("properties");
     double lng;
     double lat;
-    String[] coordinate = properties.getStr(DeviceManagerConstant.COORDINATE).split(",");
+    String[] coordinate = properties.getStr(DeviceManagerConstant.COORDINATES).split(",");
     lng = Double.parseDouble(coordinate[0]);
     lat = Double.parseDouble(coordinate[1]);
 
@@ -117,8 +117,8 @@ public class FenceDelayConsumer extends IoTUPPushAdapter {
                 put("fenceId", ioTDeviceGeoFence.getId());
                 put("fenceName", ioTDeviceGeoFence.getName());
                 put(
-                    DeviceManagerConstant.COORDINATE,
-                    properties.get(DeviceManagerConstant.COORDINATE));
+                    DeviceManagerConstant.COORDINATES,
+                    properties.get(DeviceManagerConstant.COORDINATES));
               }
             };
         request.setData(data);

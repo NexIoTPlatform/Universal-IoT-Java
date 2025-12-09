@@ -63,8 +63,7 @@
               <a-icon type="plus"/>
               新增连接
             </a-button>
-            <a-button type="primary" size="large"
-                      @click="handleActionClick('/DataBridge/DataBridgeBridge', $event)">
+            <a-button type="primary" size="large" @click="handleActionClick('/DataBridge/DataBridgeBridge', $event)">
               <a-icon type="plus"/>
               新增规则
             </a-button>

@@ -18,8 +18,7 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="发布状态" prop="state">
-                <a-select placeholder="请选择发布状态" style="width: 100%"
-                          v-model="queryParam.state"
+                <a-select placeholder="请选择发布状态" style="width: 100%" v-model="queryParam.state"
                           allow-clear>
                   <a-select-option v-for="(d, index) in protocolStateOptions" :key="index"
                                    :value="d.dictValue">
@@ -46,13 +45,11 @@
       <div class="table-operations">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['protocol:protocol:add']">
-          <a-icon type="plus"/>
-          {{ $t('button.add') }}
+          <a-icon type="plus"/>{{ $t('button.add') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['protocol:protocol:remove']">
-          <a-icon type="delete"/>
-          {{ $t('button.delete') }}
+          <a-icon type="delete"/>{{ $t('button.delete') }}
         </a-button>
         <a-button type="primary" size="small" :loading="loading" :style="{ float: 'right' }"
                   @click="getList">
@@ -318,13 +315,13 @@ export default {
       const text = row.state === 1 ? '停用' : '发布'
       row.state = row.state === 0 ? 1 : 0
       updateProtocol(row)
-      .then(() => {
-        this.$message.success(text + '成功', 3)
-        this.getList()
-      })
-      .catch(function () {
-        this.$message.error(text + '发生异常', 3)
-      })
+        .then(() => {
+          this.$message.success(text + '成功', 3)
+          this.getList()
+        })
+        .catch(function () {
+          this.$message.error(text + '发生异常', 3)
+        })
     },
     cancelHandleStatus(row) {
     },

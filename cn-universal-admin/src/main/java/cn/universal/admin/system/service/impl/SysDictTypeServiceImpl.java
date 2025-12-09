@@ -142,7 +142,7 @@ public class SysDictTypeServiceImpl
         "selectDictTypeById",
         "selectDictTypeByType",
         "selectPageDictTypeList"
-      })
+      },allEntries = true)
   public void deleteDictTypeByIds(Long[] dictIds) {
     for (Long dictId : dictIds) {
       SysDictType dictType = selectDictTypeById(dictId);
@@ -177,7 +177,7 @@ public class SysDictTypeServiceImpl
         "selectDictTypeById",
         "selectDictTypeByType",
         "selectPageDictTypeList"
-      })
+      },allEntries = true)
   public void clearDictCache() {}
 
   /** 重置字典缓存数据 */
@@ -190,7 +190,7 @@ public class SysDictTypeServiceImpl
         "selectDictTypeById",
         "selectDictTypeByType",
         "selectPageDictTypeList"
-      })
+      },allEntries = true)
   public void resetDictCache() {}
 
   /**
@@ -208,7 +208,7 @@ public class SysDictTypeServiceImpl
         "selectDictTypeById",
         "selectDictTypeByType",
         "selectPageDictTypeList"
-      })
+      },allEntries = true)
   public int insertDictType(SysDictType dict) {
     int row = dictTypeMapper.insert(dict);
     return row;
@@ -230,7 +230,7 @@ public class SysDictTypeServiceImpl
         "selectDictTypeById",
         "selectDictTypeByType",
         "selectPageDictTypeList"
-      })
+      },allEntries = true)
   public int updateDictType(SysDictType dict) {
     SysDictType oldDict = dictTypeMapper.selectByPrimaryKey(dict.getDictId());
     Example ex = new Example(SysDictData.class);

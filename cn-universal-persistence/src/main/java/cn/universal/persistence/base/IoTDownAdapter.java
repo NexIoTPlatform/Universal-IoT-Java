@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /** 指令下发包装类 */
@@ -43,7 +44,8 @@ public abstract class IoTDownAdapter<T extends BaseDownRequest> {
 
   @Resource private StringRedisTemplate stringRedisTemplate;
 
-  @Resource(name = "ioTDeviceActionBeforeService")
+  @Resource
+  @Qualifier("ioTDeviceActionBeforeService")
   private IoTDeviceLifeCycle ioTDeviceLifeCycle;
 
   @Resource private IoTDeviceExtendService deviceExtTemplate;

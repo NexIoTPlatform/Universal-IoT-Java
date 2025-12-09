@@ -16,7 +16,7 @@ import cn.universal.persistence.common.BaseMapper;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.bo.IoTUserBO;
 import java.util.List;
-import org.apache.ibatis.annotations.Param;
+ 
 
 public interface IoTUserMapper extends BaseMapper<IoTUser> {
 
@@ -53,27 +53,7 @@ public interface IoTUserMapper extends BaseMapper<IoTUser> {
    */
   public List<IoTUser> selectUnallocatedList(IoTUserBO user);
 
-  /**
-   * 扣除license额度
-   *
-   * @param unionId 用户唯一标识
-   */
-  public void licenseBuckle(String unionId);
-
-  /**
-   * 增加license额度
-   *
-   * @param unionId 用户唯一标识
-   */
-  public void licenseAdd(String unionId);
-
-  /**
-   * 增加license额度
-   *
-   * @param unionId 用户唯一标识
-   */
-  public void licenseRecharge(
-      @Param("unionId") String unionId, @Param("licenseNumber") Integer licenseNumber);
+  
 
   int doAccountDisable();
 }

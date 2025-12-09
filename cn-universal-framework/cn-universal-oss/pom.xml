@@ -35,7 +35,7 @@
     <dependency>
       <groupId>com.qiniu</groupId>
       <artifactId>qiniu-java-sdk</artifactId>
-      <version>7.18.0</version>
+      <version>7.15.0</version> <!-- 或更高稳定版 -->
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>

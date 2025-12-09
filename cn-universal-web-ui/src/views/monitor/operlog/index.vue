@@ -61,11 +61,10 @@
       </div>
       <!-- 操作 -->
       <div class="table-operations">
-
+      
         <a-button type="primary" :loading="exportLoading" @click="handleExport"
                   v-hasPermi="['monitor:operlog:export']">
-          <iot-icon type="icon-u-export"/>
-          {{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
         </a-button>
         <a-button
           type="dashed"
@@ -292,14 +291,14 @@ export default {
         content: '当前选中日志编号为' + operIds + '的数据',
         onOk() {
           return delOperlog(operIds)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -313,14 +312,14 @@ export default {
         content: '此操作将会清空所有操作日志数据项',
         onOk() {
           return cleanOperlog()
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '清空成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '清空成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

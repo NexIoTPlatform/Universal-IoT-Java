@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class ConnectionConfig {
 
   // TCP配置 - 复用现有配置
-  @Value("${tcp.protocol.sni.host.out:#productKey.tcp.nexiot.xyz}")
+  @Value("${tcp.protocol.sni.host.out:#productKey.tcp.nexiot.cc}")
   private String tcpSniHostTemplate;
 
   @Value("${tcp.protocol.sni.port.out:38883}")

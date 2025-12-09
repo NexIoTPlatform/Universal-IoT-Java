@@ -67,18 +67,18 @@ public interface SubDeviceMessageProcessor {
 
   /** 异常处理（可选） */
   default void onError(SubDeviceRequest subDeviceRequest, Exception e) {}
-
+  
   /** 处理结果枚举 */
   enum ProcessorResult {
     /** 继续处理 - 传递给下一个处理器 */
     CONTINUE,
-
+    
     /** 停止处理 - 成功完成，不再传递给后续处理器 */
     STOP,
-
+    
     /** 跳过当前消息 - 忽略该消息，不进行后续处理 */
     SKIP,
-
+    
     /** 处理失败 - 发生错误，停止处理链 */
     ERROR
   }

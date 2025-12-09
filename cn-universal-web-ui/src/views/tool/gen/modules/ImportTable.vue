@@ -24,9 +24,7 @@
           <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
               <a-button @click="handleQuery" type="primary">{{ $t('button.search') }}</a-button>
-              <a-button @click="resetQuery" style="margin-left: 8px">{{
-                  $t('button.reset')
-                }}</a-button>
+              <a-button @click="resetQuery" style="margin-left: 8px">{{ $t('button.reset') }}</a-button>
             </span>
           </a-col>
         </a-row>

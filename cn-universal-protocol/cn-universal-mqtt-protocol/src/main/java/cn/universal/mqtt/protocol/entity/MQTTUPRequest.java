@@ -12,6 +12,7 @@
 
 package cn.universal.mqtt.protocol.entity;
 
+import cn.universal.mqtt.protocol.config.MqttConstant;
 import cn.universal.persistence.base.BaseUPRequest;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,8 @@ public class MQTTUPRequest extends BaseUPRequest {
 
   /** 是否用的系统内置MQTT通道 */
   private boolean isSysMQTTBroker;
+
+  private MqttConstant.TopicCategory topicCategory;
 
   /** 编解码上下文 */
   @Builder.Default private Map<String, Object> codecContext = new ConcurrentHashMap<>();

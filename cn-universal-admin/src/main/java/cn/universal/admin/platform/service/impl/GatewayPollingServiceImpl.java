@@ -15,6 +15,9 @@ package cn.universal.admin.platform.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.HexUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.universal.admin.platform.service.DeviceCommandDispatcher;
 import cn.universal.admin.platform.service.IGatewayPollingService;
 import cn.universal.common.constant.IoTConstant.DeviceNode;
@@ -29,6 +32,8 @@ import cn.universal.persistence.mapper.GatewayPollingConfigMapper;
 import cn.universal.persistence.mapper.IoTDeviceMapper;
 import java.util.Date;
 import java.util.List;
+
+import cn.universal.persistence.query.IoTAPIQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,12 +193,11 @@ public class GatewayPollingServiceImpl implements IGatewayPollingService {
       IoTDevice gateway =
           deviceMapper.selectIoTDevice(config.getProductKey(), config.getDeviceId());
 
-      //      if (gateway == null || !Boolean.TRUE.equals(gateway.getState())) {
-      //        log.warn(
-      //            "网关离线，跳过轮询: productKey={}, deviceId={}", config.getProductKey(),
-      // config.getDeviceId());
-      //        return;
-      //      }
+//      if (gateway == null || !Boolean.TRUE.equals(gateway.getState())) {
+//        log.warn(
+//            "网关离线，跳过轮询: productKey={}, deviceId={}", config.getProductKey(), config.getDeviceId());
+//        return;
+//      }
 
       // 2. 查询轮询指令 (使用 productKey + deviceId)
       List<GatewayPollingCommand> commands =
@@ -215,9 +219,8 @@ public class GatewayPollingServiceImpl implements IGatewayPollingService {
       boolean allSuccess = true;
       int executedCount = 0;
       // 获取配置的指令间隔，默认300ms
-      int commandIntervalMs =
-          config.getCommandIntervalMs() != null ? config.getCommandIntervalMs() : 300;
-
+      int commandIntervalMs = config.getCommandIntervalMs() != null ? config.getCommandIntervalMs() : 300;
+      
       for (GatewayPollingCommand command : commands) {
         if (Boolean.TRUE.equals(command.getEnabled())) {
           // 非第一条指令先等待，给设备响应时间
@@ -225,13 +228,15 @@ public class GatewayPollingServiceImpl implements IGatewayPollingService {
             try {
               Thread.sleep(commandIntervalMs);
               log.debug(
-                  "[指令间隔] 等待{}ms，防止设备缓冲区溢出: deviceId={}", commandIntervalMs, config.getDeviceId());
+                  "[指令间隔] 等待{}ms，防止设备缓冲区溢出: deviceId={}",
+                  commandIntervalMs,
+                  config.getDeviceId());
             } catch (InterruptedException e) {
               Thread.currentThread().interrupt();
               log.warn("指令间隔等待被中断", e);
             }
           }
-
+          
           boolean success = executeCommand(gateway, command);
           if (!success) {
             allSuccess = false;
@@ -280,7 +285,10 @@ public class GatewayPollingServiceImpl implements IGatewayPollingService {
       IoTDeviceDTO device =
           deviceMapper.selectIoTDeviceBO(
               BeanUtil.beanToMap(
-                  IoTDevice.builder().productKey(productKey).deviceId(deviceId).build()));
+                  IoTDevice.builder()
+                      .productKey(productKey)
+                      .deviceId(deviceId)
+                      .build()));
 
       if (device == null) {
         return R.error("设备不存在");
@@ -298,16 +306,13 @@ public class GatewayPollingServiceImpl implements IGatewayPollingService {
         return R.error("未配置轮询指令，请先添加轮询指令");
       }
 
-      log.info(
-          "开始测试轮询: productKey={}, deviceId={}, commands={}", productKey, deviceId, commands.size());
+      log.info("开始测试轮询: productKey={}, deviceId={}, commands={}", 
+          productKey, deviceId, commands.size());
 
       // 4. 立即执行轮询
       pollGatewayDevice(config);
 
-      return R.ok(
-          "测试轮询已执行，共发送 "
-              + commands.stream().filter(cmd -> Boolean.TRUE.equals(cmd.getEnabled())).count()
-              + " 条指令");
+      return R.ok("测试轮询已执行，共发送 " + commands.stream().filter(cmd -> Boolean.TRUE.equals(cmd.getEnabled())).count() + " 条指令");
 
     } catch (Exception e) {
       log.error("测试轮询失败: productKey={}, deviceId={}", productKey, deviceId, e);

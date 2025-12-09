@@ -13,8 +13,7 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="桥接类型" prop="bridgeType">
-                <a-select v-model="queryParam.bridgeType" placeholder="请选择桥接类型"
-                          style="width: 100%"
+                <a-select v-model="queryParam.bridgeType" placeholder="请选择桥接类型" style="width: 100%"
                           allow-clear>
                   <a-select-option value="JDBC">JDBC</a-select-option>
                   <a-select-option value="KAFKA">Kafka</a-select-option>
@@ -26,9 +25,7 @@
             <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons">
                 <a-button type="primary" @click="handleQuery">{{ $t('button.search') }}</a-button>
-                <a-button style="margin-left: 8px" @click="resetQuery">{{
-                    $t('button.reset')
-                  }}</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery">{{ $t('button.reset') }}</a-button>
                 <!-- <a-button type="primary" style="margin-left: 8px" @click="handleAdd" v-hasPermi="['databridge:config:add']">新增规则</a-button> -->
               </span>
             </a-col>
@@ -37,9 +34,7 @@
       </div>
       <!-- 操作 -->
       <div class="table-operations">
-        <a-button type="primary" @click="handleAdd" v-hasPermi="['databridge:config:add']">{{
-            $t('button.add')
-          }}
+        <a-button type="primary" @click="handleAdd" v-hasPermi="['databridge:config:add']">{{ $t('button.add') }}
         </a-button>
         <a-button type="primary" :disabled="single"
                   @click="handleUpdate(undefined, ids)"
@@ -96,9 +91,7 @@
                 <span class="source-icon">🌐</span>
               </div>
               <div v-else-if="record.sourceScope === 'SPECIFIC_PRODUCTS'" class="source-products">
-                <span class="source-text">{{
-                    getSourceProductCount(record.sourceProductKeys)
-                  }}个产品</span>
+                <span class="source-text">{{ getSourceProductCount(record.sourceProductKeys) }}个产品</span>
                 <a-tooltip v-if="getSourceProductKeys(record.sourceProductKeys).length > 0"
                            :title="getSourceProductNames(record.sourceProductNames).join(', ')">
                   <span class="source-info">ℹ️</span>
@@ -113,23 +106,20 @@
         </div>
 
         <div slot="status" slot-scope="text, record" class="status-cell">
-          <div
-            :class="{ 'status-badge online': record.status === 1, 'status-badge offline': record.status !== 1 }">
+          <div :class="{ 'status-badge online': record.status === 1, 'status-badge offline': record.status !== 1 }">
             <span class="status-dot"></span>
             <span class="status-text">{{ record.status === 1 ? '启用' : '禁用' }}</span>
           </div>
         </div>
 
         <span slot="operation" slot-scope="text, record" class="operation-buttons">
-          <a @click="validateConfig(record)" v-hasPermi="['databridge:config:validate']"
-             class="operation-btn">
+          <a @click="validateConfig(record)" v-hasPermi="['databridge:config:validate']" class="operation-btn">
             {{ $t('button.verify') }} </a>
           <!-- <a-divider type="vertical" v-hasPermi="['databridge:config:edit']"/>
           <a @click="handleUpdate(record, undefined)" v-hasPermi="['databridge:config:edit']" class="operation-btn">
             {{ $t('button.edit') }} </a> -->
           <a-divider type="vertical" v-hasPermi="['databridge:config:remove']"/>
-          <a style="color:#F53F3F" @click="handleDelete(record)"
-             v-hasPermi="['databridge:config:remove']"
+          <a style="color:#F53F3F" @click="handleDelete(record)" v-hasPermi="['databridge:config:remove']"
              class="operation-btn">
             {{ $t('button.delete') }} </a>
         </span>
@@ -145,13 +135,7 @@
 </template>
 
 <script>
-import {
-  createConfig,
-  deleteConfig,
-  getConfigList,
-  updateConfig,
-  validateConfig
-} from '@/api/databridge/config'
+import {createConfig, deleteConfig, getConfigList, updateConfig, validateConfig} from '@/api/databridge/config'
 import {getResourceList} from '@/api/databridge/resource'
 import ConfigForm from './modules/ConfigForm'
 
@@ -300,11 +284,11 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return deleteConfig(ids)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success('删除成功', 3)
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success('删除成功', 3)
+            })
         },
         onCancel() {
         }
@@ -334,9 +318,7 @@ export default {
     },
     /** 获取产品键列表 */
     getSourceProductKeys(sourceProductKeys) {
-      if (!sourceProductKeys) {
-        return []
-      }
+      if (!sourceProductKeys) return []
       try {
         if (typeof sourceProductKeys === 'string') {
           return JSON.parse(sourceProductKeys)

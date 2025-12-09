@@ -189,7 +189,7 @@ export default {
       }).catch(error => {
         console.warn('Failed to load meta data for editing:', error)
         this.isFunction = (this.value.type === 'functions')
-
+        
         // 如果是因为缺少 productKey 导致的错误，提供更友好的提示
         if (!this.value.productKey && this.value.deviceId) {
           console.warn(`设备 ${this.value.deviceId} 缺少 productKey，无法加载物模型数据`)

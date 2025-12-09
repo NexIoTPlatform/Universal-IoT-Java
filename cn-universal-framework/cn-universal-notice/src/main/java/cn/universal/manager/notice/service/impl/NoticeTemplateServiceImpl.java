@@ -56,7 +56,7 @@ public class NoticeTemplateServiceImpl implements NoticeTemplateService {
   public void saveTemplate(NoticeTemplateDTO templateDTO, String currentUser) {
     Date now = new Date();
     NoticeTemplate template = new NoticeTemplate();
-
+    
     // 设置基本属性
     template.setId(templateDTO.getId());
     template.setName(templateDTO.getName());
@@ -67,7 +67,7 @@ public class NoticeTemplateServiceImpl implements NoticeTemplateService {
     template.setStatus(templateDTO.getStatus());
     template.setRemark(templateDTO.getRemark());
     template.setUpdateTime(now);
-
+    
     if (template.getId() == null) {
       // 新增：设置创建者和创建时间
       template.setCreator(currentUser);

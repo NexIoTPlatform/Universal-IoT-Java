@@ -78,7 +78,7 @@ const constantRouterComponents = {
   'GenEdit': () => import('@/views/tool/gen/modules/GenEdit'),
   // 设备绑定页面
   'DeviceBind': () => import('@/views/application/modules/DeviceBind'),
-  'applicationDetails': () => import('@/views/application/modules/index'),
+  'applicationDetails': () => import('@/views/application/modules/ApplicationDetail'),
   // 产品详情
   'productDetails': () => import('@/views/system/product/modules/productDetails'),
   // 产品详情
@@ -108,6 +108,14 @@ const constantRouterComponents = {
   'Imoulife': () => import('@/views/system/video/Imoulife'),
   'EzvizPlayer': () => import('@/views/system/video/EzvizPlayer'),
   'ImouPlayer': () => import('@/views/system/video/ImouPlayer'),
+  // 视频中心（新版）
+  'VideoCenter': () => import('@/views/video/VideoCenter'),
+  'VideoPlatformDetail': () => import('@/views/video/VideoPlatformDetail'),
+  'WvpPlatformDetail': () => import('@/views/video/WvpPlatformDetail'),
+  'HikIcsPlatformDetail': () => import('@/views/video/HikIcsPlatformDetail'),
+  'DahuaIccPlatformDetail': () => import('@/views/video/DahuaIccPlatformDetail'),
+  'VideoDevices': () => import('@/views/video/VideoDevices'),
+  'WvpDeviceDetailsPro': () => import('@/views/video/WvpDeviceDetailsPro'),
   // 数据桥接
   'DataBridge': () => import('@/views/system/databridge/index'),
   'DataBridgeConnection': () => import('@/views/system/databridge/connection'),

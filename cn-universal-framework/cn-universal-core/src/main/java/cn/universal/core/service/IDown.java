@@ -28,10 +28,8 @@ public interface IDown {
 
   /**
    * 下行处理（统一命令对象）
-   *
-   * <p>这是唯一的下行入口方法，提供类型安全的参数传递
-   *
-   * <p>此方法会自动应用拦截器链（如果已配置）
+   * <p>这是唯一的下行入口方法，提供类型安全的参数传递</p>
+   * <p>此方法会自动应用拦截器链（如果已配置）</p>
    *
    * @param command 统一下行命令对象
    * @return 处理结果
@@ -59,7 +57,8 @@ public interface IDown {
   }
 
   /**
-   * 创建下行上下文 基于UnifiedDownlinkCommand创建上下文对象
+   * 创建下行上下文
+   * 基于UnifiedDownlinkCommand创建上下文对象
    *
    * @param command 统一下行命令对象
    * @return 下行上下文

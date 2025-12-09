@@ -20,16 +20,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * 下行子设备拦截器 用于处理网关下的子设备相关逻辑
+ * 下行子设备拦截器
+ * 用于处理网关下的子设备相关逻辑
  *
  * <p>使用场景：
- *
  * <ul>
- *   <li>子设备路由：判断消息是否需要转发到子设备
- *   <li>子设备鉴权：验证子设备是否有权接收指令
- *   <li>子设备映射：将网关设备ID映射到子设备ID
- *   <li>子设备状态检查：检查子设备是否在线
- *   <li>子设备协议转换：处理网关到子设备的协议差异
+ *   <li>子设备路由：判断消息是否需要转发到子设备</li>
+ *   <li>子设备鉴权：验证子设备是否有权接收指令</li>
+ *   <li>子设备映射：将网关设备ID映射到子设备ID</li>
+ *   <li>子设备状态检查：检查子设备是否在线</li>
+ *   <li>子设备协议转换：处理网关到子设备的协议差异</li>
  * </ul>
  *
  * @version 1.0
@@ -43,7 +43,7 @@ public class DownlinkSubDeviceInterceptor implements DownlinkInterceptor {
   // TODO: 注入需要的服务
   // @Resource
   // private SubDeviceService subDeviceService;
-
+  
   // @Resource
   // private GatewayService gatewayService;
 
@@ -70,38 +70,37 @@ public class DownlinkSubDeviceInterceptor implements DownlinkInterceptor {
     // 1. 检查上下文中是否有子设备标识
     // 2. 检查产品类型是否支持子设备
     // 3. 检查是否有网关设备信息
-
+    
     // 示例代码：
     // String productKey = context.getProductKey();
     // Boolean isSubDevice = context.getAttribute("isSubDevice");
     // return Boolean.TRUE.equals(isSubDevice);
-
+    
     // 默认返回 false，由你根据业务逻辑实现
     return false;
   }
 
   @Override
   public boolean preHandle(DownlinkContext<?> context) throws Exception {
-    log.debug(
-        "[子设备拦截器][PreHandle] 开始处理: productKey={}, deviceId={}",
-        context.getProductKey(),
+    log.debug("[子设备拦截器][PreHandle] 开始处理: productKey={}, deviceId={}", 
+        context.getProductKey(), 
         context.getDeviceId());
 
     // TODO: 实现前置处理逻辑
     // 示例场景：
-
+    
     // 1. 子设备路由判断
     // if (isSubDeviceMessage(context)) {
     //     context.setAttribute("routeType", "subdevice");
     //     log.info("[子设备拦截器] 检测到子设备消息");
     // }
-
+    
     // 2. 子设备鉴权
     // if (!checkSubDevicePermission(context)) {
     //     log.warn("[子设备拦截器] 子设备鉴权失败");
     //     return false; // 中断执行
     // }
-
+    
     // 3. 子设备状态检查
     // if (!isSubDeviceOnline(context)) {
     //     log.warn("[子设备拦截器] 子设备离线");
@@ -109,14 +108,14 @@ public class DownlinkSubDeviceInterceptor implements DownlinkInterceptor {
     //     // 可以选择是否中断
     //     // return false;
     // }
-
+    
     // 4. 子设备ID映射
     // String subDeviceId = mapToSubDeviceId(context);
     // if (subDeviceId != null) {
     //     context.setAttribute("subDeviceId", subDeviceId);
     //     log.debug("[子设备拦截器] 映射到子设备ID: {}", subDeviceId);
     // }
-
+    
     // 5. 网关信息填充
     // fillGatewayInfo(context);
 
@@ -125,25 +124,24 @@ public class DownlinkSubDeviceInterceptor implements DownlinkInterceptor {
 
   @Override
   public void postHandle(DownlinkContext<?> context) throws Exception {
-    log.debug(
-        "[子设备拦截器][PostHandle] 处理完成: productKey={}, deviceId={}",
-        context.getProductKey(),
+    log.debug("[子设备拦截器][PostHandle] 处理完成: productKey={}, deviceId={}", 
+        context.getProductKey(), 
         context.getDeviceId());
 
     // TODO: 实现后置处理逻辑
     // 示例场景：
-
+    
     // 1. 记录子设备下行日志
     // if (Boolean.TRUE.equals(context.getAttribute("isSubDevice"))) {
     //     logSubDeviceDownlink(context);
     // }
-
+    
     // 2. 更新子设备状态
     // updateSubDeviceStatus(context);
-
+    
     // 3. 统计子设备指令数量
     // incrementSubDeviceCommandCount(context);
-
+    
     // 4. 清理临时数据
     // cleanupTempData(context);
   }
@@ -152,25 +150,24 @@ public class DownlinkSubDeviceInterceptor implements DownlinkInterceptor {
   public void afterCompletion(DownlinkContext<?> context, Exception ex) {
     // TODO: 实现完成处理逻辑（无论成功失败都会执行）
     // 示例场景：
-
+    
     // 1. 异常处理
     if (ex != null) {
-      log.error(
-          "[子设备拦截器][AfterCompletion] 处理异常: productKey={}, deviceId={}, error={}",
-          context.getProductKey(),
-          context.getDeviceId(),
+      log.error("[子设备拦截器][AfterCompletion] 处理异常: productKey={}, deviceId={}, error={}", 
+          context.getProductKey(), 
+          context.getDeviceId(), 
           ex.getMessage());
-
+      
       // TODO: 记录子设备错误
       // recordSubDeviceError(context, ex);
     }
-
+    
     // 2. 资源清理
     // cleanupResources(context);
-
+    
     // 3. 释放锁（如果有）
     // releaseLock(context);
-
+    
     // 4. 记录处理耗时
     long duration = context.getDuration();
     if (duration > 1000) {

@@ -82,7 +82,7 @@ public abstract class AbstractIoTDeviceLogService implements IIoTDeviceLogServic
             .deviceName(StrUtil.sub(ioTDeviceDTO.getDeviceName(), 0, 30))
             .build();
     if (upRequest.getProperties() != null
-        && upRequest.getProperties().containsKey(DeviceManagerConstant.COORDINATE)) {
+        && upRequest.getProperties().containsKey(DeviceManagerConstant.COORDINATES)) {
       log.setPoint(ioTDeviceDTO.getCoordinate());
     }
 

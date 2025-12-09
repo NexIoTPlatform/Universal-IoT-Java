@@ -14,10 +14,6 @@ const allowList = ['login', 'register'] // no redirect allowList
 const loginRoutePath = '/user/login'
 const defaultRoutePath = '/index'
 
-// if (storage.get(ACCESS_TOKEN)) {
-//   store.dispatch('RefreshToken', true)
-// }
-
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
   to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(
@@ -29,7 +25,6 @@ router.beforeEach((to, from, next) => {
       NProgress.done()
     } else {
       // check login user.roles is null
-
       if (store.getters.roles.length === 0) {
         // request login userInfo
         store
@@ -42,20 +37,10 @@ router.beforeEach((to, from, next) => {
           const roles = res.roles
           // generate dynamic router
           store.dispatch('GenerateRoutes', {roles}).then(() => {
-            // 根据roles权限生成可访问的路由表
-            // 动态添加可访问路由表
+            // roles权限生成可访问的路由表;动态添加可访问路由表
             router.addRoutes(store.getters.addRouters)
-            // router.addRoutes(accessRoutes)
             // 请求带有 redirect 重定向时，登录自动重定向到该地址
             next({...to, replace: true}) // hack方法 确保addRoutes已完成
-            // const redirect = decodeURIComponent(from.query.redirect || to.path)
-            // if (to.path === redirect) {
-            //   // set the replace: true so the navigation will not leave a history record
-            //   next({ ...to, replace: true })
-            // } else {
-            //   // 跳转到目的路由
-            //   next({ path: redirect })
-            // }
           })
         })
         .catch(() => {
@@ -75,7 +60,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     if (allowList.includes(to.name)) {
-      // 在免登录名单，直接进入
+      //在免登录名单，直接进入
       next()
     } else {
       next({path: loginRoutePath, query: {redirect: to.fullPath}})

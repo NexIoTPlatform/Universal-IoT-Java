@@ -1,7 +1,7 @@
 1833 curl -sSL https://raw.githubusercontent.com/voidint/g/master/install.sh | bash
 1834 ls
 1835 g install 1.24.1 --mirror=https://golang.google.cn/dl/
-1836 source "/home/abc/.g/env"
+1836 source "/home/abc123/.g/env"
 1837 g install 1.24.1 --mirror=https://golang.google.cn/dl/
 1838 g use 1.24.1 # 切换版本
 1839 ll

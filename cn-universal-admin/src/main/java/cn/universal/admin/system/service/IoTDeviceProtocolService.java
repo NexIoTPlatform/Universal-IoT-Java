@@ -14,6 +14,7 @@ package cn.universal.admin.system.service;
 
 import cn.universal.admin.common.service.BaseService;
 import cn.universal.persistence.entity.IoTDeviceProtocol;
+import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.entity.bo.IoTDeviceProtocolBO;
 import java.util.List;
@@ -92,4 +93,13 @@ public interface IoTDeviceProtocolService extends BaseService {
    * @return 结果
    */
   public int deleteDevProtocolById(String id);
+
+  /**
+   * 查询未创建协议的产品列表（归属人为当前用户）
+   *
+   * @param unionId 用户unionId
+   * @param searchKey 搜索关键词（产品名称或productKey）
+   * @return 产品列表
+   */
+  List<IoTProduct> selectProductsWithoutProtocol(String unionId, String searchKey);
 }

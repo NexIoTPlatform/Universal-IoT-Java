@@ -37,7 +37,7 @@
             </a-col>
             <template v-if="advanced">
               <a-col :md="8" :sm="24">
-                <a-form-item label="$t('device.status')">
+                <a-form-item :label="$t('device.status')">
                   <a-select placeholder="请选择" v-model="queryParam.state" style="width: 100%"
                             allow-clear>
                     <a-select-option v-for="(d, index) in stateOptions" :key="index"
@@ -75,23 +75,19 @@
       <div class="table-operations">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['system:instance:add']">
-          <iot-icon type="icon-u-add"/>
-          {{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
         </a-button>
         <a-button type="primary" :disabled="single"
                   @click="$refs.createForm.handleUpdate(undefined, ids)"
                   v-hasPermi="['system:instance:edit']">
-          <iot-icon type="icon-u-edit"/>
-          {{ $t('button.edit') }}
+          <iot-icon type="icon-u-edit"/>{{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['system:instance:remove']">
-          <iot-icon type="icon-u-del"/>
-          {{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
         </a-button>
         <a-button type="primary" @click="handleExport" v-hasPermi="['system:instance:export']">
-          <iot-icon type="icon-u-export"/>
-          {{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
         </a-button>
         <a-button type="primary" size="small" :loading="loading" :style="{ float: 'right' }"
                   @click="getList">
@@ -110,8 +106,7 @@
                      v-if="getConfigInfo(record.configuration, record.deviceNode)">
             <template slot="content">
               <div class="config-popover">
-                <div v-for="(value, key) in getConfigInfo(record.configuration, record.deviceNode)"
-                     :key="key"
+                <div v-for="(value, key) in getConfigInfo(record.configuration, record.deviceNode)" :key="key"
                      class="config-popover-item">
                   <span class="config-popover-key">{{ key }}:</span>
                   <span class="config-popover-value">{{ value }}</span>
@@ -121,7 +116,7 @@
             <div class="device-info-content">
               <div class="device-name">
                 <a-button type="link"
-                          @click="$router.push(`/system/instance/instance-details/${record.id}`)"
+                          @click="handleDeviceClick(record)"
                           class="device-name-link">
                   {{ record.deviceName || '未命名设备' }}
                 </a-button>
@@ -133,7 +128,7 @@
           <div v-else class="device-info-content">
             <div class="device-name">
               <a-button type="link"
-                        @click="$router.push(`/system/instance/instance-details/${record.id}`)"
+                        @click="handleDeviceClick(record)"
                         class="device-name-link">
                 {{ record.deviceName || '未命名设备' }}
               </a-button>
@@ -146,8 +141,7 @@
         <div slot="productInfo" slot-scope="text, record" class="product-info-cell">
           <div class="product-name">
             {{ record.productName || '未知产品' }}
-            <device-type-badge :type="record.deviceNode"
-                               :text="getDeviceTypeText(record.deviceNode)"/>
+            <device-type-badge :type="record.deviceNode" :text="getDeviceTypeText(record.deviceNode)"/>
           </div>
           <div class="product-key">{{ record.productKey }}</div>
         </div>
@@ -186,6 +180,14 @@
                     :showTotal="total => `共 ${total} 条`"
                     @showSizeChange="onShowSizeChange" @change="changeSize"/>
     </a-card>
+    
+    <!-- 视频平台设备通道选择弹窗 -->
+    <video-channel-select-modal
+      :visible="channelSelectVisible"
+      :deviceInfo="currentVideoDevice"
+      @close="handleChannelSelectClose"
+      @select="handleChannelSelect"
+    />
   </page-header-wrapper>
 </template>
 
@@ -194,11 +196,13 @@ import {delInstance, listInstance} from '@/api/system/dev/instance'
 import {queryProductList} from '@/api/system/dev/product'
 import CreateForm from './modules/CreateForm'
 import {getDeviceConfigByType} from '@/utils/deviceConfig'
+import VideoChannelSelectModal from '@/components/VideoChannelSelectModal'
 
 export default {
   name: 'IoTDevice',
   components: {
-    CreateForm
+    CreateForm,
+    VideoChannelSelectModal
   },
   data() {
     return {
@@ -221,6 +225,9 @@ export default {
       productSearchValue: '',
       productLoading: false,
       searchTimer: null,
+      // 视频平台设备通道选择
+      channelSelectVisible: false,
+      currentVideoDevice: {},
       // 查询参数
       queryParam: {
         iotId: null,
@@ -402,14 +409,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return delInstance(ids)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -478,7 +485,8 @@ export default {
       const textMap = {
         'DEVICE': '直',
         'GATEWAY': '网',
-        'GATEWAY_SUB_DEVICE': '子'
+        'GATEWAY_SUB_DEVICE': '子',
+        'VIDEO_DEVICE': '视'
       };
       return textMap[deviceNode] || deviceNode;
     },
@@ -524,6 +532,56 @@ export default {
     /** 解析配置信息 */
     getConfigInfo(configStr, deviceNode) {
       return getDeviceConfigByType(configStr, deviceNode)
+    },
+    
+    /** 判断是否为视频平台设备 */
+    isVideoPlatformDevice(record) {
+      // 根据 thirdPlatform 判断，如果是 wvp、ics、icc 则为视频平台设备
+      const videoPlatforms = ['wvp', 'ics', 'icc']
+      return record.thirdPlatform && videoPlatforms.includes(record.thirdPlatform)
+    },
+    
+    /** 处理设备点击 */
+    handleDeviceClick(record) {
+      // 如果是视频平台设备，弹窗显示通道列表
+      if (this.isVideoPlatformDevice(record)) {
+        this.currentVideoDevice = record
+        this.channelSelectVisible = true
+      } else {
+        // 普通设备直接跳转详情页
+        this.$router.push(`/system/instance/instance-details/${record.id}`)
+      }
+    },
+    
+    /** 关闭通道选择弹窗 */
+    handleChannelSelectClose() {
+      this.channelSelectVisible = false
+      this.currentVideoDevice = {}
+    },
+    
+    /** 选择通道后跳转到详情页 */
+    handleChannelSelect(channel) {
+      // 根据平台类型跳转到对应的详情页
+      const platformType = this.currentVideoDevice.thirdPlatform
+      const instanceKey = this.currentVideoDevice.gwProductKey || this.currentVideoDevice.extDeviceId || this.currentVideoDevice.deviceId
+      const deviceId = this.currentVideoDevice.deviceId
+      const channelId = channel.channelId
+      
+      let routePath = ''
+      if (platformType === 'wvp') {
+        routePath = `/videoCenter/wvp/${instanceKey}/${deviceId}/${channelId}`
+      } else if (platformType === 'ics') {
+        routePath = `/videoCenter/hik/${instanceKey}/${deviceId}/${channelId}`
+      } else if (platformType === 'icc') {
+        routePath = `/videoCenter/dahua/${instanceKey}/${deviceId}/${channelId}`
+      }
+      
+      if (routePath) {
+        this.$router.push(routePath).catch(err => {
+          console.error('跳转失败:', err)
+        })
+        this.channelSelectVisible = false
+      }
     }
   }
 }

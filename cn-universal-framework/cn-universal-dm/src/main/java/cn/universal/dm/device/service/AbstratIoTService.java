@@ -12,8 +12,8 @@
 
 package cn.universal.dm.device.service;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
@@ -33,7 +33,6 @@ import cn.universal.dm.device.service.impl.IoTDeviceSubscribeService;
 import cn.universal.dm.device.service.impl.IoTProductDeviceService;
 import cn.universal.dm.device.service.log.IIoTDeviceDataService;
 import cn.universal.persistence.base.BaseUPRequest;
-import cn.universal.persistence.base.IoTDeviceLifeCycle;
 import cn.universal.persistence.base.IoTDownAdapter;
 import cn.universal.persistence.dto.IoTDeviceDTO;
 import cn.universal.persistence.entity.IoTDeviceSubscribe;
@@ -70,9 +69,6 @@ public abstract class AbstratIoTService extends IoTDownAdapter {
   @Resource protected IIoTDeviceDataService iIoTDeviceDataService;
 
   @Resource private IoTDeviceSubscribeService iotDeviceSubscribeService;
-
-  @Resource(name = "ioTDeviceActionAfterService")
-  private IoTDeviceLifeCycle ioTDeviceLifeCycle;
 
   @Resource private StringRedisTemplate stringRedisTemplate;
 
@@ -201,7 +197,7 @@ public abstract class AbstratIoTService extends IoTDownAdapter {
 
     if (needOnline) {
       log.info("设备需要上线，deviceId={}，原因={}", instanceBO.getDeviceId(), reason);
-      ioTDeviceLifeCycle.online(instanceBO.getProductKey(), instanceBO.getDeviceId());
+      ioTDeviceActionAfterService.online(instanceBO.getProductKey(), instanceBO.getDeviceId());
     } else {
       log.debug(
           "设备状态检查: deviceId={}, dbState={}, hasOfflineFlag={}, recentlyOnline={}, needOnline={}",
@@ -235,6 +231,9 @@ public abstract class AbstratIoTService extends IoTDownAdapter {
               });
     }
   }
+  protected UPRequest preDecode(String productKey, String payload,Object context) {
+    return codecService.preDecode(productKey,payload,context);
+  }
 
   protected <R> List<R> decode(
       String productKey, String payload, Object context, Class<R> elementType) {
@@ -255,27 +254,6 @@ public abstract class AbstratIoTService extends IoTDownAdapter {
 
   protected String encode(String productKey, String payload) {
     return encode(productKey, payload, null);
-  }
-
-  protected void buildCodecNotNullBean(
-      BaseUPRequest hasData, BaseUPRequest.BaseUPRequestBuilder builder) {
-    if (CollUtil.isNotEmpty(hasData.getProperties())) {
-      builder.properties(hasData.getProperties());
-    }
-    // 设置属性值
-    if (CollUtil.isNotEmpty(hasData.getData())) {
-      builder.data(hasData.getData());
-    }
-    // 设置原始串
-    if (hasData
-        .getIoTDeviceDTO()
-        .getProductConfig()
-        .getBool(IoTConstant.REQUIRE_PAYLOAD, Boolean.FALSE)) {
-      builder.payload(hasData.getPayload());
-    }
-    builder.tags(hasData.getTags());
-    // 设置回复值
-    builder.function(hasData.getFunction());
   }
 
   protected void buildCodecNotNullBean(
@@ -319,6 +297,9 @@ public abstract class AbstratIoTService extends IoTDownAdapter {
       AbstractFunctionMetadata functionOrNull =
           deviceMetadata.getFunctionOrNull(codec.getFunction());
       builder.functionName(functionOrNull == null ? "" : functionOrNull.getName());
+    }
+    if(NumberUtil.isLong(codec.getTs())) {
+      builder.time(Long.parseLong(codec.getTs()));
     }
   }
 

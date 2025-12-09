@@ -1,20 +1,20 @@
-// package cn.universal.dm.device.service.strategy;
+//package cn.universal.dm.device.service.strategy;
 //
-// import cn.hutool.core.util.StrUtil;
-// import cn.universal.core.message.DownRequest;
-// import lombok.extern.slf4j.Slf4j;
-// import org.springframework.stereotype.Component;
+//import cn.hutool.core.util.StrUtil;
+//import cn.universal.core.message.DownRequest;
+//import lombok.extern.slf4j.Slf4j;
+//import org.springframework.stereotype.Component;
 //
-/// **
+///**
 // * S7西门子协议子设备ID生成策略 规则：网关设备ID + "." + DB块号 + "." + 偏移地址 例如：860048070262660.DB1.0,
 // * 860048070262660.DB2.100
 // *
 // * @author system
 // * @date 2025-01-16
 // */
-// @Slf4j
-// @Component
-// public class S7SubDeviceIdStrategy implements SubDeviceIdGeneration {
+//@Slf4j
+//@Component
+//public class S7SubDeviceIdStrategy implements SubDeviceIdGeneration {
 //
 //  private static final String PROTOCOL_NAME = "s7";
 //
@@ -108,4 +108,4 @@
 //      return false;
 //    }
 //  }
-// }
+//}

@@ -107,13 +107,7 @@ public class IoTUserVO implements Serializable {
 
   private List<Long> roleIds;
 
-  /** 接入数 */
-  @Column(name = "license")
-  private Integer license;
-
-  /** 接入数 */
-  @Column(name = "license_total_amount")
-  private Integer licenseTotalAmount;
+  
 
   /** 请求参数 */
   @Builder.Default private Map<String, Object> params = new HashMap<>();

@@ -102,11 +102,7 @@ public class IoTUserBO implements Serializable {
   /** 0-正常，1-删除 */
   private Integer deleted;
 
-  /** 设备接入额度剩余 */
-  private Integer license;
-
-  /** 设备接入总数额度 */
-  private Integer licenseTotalAmount;
+  
 
   private Set<String> roles;
 
@@ -118,6 +114,5 @@ public class IoTUserBO implements Serializable {
 
   private String cfg;
 
-  @Column(name = "register_from")
-  private String registerFrom;
+  
 }

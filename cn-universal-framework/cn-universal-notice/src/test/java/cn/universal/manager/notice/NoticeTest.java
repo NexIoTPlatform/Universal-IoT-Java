@@ -1,20 +1,20 @@
-// package cn.universal.manager.notice;
+//package cn.universal.manager.notice;
 //
-// import cn.universal.manager.notice.model.NoticeSendChannel;
-// import cn.universal.manager.notice.model.NoticeTemplate;
-// import cn.universal.manager.notice.service.NoticeChannelService;
-// import cn.universal.manager.notice.service.NoticeTemplateService;
-// import cn.universal.manager.notice.util.NoticeTemplateUtil;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.context.SpringBootTest;
+//import cn.universal.manager.notice.model.NoticeSendChannel;
+//import cn.universal.manager.notice.model.NoticeTemplate;
+//import cn.universal.manager.notice.service.NoticeChannelService;
+//import cn.universal.manager.notice.service.NoticeTemplateService;
+//import cn.universal.manager.notice.util.NoticeTemplateUtil;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
 //
-// import java.util.HashMap;
-// import java.util.List;
-// import java.util.Map;
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Map;
 //
-// @SpringBootTest
-// public class NoticeTest {
+//@SpringBootTest
+//public class NoticeTest {
 //
 //  @Autowired private NoticeChannelService noticeChannelService;
 //
@@ -104,4 +104,4 @@
 //
 //    noticeTemplateService.testTemplate(1L, "test_group", params);
 //  }
-// }
+//}

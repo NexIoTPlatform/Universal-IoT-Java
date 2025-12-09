@@ -546,8 +546,7 @@ public class IoTDeviceServiceImpl extends BaseServiceImpl implements IIoTDeviceS
 
     IoTProduct ioTProduct = ioTProductMapper.getProductByProductKey(productKey);
     // 转换为UnifiedDownlinkCommand（保持所有参数）
-    UnifiedDownlinkCommand command =
-        UnifiedDownlinkCommand.fromJson(JSONUtil.parseObj(downRequest));
+    UnifiedDownlinkCommand command = UnifiedDownlinkCommand.fromJson(JSONUtil.parseObj(downRequest));
     R result = IoTDownlFactory.getIDown(ioTProduct.getThirdPlatform()).doAction(command);
     return result;
   }

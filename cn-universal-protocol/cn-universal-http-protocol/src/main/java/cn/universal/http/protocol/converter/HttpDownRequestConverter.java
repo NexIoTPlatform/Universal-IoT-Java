@@ -85,7 +85,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
 
     // 1. 判断是否需要网关代理
     boolean needGatewayProxy = isNeedGatewayProxy(command.getCmd());
-
+    
     if (!needGatewayProxy) {
       // 对于不需要网关代理的命令（如DEV_ADD等设备管理命令），直接使用子设备信息
       log.info("[HTTP转换器] 命令{}不需要网关代理，直接使用子设备信息", command.getCmd());
@@ -158,7 +158,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
 
     // 8. 处理功能下发场景：使用子设备ProductKey编解码
     if ((StrUtil.isNotBlank(down)
-        && ListUtil.of(down.split(",")).contains(command.getCmd().getValue()))
+            && ListUtil.of(down.split(",")).contains(command.getCmd().getValue()))
         || CollectionUtil.isNotEmpty(command.getFunction())) {
       String payload = encodeFunction(command);
       request.setDownResult(payload);
@@ -194,13 +194,13 @@ public class HttpDownRequestConverter extends AbstratIoTService
     if (cmd == null) {
       return false;
     }
-
+    
     // 设备管理类命令不需要网关代理，直接操作子设备
     return switch (cmd) {
       case DEV_ADD, DEV_ADDS,          // 设备新增
-           DEV_DEL, DEVICE_DELETE,     // 设备删除
+           DEV_DEL, DEVICE_DELETE,     // 设备删除  
            DEV_UPDATE, DEVICE_UPDATE   // 设备更新
-          -> false;
+           -> false;
       // 其他命令（功能调用、状态查询等）需要通过网关代理
       default -> true;
     };
@@ -215,7 +215,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
    */
   private HttpDownRequest convertSubDeviceDirectly(
       UnifiedDownlinkCommand command, IoTProduct subProduct, DownlinkContext<?> context) {
-
+    
     // 1. 创建请求对象
     HttpDownRequest request = new HttpDownRequest();
     BeanUtil.copyProperties(command, request, "extensions", "metadata");
@@ -232,7 +232,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
               .deviceId(command.getDeviceId())
               .iotId(command.getIotId())
               .build());
-
+      
       if (subDevice == null) {
         throw new IllegalArgumentException(
             "子设备不存在: productKey=" + command.getProductKey() + ", deviceId=" + command.getDeviceId());
@@ -249,7 +249,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
     if (StrUtil.isBlank(request.getMsgId())) {
       request.setMsgId(generateMsgId());
     }
-
+    
     // 6. 标记为子设备（但不通过网关代理）
     request.setIsGatewayProxy(false);
 
@@ -297,7 +297,7 @@ public class HttpDownRequestConverter extends AbstratIoTService
 
     // 6. 处理功能下发场景：编解码
     if ((StrUtil.isNotBlank(down)
-        && ListUtil.of(down.split(",")).contains(command.getCmd().getValue()))
+            && ListUtil.of(down.split(",")).contains(command.getCmd().getValue()))
         || CollectionUtil.isNotEmpty(command.getFunction())) {
       String payload = encodeFunction(command);
       request.setDownResult(payload);

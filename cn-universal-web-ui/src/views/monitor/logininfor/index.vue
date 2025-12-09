@@ -49,8 +49,7 @@
       <div class="table-operations">
 
         <a-button type="primary" @click="handleExport" v-hasPermi="['monitor:logininfor:export']">
-          <iot-icon type="icon-u-export"/>
-          {{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
         </a-button>
         <a-button
           type="dashed"
@@ -245,14 +244,14 @@ export default {
         content: '当前选中访问编号为' + infoIds + '的数据',
         onOk() {
           return delLogininfor(infoIds)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -266,14 +265,14 @@ export default {
         content: '此操作将会清空所有登录日志数据项',
         onOk() {
           return cleanLogininfor()
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '清空成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '清空成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

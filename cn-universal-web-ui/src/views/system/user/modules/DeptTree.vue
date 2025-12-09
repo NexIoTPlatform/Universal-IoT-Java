@@ -67,13 +67,13 @@ export default {
       const value = e.target.value
       const gData = this.deptOptions
       const expandedKeys = this.deptNodes
-      .map(item => {
-        if (item.label.indexOf(value) > -1) {
-          return getParentKey(item.id, gData)
-        }
-        return null
-      })
-      .filter((item, i, self) => item && self.indexOf(item) === i)
+        .map(item => {
+          if (item.label.indexOf(value) > -1) {
+            return getParentKey(item.id, gData)
+          }
+          return null
+        })
+        .filter((item, i, self) => item && self.indexOf(item) === i)
       Object.assign(this, {
         expandedKeys: expandedKeys,
         searchValue: value,

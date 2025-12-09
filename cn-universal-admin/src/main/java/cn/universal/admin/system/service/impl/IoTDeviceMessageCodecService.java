@@ -43,7 +43,7 @@ public class IoTDeviceMessageCodecService {
       return null;
     }
     try {
-      Object result = codecService.preDecode(productKey, JSONUtil.toJsonStr(payload));
+      Object result = codecService.preDecode(productKey, JSONUtil.toJsonStr(payload), null);
       log.info("产品编号={} 原始报文={} , preDecode解码={}", productKey, payload, JSONUtil.toJsonStr(result));
       return result;
     } catch (Exception e) {

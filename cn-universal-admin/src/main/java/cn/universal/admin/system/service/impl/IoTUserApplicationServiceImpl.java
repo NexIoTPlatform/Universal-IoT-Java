@@ -270,9 +270,11 @@ public class IoTUserApplicationServiceImpl extends BaseServiceImpl
         if (isEnable) {
           // HTTP启用：设置enable和support为true
           JSONObject httpConfig = pushCfg.getJSONObject("http");
-          httpConfig.set("enable", true);
-          httpConfig.set("support", true);
-          pushCfg.set("http", httpConfig);
+          if(httpConfig!=null){
+            httpConfig.set("enable", true);
+            httpConfig.set("support", true);
+            pushCfg.set("http", httpConfig);
+          }
         } else {
           // HTTP禁用：设置enable为false
           if (pushCfg.containsKey("http")) {

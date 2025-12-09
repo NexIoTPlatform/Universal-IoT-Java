@@ -12,13 +12,12 @@ export function formatOnlineTime(timestamp) {
   if (!timestamp || timestamp === '0') {
     return '从未通信'
   }
-
+  
   // 如果是字符串格式的时间（包含'-'或':'），直接返回
-  if (typeof timestamp === 'string' && (timestamp.includes('-')
-    || timestamp.includes(':'))) {
+  if (typeof timestamp === 'string' && (timestamp.includes('-') || timestamp.includes(':'))) {
     return timestamp
   }
-
+  
   // 处理数字时间戳
   const time = typeof timestamp === 'string' ? parseInt(timestamp) : timestamp
   const timeMs = time.toString().length === 10 ? time * 1000 : time
@@ -35,22 +34,21 @@ export function getTimeAgo(timestamp) {
   if (!timestamp || timestamp === '0') {
     return '从未通信'
   }
-
+  
   let timeMs
-
+  
   // 如果是字符串格式的时间（包含'-'或':'），转换为时间戳
-  if (typeof timestamp === 'string' && (timestamp.includes('-')
-    || timestamp.includes(':'))) {
+  if (typeof timestamp === 'string' && (timestamp.includes('-') || timestamp.includes(':'))) {
     timeMs = new Date(timestamp).getTime()
   } else {
     // 处理数字时间戳
     const time = typeof timestamp === 'string' ? parseInt(timestamp) : timestamp
     timeMs = time.toString().length === 10 ? time * 1000 : time
   }
-
+  
   const now = Date.now()
   const diff = now - timeMs
-
+  
   if (diff < 60000) {
     return '刚刚在线'
   }

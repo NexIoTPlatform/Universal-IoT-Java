@@ -48,18 +48,15 @@
       <div class="table-operations btn-group-small">
         <a-button type="primary" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['application:application:add']" class="btn-primary-small">
-          <iot-icon type="icon-u-add"/>
-          {{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
         </a-button>
         <a-button type="primary" :disabled="single" @click="handleEditTable"
                   v-hasPermi="['application:application:edit']" class="btn-primary-small">
-          <iot-icon type="icon-u-edit"/>
-          {{ $t('button.edit') }}
+          <iot-icon type="icon-u-edit"/>{{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['application:application:remove']" class="btn-danger-small">
-          <iot-icon type="icon-u-del"/>
-          {{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
         </a-button>
         <a-button
           type="dashed"
@@ -126,12 +123,7 @@
 </template>
 
 <script>
-import {
-  delApplication,
-  listApplication,
-  resetSecret,
-  updateApplication
-} from '@/api/application/application'
+import {delApplication, listApplication, resetSecret, updateApplication} from '@/api/application/application'
 import CreateForm from './modules/CreateForm'
 
 export default {
@@ -283,13 +275,13 @@ export default {
         content: `是否${text}应用 "${row.appName}"？`,
         onOk: () => {
           return updateApplication({appUniqueId: row.appUniqueId, appStatus: status})
-          .then(() => {
-            this.$message.success(text + '成功', 3)
-            row.appStatus = status
-          })
-          .catch(() => {
-            this.$message.error(text + '异常', 3)
-          })
+            .then(() => {
+              this.$message.success(text + '成功', 3)
+              row.appStatus = status
+            })
+            .catch(() => {
+              this.$message.error(text + '异常', 3)
+            })
         },
         onCancel: () => {
         }
@@ -304,14 +296,14 @@ export default {
         content: '当前选中编号为' + appUniqueIds + '的数据',
         onOk() {
           return delApplication(appUniqueIds)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -329,13 +321,13 @@ export default {
         content: '重置后需要重新配置应用密钥',
         onOk() {
           return resetSecret({appUniqueId: row.appUniqueId})
-          .then(() => {
-            that.getList()
-            that.$message.success(
-              '重置成功',
-              3
-            )
-          })
+            .then(() => {
+              that.getList()
+              that.$message.success(
+                '重置成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

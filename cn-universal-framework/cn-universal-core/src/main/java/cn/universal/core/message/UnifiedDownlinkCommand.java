@@ -26,15 +26,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 统一下行指令模型 作为所有下行指令的标准化入口，统一参数格式，避免String/JSONObject来回转换
+ * 统一下行指令模型
+ * 作为所有下行指令的标准化入口，统一参数格式，避免String/JSONObject来回转换
  *
  * <p>设计目标：
- *
  * <ul>
- *   <li>类型安全：通过强类型字段避免类型转换错误
- *   <li>参数统一：将分散的参数集中管理
- *   <li>易于扩展：通过extensions支持协议特定参数
- *   <li>向后兼容：支持从旧格式（String/JSONObject）构建
+ *   <li>类型安全：通过强类型字段避免类型转换错误</li>
+ *   <li>参数统一：将分散的参数集中管理</li>
+ *   <li>易于扩展：通过extensions支持协议特定参数</li>
+ *   <li>向后兼容：支持从旧格式（String/JSONObject）构建</li>
  * </ul>
  *
  * @version 1.0
@@ -110,7 +110,8 @@ public class UnifiedDownlinkCommand implements Serializable {
   // ===== 扩展参数（协议特定） =====
 
   /** 扩展字段（用于协议特定参数，避免污染核心字段） */
-  @Builder.Default private Map<String, Object> extensions = new HashMap<>();
+  @Builder.Default
+  private Map<String, Object> extensions = new HashMap<>();
 
   // ===== 控制标志 =====
 
@@ -126,9 +127,12 @@ public class UnifiedDownlinkCommand implements Serializable {
   // ===== 元数据 =====
 
   /** 指令元数据（用于记录来源、优先级等） */
-  @Builder.Default private CommandMetadata metadata = new CommandMetadata();
+  @Builder.Default
+  private CommandMetadata metadata = new CommandMetadata();
 
-  /** 指令元数据 */
+  /**
+   * 指令元数据
+   */
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
@@ -201,7 +205,7 @@ public class UnifiedDownlinkCommand implements Serializable {
 
     // 控制标志
     command.setDeviceReuse(json.getBool("deviceReuse", false));
-    command.setAdmin(json.getBool("isAdmin", false)); // 使用setAdmin而非setIsAdmin
+    command.setAdmin(json.getBool("isAdmin", false));  // 使用setAdmin而非setIsAdmin
     command.setAllowInsert(json.getBool("allowInsert", false));
 
     // 保存原始数据（用于协议特定处理）
@@ -246,37 +250,49 @@ public class UnifiedDownlinkCommand implements Serializable {
 
   // ===== 链式调用方法（便于构建） =====
 
-  /** 设置产品Key（链式调用） */
+  /**
+   * 设置产品Key（链式调用）
+   */
   public UnifiedDownlinkCommand withProductKey(String productKey) {
     this.productKey = productKey;
     return this;
   }
 
-  /** 设置设备ID（链式调用） */
+  /**
+   * 设置设备ID（链式调用）
+   */
   public UnifiedDownlinkCommand withDeviceId(String deviceId) {
     this.deviceId = deviceId;
     return this;
   }
 
-  /** 设置应用ID（链式调用） */
+  /**
+   * 设置应用ID（链式调用）
+   */
   public UnifiedDownlinkCommand withAppUnionId(String appUnionId) {
     this.appUnionId = appUnionId;
     return this;
   }
 
-  /** 设置应用实例ID（链式调用） */
+  /**
+   * 设置应用实例ID（链式调用）
+   */
   public UnifiedDownlinkCommand withApplicationId(String applicationId) {
     this.applicationId = applicationId;
     return this;
   }
 
-  /** 设置指令类型（链式调用） */
+  /**
+   * 设置指令类型（链式调用）
+   */
   public UnifiedDownlinkCommand withCmd(DownCmd cmd) {
     this.cmd = cmd;
     return this;
   }
 
-  /** 添加扩展字段（链式调用） */
+  /**
+   * 添加扩展字段（链式调用）
+   */
   public UnifiedDownlinkCommand addExtension(String key, Object value) {
     if (this.extensions == null) {
       this.extensions = new HashMap<>();
@@ -285,7 +301,9 @@ public class UnifiedDownlinkCommand implements Serializable {
     return this;
   }
 
-  /** 设置元数据来源（链式调用） */
+  /**
+   * 设置元数据来源（链式调用）
+   */
   public UnifiedDownlinkCommand withSource(String source) {
     this.metadata.setSource(source);
     return this;
@@ -310,11 +328,12 @@ public class UnifiedDownlinkCommand implements Serializable {
     // 根据不同指令类型验证特定参数
     switch (cmd) {
       case DEV_ADD:
-      case DEV_DEL: // 使用DEV_DEL而非DEV_DELETE
+      case DEV_DEL:  // 使用DEV_DEL而非DEV_DELETE
       case DEV_UPDATE:
       case DEV_FUNCTION:
         if (StrUtil.isBlank(deviceId) && StrUtil.isBlank(iotId)) {
-          throw new IllegalArgumentException(cmd.getValue() + "指令必须提供deviceId或iotId");
+          throw new IllegalArgumentException(
+              cmd.getValue() + "指令必须提供deviceId或iotId");
         }
         break;
       default:
@@ -414,18 +433,11 @@ public class UnifiedDownlinkCommand implements Serializable {
 
   @Override
   public String toString() {
-    return "UnifiedDownlinkCommand{"
-        + "productKey='"
-        + productKey
-        + '\''
-        + ", deviceId='"
-        + deviceId
-        + '\''
-        + ", cmd="
-        + cmd
-        + ", msgId='"
-        + msgId
-        + '\''
-        + '}';
+    return "UnifiedDownlinkCommand{" +
+        "productKey='" + productKey + '\'' +
+        ", deviceId='" + deviceId + '\'' +
+        ", cmd=" + cmd +
+        ", msgId='" + msgId + '\'' +
+        '}';
   }
 }

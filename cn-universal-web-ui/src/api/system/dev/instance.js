@@ -104,7 +104,7 @@ export function importDevice(data, productKey, iotId) {
 // 根据网关设备查询子设备关系
 export function getSubDeviceRelation(productKey, deviceId) {
   return request({
-    url: '/admin/v1/device/gateway/sub/relation/' + productKey + '/' + deviceId,
+    url: '/admin/v1/device/gateway/sub/relation/' + productKey + '/' + deviceId, 
     method: 'get'
   })
 }

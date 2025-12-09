@@ -33,12 +33,10 @@
               <a-form-item>
                 <a-button type="primary" size="small" @click="handleQuery">
                   <a-icon type="search"/>
-                  {{ $t('button.query') }}
-                </a-button>
+                 {{ $t('button.query') }} </a-button>
                 <a-button size="small" style="margin-left: 8px" @click="resetQuery">
                   <a-icon type="reload"/>
-                  {{ $t('button.reset') }}
-                </a-button>
+                 {{ $t('button.reset') }} </a-button>
               </a-form-item>
             </a-col>
           </a-row>

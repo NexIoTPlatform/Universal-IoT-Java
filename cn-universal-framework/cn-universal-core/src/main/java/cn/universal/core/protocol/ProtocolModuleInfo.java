@@ -72,6 +72,28 @@ public interface ProtocolModuleInfo {
   }
 
   /**
+   * 是否支持手动创建产品
+   *
+   * <p>对于视频平台类协议（WVP、海康ISC、大华ICC），产品采用懒创建策略， 不允许用户手动创建产品，应返回false。 其他协议默认支持手动创建。
+   *
+   * @return true-支持手动创建，false-不支持手动创建
+   */
+  default boolean isManualCreatable() {
+    return true;
+  }
+
+  /**
+   * 获取不可手动创建的原因描述
+   *
+   * <p>当isManualCreatable()返回false时，此方法应返回明确的原因说明
+   *
+   * @return 不可创建的原因描述
+   */
+  default String getNotCreatableReason() {
+    return "此协议不支持手动创建产品";
+  }
+
+  /**
    * 获取协议分类
    *
    * @return 协议分类 (如: MESSAGING, TRANSPORT, PLATFORM)

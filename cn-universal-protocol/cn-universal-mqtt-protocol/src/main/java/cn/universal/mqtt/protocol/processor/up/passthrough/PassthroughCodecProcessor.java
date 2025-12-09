@@ -29,6 +29,8 @@ import cn.universal.persistence.dto.IoTDeviceDTO;
 import cn.universal.persistence.entity.IoTProduct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +72,20 @@ public class PassthroughCodecProcessor extends AbstratIoTService implements Mqtt
     if (request.getIoTDeviceDTO() == null || request.getIoTProduct() == null) {
       return false;
     }
-    return MQTTTopicManager.matchCategory(request.getUpTopic())
-        .equals(MqttConstant.TopicCategory.PASSTHROUGH);
+    
+    // 优先检查第三方MQTT配置的主题分类
+    MqttConstant.TopicCategory configuredCategory = request.getContextValue("topicCategory");
+    if (configuredCategory != null) {
+      boolean supported = configuredCategory == MqttConstant.TopicCategory.PASSTHROUGH;
+      if (supported) {
+        log.debug("[{}] 通过配置的主题分类匹配: category={}", getName(), configuredCategory);
+      }
+      return supported;
+    }
+    
+    // 回退到系统内置的主题匹配逻辑
+    return MqttConstant.TopicCategory.PASSTHROUGH.equals(
+        MQTTTopicManager.matchCategory(request.getUpTopic()));
   }
 
   @Override
@@ -137,7 +151,7 @@ public class PassthroughCodecProcessor extends AbstratIoTService implements Mqtt
         if (JSONUtil.isTypeJSON(request.getPayload())) {
           jsonObject = JSONUtil.parseObj(request.getPayload());
         }
-        return List.of(buildCodecNullBean(jsonObject, request));
+        return Stream.of(buildCodecNullBean(jsonObject, request)).collect(Collectors.toList());
       }
 
     } catch (Exception e) {

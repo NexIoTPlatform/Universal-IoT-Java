@@ -331,7 +331,7 @@ export default {
       if (this.data && this.data.id && Object.keys(this.data).length > 0) {
         // 编辑模式，复制所有数据
         this.form = {...this.data}
-
+        
         // 处理默认接收人数据：如果是字符串则转换为数组，空值处理
         console.log('原始receivers数据:', this.form.receivers, '类型:', typeof this.form.receivers)
         if (this.form.receivers && typeof this.form.receivers === 'string') {
@@ -341,7 +341,7 @@ export default {
           this.form.receivers = []
           console.log('设置空数组')
         }
-
+        
         console.log('编辑模式，表单数据:', this.form)
 
         // 确保通知渠道和渠道配置都正确设置
@@ -434,13 +434,13 @@ export default {
       this.$refs.form.validate(valid => {
         if (valid) {
           this.loading = true
-
+          
           // 将接收人数组转换为逗号分隔的字符串
           const formData = {
             ...this.form,
             receivers: this.form.receivers.length > 0 ? this.form.receivers.join(',') : ''
           }
-
+          
           this.$emit('submit', formData)
           this.loading = false
         }

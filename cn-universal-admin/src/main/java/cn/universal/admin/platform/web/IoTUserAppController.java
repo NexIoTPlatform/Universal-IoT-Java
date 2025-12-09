@@ -220,9 +220,9 @@ public class IoTUserAppController extends BaseController {
   @Log(title = "重置密钥", businessType = BusinessType.UPDATE)
   public AjaxResult<Void> resetSecret(@RequestBody IoTUserApplication iotUserApplication) {
     IoTUser user = loginIoTUnionUser(SecurityUtils.getUnionId());
-
+    
     // 权限检查
-    IoTUserApplication oldApplication =
+    IoTUserApplication oldApplication = 
         iotUserApplicationService.selectIotUserApplicationById(iotUserApplication.getAppUniqueId());
     if (!user.isAdmin()
         && ObjectUtil.isNotEmpty(oldApplication)

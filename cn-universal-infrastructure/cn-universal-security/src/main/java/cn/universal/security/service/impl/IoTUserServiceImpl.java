@@ -160,7 +160,7 @@ public class IoTUserServiceImpl implements IoTUserService {
   @Override
   @CacheEvict(
       cacheNames = {"iot_user_info"},
-      key = "#userbo.unionId")
+      key = "#userbo.unionId",allEntries = true)
   @Transactional
   public int updateUser(IoTUserBO userbo) {
     IoTUser iotUser = BeanUtil.toBean(userbo, IoTUser.class);
@@ -175,7 +175,7 @@ public class IoTUserServiceImpl implements IoTUserService {
   @Override
   @CacheEvict(
       cacheNames = {"iot_user_info"},
-      key = "#iotUser.unionId")
+      key = "#iotUser.unionId",allEntries = true)
   public void updateUserById(IoTUser iotUser) {
     iotUserMapper.updateByPrimaryKeySelective(iotUser);
   }

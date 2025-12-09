@@ -1,220 +1,192 @@
 <template>
-  <div class="tcp-detail-page minimal">
-    <div class="tcp-detail-header">
-      <div class="tcp-detail-title">
-        TCP网络组件详情
-        <a-tag :color="networkInfo.state ? 'green' : 'red'"
-               style="margin-left:16px;vertical-align:middle;">
-          {{ networkInfo.state ? '运行中' : '已停止' }}
-        </a-tag>
+  <div class="app-container">
+    <a-card :bordered="false">
+      <div class="page-header">
+        <div class="header-left">
+          <a-button type="text" icon="left" @click="$router.back()" class="back-btn" />
+          <div class="page-title">
+            <h1>{{ networkInfo.name || 'TCP网络组件' }}</h1>
+          </div>
+          <a-tag :color="networkInfo.state ? 'green' : 'red'" style="margin-left: 12px;">
+            {{ networkInfo.state ? '运行中' : '已停止' }}
+          </a-tag>
+        </div>
       </div>
-      <div style="margin: 16px 0 0 0;">
-        <a-button type="default" icon="arrow-left" @click="$router.back()">返回上一页</a-button>
-      </div>
-    </div>
-    <a-row :gutter="32" style="margin-top:24px;">
-      <a-col :span="11">
-        <a-card :bordered="false" class="minimal-card" :bodyStyle="{ padding: '20px 24px' }">
-          <a-descriptions :column="1" size="default">
-            <a-descriptions-item label="组件名称">{{ networkInfo.name }}</a-descriptions-item>
-            <a-descriptions-item label="TCP类型">
-              <template v-if="networkInfo.type === 'TCP_CLIENT'">TCP客户端</template>
-              <template v-else-if="networkInfo.type === 'TCP_SERVER'">TCP服务端</template>
-              <template v-else>{{ networkInfo.type }}</template>
-            </a-descriptions-item>
-            <a-descriptions-item label="唯一标识">{{ networkInfo.unionId }}</a-descriptions-item>
-            <a-descriptions-item label="产品Key">{{ networkInfo.productKey }}</a-descriptions-item>
-            <a-descriptions-item :label="$t('time.create')">{{
-                parseTime(networkInfo.createDate)
-              }}
-            </a-descriptions-item>
-            <a-descriptions-item label="描述">{{
-                networkInfo.description || '暂无描述'
-              }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-card>
-
-        <a-card :bordered="false" class="minimal-card"
-                :bodyStyle="{ padding: '20px 24px', marginTop: '16px' }">
-          <div class="tcp-detail-section-title">
-            配置信息
-            <a-button v-if="!editing" type="link" size="small" style="float:right;"
-                      v-hasPermi="['network:tcp:edit']"
-                      @click="editing = true">{{ $t('button.edit') }}
-            </a-button>
-          </div>
-          <template v-if="!editing">
-            <a-descriptions :column="1" size="default">
-              <a-descriptions-item v-for="field in configFields" :key="field.key" v-if="!field.hide"
-                                   :label="field.label">
-                {{ renderReadValue(field) }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </template>
-          <template v-else>
-            <a-form :model="formData" layout="horizontal" label-col="{ style: { width: '120px' } }"
-                    wrapper-col="{ style: { width: '320px' } }">
-              <a-row :gutter="0">
-                <a-col :span="24" v-for="field in configFields" :key="field.key" v-if="!field.hide">
-                  <a-form-item :label="field.label">
-                    <template v-if="field.type === 'int'">
-                      <a-input-number v-model="formData[field.key]" :placeholder="field.remark"
-                                      style="width:100%" :step="1" :precision="0"/>
-                    </template>
-                    <template v-else-if="field.type === 'json'">
-                      <a-textarea v-model="formData[field.key]" :placeholder="field.remark"
-                                  auto-size/>
-                    </template>
-                    <template v-else-if="field.type === 'file'">
-                      <a-upload v-model="formData[field.key]" :show-upload-list="false"/>
-                    </template>
-                    <template v-else-if="field.type === 'select'">
-                      <a-select v-model="formData[field.key]" :placeholder="field.remark">
-                        <a-select-option v-for="opt in field.options" :key="opt.value"
-                                         :value="opt.value">{{ opt.label }}
-                        </a-select-option>
-                      </a-select>
-                    </template>
-                    <template v-else-if="field.type === 'boolean'">
-                      <a-select v-model="formData[field.key]" :placeholder="field.remark">
-                        <a-select-option v-for="opt in field.options" :key="opt.value"
-                                         :value="opt.value">{{ opt.label }}
-                        </a-select-option>
-                      </a-select>
-                    </template>
-                    <template v-else>
-                      <a-input v-model="formData[field.key]" :placeholder="field.remark"/>
-                    </template>
-                  </a-form-item>
-                </a-col>
-              </a-row>
-              <div style="margin-top:16px;text-align:right;">
-                <a-button type="link" size="small" v-hasPermi="['network:tcp:edit']"
-                          @click="handleSaveConfig">保存
-                </a-button>
-                <a-button type="link" size="small" style="margin-left:8px;" @click="cancelEdit">
-                  取消
-                </a-button>
-              </div>
-            </a-form>
-          </template>
-        </a-card>
-      </a-col>
-      <a-col :span="13">
-        <!-- 主要监测区域 -->
-        <a-card :bordered="false" class="minimal-card monitor-card strong"
-                :bodyStyle="{ padding: '20px 24px' }">
-          <div class="monitor-title">主要监测</div>
-          <div class="monitor-stats-row">
-            <div class="stat-block">
-              <a-icon type="cluster" class="stat-icon cluster"/>
-              <span class="stat-label">集群节点</span>
-              <span class="stat-value">{{ monitorData.cluster.online }}/{{
-                  monitorData.cluster.total
-                }}</span>
+      
+      <a-spin :spinning="loading" tip="Loading...">
+        <!-- 自定义标签页导航 -->
+        <div class="custom-tabs-container">
+          <div class="custom-tabs-nav">
+            <div class="custom-tab-item" :class="{ active: activeTab === '1' }" @click="switchTab('1')">
+              基础信息
             </div>
-            <div class="stat-block">
-              <a-icon type="team" class="stat-icon device"/>
-              <span class="stat-label">活跃连接</span>
-              <span class="stat-value">{{ monitorData.device.active }}</span>
+            <div class="custom-tab-item" :class="{ active: activeTab === '2' }" @click="switchTab('2')">
+              配置信息
             </div>
-            <div class="stat-block">
-              <a-icon type="message" class="stat-icon message"/>
-              <span class="stat-label">消息QPS</span>
-              <span class="stat-value">{{ monitorData.message.qps }}</span>
-            </div>
-            <div class="stat-block">
-              <a-icon type="warning" class="stat-icon alert"/>
-              <span class="stat-label">异常节点</span>
-              <span class="stat-value">{{ monitorData.cluster.abnormal }}</span>
+            <div class="custom-tab-item" :class="{ active: activeTab === '3' }" @click="switchTab('3')">
+              通信配置
             </div>
           </div>
-        </a-card>
 
-        <!-- TCP订阅主题信息 -->
-        <a-card :bordered="false" class="minimal-card"
-                :bodyStyle="{ padding: '20px 24px', marginTop: '16px' }">
-          <div class="tcp-detail-section-title">
-            <a-icon type="message" style="margin-right: 8px; color: #1890ff;"/>
-            TCP通信
-            <a-tooltip title="${productKey} 和 ${deviceId} 分别替换为产品Key和设备ID">
-              <a-icon type="question-circle"
-                      style="margin-left: 8px; color: #999; cursor: pointer;"/>
-            </a-tooltip>
-          </div>
-
-          <!-- TCP客户端主题 -->
-          <div class="topic-section" v-if="networkInfo.type === 'TCP_CLIENT'">
-            <div class="topic-category">
-              <a-icon type="user" style="color: #1890ff; margin-right: 6px;"/>
-              <span class="topic-category-title">TCP客户端通信</span>
-            </div>
-            <div class="topic-list">
-              <div class="topic-item">
-                <div class="topic-label">连接地址</div>
-                <div class="topic-value">{{
-                    getConfigValue(networkInfo, 'host')
-                  }}:{{ getConfigValue(networkInfo, 'port') }}
+          <!-- 标签页内容 -->
+          <div class="custom-tab-content">
+            <!-- 基础信息 -->
+            <div v-show="activeTab === '1'" class="tab-pane">
+              <div class="device-basic-info">
+                <div class="basic-info-header">
+                  <h3>基础信息</h3>
                 </div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">设备标识</div>
-                <div class="topic-value">${productKey}/${deviceId}</div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">心跳间隔</div>
-                <div class="topic-value">{{
-                    getConfigValue(networkInfo, 'heartbeat', '30秒')
-                  }}
+                
+                <div class="basic-info-grid">
+                  <div class="info-item">
+                    <span class="info-label">组件类型</span>
+                    <a-tag color="green">
+                      <template v-if="networkInfo.type === 'TCP_CLIENT'">TCP客户端</template>
+                      <template v-else-if="networkInfo.type === 'TCP_SERVER'">TCP服务端</template>
+                      <template v-else>{{ networkInfo.type }}</template>
+                    </a-tag>
+                  </div>
+                  <div class="info-item info-item-full">
+                    <span class="info-label">唯一标识</span>
+                    <div class="info-value-group">
+                      <span class="info-value">{{ networkInfo.unionId }}</span>
+                      <a-button type="text" size="small" class="copy-action-btn" @click.stop="copyToClipboard(networkInfo.unionId)" title="复制">
+                        <a-icon type="copy"/>
+                      </a-button>
+                    </div>
+                  </div>
+                  <div class="info-item info-item-full">
+                    <span class="info-label">产品Key</span>
+                    <div class="info-value-group">
+                      <span class="info-value">{{ networkInfo.productKey }}</span>
+                      <a-button type="text" size="small" class="copy-action-btn" @click.stop="copyToClipboard(networkInfo.productKey)" title="复制">
+                        <a-icon type="copy"/>
+                      </a-button>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <span class="info-label">创建时间</span>
+                    <span class="info-value">{{ parseTime(networkInfo.createDate) }}</span>
+                  </div>
+                  <div class="info-item info-item-full" v-if="networkInfo.description">
+                    <span class="info-label">描述信息</span>
+                    <span class="info-value">{{ networkInfo.description }}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- TCP服务端主题 -->
-          <div class="topic-section" v-if="networkInfo.type === 'TCP_SERVER'">
-            <div class="topic-category">
-              <a-icon type="cloud-server" style="color: #52c41a; margin-right: 6px;"/>
-              <span class="topic-category-title">TCP服务端监听</span>
+            <!-- 配置信息 -->
+            <div v-show="activeTab === '2'" class="tab-pane">
+              <div class="device-basic-info">
+                <div class="basic-info-header">
+                  <h3>配置信息</h3>
+                  <a-button v-if="!editing" type="link" size="small" @click="editing = true" v-hasPermi="['network:tcp:edit']">
+                    <a-icon type="edit" /> 编辑
+                  </a-button>
+                </div>
+                
+                <template v-if="!editing">
+                  <div class="basic-info-grid">
+                    <div class="info-item" v-for="field in configFields" :key="field.key" v-if="!field.hide">
+                      <span class="info-label">{{ field.label }}</span>
+                      <span class="info-value">{{ renderReadValue(field) }}</span>
+                    </div>
+                  </div>
+                </template>
+                
+                <template v-else>
+                  <a-form :model="formData" layout="vertical">
+                    <a-row :gutter="16">
+                      <a-col :span="8" v-for="field in configFields" :key="field.key" v-if="!field.hide">
+                        <a-form-item :label="field.label">
+                          <template v-if="field.type === 'int'">
+                            <a-input-number v-model="formData[field.key]" :placeholder="field.remark" style="width:100%" :step="1" :precision="0"/>
+                          </template>
+                          <template v-else-if="field.type === 'json'">
+                            <a-textarea v-model="formData[field.key]" :placeholder="field.remark" :rows="3" />
+                          </template>
+                          <template v-else-if="field.type === 'select'">
+                            <a-select v-model="formData[field.key]" :placeholder="field.remark">
+                              <a-select-option v-for="opt in field.options" :key="opt.value" :value="opt.value">
+                                {{ opt.label }}
+                              </a-select-option>
+                            </a-select>
+                          </template>
+                          <template v-else-if="field.type === 'boolean'">
+                            <a-select v-model="formData[field.key]" :placeholder="field.remark">
+                              <a-select-option v-for="opt in field.options" :key="opt.value" :value="opt.value">
+                                {{ opt.label }}
+                              </a-select-option>
+                            </a-select>
+                          </template>
+                          <template v-else>
+                            <a-input v-model="formData[field.key]" :placeholder="field.remark"/>
+                          </template>
+                        </a-form-item>
+                      </a-col>
+                    </a-row>
+                    <div class="form-actions">
+                      <a-button @click="cancelEdit">取消</a-button>
+                      <a-button type="primary" @click="handleSaveConfig" style="margin-left: 8px;" v-hasPermi="['network:tcp:edit']">
+                        保存配置
+                      </a-button>
+                    </div>
+                  </a-form>
+                </template>
+              </div>
             </div>
-            <div class="topic-list">
-              <div class="topic-item">
-                <div class="topic-label">监听地址</div>
-                <div class="topic-value">0.0.0.0:{{ getConfigValue(networkInfo, 'port') }}</div>
+
+            <!-- TCP通信配置 -->
+            <div v-show="activeTab === '3'" class="tab-pane">
+              <div class="device-basic-info">
+                <div class="basic-info-header">
+                  <h3>{{ networkInfo.type === 'TCP_CLIENT' ? 'TCP客户端配置' : 'TCP服务端配置' }}</h3>
+                  <a-tooltip title="${productKey} 和 ${deviceId} 会被实际值替换">
+                    <a-icon type="question-circle" style="color: #999; cursor: pointer;" />
+                  </a-tooltip>
+                </div>
+                
+                <template v-if="networkInfo.type === 'TCP_CLIENT'">
+                  <div class="basic-info-grid">
+                    <div class="info-item">
+                      <span class="info-label">连接地址</span>
+                      <span class="info-value highlight">{{ getConfigValue(networkInfo, 'host') }}:{{ getConfigValue(networkInfo, 'port') }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">设备标识</span>
+                      <span class="info-value code">${productKey}/${deviceId}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="info-label">心跳间隔</span>
+                      <span class="info-value">{{ getConfigValue(networkInfo, 'heartbeat', '30秒') }}</span>
+                    </div>
+                  </div>
+                </template>
+
+                <template v-if="networkInfo.type === 'TCP_SERVER'">
+                  <div class="basic-info-grid">
+                    <div class="info-item">
+                      <span class="info-label">监听地址</span>
+                      <span class="info-value highlight">0.0.0.0:{{ getConfigValue(networkInfo, 'port') }}</span>
+                    </div>
+                  </div>
+                </template>
               </div>
             </div>
           </div>
-
-          <!-- 数据格式说明 -->
-          <!-- <div class="topic-section">
-            <div class="topic-category">
-              <a-icon type="code" style="color: #fa8c16; margin-right: 6px;" />
-              <span class="topic-category-title">数据格式</span>
-            </div>
-            <div class="topic-list">
-              <div class="topic-item">
-                <div class="topic-label">设备上报</div>
-                <div class="topic-value">{"productKey":"${productKey}","deviceId":"${deviceId}","data":{...}}</div>
-              </div>
-              <div class="topic-item">
-                <div class="topic-label">指令下发</div>
-                <div class="topic-value">{"productKey":"${productKey}","deviceId":"${deviceId}","command":{...}}</div>
-              </div>
-            </div>
-          </div> -->
-        </a-card>
-      </a-col>
-    </a-row>
+        </div>
+      </a-spin>
+    </a-card>
+    
     <a-modal v-model="previewVisible" title="请确认即将提交的配置JSON" :footer="null" width="600px">
       <pre
-        style="background:#f6f6f6;padding:16px;border-radius:4px;max-height:400px;overflow:auto;">{{
+        style="background:#f6f6f6;padding:16px;max-height:400px;overflow:auto;">{{
           previewJson
         }}</pre>
       <div style="text-align:right;margin-top:16px;">
         <a-button @click="previewVisible=false">{{ $t('button.cancel') }}</a-button>
-        <a-button type="primary" style="margin-left:8px;" v-hasPermi="['network:tcp:edit']"
-                  @click="confirmSaveConfig">{{ $t('button.confirm') }}提交
+        <a-button type="primary" style="margin-left:8px;" v-hasPermi="['network:tcp:edit']" @click="confirmSaveConfig">{{ $t('button.confirm') }}提交
         </a-button>
       </div>
     </a-modal>
@@ -222,13 +194,7 @@
 </template>
 
 <script>
-import {
-  getNetwork,
-  restartNetwork,
-  startNetwork,
-  stopNetwork,
-  updateNetwork
-} from '@/api/system/network'
+import {getNetwork, restartNetwork, startNetwork, stopNetwork, updateNetwork} from '@/api/system/network'
 import {getDictMap, getDicts} from '@/api/system/dict/data'
 import * as echarts from 'echarts'
 
@@ -254,39 +220,8 @@ export default {
       previewVisible: false,
       previewJson: '',
       formDataBackup: {},
-      healthData: {
-        connected: false,
-        responseTime: null,
-        errorRate: 0,
-        packetLoss: 0,
-        lastCheckTime: null,
-        uptime: null
-      },
-      monitorData: {
-        cluster: {
-          total: 5,
-          online: 4,
-          abnormal: 1,
-          nodes: [
-            {name: '节点1', status: 'online'},
-            {name: '节点2', status: 'online'},
-            {name: '节点3', status: 'abnormal'},
-            {name: '节点4', status: 'online'},
-            {name: '节点5', status: 'online'}
-          ]
-        },
-        device: {active: 120},
-        region: {
-          barData: [
-            {name: '浙江', value: 30},
-            {name: '江苏', value: 10},
-            {name: '北京', value: 8},
-            {name: '上海', value: 7},
-            {name: '广东', value: 5}
-          ]
-        },
-        message: {qps: 320}
-      }
+      healthData: {},
+      activeTab: '1'
     }
   },
   computed: {
@@ -330,7 +265,6 @@ export default {
     this.getNetworkDetail()
   },
   mounted() {
-    this.initRegionBarChart()
   },
   methods: {
     /** 获取TCP网络组件详情 */
@@ -505,18 +439,10 @@ export default {
       })
     },
     cancelEdit() {
-      // 恢复编辑前的值
       this.formData = JSON.parse(JSON.stringify(this.formDataBackup))
       this.editing = false
     },
-    getTcpPort(item) {
-      try {
-        const config = JSON.parse(item.configuration)
-        return config.port || '未配置'
-      } catch (error) {
-        return '配置错误'
-      }
-    },
+    /** 通用配置值获取方法 */
     getConfigValue(item, key, defaultValue = '未配置') {
       try {
         const config = JSON.parse(item.configuration)
@@ -525,476 +451,254 @@ export default {
         return '配置错误'
       }
     },
-    getDecodeTyoe(item) {
-      return this.getConfigValue(item, 'decodeType')
+    switchTab(tab) {
+      this.activeTab = tab
     },
-    getTcpHost(item) {
-      return this.getConfigValue(item, 'host')
-    },
-    initRegionBarChart() {
-      if (!this.$refs.regionBarChart) {
-        return
+    copyToClipboard(text) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => {
+          this.$message.success('已复制到剪贴板')
+        }).catch(() => {
+          this.fallbackCopyTextToClipboard(text)
+        })
+      } else {
+        this.fallbackCopyTextToClipboard(text)
       }
-      const chart = echarts.init(this.$refs.regionBarChart)
-      const data = this.monitorData.region.barData
-      chart.setOption({
-        grid: {left: 40, right: 20, top: 20, bottom: 20},
-        xAxis: {
-          type: 'category',
-          data: data.map(i => i.name),
-          axisLine: {lineStyle: {color: '#e0e0e0'}},
-          axisLabel: {color: '#666', fontSize: 13}
-        },
-        yAxis: {
-          type: 'value',
-          axisLine: {show: false},
-          axisLabel: {color: '#666', fontSize: 13},
-          splitLine: {lineStyle: {color: '#f0f0f0'}}
-        },
-        series: [{
-          data: data.map(i => i.value),
-          type: 'bar',
-          barWidth: 32,
-          itemStyle: {color: '#1890ff', borderRadius: [4, 4, 0, 0]}
-        }]
-      })
+    },
+    fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      try {
+        document.execCommand('copy')
+        this.$message.success('已复制到剪贴板')
+      } catch (err) {
+        this.$message.error('复制失败')
+      }
+      document.body.removeChild(textArea)
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.tcp-detail-page.minimal {
-  background: #fff;
-  padding: 0 32px 32px 32px;
+/* 页面容器样式 */
+.app-container {
+  background: #ffffff;
 }
 
-.tcp-detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 24px;
-}
-
-.tcp-detail-title {
-  font-size: 20px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-}
-
-.tcp-detail-actions {
-  display: flex;
-  align-items: center;
-}
-
-.minimal-card {
+.ant-card {
+  background: #ffffff;
+  border: none;
   box-shadow: none;
-  border-radius: 0;
-  background: #fafbfc;
-  margin-bottom: 0;
 }
 
-.tcp-detail-section-title {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 12px;
-}
-
-.health-metrics {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.health-metric-row {
+/* 页面头部样式 */
+.page-header {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
-  color: #222;
+  align-items: center;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8eaed;
 }
 
-.monitor-section {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.monitor-block {
-  margin-bottom: 0;
-}
-
-.monitor-title {
-  font-size: 15px;
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #222;
-}
-
-.monitor-row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  color: #444;
-  margin-bottom: 2px;
-}
-
-.monitor-dashboard {
-  width: 100%;
-}
-
-.monitor-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px 0 rgba(24, 144, 255, 0.06);
-  margin-bottom: 0;
-  min-height: 180px;
-}
-
-.monitor-card.strong {
-  border-left: 4px solid #1890ff;
-}
-
-.monitor-chart-row {
-  margin-bottom: 8px;
-}
-
-.monitor-stats-row {
+.header-left {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: 32px;
-  margin-top: 8px;
-  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.stat-block {
+.back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #64748b;
+
+  &:hover {
+    background: #e2e8f0;
+    border-color: #1966ff;
+    color: #1966ff;
+    transform: scale(1.05);
+  }
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #262626;
+  line-height: 1.2;
+}
+
+/* 自定义标签页样式 */
+.custom-tabs-container {
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+  overflow: hidden;
+}
+
+.custom-tabs-nav {
+  display: flex;
+  background: #fafafa;
+  border-bottom: 1px solid #e8e8e8;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.custom-tabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-tab-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  min-width: fit-content;
+  border-right: 1px solid #e8e8e8;
+  background: #fafafa;
+}
+
+.custom-tab-item:last-child {
+  border-right: none;
+}
+
+.custom-tab-item:hover {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.custom-tab-item.active {
+  background: #ffffff;
+  color: #1890ff;
+  border-bottom: 2px solid #1890ff;
+  margin-bottom: -1px;
+}
+
+.custom-tab-content {
+  min-height: 500px;
+  background: #fff;
+}
+
+.tab-pane {
+  padding: 10px;
+}
+
+/* 设备信息页面样式 */
+.device-basic-info {
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.basic-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.basic-info-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.basic-info-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.info-item-full {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  min-width: 90px;
+  width: 90px;
+  font-size: 13px;
+  color: #8c8c8c;
+  margin-right: 12px;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.info-value-group {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-right: 16px;
+  min-width: 0;
 }
 
-.stat-icon {
-  font-size: 20px;
-  vertical-align: middle;
+.info-value {
+  font-size: 13px;
+  color: #262626;
+  line-height: 1.4;
+  
+  &.code {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    color: #1890ff;
+  }
+  
+  &.highlight {
+    color: #1890ff;
+    font-weight: 500;
+  }
 }
 
-.stat-icon.cluster {
+.copy-action-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8c8c8c;
+  background: transparent;
+  border: none;
+  transition: all 0.2s ease;
+  font-size: 10px;
+  margin-left: 2px;
+  flex-shrink: 0;
+}
+
+.copy-action-btn:hover {
   color: #1890ff;
-}
-
-.stat-icon.online {
-  color: #52c41a;
-}
-
-.stat-icon.alert {
-  color: #faad14;
-}
-
-.stat-icon.device {
-  color: #13c2c2;
-}
-
-.stat-icon.message {
-  color: #722ed1;
-}
-
-.stat-label {
-  font-size: 14px;
-  color: #666;
-}
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #222;
-  margin-left: 2px;
-}
-
-.monitor-pie-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.mini-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 13px;
-}
-
-.dashboard-monitor {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
-}
-
-.monitor-chart {
-  width: 100%;
-  height: 180px;
-  margin-bottom: 16px;
-}
-
-.monitor-list {
-  font-size: 13px;
-  color: #888;
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-}
-
-.tcp-monitor-card {
-  max-width: 900px;
-  margin: 0 auto;
-  border-radius: 14px;
-  box-shadow: 0 2px 12px rgba(24, 144, 255, 0.08);
-  padding: 32px 40px;
-}
-
-.status-overview {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.status-item {
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  color: #222;
-  gap: 8px;
-}
-
-.status-item.running {
-  color: #52c41a;
-}
-
-.trend-section {
-  display: flex;
-  gap: 32px;
-  margin-bottom: 16px;
-}
-
-.trend-chart {
-  flex: 1;
-  height: 120px;
-}
-
-.distribution-section {
-  display: flex;
-  gap: 32px;
-  margin-top: 16px;
-}
-
-.map-chart, .type-chart {
-  width: 320px;
-  height: 180px;
-}
-
-.region-bar-chart {
-  width: 320px;
-  height: 180px;
-}
-
-.mini-monitor-card {
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.06);
-  padding: 20px 28px;
-  min-height: 120px;
-  margin-bottom: 0;
-}
-
-.mini-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
-
-.mini-status-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.mini-label {
-  font-size: 15px;
-  color: #52c41a;
-  font-weight: 500;
-}
-
-.mini-metrics-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  align-items: center;
-}
-
-.mini-metric {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 14px;
-  color: #444;
-}
-
-.mini-icon {
-  font-size: 18px;
-  vertical-align: middle;
-}
-
-.mini-icon.running {
-  color: #52c41a;
-}
-
-.mini-icon.alert {
-  color: #faad14;
-}
-
-.mini-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #222;
-  margin-left: 2px;
-}
-
-/* TCP订阅主题样式 */
-.topic-section {
-  margin-bottom: 20px;
-}
-
-.topic-section:last-child {
-  margin-bottom: 0;
-}
-
-.topic-category {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.topic-category-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #333;
-}
-
-.topic-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.topic-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  background: #fafafa;
-  border-radius: 6px;
-  border-left: 3px solid #1890ff;
-  transition: all 0.2s;
-}
-
-.topic-item:hover {
   background: #f0f8ff;
-  border-left-color: #40a9ff;
 }
 
-.topic-label {
-  font-size: 13px;
-  color: #666;
-  min-width: 80px;
-  margin-right: 12px;
-}
-
-.topic-value {
-  font-size: 13px;
-  color: #1890ff;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
-  background: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid #e8e8e8;
-  flex: 1;
-  word-break: break-all;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.topic-value:hover {
-  border-color: #40a9ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
-}
-
-.topic-value::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(24, 144, 255, 0.05) 50%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.topic-value:hover::before {
-  opacity: 1;
+/* 表单操作按钮 */
+.form-actions {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
+  text-align: right;
 }
 </style>
-
-<svg style="display:none;">
-<symbol id="icon-cluster" viewBox="0 0 1024 1024">
-  <circle cx="512" cy="512" r="400" fill="#e6f7ff"/>
-  <circle cx="512" cy="512" r="320" fill="#91d5ff"/>
-  <circle cx="512" cy="512" r="160" fill="#1890ff"/>
-</symbol>
-<symbol id="icon-online" viewBox="0 0 1024 1024">
-  <circle cx="512" cy="512" r="400" fill="#f6ffed"/>
-  <circle cx="512" cy="512" r="320" fill="#b7eb8f"/>
-  <circle cx="512" cy="512" r="160" fill="#52c41a"/>
-</symbol>
-<symbol id="icon-alert" viewBox="0 0 1024 1024">
-  <circle cx="512" cy="512" r="400" fill="#fffbe6"/>
-  <circle cx="512" cy="512" r="320" fill="#ffe58f"/>
-  <circle cx="512" cy="512" r="160" fill="#faad14"/>
-</symbol>
-<symbol id="icon-device" viewBox="0 0 1024 1024">
-  <rect x="192" y="192" width="640" height="640" rx="80" fill="#e6f7ff"/>
-  <rect x="272" y="272" width="480" height="480" rx="60" fill="#91d5ff"/>
-  <rect x="352" y="352" width="320" height="320" rx="40" fill="#1890ff"/>
-</symbol>
-<symbol id="icon-active" viewBox="0 0 1024 1024">
-  <rect x="192" y="192" width="640" height="640" rx="80" fill="#f6ffed"/>
-  <rect x="272" y="272" width="480" height="480" rx="60" fill="#b7eb8f"/>
-  <rect x="352" y="352" width="320" height="320" rx="40" fill="#52c41a"/>
-</symbol>
-<symbol id="icon-offline" viewBox="0 0 1024 1024">
-  <rect x="192" y="192" width="640" height="640" rx="80" fill="#fff1f0"/>
-  <rect x="272" y="272" width="480" height="480" rx="60" fill="#ffccc7"/>
-  <rect x="352" y="352" width="320" height="320" rx="40" fill="#ff4d4f"/>
-</symbol>
-<symbol id="icon-message" viewBox="0 0 1024 1024">
-  <ellipse cx="512" cy="512" rx="400" ry="320" fill="#f0f5ff"/>
-  <ellipse cx="512" cy="512" rx="320" ry="240" fill="#adc6ff"/>
-  <ellipse cx="512" cy="512" rx="160" ry="120" fill="#2f54eb"/>
-</symbol>
-<symbol id="icon-qps" viewBox="0 0 1024 1024">
-  <ellipse cx="512" cy="512" rx="400" ry="320" fill="#e6fffb"/>
-  <ellipse cx="512" cy="512" rx="320" ry="240" fill="#87e8de"/>
-  <ellipse cx="512" cy="512" rx="160" ry="120" fill="#13c2c2"/>
-</symbol>
-<symbol id="icon-backlog" viewBox="0 0 1024 1024">
-  <ellipse cx="512" cy="512" rx="400" ry="320" fill="#fff0f6"/>
-  <ellipse cx="512" cy="512" rx="320" ry="240" fill="#ffadd2"/>
-  <ellipse cx="512" cy="512" rx="160" ry="120" fill="#eb2f96"/>
-</symbol>
-</svg>

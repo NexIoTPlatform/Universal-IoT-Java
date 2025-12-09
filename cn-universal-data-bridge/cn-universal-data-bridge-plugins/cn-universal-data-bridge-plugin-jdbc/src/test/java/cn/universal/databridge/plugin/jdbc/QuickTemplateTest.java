@@ -34,31 +34,29 @@ public class QuickTemplateTest {
 
     try {
       // 测试通用实现
-      AbstractDataBridgePlugin genericPlugin =
-          new AbstractDataBridgePlugin() {
-            @Override
-            public PluginInfo getPluginInfo() {
+      AbstractDataBridgePlugin genericPlugin = new AbstractDataBridgePlugin() {
+          @Override
+          public PluginInfo getPluginInfo() {
               return null;
-            }
+          }
 
-            @Override
-            public Boolean testConnection(ResourceConnection connection) {
+          @Override
+          public Boolean testConnection(ResourceConnection connection) {
               return null;
-            }
+          }
 
-            @Override
-            public Boolean validateConfig(DataBridgeConfig config) {
+          @Override
+          public Boolean validateConfig(DataBridgeConfig config) {
               return null;
-            }
+          }
 
-            @Override
-            public List<SourceScope> getSupportedSourceScopes() {
+          @Override
+          public List<SourceScope> getSupportedSourceScopes() {
               return List.of();
-            }
-          };
-      java.lang.reflect.Method genericMethod =
-          AbstractDataBridgePlugin.class.getDeclaredMethod(
-              "processTemplate", String.class, Map.class);
+          }
+      };
+      java.lang.reflect.Method genericMethod = 
+          AbstractDataBridgePlugin.class.getDeclaredMethod("processTemplate", String.class, Map.class);
       genericMethod.setAccessible(true);
       String genericResult = (String) genericMethod.invoke(genericPlugin, template, variables);
 
@@ -66,7 +64,7 @@ public class QuickTemplateTest {
 
       // 测试JDBC实现
       DefaultJdbcOutPlugin jdbcPlugin = new DefaultJdbcOutPlugin();
-      java.lang.reflect.Method jdbcMethod =
+      java.lang.reflect.Method jdbcMethod = 
           DefaultJdbcOutPlugin.class.getDeclaredMethod("processTemplate", String.class, Map.class);
       jdbcMethod.setAccessible(true);
       String jdbcResult = (String) jdbcMethod.invoke(jdbcPlugin, template, variables);
@@ -106,33 +104,31 @@ public class QuickTemplateTest {
 
     String template = "Nested: #{root.level2.value}";
 
-    AbstractDataBridgePlugin plugin =
-        new AbstractDataBridgePlugin() {
-          @Override
-          public PluginInfo getPluginInfo() {
+    AbstractDataBridgePlugin plugin = new AbstractDataBridgePlugin() {
+        @Override
+        public PluginInfo getPluginInfo() {
             return null;
-          }
+        }
 
-          @Override
-          public Boolean testConnection(ResourceConnection connection) {
+        @Override
+        public Boolean testConnection(ResourceConnection connection) {
             return null;
-          }
+        }
 
-          @Override
-          public Boolean validateConfig(DataBridgeConfig config) {
+        @Override
+        public Boolean validateConfig(DataBridgeConfig config) {
             return null;
-          }
+        }
 
-          @Override
-          public List<SourceScope> getSupportedSourceScopes() {
+        @Override
+        public List<SourceScope> getSupportedSourceScopes() {
             return List.of();
-          }
-        };
+        }
+    };
 
     try {
-      java.lang.reflect.Method method =
-          AbstractDataBridgePlugin.class.getDeclaredMethod(
-              "processTemplate", String.class, Map.class);
+      java.lang.reflect.Method method = 
+          AbstractDataBridgePlugin.class.getDeclaredMethod("processTemplate", String.class, Map.class);
       method.setAccessible(true);
       String result = (String) method.invoke(plugin, template, variables);
 

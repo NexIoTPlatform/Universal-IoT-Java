@@ -145,7 +145,7 @@ public class DefaultJdbcInputPlugin extends AbstractDataInputPlugin {
       case "h2" -> String.format("jdbc:h2:tcp://%s:%d/%s", host, port, databaseName);
       case "oracle" -> String.format("jdbc:oracle:thin:@%s:%d:%s", host, port, databaseName);
       case "sqlserver" ->
-          String.format("jdbc:sqlserver://%s:%d;databaseName=%s", host, port, databaseName);
+          String.format("jdbc:sqlserver://%s:%d;databaseName=%s;characterEncoding=UTF-8", host, port, databaseName);
       default -> throw new IllegalArgumentException("不支持的数据库类型: " + dbType);
     };
   }

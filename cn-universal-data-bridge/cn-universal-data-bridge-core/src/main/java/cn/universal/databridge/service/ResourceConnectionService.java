@@ -27,6 +27,7 @@ import jakarta.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +90,7 @@ public class ResourceConnectionService {
 
   /** 更新资源连接 */
   @Transactional(rollbackFor = Exception.class)
+  @CacheEvict(cacheNames = {"data_bridage_resource_connection"},allEntries = true)
   public void updateResourceConnection(ResourceConnection connection) {
     // 1. 验证连接（使用ConfigValidator进行基本验证）
     ConfigValidator.validateResourceConnection(connection);
@@ -171,6 +173,7 @@ public class ResourceConnectionService {
 
   /** 删除连接 */
   @Transactional(rollbackFor = Exception.class)
+  @CacheEvict(cacheNames = {"data_bridage_resource_connection"},allEntries = true)
   public void deleteConnection(Long id) {
     // 检查是否被桥接配置使用
     List<DataBridgeConfig> configs = dataBridgeConfigService.getConfigsByTargetResourceId(id);

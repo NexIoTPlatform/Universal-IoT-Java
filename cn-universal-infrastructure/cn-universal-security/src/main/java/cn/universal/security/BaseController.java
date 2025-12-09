@@ -1,5 +1,6 @@
 package cn.universal.security;
 
+import cn.hutool.core.date.DateUtil;
 import cn.universal.common.utils.StringUtils;
 import cn.universal.persistence.entity.IoTUser;
 import cn.universal.persistence.page.PageDomain;
@@ -15,7 +16,6 @@ import jakarta.annotation.Resource;
 import java.beans.PropertyEditorSupport;
 import java.util.Date;
 import java.util.List;
-import org.apache.http.client.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -38,7 +38,12 @@ public class BaseController {
         new PropertyEditorSupport() {
           @Override
           public void setAsText(String text) {
-            setValue(DateUtils.parseDate(text));
+            // 如果字符串为空或空白，设置为 null，避免解析错误
+            if (StringUtils.isBlank(text)) {
+              setValue(null);
+            } else {
+              setValue(DateUtil.parseDate(text));
+            }
           }
         });
   }

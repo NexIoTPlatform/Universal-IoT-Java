@@ -53,4 +53,14 @@ public class DevicePropertiesTest {
     greateValue.withValue(data.getPropertyOrNull("greateValue"), "true");
     System.out.println(JSONUtil.toJsonStr(greateValue));
   }
+
+  @Test
+  public void rwMode() {
+    String metadata =
+        """
+    {"events":[{"id":"online","name":"上线","valueType":{"type":"string"}},{"id":"offline","name":"下线","valueType":{"type":"string"}},{"config":false,"expands":{"level":"urgent"},"id":"higher_temp","name":"高温预警","valueType":{"expands":{"maxLength":"50"},"type":"string"}}],"functions":[{"config":false,"description":"水冷降温","id":"coolDown","inputs":[{"id":"waterLevel","name":"浇水量","valueType":{"precision":"2","type":"float","unit":"cm³"}}],"name":"降温","output":{}},{"config":false,"id":"setDeviceDesiredProperties","inputs":[{"id":"code","name":"编号","valueType":{"expands":{"maxLength":"50"},"type":"string"}},{"id":"humidity","name":"湿度","valueType":{"expands":{"maxLength":"50"},"type":"string"}},{"id":"temperture","name":"温度","valueType":{"precision":"2","type":"float"}}],"name":"设置期望值","output":{}}],"properties":[{"config":false,"description":"设备外壳温度","id":"temperture","mode":"r","name":"外壳温度","source":"device","valueType":{"type":"float","unit":"℃"}},{"config":false,"id":"code","mode":"rw","name":"编号","source":"device","valueType":{"type":"string"}},{"config":false,"id":"humidity","mode":"rw","name":"湿度","source":"device","valueType":{"type":"int"}}],"tags":[]}
+    """;
+    DeviceMetadata deviceMetadata = new DeviceMetadata(new JSONObject(metadata));
+    System.out.println(JSONUtil.toJsonStr(deviceMetadata.getProperties()));
+  }
 }

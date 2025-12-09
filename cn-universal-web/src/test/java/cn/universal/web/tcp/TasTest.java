@@ -1,9 +1,13 @@
 package cn.universal.web.tcp;
 
 import cn.hutool.core.util.StrUtil;
-import cn.universal.plugins.protocolapi.extend.HexFunctions;
-import cn.universal.plugins.protocolapi.extend.ModbusFunctions;
-import cn.universal.plugins.protocolapi.extend.ProtocolFunctions;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.universal.core.engine.extend.HexFunctions;
+import cn.universal.core.engine.extend.ModbusFunctions;
+import cn.universal.core.engine.extend.ProtocolFunctions;
+import cn.universal.core.engine.extend.UnivFunctions;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -15,6 +19,58 @@ import org.junit.jupiter.api.Test;
  */
 @Slf4j
 public class TasTest {
+  @Test
+  public void hex_map() {
+    String str="""
+    {
+       "deviceName": "0qNNL1gp1e1",
+       "id": "540",
+       "method": "thing.event.property.post",
+       "params": {
+          "length": {
+             "time": 1765007805000,
+             "value": 1.61903
+          }
+       },
+       "productKey": "LAyxDaDCqEz",
+       "version": "1.0"
+    }
+    """;
+    JSONObject json= JSONUtil.parseObj(str);
+     Set<String> strings = json.keySet();
+  }
+  @Test
+  public void hex_address() {
+    String coord = "120.166389,30.218244";
+    UnivFunctions univFunctions = new UnivFunctions();
+    String str = univFunctions.coordinateToAddr(coord);
+    System.out.println(str);
+    String news = univFunctions.wgs84ToGcj02(coord);
+    System.out.println(news);
+    String newsAddr = univFunctions.coordinateToAddr(news);
+    System.out.println(newsAddr);
+  }
+
+  @Test
+  public void test_hex_pad() {
+    HexFunctions hexFunctions = new HexFunctions();
+    // hex_padLeft 要求输入必须是偶数长度的十六进制字符串（每2位=1字节）
+    // "1" 长度为1（奇数），会返回null
+    // 应该使用 "01" 或使用 hex_even 方法先补齐
+    System.out.println("方法1 - 直接传入偶数长度:");
+    System.out.println(hexFunctions.hex_padLeft("01", 2, "0")); // 输出: 0001
+
+    System.out.println("方法2 - 先补齐到偶数长度:");
+    String evenHex = hexFunctions.hex_even("1"); // 自动补齐为 "01"
+    System.out.println(hexFunctions.hex_padLeft(evenHex, 2, "0")); // 输出: 0001
+  }
+
+  @Test
+  public void testModbusTCP() {
+    ModbusFunctions modbus = new ModbusFunctions();
+    System.out.println(modbus.isModbusTcp(" 02031003A8EC7EFFFFEF77C1415DFF"));
+    System.out.println(modbus.isModbusRtu(" 02031003A8EC7EFFFFEF77C1415DFF"));
+  }
 
   /**
    * Test Modbus address parsing functionality Tests various input formats: String (decimal/hex),
@@ -154,7 +210,7 @@ public class TasTest {
     HexFunctions hex = new HexFunctions();
     ProtocolFunctions protocol = new ProtocolFunctions();
     //    String dot="32";
-    String host = hex.hex_add33(hex.hex_fromAscii("tcp.nexiot.xyz"));
+    String host = hex.hex_add33(hex.hex_fromAscii("tcp.nexiot.cc"));
     String port = hex.hex_add33(hex.hex_fromAscii("19999"));
     String dot = hex.hex_add33("FF");
     // 数据区

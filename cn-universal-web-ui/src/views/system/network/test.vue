@@ -171,7 +171,7 @@ export default {
           delimitedMaxlength: 1024,
           failFast: true
         },
-        parserType: "DELIMITED",
+        parserType: "DELIMITER",
         port: 6372,
         productKey: "test_product_key",
         readerIdleTime: 360,

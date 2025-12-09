@@ -15,6 +15,8 @@ package cn.universal.mqtt.protocol.system;
 import cn.hutool.core.collection.ConcurrentHashSet;
 import cn.hutool.core.util.IdUtil;
 import cn.universal.common.constant.IoTConstant;
+import cn.universal.common.utils.PayloadCodecUtils;
+import cn.universal.dm.device.service.impl.IoTProductDeviceService;
 import cn.universal.dm.device.service.push.MQTTPushService;
 import cn.universal.mqtt.protocol.entity.MQTTProductConfig;
 import cn.universal.mqtt.protocol.entity.MQTTUPRequest;
@@ -77,6 +79,8 @@ public class SysMQTTManager
 
   @Autowired private MQTTTopicManager mqttTopicManager;
 
+  @Autowired private IoTProductDeviceService iotProductDeviceService;
+
   @Autowired
   @Qualifier("virtualScheduledExecutor")
   private ScheduledExecutorService scheduledExecutor;
@@ -127,11 +131,14 @@ public class SysMQTTManager
     public void messageArrived(String topic, MqttMessage message) throws Exception {
       try {
         MDC.put(IoTConstant.TRACE_ID, IdUtil.objectId());
-        String payload = new String(message.getPayload());
-        log.info("[MQTT] 收到消息 - 主题: {}, 消息: {}", topic, payload);
         // 解析产品Key
         String productKey = mqttTopicManager.extractProductKeyFromTopic(topic);
         if (productKey != null) {
+          // 根据产品配置获取解码类型并解码 payload
+          String decoderType = iotProductDeviceService.getProductDecoderType(productKey);
+          String payload = PayloadCodecUtils.decode(decoderType, message.getPayload());
+
+          log.info("[MQTT] 收到消息 - 主题: {}, decoderType: {}, 消息: {}", topic, decoderType, payload);
           // 构建UP请求并处理
           MQTTUPRequest request = buildMqttUPRequest(topic, payload, productKey);
           processorChain.process(request);
@@ -215,7 +222,7 @@ public class SysMQTTManager
         .map(
             topic ->
                 MQTTProductConfig.MqttTopicConfig.builder()
-                    .topicPattern(topic)
+                    .topic(topic)
                     .qos(defaultQos)
                     .enabled(true)
                     .build())
@@ -296,7 +303,7 @@ public class SysMQTTManager
 
     String[] topics =
         topicConfigs.stream()
-            .map(MQTTProductConfig.MqttTopicConfig::getTopicPattern)
+            .map(MQTTProductConfig.MqttTopicConfig::getTopic)
             .toArray(String[]::new);
     int[] qosArray =
         topicConfigs.stream().mapToInt(MQTTProductConfig.MqttTopicConfig::getQos).toArray();

@@ -149,7 +149,7 @@ public abstract class AbstractCodecService implements ICodecService {
 
   /** 预解码 */
   @Override
-  public UPRequest preDecode(String productKey, String payload) {
+  public UPRequest preDecode(String productKey, String payload,Object context) {
     ProtocolSupportDefinition protocolDef =
         getProtocolDefinitionWithScriptIfNeeded(productKey, CodecMethod.preDecode);
     UPRequest result = null;
@@ -159,7 +159,7 @@ public abstract class AbstractCodecService implements ICodecService {
       ProtocolCodecSupport protocolCodecSupport = getProtocolCodecProvider(protocolDef.getType());
       try {
         String preDecodeResult =
-            protocolCodecSupport.preDecode(new ProtocolDecodeRequest(protocolDef, payload));
+            protocolCodecSupport.preDecode(new ProtocolDecodeRequest(protocolDef, payload,context));
         if (StrUtil.isNotBlank(preDecodeResult)) {
           result = JSONUtil.toBean(preDecodeResult, UPRequest.class);
         }

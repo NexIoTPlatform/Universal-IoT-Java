@@ -1,6 +1,7 @@
 package cn.universal.mqtt.protocol.processor.up.common;
 
 import cn.hutool.core.util.StrUtil;
+import cn.universal.common.utils.PayloadCodecUtils;
 import cn.universal.dm.device.service.AbstratIoTService;
 import cn.universal.dm.device.service.impl.IoTProductDeviceService;
 import cn.universal.mqtt.protocol.config.MqttConstant;
@@ -52,19 +53,27 @@ public abstract class BaseReplyProcessor extends AbstratIoTService implements Mq
         log.debug("[{}] 无需回复，跳过", getName());
         return ProcessorResult.CONTINUE;
       }
-      String downTopic = request.getDownTopic();
-      if (StrUtil.isBlank(downTopic)) {
-        downTopic = buildReplyTopic(request);
-      }
+      String downTopic = buildDownTopic(request);
+
+      // 根据产品配置的 encoderType 编码 payload
+      String productKey = request.getProductKey();
+      String encoderType = ioTProductDeviceService.getProductEncoderType(productKey);
+      byte[] payloadBytes = PayloadCodecUtils.encode(encoderType, replyPayload);
+
       MQTTPublishMessage build =
           MQTTPublishMessage.builder()
               .topic(downTopic)
               .qos(request.getQos())
-              .payload(StrUtil.bytes(replyPayload))
+              .payload(payloadBytes)
               .build();
       boolean success = publishWithSystemOrThirdMqtt(request, build);
       if (success) {
-        log.info("[{}] 回复消息发布成功 - 主题: {} 内容：{}", getName(), downTopic, replyPayload);
+        log.info(
+            "[{}] 回复消息发布成功 - 主题: {} encoderType: {} 内容：{}",
+            getName(),
+            downTopic,
+            encoderType,
+            replyPayload);
         request.setContextValue("replySuccess", true);
       } else {
         log.warn("[{}] 回复消息发布失败 - 主题: {}", getName(), downTopic);
@@ -84,6 +93,19 @@ public abstract class BaseReplyProcessor extends AbstratIoTService implements Mq
     }
   }
 
+  private String buildDownTopic(MQTTUPRequest request) {
+    String downTopic = request.getDownTopic();
+    if (StrUtil.isBlank(downTopic)) {
+      downTopic = buildReplyTopic(request);
+    } else {
+      // 对已有的下发主题做占位符填充，以支持模板与通配符
+      downTopic =
+          mqttTopicManager.fillTopicPattern(
+              downTopic, request.getProductKey(), request.getDeviceId());
+    }
+    return downTopic;
+  }
+
   @Override
   public boolean supports(MQTTUPRequest request) {
     return request.getReplyPayload() != null;
@@ -101,25 +123,11 @@ public abstract class BaseReplyProcessor extends AbstratIoTService implements Mq
     String thirdPartyDownPattern =
         mqttTopicManager.getThirdPartyDownTopicPattern(networkUnionId, MqttConstant.TYPE_DOWN);
     if (thirdPartyDownPattern != null) {
-      return fillTopicPattern(thirdPartyDownPattern, productKey, deviceId);
+      // 2. 使用统一的pattern填充工具生成最终下发topic
+      return mqttTopicManager.fillTopicPattern(thirdPartyDownPattern, productKey, deviceId);
     }
+    // 3. 兜底：仍然走默认物模型下行topic
     return MQTTTopicType.THING_DOWN.buildTopic(productKey, deviceId);
-  }
-
-  /** 将topic pattern中的+替换为实际productKey和deviceId */
-  private String fillTopicPattern(String pattern, String productKey, String deviceId) {
-    // 只替换前两个+，防止误替换
-    int firstPlus = pattern.indexOf("+");
-    int secondPlus = pattern.indexOf("+", firstPlus + 1);
-    if (firstPlus >= 0 && secondPlus > firstPlus) {
-      return pattern.substring(0, firstPlus)
-          + productKey
-          + pattern.substring(firstPlus + 1, secondPlus)
-          + deviceId
-          + pattern.substring(secondPlus + 1);
-    }
-    // 兜底：顺序替换
-    return pattern.replaceFirst("\\+", productKey).replaceFirst("\\+", deviceId);
   }
 
   /** 根据产品类型决定推送到内置MQTT还是第三方MQTT */

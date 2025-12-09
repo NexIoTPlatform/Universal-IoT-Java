@@ -43,11 +43,20 @@ export function deleteResource(id) {
   })
 }
 
-// 测试资源连接
+// 测试资源连接（已保存的）
 export function testResource(id) {
   return request({
     url: `/databridge/resources/${id}/test`,
     method: 'post'
+  })
+}
+
+// 测试资源连接（未保存的配置）
+export function testResourceConfig(data) {
+  return request({
+    url: '/databridge/resources/test',
+    method: 'post',
+    data
   })
 }
 

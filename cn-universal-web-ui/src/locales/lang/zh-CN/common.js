@@ -35,6 +35,7 @@ export default {
   'button.reset.password': '重置密码',
   'button.assign.role': '分配角色',
 
+
   // 通用状态
   'status.enable': '启用',
   'status.disable': '禁用',
@@ -93,8 +94,9 @@ export default {
   'system.theme': '主题',
 
   // 登录页
-  'login.welcome': '仅供学习，商用需授权',
-  'login.please.input.account': '请输入您的账户信息',
+  'login.welcome': '欢迎登录',
+  //请输入您的账户信息
+  'login.please.input.account': '本环境是真实设备主战，镜像站请访问demo.nexiot.cc 疑问加wx：outlookFil',
   'login.placeholder.username': '请输入用户名',
   'login.placeholder.password': '请输入密码',
   'login.placeholder.captcha': '验证码',
@@ -119,7 +121,7 @@ export default {
   'device.detail': '设备详情',
   'device.list': '设备列表',
   'device.management': '设备管理',
-
+  'device.deviceGroup': '设备分组',
   // 产品相关
   'product.name': '产品名称',
   'product.type': '产品类型',
@@ -191,8 +193,8 @@ export default {
   'platform.feature.security': '安全可靠',
   'platform.feature.security.desc': '企业级安全保障，支持设备认证、数据加密和访问控制',
   'platform.start.using': '开始使用',
-  'login.slogan': '万物智联，协议主动适配，更不屑于标准',
-  'login.intro': '连接万物，智控未来。IoT平台为设备互联、数据采集与智能分析提供一站式解决方案，支持多协议、多插件扩展，强调主动适配各种物联网场景。',
+  'login.slogan':'万物智联，协议主动适配，更不屑于标准',
+  'login.intro':'连接万物，智控未来。IoT平台为设备互联、数据采集与智能分析提供一站式解决方案，支持多协议、多插件扩展，强调主动适配各种物联网场景。',
 
   // 快捷操作
   'quick.action.create.app': '创建应用',

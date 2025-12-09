@@ -24,61 +24,62 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface SceneLinkageMapper extends BaseMapper<SceneLinkage> {
 
-  List<SceneLinkage> selectTriggerByDevId(String deviceId);
+    List<SceneLinkage> selectTriggerByDevId(String deviceId);
 
-  List<SceneLinkage> selectTriggerByType(String deviceId);
+    List<SceneLinkage> selectTriggerByType(String deviceId);
 
-  /**
-   * 查询场景联动
-   *
-   * @param id 场景联动ID
-   * @return 场景联动
-   */
-  SceneLinkage selectSceneLinkageById(Long id);
+    /**
+     * 查询场景联动
+     *
+     * @param id 场景联动ID
+     * @return 场景联动
+     */
+    SceneLinkage selectSceneLinkageById(Long id);
 
-  int checkSelf(@Param("id") Long id, @Param("unionId") String unionId);
+    int checkSelf(@Param("id") Long id, @Param("unionId") String unionId);
 
-  /**
-   * 查询场景联动列表
-   *
-   * @param sceneLinkage 场景联动
-   * @return 场景联动集合
-   */
-  List<SceneLinkage> selectSceneLinkageList(SceneLinkage sceneLinkage);
+    /**
+     * 查询场景联动列表
+     *
+     * @param sceneLinkage 场景联动
+     * @return 场景联动集合
+     */
+    List<SceneLinkage> selectSceneLinkageList(SceneLinkage sceneLinkage);
 
-  /** 查询场景联动列表 */
-  List<SceneLinkage> selectSceneLinkageListByProductKeyAndDeviceId(
-      @Param("productKey") String productKey, @Param("deviceId") String deviceId);
+    /**
+     * 查询场景联动列表
+     */
+    List<SceneLinkage> selectSceneLinkageListByProductKeyAndDeviceId(@Param("productKey") String productKey, @Param("deviceId") String deviceId);
 
-  /**
-   * 新增场景联动
-   *
-   * @param sceneLinkage 场景联动
-   * @return 结果
-   */
-  int insertSceneLinkage(SceneLinkage sceneLinkage);
+    /**
+     * 新增场景联动
+     *
+     * @param sceneLinkage 场景联动
+     * @return 结果
+     */
+    int insertSceneLinkage(SceneLinkage sceneLinkage);
 
-  /**
-   * 修改场景联动
-   *
-   * @param sceneLinkage 场景联动
-   * @return 结果
-   */
-  int updateSceneLinkage(SceneLinkage sceneLinkage);
+    /**
+     * 修改场景联动
+     *
+     * @param sceneLinkage 场景联动
+     * @return 结果
+     */
+    int updateSceneLinkage(SceneLinkage sceneLinkage);
 
-  /**
-   * 删除场景联动
-   *
-   * @param id 场景联动ID
-   * @return 结果
-   */
-  int deleteSceneLinkageById(Long id);
+    /**
+     * 删除场景联动
+     *
+     * @param id 场景联动ID
+     * @return 结果
+     */
+    int deleteSceneLinkageById(Long id);
 
-  /**
-   * 批量删除场景联动
-   *
-   * @param ids 需要删除的数据ID
-   * @return 结果
-   */
-  int deleteSceneLinkageByIds(Long[] ids);
+    /**
+     * 批量删除场景联动
+     *
+     * @param ids 需要删除的数据ID
+     * @return 结果
+     */
+    int deleteSceneLinkageByIds(Long[] ids);
 }

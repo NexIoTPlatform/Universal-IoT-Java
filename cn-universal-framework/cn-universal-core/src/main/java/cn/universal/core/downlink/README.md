@@ -125,38 +125,34 @@ public class CustomDownlinkInterceptor implements DownlinkInterceptor {
 
 ### 2. 在协议实现中使用
 
-拦截器会自动应用到所有实现了 `IDown` 接口的协议服务中。无需额外配置，只要将拦截器注册为 Spring Bean
-即可。
+拦截器会自动应用到所有实现了 `IDown` 接口的协议服务中。无需额外配置，只要将拦截器注册为 Spring Bean 即可。
 
 ## 📋 拦截器执行阶段
 
 ### PRE 阶段（前置阶段）
-
 - **执行时机**：在消息转换（convert）之前
 - **适用场景**：
-    - ✅ 鉴权认证
-    - ✅ 参数校验
-    - ✅ 限流控制
-    - ✅ 日志记录
-    - ✅ 监控统计
+  - ✅ 鉴权认证
+  - ✅ 参数校验
+  - ✅ 限流控制
+  - ✅ 日志记录
+  - ✅ 监控统计
 
 ### MID 阶段（中置阶段）
-
 - **执行时机**：在消息转换（convert）之后，协议处理器（processor）之前
 - **适用场景**：
-    - ✅ 数据增强
-    - ✅ 编解码处理
-    - ✅ 影子服务集成
-    - ✅ 业务规则校验
+  - ✅ 数据增强
+  - ✅ 编解码处理
+  - ✅ 影子服务集成
+  - ✅ 业务规则校验
 
 ### POST 阶段（后置阶段）
-
 - **执行时机**：在协议处理器（processor）执行之后
 - **适用场景**：
-    - ✅ 结果处理
-    - ✅ 通知推送
-    - ✅ 审计日志
-    - ✅ 数据持久化
+  - ✅ 结果处理
+  - ✅ 通知推送
+  - ✅ 审计日志
+  - ✅ 数据持久化
 
 ## 🔧 上下文对象
 
@@ -190,19 +186,16 @@ context.removeAttribute(key);      // 移除属性
 ## 🎯 内置拦截器
 
 ### 1. DownlinkLoggingInterceptor（日志拦截器）
-
 - **Order**: 1000
 - **Phase**: PRE
 - **功能**: 记录下行消息的详细日志
 
 ### 2. DownlinkMetricsInterceptor（监控拦截器）
-
 - **Order**: 10
 - **Phase**: PRE
 - **功能**: 收集性能指标（耗时、成功率等）
 
 ### 3. DownlinkValidationInterceptor（校验拦截器）
-
 - **Order**: 50
 - **Phase**: PRE
 - **功能**: 校验必要参数
@@ -210,7 +203,6 @@ context.removeAttribute(key);      // 移除属性
 ## 💡 最佳实践
 
 ### 1. 拦截器命名规范
-
 ```java
 // 建议使用：Downlink + 功能 + Interceptor
 DownlinkAuthenticationInterceptor  // 鉴权拦截器
@@ -219,7 +211,6 @@ DownlinkCodecInterceptor           // 编解码拦截器
 ```
 
 ### 2. Order 值建议
-
 ```
 0-100:    系统级拦截器（鉴权、限流、监控）
 100-500:  业务级拦截器（数据处理、编解码）
@@ -227,7 +218,6 @@ DownlinkCodecInterceptor           // 编解码拦截器
 ```
 
 ### 3. 错误处理
-
 ```java
 @Override
 public boolean preHandle(DownlinkContext<?> context) throws Exception {
@@ -243,7 +233,6 @@ public boolean preHandle(DownlinkContext<?> context) throws Exception {
 ```
 
 ### 4. 使用上下文传递数据
-
 ```java
 // 在前置拦截器中存储数据
 @Override
@@ -262,7 +251,6 @@ public void postHandle(DownlinkContext<?> context) {
 ```
 
 ### 5. 条件执行
-
 ```java
 @Override
 public boolean supports(DownlinkContext<?> context) {
@@ -381,7 +369,6 @@ public class DownlinkAuthenticationInterceptor implements DownlinkInterceptor {
 ## 🐛 调试和测试
 
 ### 启用调试日志
-
 ```yaml
 logging:
   level:
@@ -389,7 +376,6 @@ logging:
 ```
 
 ### 查看拦截器链信息
-
 ```java
 @Resource
 private DownlinkInterceptorChain interceptorChain;

@@ -36,9 +36,7 @@
                   :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="handleQuery"><iot-icon
                 type="icon-search"/>{{ $t('button.query') }}</a-button>
-              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{
-                  $t('button.reset')
-                }}</a-button>
+              <a-button style="margin-left: 8px" @click="resetQuery"><iot-icon type="icon-refresh"/>{{ $t('button.reset') }}</a-button>
               <a @click="toggleAdvanced" style="margin-left: 8px">
                 {{ advanced ? $t('button.collapse') : $t('button.expand') }}
                 <a-icon :type="advanced ? 'up' : 'down'"/>
@@ -53,8 +51,7 @@
       <a-button type="primary" @click="$refs.createForm.handleAdd()"
                 v-hasPermi="['system:instance:add']">
         <iot-icon type="icon-u-add"/>
-        {{ $t('button.add') }}
-      </a-button>
+       {{ $t('button.add') }}</a-button>
       <!--
             <a-button type="primary" @click="$refs.ImportProductForm.handleImport()" v-hasPermi="['product:device:import']">
               <a-icon type="import" />导入
@@ -64,17 +61,14 @@
                 @click="$refs.createForm.handleUpdate(undefined, ids)"
                 v-hasPermi="['system:instance:edit']">
         <iot-icon type="icon-u-edit"/>
-        {{ $t('button.edit') }}
-      </a-button>
+       {{ $t('button.edit') }}</a-button>
       <a-button type="danger" :disabled="multiple" @click="handleDelete"
                 v-hasPermi="['system:instance:remove']">
         <iot-icon type="icon-u-del"/>
-        {{ $t('button.delete') }}
-      </a-button>
+       {{ $t('button.delete') }}</a-button>
       <a-button type="primary" @click="handleExport" v-hasPermi="['system:instance:export']">
         <iot-icon type="icon-u-export"/>
-        {{ $t('button.export') }}
-      </a-button>
+       {{ $t('button.export') }}</a-button>
       <a-button
         type="dashed"
         shape="circle"
@@ -346,14 +340,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return delInstance(ids)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

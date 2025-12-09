@@ -14,7 +14,7 @@
   <properties>
     <maven.test.skip>true</maven.test.skip>
     <java.version>21</java.version>
-    <mysql-connector-java.version>8.0.33</mysql-connector-java.version>
+    <mysql-connector-java.version>9.5.0</mysql-connector-java.version>
   </properties>
   <dependencies>
     <!-- 以spring-boot-starter的方式引用 -->
@@ -110,8 +110,8 @@
     <!--      <version>${project.version}</version>-->
     <!--    </dependency>-->
     <dependency>
-      <artifactId>mysql-connector-java</artifactId>
-      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <groupId>com.mysql</groupId>
       <version>${mysql-connector-java.version}</version>
     </dependency>
     <dependency>
@@ -163,7 +163,11 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>cn.universal.iot</groupId>
+      <artifactId>cn-wvp-protocol</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>cn.universal.iot</groupId>
       <artifactId>cn-universal-mqtt-protocol</artifactId>
@@ -174,7 +178,11 @@
       <artifactId>cn-universal-http-protocol</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>cn.universal.iot</groupId>
+      <artifactId>nexiot-jar-deiver-extend-plugins</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.pulsar</groupId>
       <artifactId>pulsar-client</artifactId>
@@ -249,7 +257,7 @@
     </dependency>
     <dependency>
       <groupId>cn.universal.iot</groupId>
-      <artifactId>cn-universal-plugins-web-debug</artifactId>
+      <artifactId>nexiot-web-ide-debug-plugins</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
@@ -288,6 +296,39 @@
       </resource>
     </resources>
     <plugins>
+      <!-- 依赖与重复类安全规则，避免引入高风险组件与类冲突 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>enforce-security</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <!-- 当前阶段以警告提示为主，不中断构建。后续可切换为严格失败。 -->
+              <fail>false</fail>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.8.1,)</version>
+                </requireMavenVersion>
+                <!-- 依赖版本上限与收敛性检查，避免冲突与潜在风险 -->
+                <requireUpperBoundDeps/>
+                <dependencyConvergence/>
+                <bannedDependencies>
+                  <excludes>
+                    <!-- 避免引入已知风险日志组件 -->
+                    <exclude>commons-logging:commons-logging</exclude>
+                    <exclude>log4j:log4j</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -450,17 +491,27 @@
           <source>21</source>
           <target>21</target>
           <encoding>UTF-8</encoding>
+          <!-- 默认保留参数名（开发/测试友好），在 prod/docker profile 中覆盖为更严格设置 -->
           <parameters>true</parameters>
-          <compilerArgs>
-            <arg>-parameters</arg>
-          </compilerArgs>
         </configuration>
       </plugin>
     </plugins>
+
+    <!-- 如需在 IDE 中忽略 maven-dependency-plugin 的执行，请将 m2e lifecycle-mapping
+         放置在顶层聚合 POM 的 pluginManagement 中，避免子模块触发 Plugin not found。 -->
   </build>
   <!--MAVEN打包选择运行环境-->
   <!-- 1:local(默认) 本地 2:platform:开发环境 3:test 4:uat 用户验收测试 5.pro:生产环境-->
   <profiles>
+    <profile>
+      <id>local</id>
+      <properties>
+        <profileActive>local</profileActive>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
     <profile>
       <id>dev</id>
       <properties>
@@ -471,46 +522,9 @@
       </activation>
     </profile>
     <profile>
-      <id>prod</id>
-      <properties>
-        <profileActive>prod</profileActive>
-      </properties>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-    </profile>
-    <!-- 外网测试环境-->
-    <profile>
-      <id>test</id>
-      <properties>
-        <profileActive>test</profileActive>
-      </properties>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-    </profile>
-    <profile>
       <id>docker</id>
       <properties>
         <profileActive>docker</profileActive>
-      </properties>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-    </profile>
-    <profile>
-      <id>test2</id>
-      <properties>
-        <profileActive>test2</profileActive>
-      </properties>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-    </profile>
-    <profile>
-      <id>huo</id>
-      <properties>
-        <profileActive>huo</profileActive>
       </properties>
       <activation>
         <activeByDefault>false</activeByDefault>

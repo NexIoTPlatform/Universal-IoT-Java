@@ -190,7 +190,7 @@ public class FenceService extends IoTUPPushAdapter {
     if (Objects.isNull(ioTDeviceLog)) {
       return null;
     }
-    if (!downRequest.getProperties().containsKey(DeviceManagerConstant.COORDINATE)) {
+    if (!downRequest.getProperties().containsKey(DeviceManagerConstant.COORDINATES)) {
       return null;
     }
     if (StrUtil.isNotEmpty(ioTDeviceGeoFence.getWeekTime())) {
@@ -227,8 +227,8 @@ public class FenceService extends IoTUPPushAdapter {
         JSONUtil.parseObj(ioTDeviceLog.getContent()).getJSONObject("properties");
     double lastLng;
     double lastLat;
-    if (properties.containsKey(DeviceManagerConstant.COORDINATE)) {
-      String[] coordinate = properties.getStr(DeviceManagerConstant.COORDINATE).split(",");
+    if (properties.containsKey(DeviceManagerConstant.COORDINATES)) {
+      String[] coordinate = properties.getStr(DeviceManagerConstant.COORDINATES).split(",");
       lastLng = Double.parseDouble(coordinate[0]);
       lastLat = Double.parseDouble(coordinate[1]);
     } else {
@@ -274,7 +274,7 @@ public class FenceService extends IoTUPPushAdapter {
     boolean lastIn = false;
 
     String[] coordinate =
-        downRequest.getProperties().get(DeviceManagerConstant.COORDINATE).toString().split(",");
+        downRequest.getProperties().get(DeviceManagerConstant.COORDINATES).toString().split(",");
     double lng = Double.parseDouble(coordinate[0]);
     double lat = Double.parseDouble(coordinate[1]);
 
@@ -323,8 +323,8 @@ public class FenceService extends IoTUPPushAdapter {
                 put("fenceId", ioTDeviceGeoFence.getId());
                 put("fenceName", ioTDeviceGeoFence.getName());
                 put(
-                    DeviceManagerConstant.COORDINATE,
-                    downRequest.getProperties().get(DeviceManagerConstant.COORDINATE));
+                    DeviceManagerConstant.COORDINATES,
+                    downRequest.getProperties().get(DeviceManagerConstant.COORDINATES));
               }
             };
         request.setData(data);
@@ -347,8 +347,8 @@ public class FenceService extends IoTUPPushAdapter {
                 put("fenceId", ioTDeviceGeoFence.getId());
                 put("fenceName", ioTDeviceGeoFence.getName());
                 put(
-                    DeviceManagerConstant.COORDINATE,
-                    downRequest.getProperties().get(DeviceManagerConstant.COORDINATE));
+                    DeviceManagerConstant.COORDINATES,
+                    downRequest.getProperties().get(DeviceManagerConstant.COORDINATES));
               }
             };
         request.setData(data);

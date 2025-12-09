@@ -16,7 +16,24 @@ export default {
     type: {
       type: String,
       required: false,
-      validator: value => !value || ['DEVICE', 'GATEWAY', 'GATEWAY_SUB_DEVICE'].includes(value)
+      validator: value => {
+        if (!value) return true;
+        const allowedTypes = [
+          // 设备类型
+          'DEVICE', 'GATEWAY', 'GATEWAY_SUB_DEVICE', 'VIDEO_DEVICE',
+          // 驱动类型
+          'jar', 'jscript', 'magic',
+          // 数据源范围
+          'ALL_PRODUCTS', 'SPECIFIC_PRODUCTS', 'APPLICATION',
+          // 桥接类型
+          'JDBC', 'KAFKA', 'MQTT', 'HTTP', 'IOTDB', 'INFLUXDB',
+          // 状态
+          'ENABLED', 'DISABLED', '1', '0',
+          // 数据方向
+          'INPUT', 'OUTPUT', 'BIDIRECTIONAL', 'IN', 'OUT'
+        ];
+        return allowedTypes.includes(value);
+      }
     },
     // 显示文本（必填，完全自定义）
     text: {
@@ -27,8 +44,7 @@ export default {
     color: {
       type: String,
       default: '',
-      validator: value => ['', 'blue', 'green', 'orange', 'red', 'purple', 'cyan',
-        'magenta'].includes(value)
+      validator: value => ['', 'blue', 'green', 'orange', 'red', 'purple', 'cyan', 'magenta'].includes(value)
     },
     // 自定义背景色
     backgroundColor: {
@@ -109,6 +125,7 @@ export default {
         'DEVICE': '直',
         'GATEWAY': '网',
         'GATEWAY_SUB_DEVICE': '子',
+        'VIDEO_DEVICE': '视',
         // 数据源范围
         'ALL_PRODUCTS': '全量',
         'SPECIFIC_PRODUCTS': '定向',
@@ -142,6 +159,7 @@ export default {
         'DEVICE': 'blue',
         'GATEWAY': 'green',
         'GATEWAY_SUB_DEVICE': 'orange',
+        'VIDEO_DEVICE': 'purple',
         // 驱动类型
         'jar': 'blue',
         'jscript': 'orange',
@@ -229,6 +247,12 @@ export default {
   background-color: #fa8c16;
   color: white;
   border: 1px solid #ffc53d;
+}
+
+.device-type-badge-video_device {
+  background-color: #722ed1;
+  color: white;
+  border: 1px solid #9254de;
 }
 
 /* 颜色主题 */

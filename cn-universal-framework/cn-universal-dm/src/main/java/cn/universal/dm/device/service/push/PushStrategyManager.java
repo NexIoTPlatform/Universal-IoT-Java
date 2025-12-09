@@ -21,6 +21,8 @@ import cn.universal.persistence.base.BaseUPRequest;
 import cn.universal.persistence.entity.bo.UPPushBO;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -120,7 +122,7 @@ public class PushStrategyManager {
         });
 
     // 执行推送后处理器
-    upProcessorManager.executeAfterPush(List.of(request), results);
+    upProcessorManager.executeAfterPush(Stream.of(request).collect(Collectors.toList()), results);
 
     log.debug("[推送策略管理器] 推送完成: {}", request.getIotId());
     return results;

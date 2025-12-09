@@ -60,6 +60,7 @@ public class PropertyMetadata implements AbstractPropertyMetadata {
     this.name = another.getName();
     this.description = another.getDescription();
     this.valueType = another.getValueType();
+    this.mode = another.getMode();
     this.expands = another.getExpands() == null ? null : new HashMap<>(another.getExpands());
   }
 
@@ -113,6 +114,7 @@ public class PropertyMetadata implements AbstractPropertyMetadata {
     json.set("name", name);
     json.set("description", description);
     json.set("valueType", ValueTypeCodecs.encode(getValueType()).orElse(null));
+    json.set("mode", getMode());
     json.set("expands", expands);
     return json;
   }
@@ -124,6 +126,7 @@ public class PropertyMetadata implements AbstractPropertyMetadata {
       this.id = json.getStr("id");
       this.name = json.getStr("name");
       this.description = json.getStr("description");
+      this.mode = json.getStr("mode");
       this.valueType = null;
       this.expands = json.getJSONObject("expands");
     }

@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -291,7 +292,7 @@ public class NetworkServiceImpl implements INetworkService {
     }
     // 启用/停用状态
     vo.setEnableName(Boolean.TRUE.equals(network.getState()) ? "已启用" : "已停用");
-    // 实际运行状态
+    // 实际运行状态和绑定产品
     String type = network.getType();
     String productKey = network.getProductKey();
     String unionId = network.getUnionId();
@@ -310,17 +311,29 @@ public class NetworkServiceImpl implements INetworkService {
         vo.setStateName("未启动");
         vo.setRunning(Boolean.FALSE);
       }
-
-    } else if (NetworkType.MQTT_CLIENT.getId().equals(type)
-        || NetworkType.MQTT_SERVER.getId().equals(type)) {
-      if (mqttServerManager != null && mqttServerManager.isConnected(unionId)) {
-        vo.setStateName("已启动");
-        vo.setRunning(Boolean.TRUE);
-      } else {
-        vo.setStateName("未启动");
-        vo.setRunning(Boolean.FALSE);
+      // TCP类型查询绑定产品
+      if (NetworkType.TCP_SERVER.getId().equals(type)) {
+        IoTProductBO ioTProductBO =
+            ioTProductMapper.selectTcpProductsUseNetwork(productKey);
+        vo.setBindTcpServerProductCount(ioTProductBO == null ? 0 : 1);
+        vo.setBindTcpServerProducts(ioTProductBO);
       }
-    } else if (NetworkType.UDP.getId().equals(type)) {
+
+      } else if (NetworkType.MQTT_CLIENT.getId().equals(type)
+          || NetworkType.MQTT_SERVER.getId().equals(type)) {
+        // 查询MQTT绑定产品
+        List<IoTProductBO> ioTProductBOS = ioTProductMapper.selectMqttProductsUseNetwork(unionId);
+        vo.setBindMqttServerProductCount(CollUtil.size(ioTProductBOS));
+        vo.setBindMqttServerProducts(ioTProductBOS);
+        // 查询运行状态
+        if (mqttServerManager != null && mqttServerManager.isConnected(unionId)) {
+          vo.setStateName("已启动");
+          vo.setRunning(Boolean.TRUE);
+        } else {
+          vo.setStateName("未启动");
+          vo.setRunning(Boolean.FALSE);
+        }
+      } else if (NetworkType.UDP.getId().equals(type)) {
       if (udpClusterService != null && udpClusterService.isProductServerAlive(productKey)) {
         vo.setStateName("已启动");
         vo.setRunning(Boolean.TRUE);
@@ -480,13 +493,26 @@ public class NetworkServiceImpl implements INetworkService {
         }
       }
     }
-    return networkMapper.deleteNetworkById(id);
+    int ct = networkMapper.deleteNetworkById(id);
+    if (ct <= 0) {
+      throw new RuntimeException("删除失败,请重试");
+    }
+    ioTProductMapper.updateNetworkProductsUseNetwork(network.getUnionId());
+    return ct;
   }
 
   @Override
   @Transactional
   public int deleteNetworkByIds(Integer[] ids) {
-    return networkMapper.deleteNetworkByIds(ids);
+    if (ids == null || ids.length == 0) {
+      return 0;
+    }
+    int count = 0;
+    for (Integer id : ids) {
+      count=  ((INetworkService) AopContext.currentProxy()).deleteNetworkById(id);
+      count++;
+    }
+    return count;
   }
 
   @Override

@@ -9,13 +9,11 @@
 ### 步骤1：理解新架构
 
 **改造前的流程**：
-
 ```
 IDown.doAction() → AbstractDownService.convert() → XxxDownProcessorChain.process()
 ```
 
 **改造后的流程**：
-
 ```
 IDown.doAction() 
   → createContext()                    // 创建上下文
@@ -287,24 +285,20 @@ public class MQTTDownService extends AbstractDownService<MQTTDownRequest> implem
 ## 🎯 改造要点总结
 
 ### ✅ 必须实现的方法
-
 1. `createContext(Object msg)` - 创建下行上下文
 2. `doProcess(DownlinkContext<?> context)` - 核心处理逻辑
 3. `getInterceptorChain()` - 获取拦截器链
 
 ### ✅ 必须添加的依赖
-
 ```java
 @Resource private DownlinkInterceptorChain downlinkInterceptorChain;
 ```
 
 ### ✅ 必须移除的方法
-
 - `doAction(String msg)` - 使用接口默认实现
 - `doAction(JSONObject msg)` - 使用接口默认实现
 
 ### ✅ 保持不变的方法
-
 - `code()` - 协议代码
 - `name()` - 协议名称
 - `convert()` - 消息转换逻辑
@@ -312,13 +306,11 @@ public class MQTTDownService extends AbstractDownService<MQTTDownRequest> implem
 ## 🔍 逐步迁移策略
 
 ### 方案1：一次性迁移（推荐用于新协议）
-
 直接按照上述步骤改造，一次性启用拦截器模式。
 
 ### 方案2：渐进式迁移（推荐用于现有协议）
 
 #### 阶段1：兼容模式（支持新旧两种方式）
-
 ```java
 @Override
 public R doAction(String msg) {
@@ -342,7 +334,6 @@ private boolean enableInterceptor() {
 ```
 
 #### 阶段2：灰度发布
-
 ```yaml
 # application.yml
 downlink:
@@ -354,13 +345,11 @@ downlink:
 ```
 
 #### 阶段3：全面启用
-
 移除兼容代码，完全使用新模式。
 
 ## 🧪 测试清单
 
 ### 功能测试
-
 - [ ] 下行消息能正常发送
 - [ ] 拦截器按顺序执行
 - [ ] 拦截器可以中断执行
@@ -368,13 +357,11 @@ downlink:
 - [ ] 异常能正确处理
 
 ### 性能测试
-
 - [ ] 拦截器对性能影响在可接受范围内（< 5%）
 - [ ] 并发场景下正常工作
 - [ ] 无内存泄漏
 
 ### 兼容性测试
-
 - [ ] 现有业务功能不受影响
 - [ ] 各协议下行正常
 - [ ] 第三方平台下行正常
@@ -382,7 +369,6 @@ downlink:
 ## 📋 其他协议改造示例
 
 ### TCP 协议改造
-
 ```java
 @Service("tcpDownService")
 public class TcpDownService extends AbstractDownService<TcpDownRequest> implements IDown {
@@ -406,7 +392,6 @@ public class TcpDownService extends AbstractDownService<TcpDownRequest> implemen
 ```
 
 ### HTTP 协议改造
-
 ```java
 @Service("httpDownService")
 public class HttpDownService extends AbstractDownService<HttpDownRequest> implements IDown {
@@ -432,23 +417,18 @@ public class HttpDownService extends AbstractDownService<HttpDownRequest> implem
 ## ⚠️ 常见问题
 
 ### Q1: 为什么不能直接在 IDown 接口中注入 DownlinkInterceptorChain？
-
 A: 接口不能有成员变量，需要由实现类通过依赖注入提供。
 
 ### Q2: 拦截器链为 null 怎么办？
-
 A: `doActionWithInterceptors()` 中已经做了 null 检查，即使拦截器链为 null，也能正常工作。
 
 ### Q3: 如何禁用某个拦截器？
-
 A: 在拦截器中实现 `isEnabled()` 方法，返回 false。
 
 ### Q4: 拦截器执行顺序如何控制？
-
 A: 通过 `getOrder()` 方法和 `@Order` 注解控制，数字越小越先执行。
 
 ### Q5: 如何只对特定协议应用拦截器？
-
 A: 在拦截器的 `supports()` 方法中判断协议类型。
 
 ## 📚 相关文档

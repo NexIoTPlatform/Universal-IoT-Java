@@ -128,21 +128,9 @@ public class IoTUser implements Serializable {
   @Excel(name = "备注")
   private String remark;
 
-  /** 接入数 */
-  @Column(name = "license")
-  @Excel(name = "接入数")
-  private Integer license;
-
-  /** 接入数 */
-  @Column(name = "license_total_amount")
-  @Excel(name = "接入数总额度")
-  private Integer licenseTotalAmount;
-
   private String cfg;
 
-  @Column(name = "register_from")
-  @Excel(name = "注册来源")
-  private String registerFrom;
+  
 
   /** 0-正常，1-删除 */
   private Integer deleted;

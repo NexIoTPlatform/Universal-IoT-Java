@@ -23,9 +23,9 @@
           </a-select-option>
         </a-select>
       </a-form-model-item>
-      <a-form-model-item label="推送地址(url)" prop="url">
-        <a-input v-model="form.url" placeholder="请输入推送地址"/>
-        <a-button type="primary" @click="checkUrl">测试地址</a-button>
+      <a-form-model-item label="目标地址" prop="url">
+        <a-input v-model="form.url" placeholder="请输入目标地址(http/https)"/>
+        <a-button type="primary" @click="checkUrl">验证连接</a-button>
       </a-form-model-item>
       <div class="bottom-control">
         <a-space>

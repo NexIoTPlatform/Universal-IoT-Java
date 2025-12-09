@@ -40,6 +40,9 @@ public class Request implements Serializable {
   /** 消息原文 */
   private String payload;
 
+  /** 原始字节 */
+  private byte[] payloadRaw;
+
   /** 设备名称 */
   private String deviceName;
 

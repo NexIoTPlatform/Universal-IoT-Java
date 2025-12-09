@@ -38,13 +38,11 @@
             <a-button type="primary" size="small" style="min-width:48px;height:24px;font-size:12px;"
                       @click="handleQuery" class="modern-btn">
               <a-icon type="search"/>
-              {{ $t('button.query') }}
-            </a-button>
+              {{ $t('button.query') }} </a-button>
             <a-button size="small" style="min-width:48px;height:24px;font-size:12px;"
                       @click="resetQuery" class="modern-btn">
               <a-icon type="redo"/>
-              {{ $t('button.reset') }}
-            </a-button>
+              {{ $t('button.reset') }} </a-button>
           </a-space>
         </a-col>
       </a-row>
@@ -307,10 +305,8 @@ export default {
       this.queryParam.deviceId = this.deviceId
       if (this.createTimeRange.length > 0) {
         // 将日期转换为 ISO 格式字符串，后端 LocalDateTime 可以自动解析
-        this.queryParam.params['beginCreateTime'] = this.createTimeRange[0].format(
-          'YYYY-MM-DD HH:mm:ss')
-        this.queryParam.params['endCreateTime'] = this.createTimeRange[1].format(
-          'YYYY-MM-DD HH:mm:ss')
+        this.queryParam.params['beginCreateTime'] = this.createTimeRange[0].format('YYYY-MM-DD HH:mm:ss')
+        this.queryParam.params['endCreateTime'] = this.createTimeRange[1].format('YYYY-MM-DD HH:mm:ss')
         console.log(this.queryParam.params['beginCreateTime'])
       } else {
         this.queryParam.params = {}

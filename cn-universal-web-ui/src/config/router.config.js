@@ -42,6 +42,47 @@ export const indexRouterMap = [
         }
       }
     ]
+  },
+  {
+    path: '/video',
+    name: 'Video',
+    component: 'RouteView',
+    hidden: false,
+    redirect: '/video/center',
+    children: [
+      {
+        path: '/video/center',
+        name: 'VideoCenter',
+        component: 'VideoCenter',
+        hidden: false,
+        meta: {
+          title: '平台管理',
+          noCache: true,
+          icon: 'cloud-server'
+        }
+      },
+      {
+        path: '/video/devices',
+        name: 'VideoDevices',
+        component: 'VideoDevices',
+        hidden: false,
+        meta: {
+          title: '设备管理',
+          noCache: true,
+          icon: 'video-camera'
+        }
+      },
+      {
+        path: '/video/center/:instanceKey',
+        name: 'VideoPlatformDetail',
+        component: 'VideoPlatformDetail',
+        hidden: true,
+        meta: {
+          title: '平台详情',
+          noCache: true
+        }
+      }
+    ]
   }
 ]
 /**
@@ -113,8 +154,9 @@ export const otherRouterMap = [
     meta: {
       title: '应用详情',
       noCache: true,
-      selected: ['Application'],
-      open: ['Application']
+      hidden: true,
+      selected: ['ApplicationList'],  // 选中"应用开发"子菜单
+      open: ['App']                    // 展开"北向应用"父菜单
     },
     hidden: true
   },
@@ -130,14 +172,28 @@ export const otherRouterMap = [
     }
   },
   {
+    path: '/product/details/:id',
+    name: 'productDetails',
+    component: 'productDetails',
+    meta: {
+      title: '产品详情',
+      noCache: true,
+      hidden: true,
+      selected: ['Product'],   // 选中"所有产品"子菜单
+      open: ['Product']        // 展开"产品管理"父菜单
+    },
+    hidden: true
+  },
+  {
     path: '/rule/flow/detail/:id',
     name: 'ruleFlowDetail',
     component: 'ruleFlowDetail',
     meta: {
       title: '数据流转详情',
       noCache: true,
-      selected: ['Flow'],
-      open: ['Rule']
+      hidden: true,
+      selected: ['Flow'],      // 选中"数据转发"子菜单
+      open: ['Rule']           // 展开"规则引擎"父菜单
     },
     hidden: true
   },
@@ -148,8 +204,9 @@ export const otherRouterMap = [
     meta: {
       title: '设备详情',
       noCache: true,
-      selected: ['Instance'],
-      open: ['Instance']
+      hidden: true,
+      selected: ['Device'],    // 选中"所有设备"子菜单
+      open: ['Iot']            // 展开"设备管理"父菜单
     },
     hidden: true
   },
@@ -160,20 +217,9 @@ export const otherRouterMap = [
     meta: {
       title: '批量历史',
       noCache: true,
-      selected: ['Devicesconfig'],
-      open: ['Instance']
-    },
-    hidden: true
-  },
-  {
-    path: '/product/details/:id',
-    name: 'productDetails',
-    component: 'productDetails',
-    meta: {
-      title: '产品详情',
-      noCache: true,
-      selected: ['Product'],
-      open: ['Product']
+      hidden: true,
+      selected: ['Device'],    // 选中"所有设备"子菜单
+      open: ['Iot']            // 展开"设备管理"父菜单
     },
     hidden: true
   },
@@ -185,8 +231,9 @@ export const otherRouterMap = [
     meta: {
       title: 'TCP网络组件详情',
       noCache: true,
-      selected: ['Tcp'],
-      open: ['Network']
+      hidden: true,
+      selected: ['Tcp'],       // 选中"TCP服务"子菜单
+      open: ['Network']        // 展开"通信组件"父菜单
     },
     hidden: true
   },
@@ -197,8 +244,9 @@ export const otherRouterMap = [
     meta: {
       title: 'MQTT网络组件详情',
       noCache: true,
-      selected: ['Mqttt'],
-      open: ['Network']
+      hidden: true,
+      selected: ['Mqtt'],      // 选中"MQTT服务"子菜单
+      open: ['Network']        // 展开"通信组件"父菜单
     },
     hidden: true
   },
@@ -214,6 +262,58 @@ export const otherRouterMap = [
     name: 'ImouPlayer',
     component: 'ImouPlayer',
     meta: {title: '乐橙播放', noCache: true},
+    hidden: true
+  },
+  {
+    path: '/videoCenter/detail/:instanceKey',
+    name: 'VideoPlatformDetail',
+    component: 'VideoPlatformDetail',
+    meta: { 
+      title: '平台详情', 
+      noCache: true, 
+      hidden: true,
+      selected: ['Third'],     // 选中"互联互通"子菜单
+      open: ['VideoCenter']    // 展开"视频中心"父菜单
+    },
+    hidden: true
+  },
+  {
+    path: '/videoCenter/wvp/:instanceKey/:deviceId/:channelId?',
+    name: 'WvpPlatformDetail',
+    component: 'WvpPlatformDetail',
+    meta: { 
+      title: 'WVP通道详情', 
+      noCache: true, 
+      hidden: true,
+      selected: ['Third'],     // 选中"互联互通"子菜单
+      open: ['VideoCenter']    // 展开"视频中心"父菜单
+    },
+    hidden: true
+  },
+  {
+    path: '/videoCenter/hik/:instanceKey/:deviceId/:channelId?',
+    name: 'HikIcsPlatformDetail',
+    component: 'HikIcsPlatformDetail',
+    meta: { 
+      title: '海康ISC通道详情',
+      noCache: true, 
+      hidden: true,
+      selected: ['Third'],     // 选中"互联互通"子菜单
+      open: ['VideoCenter']    // 展开"视频中心"父菜单
+    },
+    hidden: true
+  },
+  {
+    path: '/videoCenter/dahua/:instanceKey/:deviceId/:channelId?',
+    name: 'DahuaIccPlatformDetail',
+    component: 'DahuaIccPlatformDetail',
+    meta: { 
+      title: '大华ICC通道详情', 
+      noCache: true, 
+      hidden: true,
+      selected: ['Third'],     // 选中"互联互通"子菜单
+      open: ['VideoCenter']    // 展开"视频中心"父菜单
+    },
     hidden: true
   }
 ]

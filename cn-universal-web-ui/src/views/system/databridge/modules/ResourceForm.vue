@@ -53,13 +53,12 @@
               <div class="form-help-text">建议使用有意义的名称，便于后续管理</div>
             </a-form-model-item>
 
-            <a-form-model-item label="数据方向" prop="dataDirection" required
-                               class="form-item-large">
+            <a-form-model-item label="数据方向" prop="dataDirection" required class="form-item-large">
               <div class="direction-cards">
                 <div
                   class="direction-card"
-                  :class="{ active: form.dataDirection === 'OUTPUT' }"
-                  @click="selectDirection('OUTPUT')"
+                  :class="{ active: form.dataDirection === 'OUTPUT', disabled: isEditAndEnabled }"
+                  @click="!isEditAndEnabled && selectDirection('OUTPUT')"
                 >
                   <div class="card-icon">
                     <a-icon type="upload"/>
@@ -75,8 +74,8 @@
                 </div>
                 <div
                   class="direction-card"
-                  :class="{ active: form.dataDirection === 'INPUT' }"
-                  @click="selectDirection('INPUT')"
+                  :class="{ active: form.dataDirection === 'INPUT', disabled: isEditAndEnabled }"
+                  @click="!isEditAndEnabled && selectDirection('INPUT')"
                 >
                   <div class="card-icon">
                     <a-icon type="download"/>
@@ -92,8 +91,8 @@
                 </div>
                 <div
                   class="direction-card"
-                  :class="{ active: form.dataDirection === 'BIDIRECTIONAL' }"
-                  @click="selectDirection('BIDIRECTIONAL')"
+                  :class="{ active: form.dataDirection === 'BIDIRECTIONAL', disabled: isEditAndEnabled }"
+                  @click="!isEditAndEnabled && selectDirection('BIDIRECTIONAL')"
                 >
                   <div class="card-icon">
                     <a-icon type="swap"/>
@@ -114,14 +113,13 @@
               <a-select
                 v-model="form.type"
                 placeholder="请选择数据源类型"
-                :disabled="!form.dataDirection"
+                :disabled="!form.dataDirection || isEditAndEnabled"
                 @change="handleTypeChange"
                 size="large"
                 class="resource-type-select"
               >
                 <!-- 数据库类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.databases).length > 0"
-                                    label="数据库">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.databases).length > 0" label="数据库">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.databases"
                     :key="key"
@@ -133,8 +131,7 @@
                 </a-select-opt-group>
 
                 <!-- 消息队列类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.messageQueues).length > 0"
-                                    label="消息队列">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.messageQueues).length > 0" label="消息队列">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.messageQueues"
                     :key="key"
@@ -146,8 +143,7 @@
                 </a-select-opt-group>
 
                 <!-- 时序数据库类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.timeSeries).length > 0"
-                                    label="时序数据库">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.timeSeries).length > 0" label="时序数据库">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.timeSeries"
                     :key="key"
@@ -159,8 +155,7 @@
                 </a-select-opt-group>
 
                 <!-- 搜索引擎类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.searchEngines).length > 0"
-                                    label="搜索引擎">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.searchEngines).length > 0" label="搜索引擎">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.searchEngines"
                     :key="key"
@@ -172,8 +167,7 @@
                 </a-select-opt-group>
 
                 <!-- 云平台类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.cloudPlatforms).length > 0"
-                                    label="云平台">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.cloudPlatforms).length > 0" label="云平台">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.cloudPlatforms"
                     :key="key"
@@ -185,8 +179,7 @@
                 </a-select-opt-group>
 
                 <!-- 其他类型 -->
-                <a-select-opt-group v-if="Object.keys(resourceTypes.others).length > 0"
-                                    label="其他">
+                <a-select-opt-group v-if="Object.keys(resourceTypes.others).length > 0" label="其他">
                   <a-select-option
                     v-for="(name, key) in resourceTypes.others"
                     :key="key"
@@ -204,7 +197,7 @@
               <a-select
                 v-model="form.pluginType"
                 placeholder="请选择插件类型"
-                :disabled="!form.type"
+                :disabled="!form.type || isEditAndEnabled"
                 @change="handlePluginTypeChange"
                 size="large"
                 class="plugin-type-select"
@@ -255,6 +248,17 @@
           <div class="step-header">
             <h3>连接配置</h3>
             <p>配置与外部系统的连接参数</p>
+          </div>
+
+          <!-- 连接测试状态提示 -->
+          <div v-if="connectionTestStatus" class="connection-test-status" style="margin-bottom: 16px;">
+            <a-alert
+              :message="connectionTestStatus.message"
+              :type="connectionTestStatus.success ? 'success' : 'error'"
+              :show-icon="true"
+              :closable="true"
+              @close="connectionTestStatus = null"
+            />
           </div>
 
           <div class="form-section" v-if="dynamicFields.length > 0">
@@ -328,6 +332,22 @@
                     :rows="3"
                   />
                 </a-form-model-item>
+              </div>
+            </div>
+
+            <!-- 连接测试按钮 -->
+            <div class="connection-test-section" style="margin-top: 24px; text-align: center;">
+              <a-button
+                type="primary"
+                icon="check-circle"
+                :loading="testingConnection"
+                @click="testConnection"
+                size="large"
+              >
+                测试连接
+              </a-button>
+              <div class="form-help-text" style="margin-top: 8px;">
+                请填写完连接信息后点击测试连接，连接成功后才能继续下一步
               </div>
             </div>
           </div>
@@ -517,7 +537,7 @@
 </template>
 
 <script>
-import {getAllResourceTypes} from '@/api/databridge/resource'
+import {getAllResourceTypes, testResourceConfig} from '@/api/databridge/resource'
 import {getPluginTypesByResourceType} from '@/api/databridge/plugin'
 import DataBridgeMappings from '@/utils/databridge-mappings'
 
@@ -550,6 +570,8 @@ export default {
       },
       dynamicFields: [], // 动态配置字段
       availablePlugins: [], // 可用的插件类型
+      testingConnection: false, // 是否正在测试连接
+      connectionTestStatus: null, // 连接测试状态 {success: boolean, message: string}
       form: {
         name: '',
         type: '',
@@ -588,13 +610,9 @@ export default {
   computed: {
     // 核心连接字段（主机、端口、用户名、密码等）
     coreConnectionFields() {
-      if (!this.dynamicFields || this.dynamicFields.length === 0) {
-        return []
-      }
+      if (!this.dynamicFields || this.dynamicFields.length === 0) return []
 
-      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName',
-        'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey',
-        'instanceId', 'projectId', 'appId', 'appSecret']
+      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName', 'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey', 'instanceId', 'projectId', 'appId', 'appSecret']
 
       return this.dynamicFields.filter(field =>
         coreFields.includes(field.field) && field.config && field.config.required
@@ -603,17 +621,17 @@ export default {
 
     // 高级配置字段（非核心字段）
     advancedFields() {
-      if (!this.dynamicFields || this.dynamicFields.length === 0) {
-        return []
-      }
+      if (!this.dynamicFields || this.dynamicFields.length === 0) return []
 
-      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName',
-        'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey',
-        'instanceId', 'projectId', 'appId', 'appSecret']
+      const coreFields = ['host', 'port', 'username', 'password', 'database', 'databaseName', 'region', 'regionId', 'accessKeyId', 'accessKeySecret', 'secretId', 'secretKey', 'instanceId', 'projectId', 'appId', 'appSecret']
 
       return this.dynamicFields.filter(field =>
         !coreFields.includes(field.field) || (field.config && !field.config.required)
       )
+    },
+    // 判断是否为编辑模式且已启用
+    isEditAndEnabled() {
+      return this.formData && this.formData.id && this.form.status === 1
     }
   },
   watch: {
@@ -645,8 +663,7 @@ export default {
               this.form.dynamicConfig = extraConfigObj.dynamicConfig
               // 移除dynamicConfig，保留其他扩展配置
               delete extraConfigObj.dynamicConfig
-              this.form.extraConfig = Object.keys(extraConfigObj).length > 0 ? JSON.stringify(
-                extraConfigObj) : ''
+              this.form.extraConfig = Object.keys(extraConfigObj).length > 0 ? JSON.stringify(extraConfigObj) : ''
             } else {
               // 新格式：直接是动态配置 {host: ..., port: ..., ...}
               // 将extraConfig作为dynamicConfig
@@ -684,6 +701,9 @@ export default {
         }
         this.currentStep = 1
       }
+      // 重置连接测试状态
+      this.connectionTestStatus = null
+      this.testingConnection = false
     },
 
     // 步骤控制方法
@@ -718,6 +738,13 @@ export default {
             }
           }
         }
+        
+        // 检查连接是否已测试成功
+        if (!this.connectionTestStatus || !this.connectionTestStatus.success) {
+          this.$message.warning('请先测试连接，连接成功后才能继续下一步')
+          return
+        }
+        
         this.currentStep = 3
       }
     },
@@ -734,10 +761,9 @@ export default {
       this.handleDirectionChange()
     },
 
+
     getDirectionMessage() {
-      if (!this.form.dataDirection) {
-        return ''
-      }
+      if (!this.form.dataDirection) return ''
 
       const messages = {
         'INPUT': '数据输入模式：此资源的数据将导入到IoT平台',
@@ -749,9 +775,7 @@ export default {
     },
 
     getDirectionType() {
-      if (!this.form.dataDirection) {
-        return 'info'
-      }
+      if (!this.form.dataDirection) return 'info'
 
       const types = {
         'INPUT': 'processing',
@@ -823,11 +847,17 @@ export default {
 
           this.$emit('ok', formData)
           this.confirmLoading = false
+          // 保存成功后重置连接测试状态
+          this.connectionTestStatus = null
+          this.testingConnection = false
         }
       })
     },
 
     handleCancel() {
+      // 重置连接测试状态
+      this.connectionTestStatus = null
+      this.testingConnection = false
       this.$emit('cancel')
     },
 
@@ -878,8 +908,7 @@ export default {
           'REDIS': 'Redis缓存'
         },
         inputTypes: ['ALIYUN_IOT', 'TENCENT_IOT', 'MYSQL', 'KAFKA', 'MQTT'],
-        outputTypes: ['IOTDB', 'INFLUXDB', 'ELASTICSEARCH', 'MYSQL', 'KAFKA', 'MQTT', 'HTTP',
-          'REDIS'],
+        outputTypes: ['IOTDB', 'INFLUXDB', 'ELASTICSEARCH', 'MYSQL', 'KAFKA', 'MQTT', 'HTTP', 'REDIS'],
         bidirectionalTypes: ['MYSQL', 'KAFKA', 'MQTT', 'HTTP', 'REDIS']
       }
     },
@@ -1022,6 +1051,10 @@ export default {
     getTypeColor(type) {
       const colorMap = {
         'MYSQL': 'blue',
+        'POSTGRESQL': 'cyan',
+        'H2': 'green',
+        'ORACLE': 'red',
+        'SQLSERVER': 'blue',
         'REDIS': 'red',
         'KAFKA': 'orange',
         'MQTT': 'green',
@@ -1030,9 +1063,11 @@ export default {
         'ELASTICSEARCH': 'geekblue',
         'HTTP': 'magenta',
         'ALIYUN_IOT': 'gold',
-        'TENCENT_IOT': 'lime'
+        'TENCENT_IOT': 'lime',
+        'HUAWEI_IOT': 'purple'
       }
-      return colorMap[type] || 'default'
+      // 如果类型不存在，返回一个可见的默认颜色（蓝色），而不是'default'（白色）
+      return colorMap[type] || 'blue'
     },
 
     getPluginTypeColor(pluginType) {
@@ -1103,6 +1138,62 @@ export default {
       }
     },
 
+    // 测试连接
+    async testConnection() {
+      // 验证必填字段
+      if (this.dynamicFields.length > 0) {
+        const requiredFields = this.coreConnectionFields.filter(field =>
+          field.config && field.config.required
+        )
+        for (const field of requiredFields) {
+          if (!this.form.dynamicConfig[field.field]) {
+            this.$message.error(`请输入${field.label}`)
+            return
+          }
+        }
+      }
+
+      // 构建连接配置对象
+      const connectionConfig = {
+        type: this.form.type,
+        pluginType: this.form.pluginType,
+        host: this.form.dynamicConfig.host || '',
+        port: this.form.dynamicConfig.port || null,
+        username: this.form.dynamicConfig.username || '',
+        password: this.form.dynamicConfig.password || '',
+        databaseName: this.form.dynamicConfig.databaseName || this.form.dynamicConfig.database || '',
+        extraConfig: this.form.extraConfig || ''
+      }
+
+      this.testingConnection = true
+      this.connectionTestStatus = null
+
+      try {
+        const response = await testResourceConfig(connectionConfig)
+        if (response.code === 0) {
+          this.connectionTestStatus = {
+            success: true,
+            message: response.msg || '连接测试成功'
+          }
+          this.$message.success('连接测试成功')
+        } else {
+          this.connectionTestStatus = {
+            success: false,
+            message: response.msg || '连接测试失败'
+          }
+          this.$message.error(response.msg || '连接测试失败')
+        }
+      } catch (error) {
+        this.connectionTestStatus = {
+          success: false,
+          message: error.message || '连接测试异常'
+        }
+        this.$message.error('连接测试失败: ' + (error.message || '未知错误'))
+      } finally {
+        this.testingConnection = false
+      }
+    },
+
     // 初始化动态字段的默认值
     initDynamicFieldDefaults() {
       console.log('开始初始化动态字段默认值:', this.dynamicFields)
@@ -1132,8 +1223,7 @@ export default {
             configExists: !!(field && field.config),
             hasDefault: !!(field && field.config && field.config.default !== undefined),
             dynamicConfigExists: !!this.form.dynamicConfig,
-            alreadySet: !!(field && field.field && this.form.dynamicConfig
-              && this.form.dynamicConfig[field.field])
+            alreadySet: !!(field && field.field && this.form.dynamicConfig && this.form.dynamicConfig[field.field])
           })
         }
       })
@@ -1296,6 +1386,17 @@ export default {
   border-color: #1890ff;
   background: #f6ffed;
   box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+}
+
+.direction-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  background: #f5f5f5;
+}
+
+.direction-card.disabled:hover {
+  border-color: #e8e8e8;
+  box-shadow: none;
 }
 
 .card-icon {

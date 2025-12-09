@@ -5,6 +5,7 @@ import 'ant-design-vue/es/layout/style'
 import Layout from 'ant-design-vue/es/layout'
 import {isFun} from '../../utils/util'
 import BaseMenu from '../RouteMenu'
+import defaultSettings from '@/config/defaultSettings'
 
 const {Sider} = Layout
 
@@ -42,11 +43,12 @@ export const defaultRenderLogo = (h, logo) => {
 
 export const defaultRenderLogoAntTitle = (h, props) => {
   const {collapsed} = props
+  const siderMenuConfig = defaultSettings.siderMenu || {}
   // 标题：默认英文，宽屏时显示 中文+英文
-  let mainTitle = 'NexIoT'
+  let mainTitle = siderMenuConfig.expandedTitle || 'NexIoT'
   try {
-    if (typeof window !== 'undefined' && window.innerWidth >= 1280) {
-      mainTitle = '奈科斯 NexIoT'
+    if (typeof window !== 'undefined' && window.innerWidth >= (siderMenuConfig.wideScreenBreakpoint || 1280)) {
+      mainTitle = siderMenuConfig.wideScreenTitle || mainTitle
     }
   } catch (e) {
     // ignore
@@ -70,7 +72,7 @@ export const defaultRenderLogoAntTitle = (h, props) => {
           letterSpacing: '0.5px',
           fontFamily: 'PingFang SC, Microsoft YaHei, Arial, sans-serif',
           lineHeight: '1.2'
-        }}>NexIoT</span>
+        }}>{(defaultSettings.siderMenu && defaultSettings.siderMenu.collapsedTitle) || 'NexIoT'}</span>
       </div>
     )
   } else {

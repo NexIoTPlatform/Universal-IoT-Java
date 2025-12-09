@@ -9,6 +9,7 @@ import cn.universal.databridge.enums.PluginStatus;
 import cn.universal.databridge.manager.DataBridgeManager;
 import cn.universal.databridge.service.DataBridgeConfigService;
 import cn.universal.databridge.service.ResourceConnectionService;
+import cn.universal.databridge.util.ConnectionTester;
 import cn.universal.databridge.util.ConnectionTester.ConnectionTestResult;
 import cn.universal.databridge.vo.DataBridgeConfigVO;
 import cn.universal.persistence.entity.IoTUser;
@@ -31,6 +32,8 @@ public class DataBridgeController extends BaseController {
   @Resource private ResourceConnectionService resourceConnectionService;
 
   @Resource private DataBridgeConfigService dataBridgeConfigService;
+
+  @Resource private ConnectionTester connectionTester;
 
   @GetMapping("/plugins/status")
   public Map<String, PluginStatus> listStatuses() {
@@ -138,6 +141,21 @@ public class DataBridgeController extends BaseController {
       return AjaxResult.success(connectionTestResult.getMessage());
     }
     return AjaxResult.error(connectionTestResult.getMessage());
+  }
+
+  /** 测试资源连接配置（未保存的配置） */
+  @PostMapping("/resources/test")
+  public AjaxResult<Void> testResourceConfig(@RequestBody ResourceConnection connection) {
+    try {
+      ConnectionTester.ConnectionTestResult result = connectionTester.testConnection(connection);
+      if (result.isSuccess()) {
+        return AjaxResult.success(result.getMessage());
+      }
+      return AjaxResult.error(result.getMessage());
+    } catch (Exception e) {
+      logger.error("测试资源连接配置失败", e);
+      return AjaxResult.error("测试连接失败: " + e.getMessage());
+    }
   }
 
   // 资源连接管理
@@ -636,6 +654,10 @@ public class DataBridgeController extends BaseController {
       Map<String, Map<String, String>> categorizedTypes, PluginInfo.DataDirection direction) {
     // 数据库类型
     categorizedTypes.get("databases").put("MYSQL", "MySQL数据库");
+    categorizedTypes.get("databases").put("POSTGRESQL", "PostgreSQL数据库");
+    categorizedTypes.get("databases").put("H2", "H2数据库");
+    categorizedTypes.get("databases").put("ORACLE", "Oracle数据库");
+    categorizedTypes.get("databases").put("SQLSERVER", "SQL Server数据库");
     categorizedTypes.get("databases").put("REDIS", "Redis缓存");
 
     // 消息队列类型
@@ -666,6 +688,14 @@ public class DataBridgeController extends BaseController {
     switch (resourceType.toUpperCase()) {
       case "MYSQL":
         return "MySQL数据库";
+      case "POSTGRESQL":
+        return "PostgreSQL数据库";
+      case "H2":
+        return "H2数据库";
+      case "ORACLE":
+        return "Oracle数据库";
+      case "SQLSERVER":
+        return "SQL Server数据库";
       case "REDIS":
         return "Redis缓存";
       case "KAFKA":
@@ -695,6 +725,10 @@ public class DataBridgeController extends BaseController {
   private String getResourceTypeCategory(String resourceType) {
     switch (resourceType.toUpperCase()) {
       case "MYSQL":
+      case "POSTGRESQL":
+      case "H2":
+      case "ORACLE":
+      case "SQLSERVER":
       case "REDIS":
         return "databases";
       case "KAFKA":

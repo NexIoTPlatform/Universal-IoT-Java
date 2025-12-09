@@ -17,6 +17,7 @@ package cn.universal.dm.device.service.log;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.collection.ConcurrentHashSet;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.universal.common.constant.IoTConstant;
 import cn.universal.common.constant.IoTConstant.MessageType;
@@ -66,13 +67,24 @@ public class DefaultIoTDeviceLogService implements IIoTDeviceDataService, Applic
   private ScheduledExecutorService scheduledExecutorService;
 
   private AtomicBoolean scheduled = new AtomicBoolean();
+  // 尽量减少，让他走索引
+  private static final int LOG_MAX_SIZE = 200;
 
-  private static final int LOG_MAX_SIZE = 1000;
+  // 1. 基础间隔（固定12秒）
+  private static final long BASE_INTERVAL = 12 * 1000;
+  // 2. 节点级偏移范围（0~8秒，打散集群节点的基准时间）
+  private static final int NODE_OFFSET_RANGE = 8000;
+  // 3. 每次执行的随机抖动范围（±200ms，避免长期运行后趋同）
+  private static final int RANDOM_JITTER_RANGE = 200;
+  // 节点专属的固定偏移量（每个节点启动时生成一次）
+  private long nodeFixedOffset;
 
-  private static final long LOG_OUTPUT_INTERVAL = 12;
-  //
-  // private static ScheduledExecutorService executor = Executors.newScheduledThreadPool(4,
-  // new NamedThreadFactory("univ-platform-log", true));
+  // 初始化节点偏移量（构造方法中执行，保证每个节点唯一）
+  public DefaultIoTDeviceLogService() {
+    // 生成0~8000ms的固定偏移量，不同节点启动时生成的值不同
+    this.nodeFixedOffset = RandomUtil.randomInt(0, NODE_OFFSET_RANGE);
+    log.info("当前节点定时任务基础偏移量：{}ms", nodeFixedOffset);
+  }
 
   private Set<String> devBoSet = new ConcurrentHashSet<>();
 
@@ -85,8 +97,23 @@ public class DefaultIoTDeviceLogService implements IIoTDeviceDataService, Applic
           policies.put(v.getPolicy().toLowerCase(), v);
         });
     if (scheduled.compareAndSet(false, true)) {
+      // 4. 初始延迟 = 节点固定偏移 + 小范围随机抖动（首次执行就打散）
+      long initialDelay =
+          nodeFixedOffset + RandomUtil.randomInt(-RANDOM_JITTER_RANGE, RANDOM_JITTER_RANGE);
+      // 确保初始延迟不为负数
+      initialDelay = Math.max(0, initialDelay);
+
+      // 5. 循环间隔 = 基础间隔 + 每次随机抖动（避免固定间隔趋同）
       scheduledExecutorService.scheduleWithFixedDelay(
-          this::doOnline, LOG_OUTPUT_INTERVAL, LOG_OUTPUT_INTERVAL, TimeUnit.SECONDS);
+          this::doOnline,
+          initialDelay, // 节点专属初始延迟，保证集群启动时不同时执行
+          BASE_INTERVAL + RandomUtil.randomInt(-RANDOM_JITTER_RANGE, RANDOM_JITTER_RANGE),
+          TimeUnit.MILLISECONDS);
+      // 为集群的节点不在统一时间给数据库造成压力
+      log.info(
+          "当前节点定时任务已启动，初始延迟：{}ms，循环间隔：{}ms",
+          initialDelay,
+          BASE_INTERVAL + RandomUtil.randomInt(-RANDOM_JITTER_RANGE, RANDOM_JITTER_RANGE));
     }
   }
 
@@ -97,7 +124,7 @@ public class DefaultIoTDeviceLogService implements IIoTDeviceDataService, Applic
         policies.getOrDefault(ioTProduct.getStorePolicy(), policies.get("none"));
     logService.saveDeviceLog(upRequest, ioTDeviceDTO, ioTProduct);
     // 如果是设备真实上报数据或事件，处理在线状态
-    if (!IoTConstant.DevNotReallyReportEvent.contains(upRequest.getEvent())
+    if (!IoTConstant.notDeviceDataReportEvent.contains(upRequest.getEvent())
         && MessageType.devReallyReport(upRequest.getMessageType())) {
       updateOnline(ioTDeviceDTO.getIotId());
     }
@@ -110,7 +137,7 @@ public class DefaultIoTDeviceLogService implements IIoTDeviceDataService, Applic
         policies.getOrDefault(ioTProduct.getStorePolicy(), policies.get("none"));
     logService.saveDeviceLog(ioTDeviceLog, ioTDeviceDTO, ioTProduct);
     // 如果是设备真实上报数据或事件，处理在线状态
-    if (!IoTConstant.DevNotReallyReportEvent.contains(ioTDeviceLog.getEvent())
+    if (!IoTConstant.notDeviceDataReportEvent.contains(ioTDeviceLog.getEvent())
         && MessageType.devReallyReport(MessageType.find(ioTDeviceLog.getMessageType()))) {
       updateOnline(ioTDeviceDTO.getIotId());
     }

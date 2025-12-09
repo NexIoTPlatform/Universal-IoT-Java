@@ -143,9 +143,7 @@ export default {
       this.showSecret = !this.showSecret
     },
     copyToClipboard(text) {
-      if (!text) {
-        return
-      }
+      if (!text) return
 
       const textarea = document.createElement('textarea')
       textarea.value = text

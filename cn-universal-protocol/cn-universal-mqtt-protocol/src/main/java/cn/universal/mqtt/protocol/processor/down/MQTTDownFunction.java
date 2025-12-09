@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import cn.universal.common.constant.IoTConstant.DownCmd;
 import cn.universal.common.constant.IoTConstant.ERROR_CODE;
 import cn.universal.common.domain.R;
+import cn.universal.common.utils.PayloadCodecUtils;
 import cn.universal.dm.device.service.impl.IoTProductDeviceService;
 import cn.universal.mqtt.protocol.config.MqttConstant;
 import cn.universal.mqtt.protocol.entity.MQTTDownRequest;
@@ -44,8 +45,6 @@ import org.springframework.stereotype.Component;
 @Slf4j(topic = "mqtt")
 public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
     implements MQTTDownMessageProcessor, DeviceCommandSender {
-
-  @Autowired private ThirdMQTTServerManager mqttServerManager;
 
   @Autowired private ThirdMQTTConfigService mqttConfigService;
 
@@ -152,11 +151,20 @@ public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
       log.info("network union id is empty,use system network");
       //      return R.error("没有绑定网络");
     }
-    // 构建推送主题
-    String downTopic = downRequest.getDownTopic();
-    if (StrUtil.isBlank(downTopic)) {
-      downTopic = buildReplyTopic(downRequest);
+    IoTProduct ioTProduct = downRequest.getIoTProduct();
+    if (ioTProduct == null) {
+      // 查询产品信息
+      ioTProduct =
+          ioTProductMapper.selectOne(
+              IoTProduct.builder().productKey(downRequest.getProductKey()).build());
+      downRequest.setIoTProduct(ioTProduct);
     }
+    // 设置topic
+    if (ioTProduct != null && StrUtil.isNotBlank(ioTProduct.getConfiguration())) {
+      JSONObject jsonObject = JSONUtil.parseObj(ioTProduct.getConfiguration());
+      downRequest.setDownTopic(jsonObject.getStr("downTopic", null));
+    }
+    String downTopic = buildDownTopic(downRequest);
     if (StrUtil.isBlank(downTopic)) {
       return R.error(
           ERROR_CODE.DEV_DOWN_NO_MQTT_TOPIC.getCode(), ERROR_CODE.DEV_DOWN_NO_MQTT_TOPIC.getName());
@@ -177,7 +185,13 @@ public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
       if (StrUtil.isBlank(payload)) {
         payload = JSONUtil.toJsonStr(downRequest.getFunction());
       }
-      boolean success = pushMessage(downRequest, downTopic, payload);
+
+      // 根据产品配置的 encoderType 编码 payload
+      String productKey = downRequest.getProductKey();
+      String encoderType = ioTProductDeviceService.getProductEncoderType(productKey);
+      byte[] payloadBytes = PayloadCodecUtils.encode(encoderType, payload);
+
+      boolean success = pushMessage(downRequest, downTopic, payloadBytes);
       if (success) {
         // 给前端返回格式化
         if (JSONUtil.isTypeJSON(payload)) {
@@ -185,6 +199,7 @@ public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
         } else {
           rs.put("payload", payload);
         }
+        rs.put("success", success);
         // 保存指令下发日志---开始
         JSONObject commandBody = new JSONObject();
         commandBody.set("commandId", commandId);
@@ -202,15 +217,29 @@ public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
         ERROR_CODE.DEV_DOWN_NO_MQTT_TOPIC.getCode(), ERROR_CODE.DEV_DOWN_NO_MQTT_TOPIC.getName());
   }
 
-  private boolean pushMessage(MQTTDownRequest downRequest, String downTopic, String paylaod) {
+  private String buildDownTopic(MQTTDownRequest downRequest) {
+    // 构建推送主题
+    String downTopic = downRequest.getDownTopic();
+    if (StrUtil.isBlank(downTopic)) {
+      downTopic = buildReplyTopic(downRequest);
+    } else {
+      // 对已有的下发主题做占位符填充，以支持模板与通配符
+      downTopic =
+          mqttTopicManager.fillTopicPattern(
+              downTopic, downRequest.getProductKey(), downRequest.getDeviceId());
+    }
+    return downTopic;
+  }
+
+  private boolean pushMessage(MQTTDownRequest downRequest, String downTopic, byte[] payloadBytes) {
     if (sysMQTTManager.isEnabled()
         && sysMQTTManager.isProductCovered(downRequest.getProductKey())) {
       return sysMQTTManager.publishMessage(
-          downTopic, paylaod.getBytes(), sysMQTTManager.getConfig().getDefaultQos(), false);
+          downTopic, payloadBytes, sysMQTTManager.getConfig().getDefaultQos(), false);
     } else {
       // 取networkUnionId，通常等于productKey，或根据实际业务获取
       return thirdMqttServerManager.publishMessage(
-          downRequest.getIoTProduct().getNetworkUnionId(), downTopic, paylaod);
+          downRequest.getIoTProduct().getNetworkUnionId(), downTopic, new String(payloadBytes));
     }
   }
 
@@ -219,6 +248,7 @@ public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
     String productKey = request.getProductKey();
     String deviceId = request.getDeviceId();
     String networkUnionId = request.getIoTProduct().getNetworkUnionId();
+    // 未绑定第三方的MQTT通道，使用内置MQTT服务，则直接按照内置的主题规则
     if (StrUtil.isBlank(networkUnionId)) {
       return MQTTTopicType.THING_DOWN.buildTopic(productKey, deviceId);
     }
@@ -226,25 +256,9 @@ public class MQTTDownFunction extends IoTDownAdapter<MQTTDownRequest>
     String thirdPartyDownPattern =
         mqttTopicManager.getThirdPartyDownTopicPattern(networkUnionId, MqttConstant.TYPE_DOWN);
     if (thirdPartyDownPattern != null) {
-      return fillTopicPattern(thirdPartyDownPattern, productKey, deviceId);
+      return mqttTopicManager.fillTopicPattern(thirdPartyDownPattern, productKey, deviceId);
     }
     return MQTTTopicType.THING_DOWN.buildTopic(productKey, deviceId);
-  }
-
-  /** 将topic pattern中的+替换为实际productKey和deviceId */
-  private String fillTopicPattern(String pattern, String productKey, String deviceId) {
-    // 只替换前两个+，防止误替换
-    int firstPlus = pattern.indexOf("+");
-    int secondPlus = pattern.indexOf("+", firstPlus + 1);
-    if (firstPlus >= 0 && secondPlus > firstPlus) {
-      return pattern.substring(0, firstPlus)
-          + productKey
-          + pattern.substring(firstPlus + 1, secondPlus)
-          + deviceId
-          + pattern.substring(secondPlus + 1);
-    }
-    // 兜底：顺序替换
-    return pattern.replaceFirst("\\+", productKey).replaceFirst("\\+", deviceId);
   }
 
   @Override

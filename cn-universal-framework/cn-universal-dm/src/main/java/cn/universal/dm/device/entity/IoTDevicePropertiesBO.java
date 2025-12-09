@@ -59,6 +59,7 @@ public class IoTDevicePropertiesBO {
   private Object desireValue;
 
   private String formatValue;
+  private String desireFormatValue;
 
   private BigDecimal numberValue;
 
@@ -165,6 +166,14 @@ public class IoTDevicePropertiesBO {
     setValue(convertedValue);
     ofNullable(type.format(value)).map(String::valueOf).ifPresent(this::setFormatValue);
 
+    return this;
+  }
+
+  public IoTDevicePropertiesBO withDesire(ValueType type, Object value) {
+    if (value == null) {
+      return this;
+    }
+    ofNullable(type.format(value)).map(String::valueOf).ifPresent(this::setDesireFormatValue);
     return this;
   }
 }

@@ -26,9 +26,7 @@
             <span
               class="table-page-search-submitButtons"
               :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-              <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{
-                  $t('button.search')
-                }}</a-button>
+              <a-button type="primary" @click="handleQuery"><a-icon type="search"/>{{ $t('button.search') }}</a-button>
               <a-button style="margin-left: 8px" @click="resetQuery"><a-icon
                 type="reload"/>{{ $t('button.reset') }}</a-button>
             </span>
@@ -42,13 +40,11 @@
         <a-button type="primary" @click="$refs.createForm.productAdd()"
                   v-hasPermi="['protocol:protocol:add']" v-if="userName===$store.state.user.name"
                   :disabled="list.length !== 0">
-          <a-icon type="plus"/>
-          {{ $t('button.add') }}
+          <a-icon type="plus"/>{{ $t('button.add') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['protocol:protocol:remove']" ghost>
-          <a-icon type="delete"/>
-          {{ $t('button.delete') }}
+          <a-icon type="delete"/>{{ $t('button.delete') }}
         </a-button>
       </a-space>
       <a-button
@@ -98,27 +94,25 @@
         </a-tooltip>
         <span v-else style="color: #ccc;">-</span>
       </span>
-      <span slot="state" slot-scope="text, record">
-        <a-popconfirm
-          :disabled="userName!==$store.state.user.name"
-          ok-text="是"
-          cancel-text="否"
-          @confirm="confirmHandleStatus(record)"
-          @cancel="cancelHandleStatus(record)"
-        >
-          <span slot="title">确认<b>{{ record.state === 0 ? '发布' : '停用' }}</b> {{ record.name }} 协议吗?</span>
-          <a-switch default-checked :checked="record.state == 1"
-                    :disabled="userName!==$store.state.user.name"/>
-          <!-- <a-switch checked-children="已发布" un-checked-children="未发布" :checked="record.state == 1" :disabled="userName!==$store.state.user.name"/> -->
-        </a-popconfirm>
+      <span slot="state" slot-scope="text">
+        <a-tooltip :title="text == 1 ? '已发布' : '停用'">
+          <a-switch
+            :checked="text == 1"
+            checked-children="发布"
+            un-checked-children="停用"
+            disabled
+            style="vertical-align: middle"
+          />
+        </a-tooltip>
       </span>
       <span slot="operation" slot-scope="text, record">
         <a-space>
-          <a-button type="link" icon="edit"
+          <!-- 编辑按钮已禁用 -->
+          <!-- <a-button type="link" icon="edit"
                     @click="$refs.createForm.handleUpdate(record, undefined)"
                     v-hasPermi="['protocol:protocol:edit']"
                     v-if="userName===$store.state.user.name">
-            {{ $t('button.edit') }}</a-button>
+            {{ $t('button.edit') }}</a-button> -->
           <a-button type="link" icon="bug" @click="goToMagicWeb"
                     v-hasPermi="['protocol:protocol:codec']">
             {{ $t('button.debug') }} </a-button>
@@ -314,23 +308,26 @@ export default {
     toggleAdvanced() {
       this.advanced = !this.advanced
     },
-    /* 任务状态修改 */
+    /* 修改驱动协议 - 已禁用 */
     confirmHandleStatus(row) {
-      const text = row.state === 1 ? '停用' : '发布'
-      row.state = row.state === 0 ? 1 : 0
-      updateProtocol(row)
-      .then(() => {
-        this.$message.success(
-          text + '成功',
-          3
-        )
-        this.getList()
-      }).catch(function () {
-        this.$message.error(
-          text + '发生异常',
-          3
-        )
-      })
+      // 功能已禁用
+      this.$message.warning('该功能已禁用，无法修改驱动协议状态')
+      return
+      // const text = row.state === 1 ? '停用' : '发布'
+      // row.state = row.state === 0 ? 1 : 0
+      // updateProtocol(row)
+      //   .then(() => {
+      //     this.$message.success(
+      //       text + '成功',
+      //       3
+      //     )
+      //     this.getList()
+      //   }).catch(function () {
+      //   this.$message.error(
+      //     text + '发生异常',
+      //     3
+      //   )
+      // })
     },
     cancelHandleStatus(row) {
     },
@@ -343,14 +340,14 @@ export default {
         content: '当前选中编号为' + ids + '的数据',
         onOk() {
           return delProtocol(ids)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

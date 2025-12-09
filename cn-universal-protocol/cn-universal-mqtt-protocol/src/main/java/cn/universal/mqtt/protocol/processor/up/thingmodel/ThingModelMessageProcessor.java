@@ -16,6 +16,7 @@ import cn.hutool.json.JSONObject;
 import cn.universal.common.constant.IoTConstant.MessageType;
 import cn.universal.dm.device.service.AbstratIoTService;
 import cn.universal.mqtt.protocol.config.MqttConstant;
+import cn.universal.mqtt.protocol.config.MqttConstant.TopicCategory;
 import cn.universal.mqtt.protocol.entity.MQTTUPRequest;
 import cn.universal.mqtt.protocol.processor.MqttMessageProcessor;
 import cn.universal.mqtt.protocol.topic.MQTTTopicManager;
@@ -62,8 +63,21 @@ public class ThingModelMessageProcessor extends AbstratIoTService implements Mqt
     if (request.getUpTopic() == null || request.getPayload() == null) {
       return false;
     }
-    return MqttConstant.TopicCategory.THING_MODEL.equals(
+
+    // 优先检查第三方MQTT配置的主题分类
+    MqttConstant.TopicCategory configuredCategory = request.getContextValue("topicCategory");
+    if (configuredCategory != null) {
+      boolean supported = configuredCategory == MqttConstant.TopicCategory.THING_MODEL;
+      if (supported) {
+        log.debug("[{}] 通过配置的主题分类匹配: category={}", getName(), configuredCategory);
+      }
+      return supported;
+    }
+
+    // 回退到系统内置的主题匹配逻辑
+     boolean match = TopicCategory.THING_MODEL.equals(
         MQTTTopicManager.matchCategory(request.getUpTopic()));
+    return match;
   }
 
   @Override
@@ -103,24 +117,13 @@ public class ThingModelMessageProcessor extends AbstratIoTService implements Mqt
   private List<BaseUPRequest> convertThingModelMessage(
       MQTTUPRequest request, JSONObject messageJson) {
     try {
-      MQTTTopicManager.TopicInfo topicInfo =
-          (MQTTTopicManager.TopicInfo) request.getContextValue("topicInfo");
 
       // 对于物模型消息，根据消息内容判断是属性还是事件
       // 如果包含"event"字段，则为事件消息；否则为属性消息
       if (messageJson.containsKey("event")) {
         return convertEventMessage(request, messageJson);
       } else {
-        // 根据主题类型决定处理方式
-        switch (topicInfo.getTopicType()) {
-          case THING_PROPERTY_UP:
-            return convertPropertyMessage(request, messageJson);
-          case THING_DOWN:
-            return convertDownstreamMessage(request, messageJson);
-          default:
-            // 默认作为属性消息处理
-            return convertPropertyMessage(request, messageJson);
-        }
+        return convertPropertyMessage(request, messageJson);
       }
 
     } catch (Exception e) {
@@ -192,68 +195,6 @@ public class ThingModelMessageProcessor extends AbstratIoTService implements Mqt
       log.error("[{}] 事件消息转换异常: ", getName(), e);
       return null;
     }
-  }
-
-  /** 转换下行消息 */
-  private List<BaseUPRequest> convertDownstreamMessage(
-      MQTTUPRequest request, JSONObject messageJson) {
-    try {
-      if (request.getUpRequestList() != null && request.getUpRequestList().size() > 0) {
-        return request.getUpRequestList();
-      }
-      List<BaseUPRequest> upRequestList = new ArrayList<>();
-
-      BaseUPRequest upRequest = getBaseUPRequest(request.getIoTDeviceDTO()).build();
-      upRequest.setMessageType(MessageType.FUNCTIONS);
-
-      // 设置命令信息
-      //      String command = messageJson.getStr("command");
-      //      if (command != null) {
-      //        upRequest.setData(command);
-      //        upRequest.setDataKey("command");
-      //      }
-      //
-      //      // 设置参数信息
-      //      Object params = messageJson.get("params");
-      //      if (params != null) {
-      //        upRequest.setParams(params);
-      //      }
-
-      upRequestList.add(upRequest);
-
-      log.debug("[{}] 下行消息转换完成，命令: {}", getName(), "");
-      return upRequestList;
-
-    } catch (Exception e) {
-      log.error("[{}] 下行消息转换异常: ", getName(), e);
-      return null;
-    }
-  }
-
-  /** 验证转换结果 */
-  private boolean validateConvertedRequests(List<BaseUPRequest> upRequestList) {
-    if (upRequestList == null || upRequestList.isEmpty()) {
-      return false;
-    }
-
-    for (BaseUPRequest upRequest : upRequestList) {
-      if (upRequest == null) {
-        log.warn("[{}] 发现空的BaseUPRequest", getName());
-        return false;
-      }
-
-      if (upRequest.getProductKey() == null || upRequest.getDeviceId() == null) {
-        log.warn("[{}] BaseUPRequest缺少必要字段", getName());
-        return false;
-      }
-
-      if (upRequest.getMessageType() == null) {
-        log.warn("[{}] BaseUPRequest缺少消息类型", getName());
-        return false;
-      }
-    }
-
-    return true;
   }
 
   @Override

@@ -167,9 +167,7 @@ export default {
       this.showPassword = !this.showPassword
     },
     copyToClipboard(text) {
-      if (!text) {
-        return
-      }
+      if (!text) return
 
       const textarea = document.createElement('textarea')
       textarea.value = text

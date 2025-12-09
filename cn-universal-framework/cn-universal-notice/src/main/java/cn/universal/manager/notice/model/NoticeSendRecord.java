@@ -1,5 +1,6 @@
 package cn.universal.manager.notice.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.io.Serializable;
@@ -16,6 +17,9 @@ public class NoticeSendRecord implements Serializable {
   private String status;
   private String result;
   private Date sendTime;
+  
+  @Column(name = "creator")
+  private String creator;
 
   public Long getId() {
     return id;
@@ -79,5 +83,13 @@ public class NoticeSendRecord implements Serializable {
 
   public void setSendTime(Date sendTime) {
     this.sendTime = sendTime;
+  }
+
+  public String getCreator() {
+    return creator;
+  }
+
+  public void setCreator(String creator) {
+    this.creator = creator;
   }
 }

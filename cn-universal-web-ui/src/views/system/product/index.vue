@@ -120,18 +120,15 @@
       <div class="table-operations">
         <a-button type="primary" size="default" @click="$refs.createForm.handleAdd()"
                   v-hasPermi="['system:product:add']">
-          <iot-icon type="icon-u-add"/>
-          {{ $t('button.add') }}
+          <iot-icon type="icon-u-add"/>{{ $t('button.add') }}
         </a-button>
         <a-button type="primary" size="default" @click="$refs.ImportProductForm.handleImport()"
                   v-hasPermi="['system:product:import']">
-          <a-icon type="import"/>
-          {{ $t('button.import') }}
+          <a-icon type="import"/>{{ $t('button.import') }}
         </a-button>
         <a-button type="primary" size="default" @click="handleExport"
                   v-hasPermi="['system:product:export']">
-          <iot-icon type="icon-u-export"/>
-          {{ $t('button.export') }}
+          <iot-icon type="icon-u-export"/>{{ $t('button.export') }}
         </a-button>
         <a-button
           type="primary"
@@ -140,8 +137,7 @@
           :style="{float: 'right'}"
           @click="getList"
         >
-          <a-icon type="sync" :spin="loading"/>
-          {{ $t('button.refresh') }}
+          <a-icon type="sync" :spin="loading"/>{{ $t('button.refresh') }}
         </a-button>
         <!-- <div style="float: right" class="screen-btns">
           <span @click="toggleScreen('all')" class="screen" :class="{'selected': (!queryParam.hasDevice && !queryParam.self)}">全部</span>
@@ -244,10 +240,6 @@
               </div>
             </div>
           </div>
-          <div class="detailTag" v-if="!!value.photoUrl.detail">
-            <div class="tagItem"></div>
-            <a-icon type="check" class="detailIcon"/>
-          </div>
         </div>
       </div>
       <!-- 分页 -->
@@ -270,12 +262,7 @@
 </template>
 
 <script>
-import {
-  delProduct,
-  getDevNumByProduct,
-  queryProductList,
-  updateProductState
-} from '@/api/system/dev/product'
+import {delProduct, getDevNumByProduct, queryProductList, updateProductState} from '@/api/system/dev/product'
 import request from '@/utils/request'
 import CreateForm from './modules/CreateForm'
 import ImportProductForm from '@/views/system/product/modules/ImportForm'
@@ -551,12 +538,15 @@ export default {
       await this.getProtocolStatus().then(response => {
         if (response.code === 0 && response.data && response.data.protocols) {
           const protocols = response.data.protocols
-          // 显示后台返回的所有协议，不做过滤
+          // 显示后台返回的所有协议，保存完整信息
           Object.keys(protocols).forEach(key => {
             const protocol = protocols[key]
             this.thirdPlatforms.push({
               id: protocol.name, // 显示名称
-              name: protocol.code // 协议代码
+              name: protocol.code, // 协议代码
+              isManualCreatable: protocol.isManualCreatable, // 是否支持手动创建
+              notCreatableReason: protocol.notCreatableReason, // 不可创建原因
+              description: protocol.description // 协议描述
             })
           })
         }
@@ -568,7 +558,10 @@ export default {
           res.data['third_platform'].forEach((item) => {
             this.thirdPlatforms.push({
               id: item.dictLabel,
-              name: item.dictValue
+              name: item.dictValue,
+              isManualCreatable: true, // 默认支持
+              notCreatableReason: '',
+              description: item.remark || ''
             })
           })
         })
@@ -590,12 +583,12 @@ export default {
       console.log(row.state)
       row.state = row.state === 0 ? 1 : 0
       updateProductState(row.id, row.state)
-      .then(() => {
-        this.$message.success(text + '成功', 3)
-      })
-      .catch(function () {
-        this.$message.error(text + '异常', 3)
-      })
+        .then(() => {
+          this.$message.success(text + '成功', 3)
+        })
+        .catch(function () {
+          this.$message.error(text + '异常', 3)
+        })
     },
     cancelHandleState(row) {
     },
@@ -945,29 +938,6 @@ export default {
     box-shadow: 0 4px 20px rgba(25, 102, 255, 0.1);
     transform: translateY(-2px);
   }
-
-  .detailTag {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-
-    .tagItem {
-      width: 0;
-      height: 0;
-      border-top: 20px solid transparent;
-      border-right: 20px solid #ff2500;
-      border-radius: 0 0 11px 0;
-    }
-
-    .detailIcon {
-      color: #fff;
-      position: absolute;
-      right: -1px;
-      bottom: 0;
-      transform: scale(0.7);
-    }
-  }
-
   /* 标签角落定位 - 移动到左下角 */
 
   .tag-corner {

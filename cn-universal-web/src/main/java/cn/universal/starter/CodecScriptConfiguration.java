@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-/** magic-api自动配置类 */
+/** nexiot.ide.debug自动配置类 */
 @Configuration
 @ConditionalOnClass({RequestMappingHandlerMapping.class})
 public class CodecScriptConfiguration implements ApplicationContextAware {

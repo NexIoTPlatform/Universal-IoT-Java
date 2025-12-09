@@ -17,6 +17,15 @@ export function allProtocol() {
   })
 }
 
+// 查询未创建协议的产品列表（归属人为当前用户）
+export function listProductsWithoutProtocol(searchKey) {
+  return request({
+    url: '/admin/v1/protocol/products/without-protocol',
+    method: 'get',
+    params: searchKey ? { searchKey } : {}
+  })
+}
+
 // 查询设备协议详细
 export function getProtocol(id) {
   return request({

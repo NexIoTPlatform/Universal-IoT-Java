@@ -37,7 +37,6 @@ import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.mapper.IoTDeviceLogMapper;
 import cn.universal.persistence.mapper.IoTDeviceLogShardMapper;
 import cn.universal.persistence.mapper.IoTDeviceMapper;
-import cn.universal.persistence.mapper.IoTUserMapper;
 import jakarta.annotation.Resource;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
@@ -79,7 +78,6 @@ public class IoTDeviceActionAfterService extends IoTUPPushAdapter<BaseUPRequest>
 
   @Resource private IoTDeviceLogMapper ioTDeviceLogMapper;
   @Resource private IoTDeviceLogShardMapper ioTDeviceLogShardMapper;
-  @Resource private IoTUserMapper iotUserMapper;
 
   @Resource private DevicePostProcessorManager devicePostProcessorManager;
 
@@ -119,9 +117,7 @@ public class IoTDeviceActionAfterService extends IoTUPPushAdapter<BaseUPRequest>
 
   @Override
   public void create(String productKey, String deviceId, DownRequest downRequest) {
-    if (downRequest.getAppUnionId() != null) {
-      iotUserMapper.licenseBuckle(downRequest.getAppUnionId());
-    }
+
     log.info("设备创建productKey={},deviceId={}", productKey, deviceId);
     IoTDeviceDTO ioTDeviceDTO = queryDevInstance(null, productKey, deviceId);
     if (ioTDeviceDTO == null) {
@@ -325,9 +321,7 @@ public class IoTDeviceActionAfterService extends IoTUPPushAdapter<BaseUPRequest>
     if (ioTDeviceDTO == null) {
       return;
     }
-    if (downRequest.getAppUnionId() != null) {
-      iotUserMapper.licenseAdd(downRequest.getAppUnionId());
-    }
+
     log.info(
         "设备删除,deviceId={},productKey={},unionId={}",
         ioTDeviceDTO.getDeviceId(),

@@ -7,6 +7,7 @@ public class NoticeSendRequest {
   private Long templateId;
   private Map<String, Object> params;
   private String receivers;
+  private String creator;
 
   public Long getTemplateId() {
     return templateId;
@@ -30,5 +31,13 @@ public class NoticeSendRequest {
 
   public void setReceivers(String receivers) {
     this.receivers = receivers;
+  }
+
+  public String getCreator() {
+    return creator;
+  }
+
+  public void setCreator(String creator) {
+    this.creator = creator;
   }
 }

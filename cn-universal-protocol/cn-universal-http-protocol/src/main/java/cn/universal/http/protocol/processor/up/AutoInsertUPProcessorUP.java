@@ -16,6 +16,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.universal.common.constant.IoTConstant;
+import cn.universal.common.constant.IoTConstant.DownCmd;
 import cn.universal.core.message.UnifiedDownlinkCommand;
 import cn.universal.core.service.IoTDownlFactory;
 import cn.universal.dm.device.service.AbstratIoTService;
@@ -186,7 +187,7 @@ public class AutoInsertUPProcessorUP extends AbstratIoTService implements HttpUP
     downRequest.set("appUnionId", unionId);
     downRequest.set("productKey", ioTProduct.getProductKey());
     downRequest.set("deviceId", deviceId);
-    downRequest.set("cmd", "dev_add");
+    downRequest.set("cmd", DownCmd.DEV_ADD.name());
     JSONObject ob = new JSONObject();
     ob.set("deviceName", deviceId);
     ob.set("imei", deviceId);

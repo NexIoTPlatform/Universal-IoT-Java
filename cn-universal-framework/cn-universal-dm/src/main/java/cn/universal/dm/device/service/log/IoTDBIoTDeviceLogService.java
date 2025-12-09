@@ -52,6 +52,11 @@ import org.springframework.stereotype.Component;
  * IoTDB 存储日志
  *
  * <p>通过配置文件动态加载
+ * 
+ * <p><b>重连机制说明：</b>
+ * IoTDB Session 客户端没有内置自动重连机制（官方文档明确说明），
+ * 因此本类实现了统一的重连管理机制，符合官方推荐的最佳实践。
+ * 所有业务代码通过 getSession() 方法获取 session，无需关心重连细节。
  *
  * @author gitee.com/NexIoT
  * @version 1.0
@@ -83,45 +88,352 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
   @Resource private IoTProductDeviceService iotProductDeviceService;
 
-  private Session session;
+  private volatile Session session;
+
+  private final Object sessionLock = new Object();
+  @Value("${iotdb.reconnect.maxRetries:3}")
+  private int maxRetries;
+  @Value("${iotdb.reconnect.backoffMillis:}")
+  private String backoffConfig;
+  private long[] backoffMillis = new long[]{200, 500, 1000};
+  
+  // 重连冷却时间（毫秒），防止频繁重连
+  @Value("${iotdb.reconnect.cooldownMillis:5000}")
+  private long reconnectCooldownMillis;
+  
+  // 最后一次重连尝试时间
+  private volatile long lastReconnectAttemptTime = 0;
+  
+  // 重连状态：false=未重连中, true=重连中
+  private volatile boolean reconnecting = false;
+
+  @Value("${iotdb.alert.enabled:false}")
+  private boolean alertEnabled;
+  @Value("${iotdb.alert.templateId:0}")
+  private Long alertTemplateId;
+  @Value("${iotdb.alert.receivers:}")
+  private String alertReceivers;
 
   @PostConstruct
-  public void initSession() {
+  public void init() {
     try {
-      session = new Session.Builder().host(host).port(port).username(username).password(password).build();
-      session.open();
+      createAndOpenSession();
+      log.info("初始化IoTDB连接成功，host={}, port={}", host, port);
+    } catch (Exception e) {
+      log.error("初始化IoTDB连接失败，host={}, port={}", host, port, e);
+      // 初始化失败时确保 session 为 null
+      session = null;
+    }
+  }
 
-      // 创建存储组
+  /**
+   * 创建并打开 IoTDB Session
+   * 注意：此方法会抛出异常，调用方需要处理
+   */
+  private void createAndOpenSession() throws Exception {
+    Session newSession = null;
+    try {
+      // 1. 创建新 Session
+      newSession = new Session.Builder()
+          .host(host)
+          .port(port)
+          .username(username)
+          .password(password)
+          .build();
+      
+      // 2. 打开连接（这一步会初始化内部的 deviceIdToEndpoint 等 Map）
+      newSession.open();
+
+      // 3. 创建存储组
       try {
-        session.setStorageGroup(storageGroup);
+        newSession.setStorageGroup(storageGroup);
         log.info("创建存储组成功: {}", storageGroup);
       } catch (Exception e) {
         // 存储组可能已存在，忽略错误
         log.debug("存储组可能已存在: {}", storageGroup);
       }
 
-      // 创建时间序列（类似MySQL的表结构）
+      // 4. 创建时间序列（类似MySQL的表结构）
       createTimeseries();
-
-      log.info("初始化IoTDB连接成功，host={}, port={}", host, port);
+      
+      // 5. 只有完全成功后才赋值给成员变量
+      session = newSession;
+      
     } catch (Exception e) {
-      log.error("初始化IoTDB连接失败", e);
+      // 失败时关闭新创建的 Session
+      if (newSession != null) {
+        try {
+          newSession.close();
+        } catch (Exception ignore) {}
+      }
+      throw e; // 重新抛出异常，让调用方知道初始化失败
     }
   }
 
   /**
    * 创建时间序列（动态创建，类似自动建表）
-   * IoTDB会在首次插入时自动创建，此方法用于预定义数据类型和编码
+   * 预定义常用字段的数据类型，防止 IoTDB 自动推断错误
+   * 
+   * MySQL 表结构映射：
+   * - iot_device_log: device_name(varchar32), message_type(varchar20), command_id(varchar32),
+   *                   command_status(tinyint), event(varchar80), point(varchar128), content(text)
+   * - iot_device_log_metadata: property(varchar32), ext1(varchar255), ext2(varchar655), ext3(varchar255)
    */
   private void createTimeseries() {
     try {
-      // 注意: IoTDB支持动态创建时间序列，这里仅做示例
-      // 实际使用时可以省略此步骤，让IoTDB自动推断类型
-      String[] measurements = {"message_type", "content", "event", "command_id", "command_status", "point"};
-      log.info("时间序列定义已准备，将在数据插入时自动创建");
+      log.debug("IoTDB 将在数据插入时自动创建时间序列（类型定义与 MySQL 表结构对齐）");
+      log.debug("=== iot_device_log 字段类型映射 ===");
+      log.debug("  device_name    : varchar(32)  -> TEXT");
+      log.debug("  message_type   : varchar(20)  -> TEXT");
+      log.debug("  command_id     : varchar(32)  -> TEXT");
+      log.debug("  command_status : tinyint      -> INT32");
+      log.debug("  event          : varchar(80)  -> TEXT");
+      log.debug("  point          : varchar(128) -> TEXT");
+      log.debug("  content        : text         -> TEXT");
+      log.debug("=== iot_device_log_metadata 字段类型映射 ===");
+      log.debug("  property       : varchar(32)  -> TEXT");
+      log.debug("  ext1           : varchar(255) -> TEXT");
+      log.debug("  ext2           : varchar(655) -> TEXT");
+      log.debug("  ext3           : varchar(255) -> TEXT");
+      log.debug("  create_time    : datetime     -> INT64(timestamp)");
+      log.debug("  max_storage    : int          -> INT32");
     } catch (Exception e) {
       log.warn("预创建时间序列失败（不影响使用）: {}", e.getMessage());
     }
+  }
+
+  // === IoTDB重试与重连机制 ===
+  private long[] getBackoffMillis() {
+    try {
+      if (backoffConfig != null && !backoffConfig.isEmpty()) {
+        String[] arr = backoffConfig.split(",");
+        long[] res = new long[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+          res[i] = Long.parseLong(arr[i].trim());
+        }
+        return res;
+      }
+    } catch (Exception e) {
+      log.warn("解析重试退避配置失败: {}", backoffConfig);
+    }
+    return backoffMillis;
+  }
+
+  /**
+   * 统一获取 Session，自动处理重连逻辑
+   * 
+   * <p>这是所有业务代码获取 session 的唯一入口。
+   * IoTDB Session 本身没有内置自动重连机制（官方文档明确说明），
+   * 因此需要在应用层实现重连逻辑，这是官方推荐的做法。
+   * 
+   * <p>重连策略：
+   * 1. 冷却时间机制：避免频繁重连（默认5秒）
+   * 2. 错开重连：使用锁确保同一时间只有一个线程执行重连
+   * 3. 等待机制：其他线程等待重连完成，避免重复重连
+   * 
+   * @return Session 实例，如果重连失败返回 null
+   */
+  private Session getSession() {
+    // 快速路径：如果 session 已存在，直接返回
+    Session currentSession = session;
+    if (currentSession != null) {
+      return currentSession;
+    }
+    
+    // 检查冷却时间，避免频繁重连
+    long now = System.currentTimeMillis();
+    long timeSinceLastAttempt = now - lastReconnectAttemptTime;
+    
+    if (timeSinceLastAttempt < reconnectCooldownMillis) {
+      // 还在冷却期内，等待其他线程的重连结果
+      long waitTime = reconnectCooldownMillis - timeSinceLastAttempt;
+      log.debug("IoTDB重连冷却中，等待 {}ms", waitTime);
+      
+      synchronized (sessionLock) {
+        // 等待期间可能其他线程已经重连成功
+        if (session != null) {
+          return session;
+        }
+        
+        // 等待一段时间，让其他线程完成重连
+        try {
+          sessionLock.wait(Math.min(waitTime, 1000)); // 最多等待1秒
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+        }
+        
+        // 再次检查
+        if (session != null) {
+          return session;
+        }
+      }
+    }
+    
+    // 执行重连（带锁，确保只有一个线程执行重连）
+    synchronized (sessionLock) {
+      // 双重检查：可能其他线程已经重连成功
+      if (session != null) {
+        return session;
+      }
+      
+      // 检查是否正在重连中
+      if (reconnecting) {
+        log.debug("其他线程正在重连IoTDB，等待重连完成");
+        // 等待重连完成（最多等待5秒）
+        long waitStart = System.currentTimeMillis();
+        while (reconnecting && (System.currentTimeMillis() - waitStart) < 5000) {
+          try {
+            sessionLock.wait(500); // 每500ms检查一次
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            break;
+          }
+          if (session != null) {
+            return session; // 其他线程重连成功
+          }
+        }
+        // 如果等待超时，尝试自己重连
+        if (reconnecting) {
+          log.warn("等待其他线程重连超时，尝试自己重连");
+        }
+      }
+      
+      // 更新重连尝试时间
+      lastReconnectAttemptTime = System.currentTimeMillis();
+      
+      // 标记正在重连
+      reconnecting = true;
+      
+      try {
+        // 1. 先关闭旧连接
+        if (session != null) {
+          try {
+            session.close();
+            log.debug("已关闭旧的 IoTDB Session");
+          } catch (Exception ignore) {
+            // 关闭失败不影响重连
+          }
+        }
+        
+        // 2. 清空 session
+        session = null;
+        
+        // 3. 尝试创建新连接
+        createAndOpenSession();
+        log.info("✓ IoTDB重连成功");
+        return session;
+        
+      } catch (Exception e) {
+        log.error("✗ IoTDB重连失败，错误: {}", e.getMessage());
+        // 重连失败时确保 session 为 null
+        session = null;
+        return null;
+      } finally {
+        // 重置重连标志
+        reconnecting = false;
+        // 通知等待的线程
+        sessionLock.notifyAll();
+      }
+    }
+  }
+
+  /**
+   * 标记 session 无效，触发下次重连
+   * 当检测到连接错误时调用此方法
+   */
+  private void invalidateSession() {
+    synchronized (sessionLock) {
+      if (session != null) {
+        try {
+          session.close();
+        } catch (Exception ignore) {
+          // 忽略关闭异常
+        }
+        session = null;
+      }
+    }
+  }
+
+  /**
+   * 判断异常是否需要重连
+   */
+  private boolean isReconnectNeeded(Exception e) {
+    if (e == null) {
+      return false;
+    }
+    String errMsg = e.getMessage();
+    if (errMsg == null) {
+      return false;
+    }
+    return errMsg.contains("deviceIdToEndpoint") ||
+           errMsg.contains("Connection refused") ||
+           errMsg.contains("Broken pipe") ||
+           errMsg.contains("Connection reset") ||
+           errMsg.contains("Session is closed") ||
+           errMsg.contains("session未初始化");
+  }
+
+  /**
+   * 带重试机制的执行器
+   * 
+   * @param action 要执行的操作
+   * @param operation 操作名称（用于日志）
+   * @param path IoTDB路径
+   * @param iotId 设备ID
+   * @return 操作结果
+   * @throws Exception 所有重试失败后抛出最后一次异常
+   */
+  private <T> T executeWithRetry(java.util.concurrent.Callable<T> action, String operation, String path, String iotId) throws Exception {
+    Exception last = null;
+    long[] delays = getBackoffMillis();
+    int retries = Math.max(maxRetries, 1);
+    
+    for (int i = 0; i < retries; i++) {
+      try {
+        // 统一获取 session（自动处理重连）
+        Session currentSession = getSession();
+        if (currentSession == null) {
+          throw new IllegalStateException("IoTDB Session 不可用且重连失败");
+        }
+        
+        // 执行操作
+        return action.call();
+        
+      } catch (Exception e) {
+        last = e;
+        String errMsg = e.getMessage();
+        
+        // 判断是否需要重连
+        boolean needReconnect = isReconnectNeeded(e);
+        
+        log.warn("IoTDB {} 失败，path={}, iotId={}, attempt={}/{}, needReconnect={}, error={}", 
+            operation, path, iotId, (i + 1), retries, needReconnect, errMsg);
+        
+        // 需要重连时，标记 session 无效
+        if (needReconnect) {
+          invalidateSession();
+        }
+        
+        // 最后一次重试失败，不再等待
+        if (i < retries - 1 && i < delays.length) {
+          try {
+            Thread.sleep(delays[i]);
+          } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            break;
+          }
+        }
+      }
+    }
+    
+    // 所有重试都失败
+    triggerIoTDBAlert("IoTDB操作失败: " + operation, "path=" + path + ", iotId=" + iotId, last);
+    throw last;
+  }
+
+  private void triggerIoTDBAlert(String title, String content, Throwable e) {
+    log.error("{} - {}, err={}", title, content, e == null ? "" : e.toString());
+    // 如需推送到外部通知渠道，请在 cn-universal-notice 模块配置模板，并在此处接入对应服务
   }
 
   @PreDestroy
@@ -198,16 +510,15 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
                         getDeviceMetadata(ioTProduct.getMetadata()).getPropertyOrNull(key);
                     IoTDevicePropertiesBO ioTDevicePropertiesBO = new IoTDevicePropertiesBO();
                     ioTDevicePropertiesBO.withValue(propertyOrNull, value);
-
                     // 构建元数据并保存
                     String property = key;
                     String propertyName = ioTDevicePropertiesBO.getPropertyName();
                     String formatValue = ioTDevicePropertiesBO.getFormatValue();
                     String symbol = ioTDevicePropertiesBO.getSymbol();
                     String content = StrUtil.str(value, CharsetUtil.charset("UTF-8"));
-
-                    savePropertyMetadataToIoTDB(
-                        up, property, content, propertyName, formatValue, symbol);
+                    long ts = up.getTime() != null ? up.getTime() : System.currentTimeMillis();
+                    savePropertySeriesToIoTDB(
+                        up, property, content, propertyName, formatValue, symbol, ts);
                   } catch (Exception e) {
                     log.error(
                         "IoTDB保存属性元数据失败: iotId={}, property={}", up.getIotId(), key, e);
@@ -219,13 +530,17 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
     // 处理事件消息
     if (MessageType.EVENT.equals(up.getMessageType())) {
       try {
-        int maxStorage = 10;
-        if (CollectionUtil.isNotEmpty(logStorePolicyDTO.getEvent())
-            && logStorePolicyDTO.getEvent().containsKey(up.getEvent())) {
-          maxStorage = logStorePolicyDTO.getEvent().get(up.getEvent()).getMaxStorage();
+        boolean allowedEvent = CollectionUtil.isNotEmpty(logStorePolicyDTO.getEvent())
+            && logStorePolicyDTO.getEvent().containsKey(up.getEvent());
+
+        if (!allowedEvent) {
+          log.debug("跳过未配置事件写入: iotId={}, event={}", up.getIotId(), up.getEvent());
+          return;
         }
 
-        saveEventMetadataToIoTDB(up, maxStorage);
+        int maxStorage = logStorePolicyDTO.getEvent().get(up.getEvent()).getMaxStorage();
+        long ts = up.getTime() != null ? up.getTime() : System.currentTimeMillis();
+        saveEventSeriesToIoTDB(up, maxStorage, ts);
       } catch (Exception e) {
         log.error("IoTDB保存事件元数据失败: iotId={}, event={}", up.getIotId(), up.getEvent(), e);
       }
@@ -243,15 +558,13 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
       String content,
       String propertyName,
       String formatValue,
-      String symbol)
+      String symbol,
+      long timestamp)
       throws Exception {
-    if (session == null) {
-      throw new RuntimeException("IoTDB session未初始化");
-    }
+    // 通过 executeWithRetry 统一处理，无需在此检查 session
 
     String metadataPath =
         buildDevicePath(up.getProductKey(), up.getDeviceId()) + ".property_metadata";
-    long timestamp = System.currentTimeMillis();
 
     // 与MySQL一致的字段
     List<String> measurements =
@@ -267,7 +580,23 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
             "ext1",
             "ext2",
             "ext3");
-    List<String> values =
+    
+    // 显式指定数据类型（对齐 MySQL iot_device_log_metadata 表）
+    List<org.apache.iotdb.tsfile.file.metadata.enums.TSDataType> types =
+        List.of(
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // message_type: varchar(20)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // property: varchar(32)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // content: text
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // device_name: varchar(64)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // device_id: varchar(64)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // iot_id: varchar(128)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // product_key: varchar(64)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.INT64,  // create_time: datetime
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // ext1: varchar(255)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // ext2: varchar(655)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT);  // ext3: varchar(255)
+    
+    List<Object> values =
         List.of(
             escapeValue(MessageType.PROPERTIES.name()),
             escapeValue(property),
@@ -276,13 +605,20 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
             escapeValue(up.getDeviceId()),
             escapeValue(up.getIotId()),
             escapeValue(up.getProductKey()),
-            String.valueOf(System.currentTimeMillis()),
+            timestamp,  // INT64 不需要 String.valueOf
             escapeValue(propertyName),
             escapeValue(formatValue),
             escapeValue(symbol));
 
     try {
-      session.insertRecord(metadataPath, timestamp, measurements, values);
+      executeWithRetry(() -> {
+        Session currentSession = getSession();
+        if (currentSession == null) {
+          throw new IllegalStateException("IoTDB Session 不可用");
+        }
+        currentSession.insertRecord(metadataPath, timestamp, measurements, types, values);
+        return null;
+      }, "insertRecord", metadataPath, up.getIotId());
       log.debug(
           "IoTDB插入属性元数据成功: path={}, property={}, iotId={}",
           metadataPath,
@@ -304,12 +640,17 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
    * 路径: root.device.{productKey}.{deviceId}.event_metadata
    */
   private void saveEventMetadataToIoTDB(BaseUPRequest up, int maxStorage) throws Exception {
-    if (session == null) {
-      throw new RuntimeException("IoTDB session未初始化");
-    }
+    saveEventMetadataToIoTDB(up, maxStorage, System.currentTimeMillis());
+  }
+
+  /**
+   * 保存事件元数据到IoTDB
+   * 路径: root.device.{productKey}.{deviceId}.event_metadata
+   */
+  private void saveEventMetadataToIoTDB(BaseUPRequest up, int maxStorage, long timestamp) throws Exception {
+    // 通过 executeWithRetry 统一处理，无需在此检查 session
 
     String metadataPath = buildDevicePath(up.getProductKey(), up.getDeviceId()) + ".event_metadata";
-    long timestamp = System.currentTimeMillis();
 
     // 与MySQL保持一致的字段
     List<String> measurements =
@@ -324,7 +665,22 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
             "create_time",
             "ext1",
             "max_storage");
-    List<String> values =
+    
+    // 显式指定数据类型（对齐 MySQL iot_device_log_metadata 表）
+    List<org.apache.iotdb.tsfile.file.metadata.enums.TSDataType> types =
+        List.of(
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // message_type: varchar(20)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // event: varchar(32)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // content: text
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // device_name: varchar(64)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // device_id: varchar(64)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // iot_id: varchar(128)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // product_key: varchar(64)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.INT64,  // create_time: datetime
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,   // ext1: varchar(255)
+            org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.INT32); // max_storage: int
+    
+    List<Object> values =
         List.of(
             escapeValue(MessageType.EVENT.name()),
             escapeValue(up.getEvent()),
@@ -333,12 +689,19 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
             escapeValue(up.getDeviceId()),
             escapeValue(up.getIotId()),
             escapeValue(up.getProductKey()),
-            String.valueOf(System.currentTimeMillis()),
+            timestamp,  // INT64 不需要 String.valueOf
             escapeValue(JSONUtil.toJsonStr(up.getData())),
-            String.valueOf(maxStorage));
+            maxStorage);  // INT32 不需要 String.valueOf
 
     try {
-      session.insertRecord(metadataPath, timestamp, measurements, values);
+      executeWithRetry(() -> {
+        Session currentSession = getSession();
+        if (currentSession == null) {
+          throw new IllegalStateException("IoTDB Session 不可用");
+        }
+        currentSession.insertRecord(metadataPath, timestamp, measurements, types, values);
+        return null;
+      }, "insertRecord", metadataPath, up.getIotId());
       log.debug(
           "IoTDB插入事件元数据成功: path={}, event={}, iotId={}",
           metadataPath,
@@ -362,9 +725,7 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
    * - 元数据: root.device.{productKey}.{deviceId}.metadata
    */
   private void saveDeviceLogToIoTDB(IoTDeviceLog ioTDeviceLog, BaseUPRequest upRequest) throws Exception {
-    if (session == null) {
-      throw new RuntimeException("IoTDB session未初始化");
-    }
+    // 通过 executeWithRetry 统一处理，无需在此检查 session
 
     // 主日志路径 (对应iot_device_log_*)
     String devicePath = buildDevicePath(ioTDeviceLog.getProductKey(), ioTDeviceLog.getDeviceId()) + ".log";
@@ -372,20 +733,40 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
     // 时间戳（毫秒）
     long timestamp = ioTDeviceLog.getCreateTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-    // 使用List方式批量插入（推荐方式，性能更好）
+    // 字段定义（对齐 MySQL iot_device_log 表结构）
     List<String> measurements = List.of("message_type", "content", "event", "command_id", "command_status", "point", "device_name");
-    List<String> values = List.of(
+    
+    // 显式指定数据类型（重要：防止 IoTDB 自动推断错误）
+    List<org.apache.iotdb.tsfile.file.metadata.enums.TSDataType> types = List.of(
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,    // message_type: varchar(20)
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,    // content: text
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,    // event: varchar(80)
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,    // command_id: varchar(32)
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.INT32,   // command_status: tinyint
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,    // point: varchar(128)
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT     // device_name: varchar(32)
+    );
+    
+    // 字段值（需要根据类型转换）
+    List<Object> values = List.of(
         escapeValue(ioTDeviceLog.getMessageType()),
         escapeValue(ioTDeviceLog.getContent()),
         escapeValue(ioTDeviceLog.getEvent()),
         escapeValue(ioTDeviceLog.getCommandId()),
-        String.valueOf(ioTDeviceLog.getCommandStatus() != null ? ioTDeviceLog.getCommandStatus() : 0),
+        ioTDeviceLog.getCommandStatus() != null ? ioTDeviceLog.getCommandStatus() : 0,  // INT32 不需要 String.valueOf
         escapeValue(ioTDeviceLog.getPoint()),
         escapeValue(ioTDeviceLog.getDeviceName())
     );
 
     try {
-      session.insertRecord(devicePath, timestamp, measurements, values);
+      executeWithRetry(() -> {
+        Session currentSession = getSession();
+        if (currentSession == null) {
+          throw new IllegalStateException("IoTDB Session 不可用");
+        }
+        currentSession.insertRecord(devicePath, timestamp, measurements, types, values);
+        return null;
+      }, "insertRecord", devicePath, ioTDeviceLog.getIotId());
       log.debug("IoTDB插入设备日志成功: path={}, timestamp={}, productKey={}, deviceId={}",
           devicePath, timestamp, ioTDeviceLog.getProductKey(), ioTDeviceLog.getDeviceId());
     } catch (Exception e) {
@@ -396,30 +777,105 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
   }
 
   /**
-   * 保存元数据到IoTDB
-   * 路径: root.device.{productKey}.{deviceId}.metadata
-   * 注意: IoTDeviceLog暂无property字段,这里预留接口供未来扩展
+   * 按属性名拆分时间序列写入
+   * 路径: root.device.{productKey}.{deviceId}.property.{sanitizedProperty}
+   * 精简字段：message_type,content,create_time,ext1,ext2,ext3
    */
-  private void saveMetadataToIoTDB(IoTDeviceLog ioTDeviceLog, String property) throws Exception {
-    if (session == null) {
-      throw new RuntimeException("IoTDB session未初始化");
-    }
+  private void savePropertySeriesToIoTDB(BaseUPRequest up,
+                                        String property,
+                                        String content,
+                                        String propertyName,
+                                        String formatValue,
+                                        String symbol,
+                                        long timestamp) throws Exception {
+    // 通过 executeWithRetry 统一处理，无需在此检查 session
 
-    String metadataPath = buildDevicePath(ioTDeviceLog.getProductKey(), ioTDeviceLog.getDeviceId()) + ".metadata";
-    long timestamp = ioTDeviceLog.getCreateTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli();
+    String seriesPath = buildDevicePath(up.getProductKey(), up.getDeviceId()) + ".property." + sanitizePathNode(property);
 
-    List<String> measurements = List.of("message_type", "property", "event", "content", "device_name", "iot_id", "product_key");
-    List<String> values = List.of(
-        escapeValue(ioTDeviceLog.getMessageType()),
-        escapeValue(property),  // 从参数传入
-        escapeValue(ioTDeviceLog.getEvent()),
-        escapeValue(ioTDeviceLog.getContent()),
-        escapeValue(ioTDeviceLog.getDeviceName()),
-        escapeValue(ioTDeviceLog.getIotId()),
-        escapeValue(ioTDeviceLog.getProductKey())
+    List<String> measurements = List.of("message_type","content","create_time","device_name","device_id","iot_id","product_key","ext1","ext2","ext3");
+
+    List<org.apache.iotdb.tsfile.file.metadata.enums.TSDataType> types = List.of(
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.INT64,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT
     );
 
-    session.insertRecord(metadataPath, timestamp, measurements, values);
+    List<Object> values = List.of(
+        escapeValue(MessageType.PROPERTIES.name()),
+        escapeValue(content),
+        timestamp,
+        escapeValue(up.getDeviceName()),
+        escapeValue(up.getDeviceId()),
+        escapeValue(up.getIotId()),
+        escapeValue(up.getProductKey()),
+        escapeValue(propertyName),
+        escapeValue(formatValue),
+        escapeValue(symbol)
+    );
+
+    executeWithRetry(() -> {
+      Session currentSession = getSession();
+      if (currentSession == null) {
+        throw new IllegalStateException("IoTDB Session 不可用");
+      }
+      currentSession.insertRecord(seriesPath, timestamp, measurements, types, values);
+      return null;
+    }, "insertRecord", seriesPath, up.getIotId());
+
+    log.debug("IoTDB插入属性拆分序列成功: path={}, property={}, iotId={}", seriesPath, property, up.getIotId());
+  }
+
+  /**
+   * 按事件名拆分时间序列写入
+   * 路径: root.device.{productKey}.{deviceId}.event.{sanitizedEvent}
+   * 精简字段：message_type,content,create_time,ext1(maxStorage)
+   */
+  private void saveEventSeriesToIoTDB(BaseUPRequest up, int maxStorage, long timestamp) throws Exception {
+    // 通过 executeWithRetry 统一处理，无需在此检查 session
+
+    String seriesPath = buildDevicePath(up.getProductKey(), up.getDeviceId()) + ".event." + sanitizePathNode(up.getEvent());
+
+    List<String> measurements = List.of("message_type","content","create_time","device_name","device_id","iot_id","product_key","ext1");
+
+    List<org.apache.iotdb.tsfile.file.metadata.enums.TSDataType> types = List.of(
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.INT64,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT,
+        org.apache.iotdb.tsfile.file.metadata.enums.TSDataType.TEXT
+    );
+
+    List<Object> values = List.of(
+        escapeValue(MessageType.EVENT.name()),
+        escapeValue(up.getEventName()),
+        timestamp,
+        escapeValue(up.getDeviceName()),
+        escapeValue(up.getDeviceId()),
+        escapeValue(up.getIotId()),
+        escapeValue(up.getProductKey()),
+        String.valueOf(maxStorage)
+    );
+
+    executeWithRetry(() -> {
+      Session currentSession = getSession();
+      if (currentSession == null) {
+        throw new IllegalStateException("IoTDB Session 不可用");
+      }
+      currentSession.insertRecord(seriesPath, timestamp, measurements, types, values);
+      return null;
+    }, "insertRecord", seriesPath, up.getIotId());
+
+    log.debug("IoTDB插入事件拆分序列成功: path={}, event={}, iotId={}", seriesPath, up.getEvent(), up.getIotId());
   }
 
   /**
@@ -519,11 +975,29 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
     return cleaned;
   }
 
+  private String resolvePathNode(String path, String tag) {
+    if (StrUtil.isBlank(path) || StrUtil.isBlank(tag)) {
+      return "";
+    }
+    int idx = path.indexOf(tag);
+    if (idx < 0) {
+      return "";
+    }
+    String sub = path.substring(idx + tag.length());
+    int dot = sub.indexOf('.');
+    if (dot >= 0) {
+      return sub.substring(0, dot);
+    }
+    return sub;
+  }
+
   @Override
   public PageBean<IoTDeviceLogVO> pageList(LogQuery logQuery) {
     try {
-      if (session == null) {
-        log.warn("IoTDB session未初始化");
+      // 统一获取 session
+      Session currentSession = getSession();
+      if (currentSession == null) {
+        log.warn("IoTDB session不可用且重连失败，返回空结果");
         return new PageBean<>(new ArrayList<>(), 0L, logQuery.getPageSize(), logQuery.getPageNum());
       }
 
@@ -577,6 +1051,17 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
         sql.append(" event='").append(logQuery.getEvent()).append("'");
         hasWhere = true;
       }
+      
+      // 添加时间范围查询条件
+      if (logQuery.getBeginCreateTime() != null) {
+        sql.append(hasWhere ? " AND" : " WHERE");
+        sql.append(" time >= ").append(logQuery.getBeginCreateTime() * 1000); // 转换为毫秒
+        hasWhere = true;
+      }
+      if (logQuery.getEndCreateTime() != null) {
+        sql.append(hasWhere ? " AND" : " WHERE");
+        sql.append(" time <= ").append(logQuery.getEndCreateTime() * 1000); // 转换为毫秒
+      }
 
       sql.append(" ORDER BY time DESC LIMIT ").append(logQuery.getPageSize())
           .append(" OFFSET ").append((logQuery.getPageNum() - 1) * logQuery.getPageSize());
@@ -593,24 +1078,38 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
         log.debug("IoTDB统计SQL: {}", countSql);
 
         try {
-          var countDataSet = session.executeQueryStatement(countSql);
-          if (countDataSet.hasNext()) {
-            RowRecord countRecord = countDataSet.next();
-            if (!countRecord.getFields().isEmpty()) {
-              Field countField = countRecord.getFields().get(0);
-              String countValue = getFieldValue(countField);
-              total = countValue != null ? Long.parseLong(countValue) : 0;
+          // 确保 session 可用
+          Session countSession = getSession();
+          if (countSession == null) {
+            log.warn("IoTDB session不可用，跳过统计查询");
+          } else {
+            var countDataSet = countSession.executeQueryStatement(countSql);
+            if (countDataSet.hasNext()) {
+              RowRecord countRecord = countDataSet.next();
+              if (!countRecord.getFields().isEmpty()) {
+                Field countField = countRecord.getFields().get(0);
+                String countValue = getFieldValue(countField);
+                total = countValue != null ? Long.parseLong(countValue) : 0;
+              }
             }
+            countDataSet.closeOperationHandle();
           }
-          countDataSet.closeOperationHandle();
         } catch (Exception e) {
           log.warn("IoTDB统计查询失败，使用结果集大小: {}", e.getMessage());
+          // 如果是连接错误，标记 session 无效
+          if (isReconnectNeeded(e instanceof Exception ? (Exception) e : new RuntimeException(e.getMessage()))) {
+            invalidateSession();
+          }
         }
 
         // 2. 查询数据
-        var dataSet = session.executeQueryStatement(sql.toString());
+        Session querySession = getSession();
+        if (querySession == null) {
+          log.warn("IoTDB session不可用，跳过数据查询");
+        } else {
+          var dataSet = querySession.executeQueryStatement(sql.toString());
 
-        while (dataSet.hasNext()) {
+          while (dataSet.hasNext()) {
           RowRecord record = dataSet.next();
           IoTDeviceLogVO vo = new IoTDeviceLogVO();
 
@@ -634,15 +1133,16 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
             vo.setDeviceName(getFieldValue(fields.get(6)));
           }
 
-          // 设置其他字段
-          vo.setProductKey(logQuery.getProductKey());
-          vo.setDeviceId(logQuery.getDeviceId());
-          vo.setIotId(logQuery.getIotId());
+            // 设置其他字段
+            vo.setProductKey(logQuery.getProductKey());
+            vo.setDeviceId(logQuery.getDeviceId());
+            vo.setIotId(logQuery.getIotId());
 
-          resultList.add(vo);
+            resultList.add(vo);
+          }
+
+          dataSet.closeOperationHandle();
         }
-
-        dataSet.closeOperationHandle();
 
         // 如果没有统计到总数，使用结果集大小
         if (total == 0 && !resultList.isEmpty()) {
@@ -653,6 +1153,10 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
       } catch (IoTDBConnectionException | StatementExecutionException e) {
         log.error("IoTDB执行查询失败: sql={}", sql, e);
+        // 连接错误时标记 session 无效
+        if (isReconnectNeeded(e)) {
+          invalidateSession();
+        }
       }
 
       return new PageBean<>(resultList, total, logQuery.getPageSize(), logQuery.getPageNum());
@@ -666,8 +1170,10 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
   @Override
   public IoTDeviceLogVO queryById(LogQuery logQuery) {
     try {
-      if (session == null) {
-        log.warn("IoTDB session未初始化");
+      // 统一获取 session
+      Session currentSession = getSession();
+      if (currentSession == null) {
+        log.warn("IoTDB session不可用且重连失败，返回null");
         return null;
       }
 
@@ -686,7 +1192,12 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
       log.debug("IoTDB查询日志详情SQL: {}", sql);
 
       try {
-        var dataSet = session.executeQueryStatement(sql);
+        // 确保 session 可用
+        Session detailSession = getSession();
+        if (detailSession == null) {
+          return null;
+        }
+        var dataSet = detailSession.executeQueryStatement(sql);
 
         if (dataSet.hasNext()) {
           RowRecord record = dataSet.next();
@@ -725,6 +1236,10 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
       } catch (IoTDBConnectionException | StatementExecutionException e) {
         log.error("IoTDB执行日志详情查询失败: sql={}", sql, e);
+        // 连接错误时标记 session 无效
+        if (isReconnectNeeded(e)) {
+          invalidateSession();
+        }
         return null;
       }
 
@@ -739,8 +1254,12 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
     List<IoTDeviceEvents> list = selectDevEvents(productKey);
     for (IoTDeviceEvents devEvent : list) {
       try {
-        if (session == null) {
-          log.warn("IoTDB session未初始化");
+        // 统一获取 session
+        Session currentSession = getSession();
+        if (currentSession == null) {
+          log.warn("IoTDB session不可用且重连失败，跳过事件统计");
+          devEvent.setQty("0");
+          devEvent.setTime("");
           continue;
         }
 
@@ -753,43 +1272,75 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
         // 使用buildDevicePath构建路径查询事件元数据
         String devicePath = buildDevicePath(parsed[0], parsed[1]) + ".event_metadata";
-        String sql = "SELECT COUNT(*) as qty, MAX(time) as last_time FROM " + devicePath +
+
+        // IoTDB 不支持混合聚合查询，需要分两次查询
+        // 1. 查询事件数量
+        String countSql = "SELECT COUNT(content) FROM " + devicePath +
             " WHERE event='" + devEvent.getId() + "'";
 
-        log.debug("IoTDB查询事件统计SQL: {}", sql);
+        log.debug("IoTDB查询事件数量SQL: {}", countSql);
 
         try {
-          var dataSet = session.executeQueryStatement(sql);
-
-          if (dataSet.hasNext()) {
-            RowRecord record = dataSet.next();
-            List<Field> fields = record.getFields();
-
-            if (fields.size() >= 2) {
-              // 获取事件数量
-              String qtyValue = getFieldValue(fields.get(0));
-              if (qtyValue != null) {
-                Long count = Long.parseLong(qtyValue);
-                devEvent.setQty(count >= 100 ? "99+" : String.valueOf(count));
-              } else {
-                devEvent.setQty("0");
-              }
-
-              // 获取最后更新时间
-              String timeValue = getFieldValue(fields.get(1));
-              devEvent.setTime(timeValue != null ? timeValue : "");
-            }
-          } else {
+          // 确保 session 可用
+          Session eventCountSession = getSession();
+          if (eventCountSession == null) {
             devEvent.setQty("0");
+            devEvent.setTime("");
+            continue;
+          }
+          // 查询数量
+          var countDataSet = eventCountSession.executeQueryStatement(countSql);
+          long count = 0;
+
+          if (countDataSet.hasNext()) {
+            RowRecord countRecord = countDataSet.next();
+            List<Field> countFields = countRecord.getFields();
+            if (!countFields.isEmpty()) {
+              String countValue = getFieldValue(countFields.get(0));
+              if (countValue != null) {
+                count = Long.parseLong(countValue);
+              }
+            }
+          }
+          countDataSet.closeOperationHandle();
+
+          devEvent.setQty(count >= 100 ? "99+" : String.valueOf(count));
+
+          // 2. 查询最后时间（只有当有数据时才查询）
+          if (count > 0) {
+            String timeSql = "SELECT content FROM " + devicePath +
+                " WHERE event='" + devEvent.getId() + "'" +
+                " ORDER BY time DESC LIMIT 1";
+
+            log.debug("IoTDB查询事件最后时间SQL: {}", timeSql);
+
+            Session eventTimeSession = getSession();
+            if (eventTimeSession == null) {
+              devEvent.setTime("");
+              continue;
+            }
+            var timeDataSet = eventTimeSession.executeQueryStatement(timeSql);
+            if (timeDataSet.hasNext()) {
+              RowRecord timeRecord = timeDataSet.next();
+              // 时间戳在 record.getTimestamp() 中
+              long timestamp = timeRecord.getTimestamp();
+              devEvent.setTime(java.time.Instant.ofEpochMilli(timestamp).toString());
+            } else {
+              devEvent.setTime("");
+            }
+            timeDataSet.closeOperationHandle();
+          } else {
             devEvent.setTime("");
           }
 
-          dataSet.closeOperationHandle();
-
         } catch (IoTDBConnectionException | StatementExecutionException e) {
-          log.warn("IoTDB查询事件统计失败: sql={}", sql, e);
+          log.warn("IoTDB查询事件统计失败", e);
           devEvent.setQty("0");
           devEvent.setTime("");
+          // 连接错误时标记 session 无效
+          if (isReconnectNeeded(e)) {
+            invalidateSession();
+          }
         }
 
       } catch (Exception e) {
@@ -804,8 +1355,10 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
   @Override
   public PageBean<IoTDeviceLogMetadataVO> queryLogMeta(LogQuery logQuery) {
     try {
-      if (session == null) {
-        log.warn("IoTDB session未初始化");
+      // 统一获取 session
+      Session currentSession = getSession();
+      if (currentSession == null) {
+        log.warn("IoTDB session不可用且重连失败，返回空结果");
         return new PageBean<>(new ArrayList<>(), 0L, logQuery.getPageSize(), logQuery.getPageNum());
       }
 
@@ -832,10 +1385,23 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
       // 优先级 3: 如果只有 productKey
       else if (StrUtil.isNotBlank(logQuery.getProductKey())) {
         String cleanProductKey = sanitizePathNode(logQuery.getProductKey());
-        basePath = storageGroup + "." + cleanProductKey + ".*.property_metadata";
-        queryPaths.add(basePath);
-        basePath = storageGroup + "." + cleanProductKey + ".*.event_metadata";
-        queryPaths.add(basePath);
+        String productBase = storageGroup + "." + cleanProductKey + ".*";
+        boolean wantProperty = MessageType.PROPERTIES.name().equalsIgnoreCase(logQuery.getMessageType())
+            || StrUtil.isNotBlank(logQuery.getProperty());
+        boolean wantEvent = MessageType.EVENT.name().equalsIgnoreCase(logQuery.getMessageType())
+            || StrUtil.isNotBlank(logQuery.getEvent());
+
+        if (!wantProperty && !wantEvent) {
+          queryPaths.add(productBase + ".property.*");
+          queryPaths.add(productBase + ".event.*");
+        } else {
+          if (wantProperty) {
+            queryPaths.add(productBase + ".property.*");
+          }
+          if (wantEvent) {
+            queryPaths.add(productBase + ".event.*");
+          }
+        }
         log.debug("IoTDB使用产品模糊查询元数据");
       }
       else {
@@ -843,39 +1409,83 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
         return new PageBean<>(new ArrayList<>(), 0L, logQuery.getPageSize(), logQuery.getPageNum());
       }
 
-      // 如果有基础路径，添加属性和事件元数据路径
+      // 如果有基础路径，添加属性或事件序列路径（按参数/类型选择）
       if (basePath != null && queryPaths.isEmpty()) {
-        queryPaths.add(basePath + ".property_metadata");
-        queryPaths.add(basePath + ".event_metadata");
+        boolean wantProperty = MessageType.PROPERTIES.name().equalsIgnoreCase(logQuery.getMessageType())
+            || StrUtil.isNotBlank(logQuery.getProperty());
+        boolean wantEvent = MessageType.EVENT.name().equalsIgnoreCase(logQuery.getMessageType())
+            || StrUtil.isNotBlank(logQuery.getEvent());
+
+        if (!wantProperty && !wantEvent) {
+          // 未指定类型与具体名时，两类都查询
+          queryPaths.add(basePath + ".property.*");
+          queryPaths.add(basePath + ".event.*");
+        } else {
+          if (wantProperty) {
+            if (StrUtil.isNotBlank(logQuery.getProperty())) {
+              queryPaths.add(basePath + ".property." + sanitizePathNode(logQuery.getProperty()));
+            } else {
+              queryPaths.add(basePath + ".property.*");
+            }
+          }
+          if (wantEvent) {
+            if (StrUtil.isNotBlank(logQuery.getEvent())) {
+              queryPaths.add(basePath + ".event." + sanitizePathNode(logQuery.getEvent()));
+            } else {
+              queryPaths.add(basePath + ".event.*");
+            }
+          }
+        }
       }
 
       List<IoTDeviceLogMetadataVO> resultList = new ArrayList<>();
+      long total = 0;
 
       // 执行对每个路径的查询
       for (String queryPath : queryPaths) {
         StringBuilder sql = new StringBuilder();
-        // 不同路径查询不同字段：属性查11个，事件查9个
-        if (queryPath.contains(".property_metadata")) {
-          sql.append("SELECT message_type, property, content, device_name, device_id, iot_id, product_key, create_time, ext1, ext2, ext3 FROM ")
+        // 改造后字段精简：属性6列，事件4列
+        if (queryPath.contains(".property.")) {
+          sql.append("SELECT message_type, content, create_time, device_name, device_id, iot_id, product_key, ext1, ext2, ext3 FROM ")
               .append(queryPath);
-        } else if (queryPath.contains(".event_metadata")) {
-          sql.append("SELECT message_type, event, content, device_name, device_id, iot_id, product_key, create_time, ext1 FROM ")
+        } else if (queryPath.contains(".event.")) {
+          sql.append("SELECT message_type, content, create_time, device_name, device_id, iot_id, product_key, ext1 FROM ")
               .append(queryPath);
         } else {
           continue; // 跳过不是元数据的路径
         }
 
-        // 动态构建 WHERE 子句
+        // 仅保留时间范围过滤
         boolean hasWhere = false;
-        if (StrUtil.isNotBlank(logQuery.getProperty())) {
+        
+        // 添加时间范围查询条件
+        if (logQuery.getBeginCreateTime() != null) {
           sql.append(hasWhere ? " AND" : " WHERE");
-          sql.append(" property='").append(logQuery.getProperty()).append("'");
+          sql.append(" time >= ").append(logQuery.getBeginCreateTime() * 1000); // 转换为毫秒
           hasWhere = true;
         }
-        if (StrUtil.isNotBlank(logQuery.getEvent())) {
+        if (logQuery.getEndCreateTime() != null) {
           sql.append(hasWhere ? " AND" : " WHERE");
-          sql.append(" event='").append(logQuery.getEvent()).append("'");
-          hasWhere = true;
+          sql.append(" time <= ").append(logQuery.getEndCreateTime() * 1000); // 转换为毫秒
+        }
+
+        // 先查询总数（仅按时间过滤）
+        String countSql = buildMetadataCountSql(queryPath, logQuery);
+        log.debug("IoTDB查询元数据总数SQL: {}", countSql);
+
+        try {
+          var countDataSet = session.executeQueryStatement(countSql);
+          if (countDataSet.hasNext()) {
+            RowRecord countRecord = countDataSet.next();
+            if (!countRecord.getFields().isEmpty()) {
+              Field countField = countRecord.getFields().get(0);
+              String countValue = getFieldValue(countField);
+              total += countValue != null ? Long.parseLong(countValue) : 0;
+            }
+          }
+          countDataSet.closeOperationHandle();
+        } catch (Exception e) {
+          log.warn("IoTDB元数据统计查询失败: {}", e.getMessage());
         }
 
         sql.append(" ORDER BY time DESC LIMIT ").append(logQuery.getPageSize())
@@ -885,7 +1495,13 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
         // 执行查询
         try {
-          var dataSet = session.executeQueryStatement(sql.toString());
+          // 确保 session 可用
+          Session metaSession = getSession();
+          if (metaSession == null) {
+            log.warn("IoTDB session不可用，跳过元数据查询");
+            continue;
+          }
+          var dataSet = metaSession.executeQueryStatement(sql.toString());
 
           while (dataSet.hasNext()) {
             RowRecord record = dataSet.next();
@@ -897,36 +1513,34 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
                 java.time.ZoneId.systemDefault()
             ));
 
-            // 解析字段值——属性查11个字段，事件查9个字段
+            // 解析字段值——属性6列，事件4列
             List<Field> fields = record.getFields();
-            if (queryPath.contains(".property_metadata")) {
-              // 属性元数据: message_type, property, content, device_name, device_id, iot_id, product_key, create_time, ext1(propertyName), ext2(formatValue), ext3(symbol)
-              if (fields.size() >= 11) {
+            if (queryPath.contains(".property.")) {
+              if (fields.size() >= 10) {
                 vo.setMessageType(getFieldValue(fields.get(0)));
-                vo.setProperty(getFieldValue(fields.get(1)));
-                vo.setContent(getFieldValue(fields.get(2)));
+                vo.setContent(getFieldValue(fields.get(1)));
                 vo.setDeviceName(getFieldValue(fields.get(3)));
                 vo.setDeviceId(getFieldValue(fields.get(4)));
                 vo.setIotId(getFieldValue(fields.get(5)));
                 vo.setProductKey(getFieldValue(fields.get(6)));
-                // fields.get(7) = create_time，已在vo.setCreateTime()中设置
-                vo.setExt1(getFieldValue(fields.get(8)));   // propertyName
-                vo.setExt2(getFieldValue(fields.get(9)));   // formatValue
-                vo.setExt3(getFieldValue(fields.get(10)));  // symbol
+                vo.setExt1(getFieldValue(fields.get(7)));   
+                vo.setExt2(getFieldValue(fields.get(8)));   
+                vo.setExt3(getFieldValue(fields.get(9)));   
               }
-            } else if (queryPath.contains(".event_metadata")) {
-              // 事件元数据: message_type, event, content, device_name, device_id, iot_id, product_key, create_time, ext1(JSONData)
-              if (fields.size() >= 9) {
+              String prop = StrUtil.isNotBlank(logQuery.getProperty()) ? logQuery.getProperty() : resolvePathNode(queryPath, ".property.");
+              vo.setProperty(prop);
+            } else if (queryPath.contains(".event.")) {
+              if (fields.size() >= 8) {
                 vo.setMessageType(getFieldValue(fields.get(0)));
-                vo.setEvent(getFieldValue(fields.get(1)));
-                vo.setContent(getFieldValue(fields.get(2)));
+                vo.setContent(getFieldValue(fields.get(1)));
                 vo.setDeviceName(getFieldValue(fields.get(3)));
                 vo.setDeviceId(getFieldValue(fields.get(4)));
                 vo.setIotId(getFieldValue(fields.get(5)));
                 vo.setProductKey(getFieldValue(fields.get(6)));
-                // fields.get(7) = create_time，已在vo.setCreateTime()中设置
-                vo.setExt1(getFieldValue(fields.get(8)));   // JSON数据
+                vo.setExt1(getFieldValue(fields.get(7)));   
               }
+              String evt = StrUtil.isNotBlank(logQuery.getEvent()) ? logQuery.getEvent() : resolvePathNode(queryPath, ".event.");
+              vo.setEvent(evt);
             }
 
             resultList.add(vo);
@@ -937,10 +1551,19 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
 
         } catch (IoTDBConnectionException | StatementExecutionException e) {
           log.error("IoTDB执行元数据查询失败: sql={}", sql, e);
+          // 连接错误时标记 session 无效
+          if (isReconnectNeeded(e)) {
+            invalidateSession();
+          }
         }
       }
 
-      return new PageBean<>(resultList, (long) resultList.size(), logQuery.getPageSize(), logQuery.getPageNum());
+      // 如果没有统计到总数，使用结果集大小
+      if (total == 0 && !resultList.isEmpty()) {
+        total = resultList.size();
+      }
+
+      return new PageBean<>(resultList, total, logQuery.getPageSize(), logQuery.getPageNum());
 
     } catch (Exception e) {
       log.error("IoTDB查询设备元数据失败", e);
@@ -1018,6 +1641,40 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
       sql.append(hasWhere ? " AND" : " WHERE");
       sql.append(" event='").append(logQuery.getEvent()).append("'");
       hasWhere = true;
+    }
+    
+    // 添加时间范围查询条件
+    if (logQuery.getBeginCreateTime() != null) {
+      sql.append(hasWhere ? " AND" : " WHERE");
+      sql.append(" time >= ").append(logQuery.getBeginCreateTime() * 1000); // 转换为毫秒
+      hasWhere = true;
+    }
+    if (logQuery.getEndCreateTime() != null) {
+      sql.append(hasWhere ? " AND" : " WHERE");
+      sql.append(" time <= ").append(logQuery.getEndCreateTime() * 1000); // 转换为毫秒
+    }
+
+    return sql.toString();
+  }
+
+  /**
+   * 构建元数据统计SQL
+   */
+  private String buildMetadataCountSql(String queryPath, LogQuery logQuery) {
+    StringBuilder sql = new StringBuilder();
+    sql.append("SELECT COUNT(*) FROM ").append(queryPath);
+
+    boolean hasWhere = false;
+    
+    // 添加时间范围查询条件
+    if (logQuery.getBeginCreateTime() != null) {
+      sql.append(hasWhere ? " AND" : " WHERE");
+      sql.append(" time >= ").append(logQuery.getBeginCreateTime() * 1000); // 转换为毫秒
+      hasWhere = true;
+    }
+    if (logQuery.getEndCreateTime() != null) {
+      sql.append(hasWhere ? " AND" : " WHERE");
+      sql.append(" time <= ").append(logQuery.getEndCreateTime() * 1000); // 转换为毫秒
     }
 
     return sql.toString();

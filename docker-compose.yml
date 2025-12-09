@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: nexiot/back:2.0
+    image: nexiot/back:2.1
     container_name: cn-universal-backend
     restart: unless-stopped
     ports:
@@ -56,7 +56,7 @@ services:
         max-file: "3"
 
   frontend:
-    image: nexiot/front:2.0
+    image: nexiot/front:2.1
     container_name: cn-universal-frontend
     restart: unless-stopped
     ports:
@@ -74,7 +74,7 @@ services:
         max-file: "3"
 
   mysql:
-    image: nexiot/mysql8:2.0
+    image: nexiot/mysql8:2.1
     container_name: cn-universal-mysql
     restart: unless-stopped
     environment:

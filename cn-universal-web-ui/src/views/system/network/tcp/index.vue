@@ -74,12 +74,8 @@
             </a-col>
             <a-col :lg="6" :md="8" :sm="12" :xs="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="handleQuery" icon="search">{{
-                    $t('button.query')
-                  }}</a-button>
-                <a-button style="margin-left: 8px" @click="resetQuery" icon="reload">{{
-                    $t('button.reset')
-                  }}</a-button>
+                <a-button type="primary" @click="handleQuery" icon="search">{{ $t('button.query') }}</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery" icon="reload">{{ $t('button.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -90,8 +86,7 @@
         <a-space>
           <a-button type="primary" @click="$refs.createForm.handleAdd()"
                     v-hasPermi="['network:tcp:add']" icon="plus">
-            {{ $t('button.add') }}
-          </a-button>
+            {{ $t('button.add') }}</a-button>
           <a-button
             type="danger"
             :disabled="multiple"
@@ -99,11 +94,9 @@
             v-hasPermi="['network:tcp:remove']"
             ghost
             icon="delete">
-            {{ $t('button.delete') }}
-          </a-button>
+            {{ $t('button.delete') }}</a-button>
           <a-button @click="handleExport" v-hasPermi="['network:tcp:export']" icon="export">
-            {{ $t('button.export') }}
-          </a-button>
+            {{ $t('button.export') }}</a-button>
         </a-space>
         <a-button
           type="dashed"
@@ -164,7 +157,7 @@
               </div>
               <div class="card-row">
                 <a-icon type="poweroff" style="margin-right:4px;"/>
-                {{ $t('common.status') }}：
+               {{$t('common.status')}}：
                 <span :class="getStatusClass(item)">
                   {{ getStatusText(item) }}
                 </span>
@@ -235,12 +228,10 @@
                 <a-descriptions-item label="公司简称" v-if="currentBindProduct.companyNo">
                   {{ currentBindProduct.companyNo }}
                 </a-descriptions-item>
-                <a-descriptions-item :label="$t('device.node')"
-                                     v-if="currentBindProduct.deviceNode">
+                <a-descriptions-item :label="$t('device.node')" v-if="currentBindProduct.deviceNode">
                   {{ currentBindProduct.deviceNode }}
                 </a-descriptions-item>
-                <a-descriptions-item :label="$t('device.accessMethod')"
-                                     v-if="currentBindProduct.thirdPlatform">
+                <a-descriptions-item :label="$t('device.accessMethod')" v-if="currentBindProduct.thirdPlatform">
                   {{ currentBindProduct.thirdPlatform }}
                 </a-descriptions-item>
               </a-descriptions>
@@ -266,13 +257,7 @@
 </template>
 
 <script>
-import {
-  delNetwork,
-  delNetworkBatch,
-  listNetwork,
-  startNetwork,
-  stopNetwork
-} from '@/api/system/network'
+import {delNetwork, delNetworkBatch, listNetwork, startNetwork, stopNetwork} from '@/api/system/network'
 import {listProduct} from '@/api/system/dev/product'
 import CreateForm from '../modules/CreateForm'
 import {parseTime} from '@/utils/ruoyi'
@@ -626,9 +611,7 @@ export default {
     },
     /** 检查TCP配置是否完整 */
     isTcpConfigured(item) {
-      if (!item.configuration) {
-        return false
-      }
+      if (!item.configuration) return false
       try {
         const config = typeof item.configuration === 'string'
           ? JSON.parse(item.configuration)
@@ -660,9 +643,7 @@ export default {
     },
     /** 获取产品图片 */
     getProductImage(item) {
-      if (!item.photoUrl) {
-        return null
-      }
+      if (!item.photoUrl) return null
 
       // 如果是字符串，尝试解析JSON
       if (typeof item.photoUrl === 'string') {

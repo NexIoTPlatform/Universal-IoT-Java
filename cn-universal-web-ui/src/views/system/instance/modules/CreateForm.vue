@@ -50,7 +50,8 @@
           allow-clear
           show-search
           option-filter-prop="children"
-          :filter-option="filterOption">
+          :filter-option="filterOption"
+          @change="onGatewayDeviceChange">
           <a-select-option v-for="(item) in gatewayList" :key="item.deviceId"
                            :value="item.deviceId">
             {{ item.deviceName }}- {{ item.deviceId }}
@@ -146,12 +147,14 @@
         />
         <div class="form-item-help">
           Modbus从站地址，范围1-247，设备ID将自动生成
+          <span v-if="usedSlaveAddresses.length > 0" style="color: #ff4d4f; margin-left: 8px;">
+            已使用：{{ usedSlaveAddresses.join(', ') }}
+          </span>
         </div>
       </a-form-model-item>
 
       <a-form-model-item label="设备序列号" prop="deviceId">
-        <a-input v-model="form.deviceId" placeholder="请输入设备序列号"
-                 :disabled="isEdit || isModbusSubDevice"/>
+        <a-input v-model="form.deviceId" placeholder="请输入设备序列号" :disabled="isEdit || isModbusSubDevice"/>
         <div v-if="isModbusSubDevice" class="form-item-help">
           设备ID将根据父设备ID和从站地址自动生成
         </div>
@@ -162,8 +165,8 @@
 
       <a-form-model-item label="设备坐标" prop="longitude">
         <a-input v-model="locationStr" :disabled="true" style="width: 75%; margin-right: 8px;"/>
-        <a-button type="primary" style="width: 20%;" :disabled="isEdit" @click="openMap">
-          获取
+        <a-button type="primary" style="width: 20%;"  @click="openMap">
+          标注地图
         </a-button>
       </a-form-model-item>
       <a-form-model-item :label="$t('common.remark')" prop="detail">
@@ -197,7 +200,7 @@
 </template>
 
 <script>
-import {addInstance, getInstance, getModels, updateInstance} from '@/api/system/dev/instance'
+import {addInstance, getInstance, getModels, updateInstance, getSubDeviceRelation} from '@/api/system/dev/instance'
 import {
   getInstanceGateway,
   getProByKey,
@@ -355,9 +358,13 @@ export default {
           }
         ],
         slaveAddress: [
-          {required: true, message: '请输入从站地址', trigger: 'blur'},
           {
             validator: (rule, value, callback) => {
+              // 如果是编辑模式，不验证必填和冲突
+              if (this.isEdit) {
+                return callback()
+              }
+              // 新增模式下验证必填
               if (!value) {
                 return callback(new Error('请输入从站地址'))
               }
@@ -365,7 +372,10 @@ export default {
                 return callback(new Error('从站地址必须在1-247之间'))
               }
               // 检查从站地址是否已存在
-              this.checkSlaveAddressExists(value, callback)
+              if (this.usedSlaveAddresses.includes(String(value))) {
+                return callback(new Error(`从站地址 ${value} 已被使用，请选择其他地址`))
+              }
+              callback()
             },
             trigger: 'blur'
           }
@@ -377,7 +387,11 @@ export default {
         value: 'id',
         key: 'id'
       },
-      gatewayList: []
+      gatewayList: [],
+      // 已使用的从站地址列表
+      usedSlaveAddresses: [],
+      // 网关产品Key（用于查询子设备关系）
+      gwProductKey: null
     }
   },
   computed: {
@@ -436,6 +450,8 @@ export default {
       this.typeName = undefined
       this.companie = undefined
       this.sorts = []
+      this.usedSlaveAddresses = []
+      this.gwProductKey = null
       this.form = {
         id: null,
         name: undefined,
@@ -710,6 +726,14 @@ export default {
     getGatewayList() {
       getInstanceGateway(this.form.productKey).then(res => {
         this.gatewayList = res.data
+        // 如果已选择网关设备，获取其productKey并加载已使用的从站地址
+        if (this.form.extDeviceId && this.isModbusSubDevice && !this.isEdit) {
+          const selectedGateway = this.gatewayList.find(gw => gw.deviceId === this.form.extDeviceId)
+          if (selectedGateway && selectedGateway.productKey) {
+            this.gwProductKey = selectedGateway.productKey
+            this.getUsedSlaveAddresses()
+          }
+        }
       })
     },
     /** 查询设备管理列表 */
@@ -762,17 +786,53 @@ export default {
         this.form.deviceId = `${this.form.extDeviceId}-${value}`
       }
     },
-    // 检查从站地址是否已存在
-    checkSlaveAddressExists(slaveAddress, callback) {
-      // 这里需要调用API检查从站地址是否已存在
-      // 暂时先通过验证
-      callback()
+    // 网关设备变化处理
+    onGatewayDeviceChange(deviceId) {
+      if (deviceId && this.isModbusSubDevice && !this.isEdit) {
+        // 找到选中的网关设备，获取其productKey
+        const selectedGateway = this.gatewayList.find(gw => gw.deviceId === deviceId)
+        if (selectedGateway && selectedGateway.productKey) {
+          this.gwProductKey = selectedGateway.productKey
+          this.getUsedSlaveAddresses()
+        }
+      }
+    },
+    // 获取已使用的从站地址
+    async getUsedSlaveAddresses() {
+      if (!this.gwProductKey || !this.form.extDeviceId) {
+        this.usedSlaveAddresses = []
+        return
+      }
+      try {
+        const response = await getSubDeviceRelation(this.gwProductKey, this.form.extDeviceId)
+        if (response && response.code === 0) {
+          const subDevices = response.data || []
+          // 提取已使用的从站地址（从ext1字段）
+          this.usedSlaveAddresses = subDevices
+            .map(device => device.ext1)
+            .filter(addr => addr && addr.trim() !== '')
+            .map(addr => String(addr).trim())
+        } else {
+          this.usedSlaveAddresses = []
+        }
+      } catch (error) {
+        console.error('获取已使用从站地址失败:', error)
+        this.usedSlaveAddresses = []
+      }
     },
     // 获取产品的传输协议
     getProductTransportProtocol() {
-      // 这里需要根据productKey获取产品的transportProtocol
-      // 暂时返回modbus作为示例
-      return 'modbus'
+      // 从表单中获取传输协议
+      if (this.form.protocol) {
+        return this.form.protocol
+      }
+      // 如果表单中没有，尝试从产品列表中查找
+      if (this.form.productKey) {
+        // 这里可以根据需要从产品列表中查找
+        // 暂时返回空字符串，让 isModbusSubDevice 计算属性处理
+        return ''
+      }
+      return ''
     }
   }
 }

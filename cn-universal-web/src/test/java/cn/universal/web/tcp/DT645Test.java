@@ -1,8 +1,10 @@
 package cn.universal.web.tcp;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.universal.plugins.protocolapi.extend.HexFunctions;
-import cn.universal.plugins.protocolapi.extend.ProtocolFunctions;
+import cn.universal.core.engine.extend.HexFunctions;
+import cn.universal.core.engine.extend.ProtocolFunctions;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,20 @@ import org.junit.jupiter.api.Test;
  */
 @Slf4j
 public class DT645Test {
+
+
+  @Test
+  public void test_bcd_count() {
+    System.out.println(DateUtil.year(new Date()));
+
+//    HexFunctions hex = new HexFunctions();
+//   Integer count=5;
+//   System.out.println(count.toString());
+//    StrUtil.toString()
+//    String cs = hex.hex_bcdToDec(data, 256);
+//    System.out.println(data + cs + "16");
+  }
+
   @Test
   public void test_len_count() {
     ProtocolFunctions protocol = new ProtocolFunctions();
@@ -46,7 +62,7 @@ public class DT645Test {
     HexFunctions hex = new HexFunctions();
     ProtocolFunctions protocol = new ProtocolFunctions();
     //    String dot="32";
-    String host = hex.hex_add33(hex.hex_fromAscii("tcp.nexiot.xyz"));
+    String host = hex.hex_add33(hex.hex_fromAscii("tcp.nexiot.cc"));
     String port = hex.hex_add33(hex.hex_fromAscii("19999"));
     String dot = hex.hex_add33("FF");
     // 数据区

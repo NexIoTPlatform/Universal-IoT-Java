@@ -87,6 +87,7 @@ public class SysDictDataController extends BaseController {
     return toAjax(dictDataService.insertDictData(dict));
   }
 
+
   /** 修改保存字典类型 */
   @PutMapping
   public AjaxResult edit(@Validated @RequestBody SysDictData dict) {

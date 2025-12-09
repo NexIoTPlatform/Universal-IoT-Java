@@ -10,4 +10,6 @@ public interface NoticeRecordService {
   List<NoticeSendRecord> list();
 
   List<NoticeSendRecord> search(String keyword, String type, String status);
+
+  List<NoticeSendRecord> search(String keyword, String type, String status, String creator);
 }

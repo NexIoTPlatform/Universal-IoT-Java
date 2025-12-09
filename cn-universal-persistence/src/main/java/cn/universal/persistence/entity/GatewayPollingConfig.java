@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * 网关轮询配置实体
- *
+ * 
  * @author Aleo
  * @date 2025-10-26
  */
@@ -39,7 +39,8 @@ public class GatewayPollingConfig implements Serializable {
   private static final long serialVersionUID = 1L;
 
   /** 主键ID */
-  @Id private Long id;
+  @Id
+  private Long id;
 
   /** 网关设备ID */
   @Column(name = "device_id")

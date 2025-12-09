@@ -1,146 +1,129 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.universal.persistence.mapper.IoTUserMapper">
-  <resultMap id="BaseResultMap" type="cn.universal.persistence.entity.IoTUser">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <result column="id" jdbcType="BIGINT" property="id"/>
-    <result column="org_id" jdbcType="BIGINT" property="orgId"/>
-    <result column="username" jdbcType="VARCHAR" property="username"/>
-    <result column="password" jdbcType="VARCHAR" property="password"/>
-    <result column="alias" jdbcType="VARCHAR" property="alias"/>
-    <result column="union_id" jdbcType="VARCHAR" property="unionId"/>
-    <result column="email" jdbcType="VARCHAR" property="email"/>
-    <result column="salt" jdbcType="VARCHAR" property="salt"/>
-    <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
-    <result column="status" jdbcType="BIT" property="status"/>
-    <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
-    <result column="login_ip" jdbcType="VARCHAR" property="loginIp"/>
-    <result column="login_date" jdbcType="TIMESTAMP" property="loginDate"/>
-    <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
-    <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
-    <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
-    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate"/>
-    <result column="remark" jdbcType="VARCHAR" property="remark"/>
-    <result column="configuration" jdbcType="VARCHAR" property="cfg"/>
+    <resultMap id="BaseResultMap" type="cn.universal.persistence.entity.IoTUser">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="org_id" jdbcType="BIGINT" property="orgId"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="alias" jdbcType="VARCHAR" property="alias"/>
+        <result column="union_id" jdbcType="VARCHAR" property="unionId"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="salt" jdbcType="VARCHAR" property="salt"/>
+        <result column="mobile" jdbcType="VARCHAR" property="mobile"/>
+        <result column="status" jdbcType="BIT" property="status"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="login_ip" jdbcType="VARCHAR" property="loginIp"/>
+        <result column="login_date" jdbcType="TIMESTAMP" property="loginDate"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="configuration" jdbcType="VARCHAR" property="cfg"/>
 
-    <result column="deleted" jdbcType="BIT" property="deleted"/>
-  </resultMap>
+        <result column="deleted" jdbcType="BIT" property="deleted"/>
+    </resultMap>
 
-  <update id="updateLoginDate">
-    update iot_user
-    set login_date=now()
-    where id = #{id}
-  </update>
+    <update id="updateLoginDate">
+        update iot_user
+        set login_date=now()
+        where id = #{id}
+    </update>
 
-  <select id="selectList" parameterType="cn.universal.persistence.entity.IoTUser"
-    resultMap="BaseResultMap">
-    select * from iot_user u
-    <where>
-      <if test="orgId!=null and orgId!=''">
-        and u.org_id=#{orgId}
-      </if>
-      <if test="username!=null and  username!=''">
-        and u.username like concat('%',#{username},'%')
-      </if>
-      <if test="unionId!=null  and unionId!=''">
-        and u.union_id=#{unionId}
-      </if>
-      <if test="mobile!=null and  mobile!=''">
-        and u.mobile=#{mobile}
-      </if>
-      <if test="id!=null and  id!=''">
-        and u.id=#{id}
-      </if>
-      <if test="alias!=null and  alias!=''">
-        and u.alias like concat ('%',#{alias},'%')
-      </if>
-      <if test="status!=null and status !=''">
-        and status=#{status}
-      </if>
-      <if test="createBy !=null and createBy!=''">
+    <select id="selectList" parameterType="cn.universal.persistence.entity.IoTUser"
+            resultMap="BaseResultMap">
+        select * from iot_user u
+        <where>
+            <if test="orgId!=null and orgId!=''">
+                and u.org_id=#{orgId}
+            </if>
+            <if test="username!=null and  username!=''">
+                and u.username like concat('%',#{username},'%')
+            </if>
+            <if test="unionId!=null  and unionId!=''">
+                and u.union_id=#{unionId}
+            </if>
+            <if test="mobile!=null and  mobile!=''">
+                and u.mobile=#{mobile}
+            </if>
+            <if test="id!=null and  id!=''">
+                and u.id=#{id}
+            </if>
+            <if test="alias!=null and  alias!=''">
+                and u.alias like concat ('%',#{alias},'%')
+            </if>
+            <if test="status!=null and status !=''">
+                and status=#{status}
+            </if>
+            <if test="createBy !=null and createBy!=''">
+                and u.create_by=#{createBy}
+            </if>
+            <if test="params!=null and params.beginTime!=null and params.beginTime!=''">
+                and date_format(create_date,'%y%m%d') >= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params!=null and params.endTime!=null and params.endTime!=''">
+                and date_format(create_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <!--      <if test="params!=null and params.scope != null and params.scope != ''">-->
+            <!--        AND ( ${params.scope} )-->
+            <!--      </if>-->
+        </where>
+    </select>
+
+    <select id="selectAllocatedList" parameterType="cn.universal.persistence.entity.bo.IoTUserBO"
+            resultMap="BaseResultMap">
+        select distinct u.id, u.org_id, u.username, u.union_id,u.alias, u.email, u.mobile, u.status,
+        u.create_date
+        from iot_user u
+        left join sys_user_role ur on u.union_id = ur.union_id
+        where u.deleted = 0 and ur.role_id = #{roleId}
+        <if test="username != null and username != ''">
+            AND u.username like concat('%', #{username}, '%')
+        </if>
+        <if test="mobile != null and mobile != ''">
+            AND u.mobile like concat('%', #{mobile}, '%')
+        </if>
+    </select>
+
+    <select id="selectUserByMobile" parameterType="string"
+            resultType="cn.universal.persistence.entity.IoTUser">
+        select *
+        from iot_user
+        where mobile = #{mobile}
+    </select>
+
+    <select id="selectUnallocatedList" parameterType="cn.universal.persistence.entity.bo.IoTUserBO"
+            resultMap="BaseResultMap">
+        select distinct u.id, u.org_id, u.username, u.union_id,u.alias, u.email, u.mobile, u.status,
+        u.create_date
+        from iot_user u
+        left join sys_user_role ur on u.union_id = ur.union_id
+        where u.deleted = 0
+        and (ur.role_id &lt;&gt; #{roleId} or ur.role_id IS NULL)
+        and u.union_id not in (select ur.union_id from sys_user_role where ur.role_id = #{roleId})
         and u.create_by=#{createBy}
-      </if>
-      <if test="params!=null and params.beginTime!=null and params.beginTime!=''">
-        and date_format(create_date,'%y%m%d') >= date_format(#{params.beginTime},'%y%m%d')
-      </if>
-      <if test="params!=null and params.endTime!=null and params.endTime!=''">
-        and date_format(create_date,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
-      </if>
-      <!--      <if test="params!=null and params.scope != null and params.scope != ''">-->
-      <!--        AND ( ${params.scope} )-->
-      <!--      </if>-->
-    </where>
-  </select>
+        <if test="username != null and username != ''">
+            AND u.username like concat('%', #{username}, '%')
+        </if>
+        <if test="mobile != null and mobile != ''">
+            AND u.mobile like concat('%', #{mobile}, '%')
+        </if>
 
-  <select id="selectAllocatedList" parameterType="cn.universal.persistence.entity.bo.IoTUserBO"
-    resultMap="BaseResultMap">
-    select distinct u.id, u.org_id, u.username, u.union_id,u.alias, u.email, u.mobile, u.status,
-    u.create_date
-    from iot_user u
-    left join sys_user_role ur on u.union_id = ur.union_id
-    where u.deleted = 0 and ur.role_id = #{roleId}
-    <if test="username != null and username != ''">
-      AND u.username like concat('%', #{username}, '%')
-    </if>
-    <if test="mobile != null and mobile != ''">
-      AND u.mobile like concat('%', #{mobile}, '%')
-    </if>
-  </select>
+    </select>
 
-  <select id="selectUserByMobile" parameterType="string"
-    resultType="cn.universal.persistence.entity.IoTUser">
-    select *
-    from iot_user
-    where mobile = #{mobile}
-  </select>
-
-  <select id="selectUnallocatedList" parameterType="cn.universal.persistence.entity.bo.IoTUserBO"
-    resultMap="BaseResultMap">
-    select distinct u.id, u.org_id, u.username, u.union_id,u.alias, u.email, u.mobile, u.status,
-    u.create_date
-    from iot_user u
-    left join sys_user_role ur on u.union_id = ur.union_id
-    where u.deleted = 0
-    and (ur.role_id &lt;&gt; #{roleId} or ur.role_id IS NULL)
-    and u.union_id not in (select ur.union_id from sys_user_role where ur.role_id = #{roleId})
-    and u.create_by=#{createBy}
-    <if test="username != null and username != ''">
-      AND u.username like concat('%', #{username}, '%')
-    </if>
-    <if test="mobile != null and mobile != ''">
-      AND u.mobile like concat('%', #{mobile}, '%')
-    </if>
-
-  </select>
-
-  <update id="licenseBuckle" parameterType="string">
-    update iot_user
-    set license=if(license = 0, 0, license - 1)
-    where union_id = #{unionId}
-  </update>
-
-  <update id="licenseAdd" parameterType="string">
-    update iot_user
-    set license=license + 1
-    where union_id = #{unionId}
-  </update>
-
-  <update id="licenseRecharge">
-    update iot_user
-    set license=license + #{licenseNumber},
-        license_total_amount=license_total_amount + #{licenseNumber}
-    where union_id = #{unionId}
-  </update>
-  <update id="doAccountDisable">
-    update iot_user
-    set status=1
-    where status = 0
-      and deleted = 0
-      and ((login_date is null and DATEDIFF(NOW(), create_date) >= 90)
-      or (login_date is not null and DATEDIFF(NOW(), login_date) >= 90))
-  </update>
+    
+    <update id="doAccountDisable">
+        update iot_user
+        set status=1
+        where status = 0
+          and deleted = 0
+          and ((login_date is null and DATEDIFF(NOW(), create_date) >= 90)
+            or (login_date is not null and DATEDIFF(NOW(), login_date) >= 90))
+    </update>
 
 </mapper>

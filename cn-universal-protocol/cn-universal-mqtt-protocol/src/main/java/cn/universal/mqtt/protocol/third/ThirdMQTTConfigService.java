@@ -36,8 +36,7 @@ import tk.mybatis.mapper.entity.Example;
 /**
  * MQTT配置服务
  *
- * <p>业务聚合入口，聚合Loader和Parser，统一对外暴露加载、统计、校验等接口。 不包含任何解析细节，全部委托给MqttConfigParser。 @Author
- * gitee.com/NexIoT
+ * <p>业务聚合入口，聚合Loader和Parser，统一对外暴露加载、统计、校验等接口。 不包含任何解析细节，全部委托给MqttConfigParser。 @Author gitee.com/NexIoT
  *
  * @since 2025/1/20
  */
@@ -78,6 +77,25 @@ public class ThirdMQTTConfigService implements ThirdMQTTConfigChecker {
         serverNetworks.size(),
         allConfigs.size());
     return allConfigs;
+  }
+
+  /** 根据networkUnionId获取单个配置 */
+  public MQTTProductConfig getConfig(String networkUnionId) {
+    if (StrUtil.isBlank(networkUnionId)) {
+      return null;
+    }
+    try {
+      List<Network> networks = networkMapper.selectByUnionId(networkUnionId);
+      if (networks == null || networks.isEmpty()) {
+        return null;
+      }
+      // 取第一个（通常unionId是唯一的）
+      Network network = networks.get(0);
+      return thirdMQTTConfigParser.parse(network, false);
+    } catch (Exception e) {
+      log.warn("[MqttConfig] 获取配置失败: networkUnionId={}, error={}", networkUnionId, e.getMessage());
+      return null;
+    }
   }
 
   /** 检查产品是否有专用配置 */

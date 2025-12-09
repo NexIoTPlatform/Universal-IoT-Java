@@ -287,10 +287,10 @@
             </a-radio-group>
           </a-form-model-item>
 
-          <!-- 解析器下拉框渲染 -->
+          <!-- 通用下拉框渲染（支持通过url动态加载选项，包括parserType、delimiter等所有select类型字段） -->
           <a-form-model-item
             v-show="highConfigShow"
-            v-else-if="item.key === 'parserType' && item.valueType === 'select' && item.hide === 'true'"
+            v-else-if="item.valueType === 'select' && item.hide === 'true' && item.valueData && item.valueData.length > 0"
             :key="item.key"
             :prop="item.key"
           >
@@ -308,24 +308,15 @@
               show-search
               v-model="form[item.key]"
               :placeholder="`请选择${item.name}`"
-              default-value="DELIMITED"
+              :default-value="item.key === 'parserType' ? 'DELIMITED' : undefined"
               option-filter-prop="children"
-              @change="parserTypeChange"
+              @change="handleSelectChange(item.key, $event)"
               style="width: 200px"
             >
               <template v-for="itemSelect in item.valueData">
                 <a-select-option :value="itemSelect.dictValue" :key="itemSelect.dictValue">
                   {{ itemSelect.dictLabel }}
                 </a-select-option>
-                <!--              <a-select-option value="jack">
-                                Jack
-                              </a-select-option>
-                              <a-select-option value="lucy">
-                                Lucy
-                              </a-select-option>
-                              <a-select-option value="tom">
-                                Tom
-                              </a-select-option>-->
               </template>
             </a-select>
           </a-form-model-item>
@@ -485,7 +476,7 @@
             </a-radio-group>
           </a-form-model-item>
 
-          <!-- 下拉框渲染 -->
+          <!-- 通用下拉框渲染（兜底：处理valueData为空或未加载的情况） -->
           <a-form-model-item
             v-show="highConfigShow"
             v-else-if="item.valueType === 'select' && item.hide === 'true'"
@@ -507,44 +498,23 @@
               v-model="form[item.key]"
               :placeholder="`请选择${item.name}`"
               option-filter-prop="children"
+              @change="handleSelectChange(item.key, $event)"
               style="width: 200px"
             >
-              <template v-for="itemSelect in item.valueData">
-                <a-select-option :value="itemSelect.dictValue" :key="itemSelect.dictValue">
-                  {{ itemSelect.dictLabel }}
-                </a-select-option>
-                <!--              <a-select-option value="jack">
-                                Jack
-                              </a-select-option>
-                              <a-select-option value="lucy">
-                                Lucy
-                              </a-select-option>
-                              <a-select-option value="tom">
-                                Tom
-                              </a-select-option>-->
+              <template v-if="item.valueData && item.valueData.length > 0">
+                <template v-for="itemSelect in item.valueData">
+                  <a-select-option :value="itemSelect.dictValue" :key="itemSelect.dictValue">
+                    {{ itemSelect.dictLabel }}
+                  </a-select-option>
+                </template>
               </template>
+              <a-select-option v-else :value="form[item.key]" :key="form[item.key]">
+                {{ form[item.key] || '暂无选项' }}
+              </a-select-option>
             </a-select>
           </a-form-model-item>
 
-          <!-- 分隔符（分隔符解析器） -->
-          <a-form-model-item
-            v-show="highConfigShow && delimitedShow"
-            v-else-if="item.valueType === 'string' && item.key === 'delimited' && item.hide === 'true'"
-            :key="item.key"
-            :prop="item.key"
-          >
-            <span slot="label">
-              {{ item.name }}
-              <a-tooltip
-                style="background-color: #efcbc4;padding: 2px;border-radius: 50%;font-size: 14px;">
-                <template slot="title">
-                  {{ item.remark }}
-                </template>
-                <a-icon type="question"/>
-              </a-tooltip>
-            </span>
-            <a-input v-model="form[item.key]" :placeholder="`请输入${item.name}`"/>
-          </a-form-model-item>
+          <!-- 分隔符已改为select类型，通过通用下拉框渲染，此处删除特殊处理 -->
 
           <!-- 分隔的最大长度（分隔符解析器） -->
           <a-form-model-item
@@ -910,7 +880,7 @@ export default {
                 } catch (e) {
                   config = {}
                 }
-                if (config.url !== undefined && config.url() !== '') {
+                if (config.url !== undefined && config.url !== '') {
                   this.getDicts(config.url).then(response => {
                     this.configurationArray.push({
                       name: this.dicts[t].dictLabel,
@@ -1006,6 +976,15 @@ export default {
       this.form['cert'] = val.url
       // console.log('fileList this.form.url = ', this.form)
     },
+    /** 通用下拉框change事件处理（支持所有select类型字段） */
+    handleSelectChange(fieldKey, value) {
+      // 如果是parserType字段，触发特殊处理逻辑
+      if (fieldKey === 'parserType') {
+        this.parserTypeChange(value)
+      }
+      // 其他字段可以在这里添加特殊处理逻辑
+      // 例如：if (fieldKey === 'delimiter') { ... }
+    },
     parserTypeChange(value) {
       if (value) {
         if (value === 'DELIMITED') {
@@ -1020,13 +999,14 @@ export default {
           this.fixedLengthShow = true
           this.lineMaxLengthShow = false
           this.fieldLengthShow = false
-        } else if (value === 'FIELD_LENGTH') {
+          //长度域解码器
+        } else if (value === 'LENGTH_FIELD') {
           this.delimitedMaxlengthShow = false
           this.delimitedShow = false
           this.fixedLengthShow = false
           this.lineMaxLengthShow = false
           this.fieldLengthShow = true
-        } else if (value === 'LINE_BREAK') {
+        } else if (value === 'LINE') {
           this.delimitedMaxlengthShow = false
           this.delimitedShow = false
           this.fixedLengthShow = false

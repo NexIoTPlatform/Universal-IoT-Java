@@ -222,9 +222,7 @@ export default {
       this.$emit('change', checked)
     },
     copyToClipboard(text) {
-      if (!text) {
-        return
-      }
+      if (!text) return
 
       const textarea = document.createElement('textarea')
       textarea.value = text

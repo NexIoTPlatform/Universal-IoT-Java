@@ -27,9 +27,7 @@
                   <a-space>
                     <a-button type="primary" @click="handleQuery"><a-icon
                       type="search"/>{{ $t('button.search') }}</a-button>
-                    <a-button @click="resetQuery"><a-icon type="sync"/>{{
-                        $t('button.reset')
-                      }}</a-button>
+                    <a-button @click="resetQuery"><a-icon type="sync"/>{{ $t('button.reset') }}</a-button>
                   </a-space>
                 </span>
               </a-col>
@@ -74,8 +72,7 @@
         >
           <span slot="icon" slot-scope="text">
             <a-icon :component="allIcon[text]" v-if="allIcon[text]"/>
-            <a-icon :component="allIcon[text + 'Icon']"
-                    v-if="!allIcon[text] && allIcon[text + 'Icon']"/>
+            <a-icon :component="allIcon[text + 'Icon']" v-if="!allIcon[text] && allIcon[text + 'Icon']"/>
             <a-icon :type="text" v-if="!allIcon[text] && !allIcon[text + 'Icon']"/>
           </span>
           <span slot="status" slot-scope="text, record">
@@ -251,13 +248,13 @@ export default {
         content: '当前选中编号为' + menuId + '的数据',
         onOk() {
           return delMenu(menuId)
-          .then(() => {
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

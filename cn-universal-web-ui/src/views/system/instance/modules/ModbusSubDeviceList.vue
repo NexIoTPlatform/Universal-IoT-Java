@@ -52,9 +52,9 @@
 
             <!-- 子设备列表 -->
             <div class="subdevices-grid">
-              <div v-for="(subDevice, slaveAddress) in subDeviceMapping" :key="slaveAddress"
+              <div v-for="(subDevice, slaveAddress) in subDeviceMapping" :key="slaveAddress" 
                    class="subdevice-card" :class="{ 'offline': !subDevice.state }">
-
+                
                 <!-- 设备图片 -->
                 <div class="subdevice-image">
                   <div class="pic" v-if="getSubDeviceImageUrl(subDevice)">
@@ -64,7 +64,7 @@
                     <div class="default-icon">📱</div>
                   </div>
                 </div>
-
+                
                 <!-- 设备信息 -->
                 <div class="subdevice-info">
                   <div class="subdevice-name">{{ subDevice.productName }}</div>
@@ -103,8 +103,7 @@
               </a-col>
               <a-col :md="8" :sm="24">
                 <a-form-item :label="$t('device.name')">
-                  <a-input v-model="queryParam.deviceName" placeholder="请输入设备名称"
-                           allow-clear/>
+                  <a-input v-model="queryParam.deviceName" placeholder="请输入设备名称" allow-clear/>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
@@ -129,8 +128,7 @@
           </a-button>
           <a-button type="danger" :disabled="multiple" @click="handleDelete">
             <a-icon type="delete"/>
-            {{ $t('button.delete') }}
-          </a-button>
+            {{ $t('button.delete') }}</a-button>
           <a-button
             type="primary"
             size="small"
@@ -192,8 +190,7 @@
           <div slot="productInfo" slot-scope="text, record" class="product-info-cell">
             <div class="product-name">
               {{ record.productName || '未知产品' }}
-              <device-type-badge :type="record.deviceNode"
-                                 :text="getDeviceTypeText(record.deviceNode)"/>
+              <device-type-badge :type="record.deviceNode" :text="getDeviceTypeText(record.deviceNode)"/>
             </div>
             <div class="product-key">{{ record.productKey }}</div>
           </div>
@@ -462,25 +459,24 @@ export default {
     formatOnlineTime(onlineTime) {
       return getTimeAgo(onlineTime)
     },
-
+    
     onShowSizeChange(current, pageSize) {
       this.pagination.pageSize = pageSize
       this.pagination.current = 1
       this.getList()
     },
-
+    
     changeSize(current, pageSize) {
       this.pagination.current = current
       this.pagination.pageSize = pageSize
       this.getList()
     },
-
+    
     /** 获取网关配置信息 */
     async getGatewayConfig() {
       try {
-        console.log('开始获取网关配置，参数:',
-          {gwProductKey: this.gwProductKey, gwDeviceId: this.gwDeviceId})
-
+        console.log('开始获取网关配置，参数:', { gwProductKey: this.gwProductKey, gwDeviceId: this.gwDeviceId })
+        
         // 构建查询网关设备的参数
         const gatewayQueryParam = {
           deviceId: this.gwDeviceId,
@@ -523,10 +519,10 @@ export default {
               const parts = device.deviceId.split('-')
               slaveAddress = parts[parts.length - 1] || device.deviceId
             }
-
+            
             this.subDeviceMapping[slaveAddress] = device
           })
-
+          
         } else {
           console.warn('子设备关系API返回错误:', response)
         }

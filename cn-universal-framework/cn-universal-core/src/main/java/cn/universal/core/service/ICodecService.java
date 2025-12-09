@@ -84,7 +84,7 @@ public interface ICodecService {
    * @param payload 原始数据
    * @return 预解码后的UPRequest
    */
-  UPRequest preDecode(String productKey, String payload);
+  UPRequest preDecode(String productKey, String payload, Object context);
 
   /**
    * 通用编解码方法 - 支持所有CodecMethod类型

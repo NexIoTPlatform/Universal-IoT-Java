@@ -29,13 +29,10 @@ import cn.universal.mqtt.protocol.config.MqttConstant;
 import cn.universal.mqtt.protocol.entity.MQTTProductConfig;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -559,7 +556,21 @@ public class MQTTTopicManager {
   }
 
   /**
-   * 解析第三方MQTT订阅主题，支持JSON和字符串格式，并缓存类型映射
+   * 解析第三方MQTT订阅主题（仅支持对象数组格式）
+   *
+   * <p>只支持新格式的对象数组，格式示例：
+   *
+   * <pre>
+   * [
+   *   {
+   *     "enabled": true,
+   *     "productKey": "xxx",
+   *     "qos": 0,
+   *     "topicCategory": "THING_MODEL",
+   *     "topicPattern": "$third/up/#"
+   *   }
+   * ]
+   * </pre>
    *
    * @param networkUnionId 第三方MQTT唯一标识
    * @param configMap 配置Map
@@ -569,78 +580,54 @@ public class MQTTTopicManager {
   public List<MQTTProductConfig.MqttTopicConfig> parseThirdMQTTSubscribeTopicsFromConfig(
       String networkUnionId, Map<String, Object> configMap, int defaultQos) {
     try {
-      String topicsStr =
-          getStringValue(configMap, "subscribeTopics", getStringValue(configMap, "topics", null));
-      if (StrUtil.isBlank(topicsStr)) {
-        log.info("网络={}没有找到自定义主题，切换使用Sys主题", networkUnionId);
-        return getAllSubscriptionTopics().stream()
-            .map(String::trim)
-            .filter(topic -> !topic.isEmpty())
-            .map(
-                topic ->
-                    MQTTProductConfig.MqttTopicConfig.builder()
-                        .topicPattern(topic)
-                        .qos(defaultQos)
-                        .enabled(true)
-                        .build())
-            .collect(Collectors.toList());
+      Object topicsObj = configMap.get("subscribeTopics");
+      if (topicsObj == null) {
+        topicsObj = configMap.get("topics");
       }
 
-      Map<String, String> typeMap = new ConcurrentHashMap<>();
-      Set<String> subTopicsList = new HashSet<>();
-      if (JSONUtil.isTypeJSON(topicsStr)) {
-        // JSON格式
-        /*{
-          "THING_PROPERTY_UP": "$qiantang/up/property/+/+",
-            "THING_EVENT_UP": "$qiantang/up/event/+/+",
-            "THING_DOWN": "$qiantang/up/down/+/+",
-            "PASSTHROUGH_UP": "$qiantang/up/+/+",
-            "PASSTHROUGH_DOWN": "$qiantang/down/+/+"
-        }*/
-        JSONObject json = JSONUtil.parseObj(topicsStr);
-        for (String key : json.keySet()) {
-          if (MqttConstant.TYPE_DOWN.equalsIgnoreCase(key)) {
-            String pattern = json.getStr(key);
-            typeMap.put(key, pattern);
-          }
-          subTopicsList.add(json.getStr(key));
-        }
-      } else {
-        // 逗号/分号分隔
-        List<String> topicList =
-            Arrays.stream(topicsStr.split("[,;]"))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
-        for (String topic : topicList) {
-          if (topic.contains("/down")) {
-            typeMap.put(MqttConstant.TYPE_DOWN, topic);
-          }
-          subTopicsList.add(topic);
-        }
+      if (topicsObj == null) {
+        log.warn("[MQTT_TOPIC] 网络={}没有配置subscribeTopics，使用默认主题", networkUnionId);
+        return getDefaultSubscriptionTopics(defaultQos);
       }
-      thirdPartyTopicTypeMap.put(networkUnionId, typeMap);
-      return subTopicsList.stream()
-          .map(
-              topic ->
-                  MQTTProductConfig.MqttTopicConfig.builder()
-                      .topicPattern(topic)
-                      .qos(defaultQos)
-                      .enabled(true)
-                      .build())
-          .collect(Collectors.toList());
+
+      // 只支持 List 类型（对象数组格式）
+      if (!(topicsObj instanceof List)) {
+        log.error(
+            "[MQTT_TOPIC] 网络={}的主题配置格式错误，期望List类型（对象数组），实际类型={}，值={}",
+            networkUnionId,
+            topicsObj.getClass().getName(),
+            topicsObj);
+        return getDefaultSubscriptionTopics(defaultQos);
+      }
+
+      List<?> topicList = (List<?>) topicsObj;
+      if (topicList.isEmpty()) {
+        log.warn("[MQTT_TOPIC] 网络={}的主题配置为空列表，使用默认主题", networkUnionId);
+        return getDefaultSubscriptionTopics(defaultQos);
+      }
+
+      return parseObjectTopics(topicList, defaultQos, networkUnionId);
+
     } catch (Exception e) {
-      log.warn("[MQTT_TOPIC] 解析订阅主题失败，使用默认主题: ", e);
+      log.error("[MQTT_TOPIC] 解析订阅主题失败，网络={}，使用默认主题，错误={}", networkUnionId, e.getMessage(), e);
+      return getDefaultSubscriptionTopics(defaultQos);
     }
-    // 默认
-    log.debug("[MQTT_TOPIC] 使用默认订阅主题");
+  }
+
+  /**
+   * 获取默认订阅主题配置列表
+   *
+   * @param defaultQos 默认QoS
+   * @return 默认主题配置列表
+   */
+  private List<MQTTProductConfig.MqttTopicConfig> getDefaultSubscriptionTopics(int defaultQos) {
     return getAllSubscriptionTopics().stream()
         .map(String::trim)
         .filter(topic -> !topic.isEmpty())
         .map(
             topic ->
                 MQTTProductConfig.MqttTopicConfig.builder()
-                    .topicPattern(topic)
+                    .topic(topic)
                     .qos(defaultQos)
                     .enabled(true)
                     .build())
@@ -648,47 +635,90 @@ public class MQTTTopicManager {
   }
 
   /**
-   * 从配置Map中解析订阅主题
+   * 解析对象数组格式的主题配置
    *
-   * @param configMap 配置Map
-   * @param defaultQos 默认QoS值
+   * @param topicList 主题配置列表
+   * @param defaultQos 默认QoS
+   * @param networkUnionId 网络标识
    * @return 主题配置列表
    */
-  public List<MQTTProductConfig.MqttTopicConfig> parseSubscribeTopicsFromConfig(
-      Map<String, Object> configMap, int defaultQos) {
-    try {
-      String topicsStr =
-          getStringValue(configMap, "subscribeTopics", getStringValue(configMap, "topics", null));
-      if (topicsStr != null && !topicsStr.trim().isEmpty()) {
-        return Arrays.stream(topicsStr.split("[,;]"))
-            .map(String::trim)
-            .filter(topic -> !topic.isEmpty())
-            .map(
-                topic ->
-                    MQTTProductConfig.MqttTopicConfig.builder()
-                        .topicPattern(topic)
-                        .qos(defaultQos)
-                        .enabled(true)
-                        .build())
-            .collect(Collectors.toList());
+  private List<MQTTProductConfig.MqttTopicConfig> parseObjectTopics(
+      List<?> topicList, int defaultQos, String networkUnionId) {
+    Map<String, String> typeMap = new ConcurrentHashMap<>();
+    List<MQTTProductConfig.MqttTopicConfig> configs = new ArrayList<>();
+
+    for (Object item : topicList) {
+      try {
+        if (item instanceof Map || item instanceof JSONObject) {
+          // 对象格式，支持新功能
+          @SuppressWarnings("unchecked")
+          Map<String, Object> topicMap = (Map<String, Object>) item;
+          String topic =
+              getStringValue(topicMap, "topicPattern", getStringValue(topicMap, "topic", null));
+          if (StrUtil.isBlank(topic)) {
+            continue;
+          }
+
+          int qos = getIntValue(topicMap, "qos", defaultQos);
+          boolean enabled = getBooleanValue(topicMap, "enabled", true);
+          String productKey = getStringValue(topicMap, "productKey", null);
+          String topicCategoryStr = getStringValue(topicMap, "topicCategory", null);
+          // 将字符串转换为枚举
+          MqttConstant.TopicCategory topicCategory = null;
+          if (StrUtil.isNotBlank(topicCategoryStr)) {
+            try {
+              topicCategory = MqttConstant.TopicCategory.valueOf(topicCategoryStr);
+            } catch (IllegalArgumentException e) {
+              log.warn("[MQTT_TOPIC] 无效的主题分类值: {}, 将忽略", topicCategoryStr);
+            }
+          }
+
+          MQTTProductConfig.MqttTopicConfig config =
+              MQTTProductConfig.MqttTopicConfig.builder()
+                  .topic(topic)
+                  .qos(qos)
+                  .enabled(enabled)
+                  .productKey(productKey)
+                  .topicCategory(topicCategory)
+                  .build();
+
+          configs.add(config);
+        }
+      } catch (Exception e) {
+        log.warn("[MQTT_TOPIC] 解析主题配置项失败: {}", item, e);
       }
-    } catch (Exception e) {
-      log.warn("[MQTT_TOPIC] 解析订阅主题失败，使用默认主题: ", e);
     }
 
-    // 使用默认主题
-    log.debug("[MQTT_TOPIC] 使用默认订阅主题");
-    return getAllSubscriptionTopics().stream()
-        .map(String::trim)
-        .filter(topic -> !topic.isEmpty())
-        .map(
-            topic ->
-                MQTTProductConfig.MqttTopicConfig.builder()
-                    .topicPattern(topic)
-                    .qos(defaultQos)
-                    .enabled(true)
-                    .build())
-        .collect(Collectors.toList());
+    thirdPartyTopicTypeMap.put(networkUnionId, typeMap);
+    return configs;
+  }
+
+  /** 从Map中获取整数值 */
+  private int getIntValue(Map<String, Object> map, String key, int defaultValue) {
+    Object value = map.get(key);
+    if (value instanceof Number) {
+      return ((Number) value).intValue();
+    }
+    if (value instanceof String) {
+      try {
+        return Integer.parseInt((String) value);
+      } catch (NumberFormatException e) {
+        return defaultValue;
+      }
+    }
+    return defaultValue;
+  }
+
+  /** 从Map中获取布尔值 */
+  private boolean getBooleanValue(Map<String, Object> map, String key, boolean defaultValue) {
+    Object value = map.get(key);
+    if (value instanceof Boolean) {
+      return (Boolean) value;
+    }
+    if (value instanceof String) {
+      return Boolean.parseBoolean((String) value);
+    }
+    return defaultValue;
   }
 
   /**
@@ -704,6 +734,319 @@ public class MQTTTopicManager {
       return typeMap.get(type);
     }
     return null;
+  }
+
+  /**
+   * 判断topic是否匹配pattern（支持MQTT通配符）
+   *
+   * @param topic 实际topic
+   * @param pattern 主题模式，支持 + 和 # 通配符
+   * @return 是否匹配
+   */
+  public boolean matchesTopic(String topic, String pattern) {
+    if (topic == null || pattern == null) {
+      return false;
+    }
+    if (topic.equals(pattern)) {
+      return true;
+    }
+
+    // 将MQTT通配符转换为正则表达式
+    // + 匹配单个层级，转换为 [^/]+
+    // # 匹配多个层级，转换为 .*
+    String regex = pattern.replace("+", "[^/]+").replace("#", ".*").replace("$", "\\$"); // 转义 $ 符号
+
+    try {
+      return topic.matches(regex);
+    } catch (Exception e) {
+      log.warn("[MQTT_TOPIC] Topic匹配失败: topic={}, pattern={}", topic, pattern, e);
+      return false;
+    }
+  }
+
+  /**
+   * 从第三方MQTT配置中提取productKey（公共方法）
+   *
+   * <p>根据配置的主题映射关系，从实际topic中提取对应的productKey
+   *
+   * @param topic 实际接收到的topic
+   * @param subscribeTopics 订阅主题配置列表
+   * @return productKey，如果未找到返回null
+   */
+  public String extractProductKeyFromConfig(
+      String topic, List<MQTTProductConfig.MqttTopicConfig> subscribeTopics) {
+    if (StrUtil.isBlank(topic) || subscribeTopics == null || subscribeTopics.isEmpty()) {
+      return null;
+    }
+
+    // 遍历订阅主题配置，查找匹配的topic
+    for (MQTTProductConfig.MqttTopicConfig topicConfig : subscribeTopics) {
+      if (!topicConfig.isEnabled()) {
+        continue;
+      }
+
+      String pattern = topicConfig.getTopic();
+      if (pattern == null) {
+        continue;
+      }
+
+      // 判断topic是否匹配pattern
+      if (matchesTopic(topic, pattern)) {
+        // 如果配置了productKey，直接返回
+        if (StrUtil.isNotBlank(topicConfig.getProductKey())) {
+          log.debug(
+              "[MQTT_TOPIC] 从配置映射中找到productKey: topic={}, pattern={}, productKey={}",
+              topic,
+              pattern,
+              topicConfig.getProductKey());
+          return topicConfig.getProductKey();
+        }
+
+        // 如果没有配置productKey，尝试从实际topic中自动提取
+        String extractedKey = extractProductKeyFromTopicPattern(topic, pattern);
+        if (StrUtil.isNotBlank(extractedKey)) {
+          log.debug(
+              "[MQTT_TOPIC] 从topic pattern自动提取productKey: topic={}, pattern={}, productKey={}",
+              topic,
+              pattern,
+              extractedKey);
+          return extractedKey;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * 从配置中获取主题分类（物模型/透传）
+   *
+   * @param topic 实际接收到的MQTT主题
+   * @param subscribeTopics 订阅主题配置列表
+   * @return 主题分类：THING_MODEL（物模型）或 PASSTHROUGH（透传），如果未找到返回null
+   */
+  public MqttConstant.TopicCategory getTopicCategoryFromConfig(
+      String topic, List<MQTTProductConfig.MqttTopicConfig> subscribeTopics) {
+    if (StrUtil.isBlank(topic) || subscribeTopics == null || subscribeTopics.isEmpty()) {
+      return null;
+    }
+
+    // 遍历订阅主题配置，查找匹配的topic
+    for (MQTTProductConfig.MqttTopicConfig topicConfig : subscribeTopics) {
+      if (!topicConfig.isEnabled()) {
+        continue;
+      }
+
+      String pattern = topicConfig.getTopic();
+      if (StrUtil.isBlank(pattern)) {
+        continue;
+      }
+
+      // 检查topic是否匹配pattern
+      if (matchesTopic(topic, pattern)) {
+        // 如果配置了主题分类，直接返回
+        if (topicConfig.getTopicCategory() != null) {
+          log.debug(
+              "[MQTT_TOPIC] 从配置映射中找到主题分类: topic={}, pattern={}, category={}",
+              topic,
+              pattern,
+              topicConfig.getTopicCategory());
+          return topicConfig.getTopicCategory();
+        }
+        // 如果没有配置，尝试使用系统内置的匹配逻辑
+        MqttConstant.TopicCategory category = matchCategory(topic);
+        if (category != MqttConstant.TopicCategory.UNKNOWN) {
+          return category;
+        }
+        break;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * 从topic pattern中提取productKey 使用新的匹配模式：先验证topic是否匹配pattern，然后从匹配的位置提取productKey
+   *
+   * @param topic 实际topic
+   * @param pattern topic pattern（可能包含+和#通配符）
+   * @return productKey，如果无法提取返回null
+   */
+  private String extractProductKeyFromTopicPattern(String topic, String pattern) {
+    try {
+      // 首先验证topic是否匹配pattern
+      if (!matchesTopic(topic, pattern)) {
+        return null;
+      }
+
+      // 将pattern和topic按/分割
+      String[] patternParts = pattern.split("/");
+      String[] topicParts = topic.split("/");
+
+      // 处理#通配符：如果pattern以#结尾，只匹配#之前的部分
+      int maxCompareLength = patternParts.length;
+      if (pattern.endsWith("/#") || pattern.endsWith("#")) {
+        // 找到最后一个#的位置
+        for (int i = patternParts.length - 1; i >= 0; i--) {
+          if (patternParts[i].equals("#")) {
+            maxCompareLength = i;
+            break;
+          }
+        }
+      }
+
+      // 从匹配的部分中提取productKey
+      // 优先从+通配符位置提取
+      for (int i = 0; i < maxCompareLength && i < topicParts.length; i++) {
+        String patternPart = patternParts[i];
+        String topicPart = topicParts[i];
+
+        // 如果是通配符+，这个位置可能是productKey
+        if (patternPart.equals("+")) {
+          if (StrUtil.isNotBlank(topicPart) && !topicPart.equals("+") && !topicPart.equals("#")) {
+            // 验证提取的productKey是否有效（基本格式检查）
+            if (isValidProductKey(topicPart)) {
+              return topicPart;
+            }
+          }
+        }
+      }
+
+      // 如果没有找到+通配符，尝试从#通配符匹配的部分提取
+      if (pattern.endsWith("/#") || pattern.endsWith("#")) {
+        // 从#之前的部分查找可能的productKey
+        for (int i = 0; i < maxCompareLength && i < topicParts.length; i++) {
+          String topicPart = topicParts[i];
+          if (StrUtil.isNotBlank(topicPart) && isValidProductKey(topicPart)) {
+            return topicPart;
+          }
+        }
+      }
+
+      return null;
+    } catch (Exception e) {
+      log.warn("[MQTT_TOPIC] 从pattern提取productKey失败: topic={}, pattern={}", topic, pattern, e);
+      return null;
+    }
+  }
+
+  /**
+   * 验证productKey格式是否有效
+   *
+   * @param productKey 待验证的productKey
+   * @return 是否有效
+   */
+  private boolean isValidProductKey(String productKey) {
+    if (StrUtil.isBlank(productKey)) {
+      return false;
+    }
+    // 基本格式检查：长度合理，不包含特殊字符
+    return productKey.length() >= 4
+        && productKey.length() <= 64
+        && productKey.matches("^[a-zA-Z0-9_-]+$");
+  }
+
+  /**
+   * 根据提取规则从topic中提取productKey
+   *
+   * @param topic 实际topic
+   * @param extractRule 提取规则，格式： - "regex:pattern" - 使用正则表达式提取，第一个捕获组作为productKey - "path:index" -
+   *     从topic路径中提取，index为路径段索引（从0开始）
+   * @return productKey，如果提取失败返回null
+   */
+  public String extractProductKeyByRule(String topic, String extractRule) {
+    if (StrUtil.isBlank(topic) || StrUtil.isBlank(extractRule)) {
+      return null;
+    }
+
+    try {
+      if (extractRule.startsWith("regex:")) {
+        // 正则表达式提取
+        String pattern = extractRule.substring(6);
+        java.util.regex.Pattern regexPattern = java.util.regex.Pattern.compile(pattern);
+        java.util.regex.Matcher matcher = regexPattern.matcher(topic);
+        if (matcher.find() && matcher.groupCount() > 0) {
+          return matcher.group(1);
+        }
+      } else if (extractRule.startsWith("path:")) {
+        // 路径提取
+        String indexStr = extractRule.substring(5);
+        int index = Integer.parseInt(indexStr);
+        String[] parts = topic.split("/");
+        if (index >= 0 && index < parts.length) {
+          return parts[index];
+        }
+      }
+    } catch (Exception e) {
+      log.warn("[MQTT_TOPIC] 根据规则提取productKey失败: topic={}, rule={}", topic, extractRule, e);
+    }
+
+    return null;
+  }
+
+  /**
+   * 将topic pattern中的占位符替换为实际值（公共方法）
+   *
+   * <p>支持的占位符格式：
+   *
+   * <ul>
+   *   <li>#{productKey} 或 {{productKey}} - 替换为产品Key
+   *   <li>#{deviceId} 或 {{deviceId}} - 替换为设备ID
+   *   <li>+ - MQTT通配符，按顺序替换为productKey和deviceId（向后兼容）
+   * </ul>
+   *
+   * <p>示例：
+   *
+   * <ul>
+   *   <li>"$third/up/#{productKey}/set/#{deviceId}" -> "$third/up/product123/set/device456"
+   *   <li>"$third/upxcz/set/#{deviceId}" -> "$third/upxcz/set/device456"
+   *   <li>"$third/+/+/set" -> "$third/product123/device456/set"（向后兼容）
+   * </ul>
+   *
+   * @param pattern 主题模式
+   * @param productKey 产品Key
+   * @param deviceId 设备ID
+   * @return 替换后的主题
+   */
+  public String fillTopicPattern(String pattern, String productKey, String deviceId) {
+    if (StrUtil.isBlank(pattern)) {
+      return pattern;
+    }
+
+    String result = pattern;
+    // 优先处理 #{productKey}||{{productKey}} 和 #{deviceId}||{{deviceId}} 占位符
+    if (pattern.contains("#{productKey}") || pattern.contains("{{productKey}}")) {
+      result = result.replace("#{productKey}", StrUtil.blankToDefault(productKey, ""));
+      result = result.replace("{{productKey}}", StrUtil.blankToDefault(productKey, ""));
+    }
+    if (pattern.contains("#{deviceId}") || pattern.contains("{{deviceId}}")) {
+      result = result.replace("#{deviceId}", StrUtil.blankToDefault(deviceId, ""));
+      result = result.replace("{{deviceId}}", StrUtil.blankToDefault(deviceId, ""));
+    }
+
+    // 如果已经使用了占位符格式，直接返回
+    if (pattern.contains("#{productKey}")
+        || pattern.contains("#{deviceId}")
+        || pattern.contains("{{productKey}}")
+        || pattern.contains("{{deviceId}}")) {
+      return result;
+    }
+
+    // 向后兼容：处理 + 通配符（只替换前两个+，防止误替换）
+    int firstPlus = result.indexOf("+");
+    int secondPlus = result.indexOf("+", firstPlus + 1);
+    if (firstPlus >= 0 && secondPlus > firstPlus) {
+      return result.substring(0, firstPlus)
+          + StrUtil.blankToDefault(productKey, "")
+          + result.substring(firstPlus + 1, secondPlus)
+          + StrUtil.blankToDefault(deviceId, "")
+          + result.substring(secondPlus + 1);
+    } else if (firstPlus >= 0) {
+      // 只有一个+，替换为productKey
+      return result.replaceFirst("\\+", StrUtil.blankToDefault(productKey, ""));
+    }
+
+    return result;
   }
 
   // 辅助方法

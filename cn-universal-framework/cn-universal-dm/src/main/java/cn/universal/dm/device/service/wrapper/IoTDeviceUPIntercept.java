@@ -91,8 +91,8 @@ public class IoTDeviceUPIntercept {
     if (cfg != null
         && cfg.containsKey(IoTConstant.IS_GPS_PRODUCT)
         && cfg.getBool(IoTConstant.IS_GPS_PRODUCT)
-        && properties.containsKey(DeviceManagerConstant.COORDINATE)) {
-      String geoPoint = (String) properties.get(DeviceManagerConstant.COORDINATE);
+        && properties.containsKey(DeviceManagerConstant.COORDINATES)) {
+      String geoPoint = (String) properties.get(DeviceManagerConstant.COORDINATES);
       log.info("处理定位类经纬度数据处理，deviceId={},coordinate={}", baseUPRequest.getDeviceId(), geoPoint);
       if (StrUtil.isNotBlank(geoPoint)) {
         IoTDevice ioTDevice = new IoTDevice();
@@ -101,7 +101,7 @@ public class IoTDeviceUPIntercept {
         String[] coors = geoPoint.split(",");
         SupportMapAreas supportMapAreas = supportMapAreasMapper.selectMapAreas(coors[0], coors[1]);
         if (supportMapAreas == null) {
-          log.info("查询区域id为空,lot={},lat={}", coors[0], coors[1]);
+          log.info("查询区域id为空,longitude={},latitude={}", coors[0], coors[1]);
         } else {
           ioTDevice.setAreasId(supportMapAreas.getId());
         }

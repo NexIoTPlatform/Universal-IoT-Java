@@ -152,7 +152,7 @@ export function handleBatchImport(productKey, data) {
  * @returns
  */
 export function getDeviceVideoTapeList(deviceId, channelId, startTime,
-  endTime) {
+                                       endTime) {
   return request({
     url: `/admin/wvpDevice/local/record/list/${deviceId}/${channelId}`,
     method: 'get',
@@ -249,7 +249,7 @@ export function resumeDeviceVideoTape(deviceId, channelId, stream) {
  * @returns
  */
 export function downloadDeviceVideoTape(deviceId, channelId, startTime, endTime,
-  downloadSpeed = 128) {
+                                        downloadSpeed = 128) {
   return request({
     url: `/admin/wvpDevice/local/record/download/start/${deviceId}/${channelId}`,
     method: 'get',

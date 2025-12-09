@@ -172,12 +172,12 @@ public class NetworkConfigUtil {
     config.set("readerIdleTime", 360);
     config.set("writerIdleTime", 0);
     config.set("decoderType", "STRING");
-    config.set("parserType", "DELIMITED");
+    config.set("parserType", "DELIMITER");
     config.set(
         "parserConfiguration",
         new JSONObject()
             .set("byteOrderLittle", true)
-            .set("delimited", "]")
+            .set("delimiter", "]")
             .set("delimitedMaxlength", 1024)
             .set("failFast", true));
     return config.toString();

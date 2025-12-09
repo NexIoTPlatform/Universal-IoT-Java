@@ -16,6 +16,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.universal.dm.device.entity.IoTPushResult;
 import cn.universal.persistence.base.BaseUPRequest;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class UPProcessorManager {
   public <T extends BaseUPRequest> List<UPProcessor<T>> getProcessors() {
     Map<String, UPProcessor> processorMap = SpringUtil.getBeansOfType(UPProcessor.class);
     if (processorMap.isEmpty()) {
-      return List.of();
+      return new ArrayList<>();
     }
 
     return processorMap.values().stream()

@@ -30,7 +30,7 @@
             v-for="(d) in thirdPlatforms"
             :value="d.dictValue"
             :key="d.dictValue"
-            :disabled="d.enabled === false"
+            :disabled="d.enabled === false || d.isManualCreatable === false"
             :label="d.dictLabel"
           >
             <div class="protocol-option">
@@ -44,8 +44,20 @@
                 >
                   {{ d.status }}
                 </a-tag>
+                <a-tag
+                  v-if="d.isManualCreatable === false"
+                  color="red"
+                  size="small"
+                  style="margin-left: 8px;"
+                >
+                  禁止手动创建
+                </a-tag>
               </div>
               <div v-if="d.description" class="protocol-description">{{ d.description }}</div>
+              <div v-if="d.isManualCreatable === false && d.notCreatableReason" class="protocol-reason">
+                <a-icon type="info-circle" style="margin-right: 4px; color: #ff4d4f;" />
+                {{ d.notCreatableReason }}
+              </div>
             </div>
           </a-select-option>
         </a-select>
@@ -377,30 +389,36 @@ export default {
 
         // 直接使用接口返回的协议数据，转换为下拉选项格式
         this.thirdPlatforms = Object.keys(protocols)
-        .map(key => {
-          const protocol = protocols[key]
-          return {
-            dictValue: protocol.code,
-            dictLabel: protocol.name,
-            enabled: protocol.available,
-            status: protocol.status,
-            description: protocol.description,
-            vendor: protocol.vendor,
-            category: protocol.category,
-            isCore: protocol.isCore
-          }
-        })
-        .filter(protocol => protocol.enabled) // 只显示可用的协议
+          .map(key => {
+            const protocol = protocols[key]
+            return {
+              dictValue: protocol.code,
+              dictLabel: protocol.name,
+              enabled: protocol.available,
+              status: protocol.status,
+              description: protocol.description,
+              vendor: protocol.vendor,
+              category: protocol.category,
+              isCore: protocol.isCore,
+              isManualCreatable: protocol.isManualCreatable, // 是否支持手动创建
+              notCreatableReason: protocol.notCreatableReason // 不可创建原因
+            }
+          })
+          .filter(protocol => protocol.enabled) // 只显示可用的协议
       }
     }).catch(error => {
       console.error('获取协议状态失败:', error)
       // 如果接口失败，使用默认数据作为备份
       const dictArray2 = ['third_platform']
-      const renderThirdPlatform = ['ctaiot', 'mqtt', 'http', 'tcp', 'udp']
+      const renderThirdPlatform = ['ctaiot', 'mqtt',  'http', 'tcp','udp']
       this.getDictMap(dictArray2).then(res => {
         this.thirdPlatforms = res.data['third_platform'].filter(function (value, index, arr) {
           return renderThirdPlatform.indexOf(value.dictValue) !== -1
-        })
+        }).map(item => ({
+          ...item,
+          isManualCreatable: true, // 默认支持手动创建
+          notCreatableReason: ''
+        }))
       })
     })
   },
@@ -828,5 +846,16 @@ export default {
   font-size: 12px;
   color: #666;
   margin-top: 2px;
+}
+
+.protocol-reason {
+  font-size: 12px;
+  color: #ff4d4f;
+  margin-top: 4px;
+  padding: 4px 8px;
+  background: #fff1f0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
 }
 </style>

@@ -42,6 +42,7 @@ export function addData(data) {
   })
 }
 
+
 // 修改字典数据
 export function updateData(data) {
   return request({

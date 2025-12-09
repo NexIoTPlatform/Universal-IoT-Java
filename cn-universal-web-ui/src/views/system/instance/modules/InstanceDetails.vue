@@ -304,21 +304,42 @@
 
                 <!-- 属性卡片显示 -->
                 <div v-if="properties && properties.length > 0" class="status-cards">
-                  <div class="status-card property-card" v-for="(item, index) in properties"
-                       :key="index">
+                  <div class="status-card property-card"
+                       :class="{ 'desired-card': item.customized === 'device_desired_property' }"
+                       v-for="(item, index) in properties"
+                       :key="index"
+                       v-copy="item.formatValue || item.desireFormatValue || item.desireValue || '--'"
+                       :title="item.formatValue && item.desireValue != null && String(item.desireValue) !== String(item.value)
+                         ? ('上报值：' + String(item.formatValue) + '，期望值：' + String(item.desireValue))
+                         : (!item.formatValue && item.desireValue != null
+                           ? ('期望值：' + String(item.desireValue) + '（设备未上报）')
+                           : String(item.formatValue || item.desireFormatValue || item.desireValue || '--'))"
+                  >
                     <div class="card-header">
                       <div class="card-title" :title="item.name + '(' + item.property + ')'">
                         {{ item.name }}
                         <span class="property-key">({{ item.property }})</span>
                       </div>
-                      <div class="card-badge badge-property">
-                        <span class="badge-dot">●</span>
-                        属性
+                      <div class="card-badge badge-property" :class="{ 'has-desire': item.customized === 'device_desired_property' }">
+                        <span class="badge-dot" :style="item.customized === 'device_desired_property' ? 'color:#38aa39' : ''">●</span>
+                        <span class="badge-text">属性</span>
                       </div>
                     </div>
-                    <div class="card-value property-value" v-copy="item.formatValue"
-                         :title="item.formatValue">
-                      {{ item.formatValue || '--' }}
+                    <div class="card-value property-value">
+                      <div
+                        class="value-row"
+                      >
+                        <a-tooltip
+                          placement="top"
+                          :title="item.formatValue && item.desireValue != null && String(item.desireValue) !== String(item.value)
+                            ? ('上报值：' + String(item.formatValue) + '，期望值：' + String(item.desireValue))
+                            : (!item.formatValue && item.desireValue != null
+                              ? ('期望值：' + String(item.desireValue) + '（设备未上报）')
+                              : String(item.formatValue || item.desireValue || '--'))"
+                        >
+                          <span class="value-text">{{ item.formatValue || item.desireValue || '--' }}</span>
+                        </a-tooltip>
+                      </div>
                     </div>
                     <div class="card-footer">
                       <div class="card-time">
@@ -326,21 +347,33 @@
                         {{ item.lastTime }}
                       </div>
                       <div class="card-actions">
+                        <!-- 地理位置类型显示轨迹按钮 -->
+                        <div
+                          v-if="item.storagePolicy && isGeoPointType(item)"
+                          class="history-btn track-btn"
+                          @click="showTrackMap(item)"
+                          title="查看轨迹地图"
+                        >
+                          <a-icon type="environment" />
+                          <span class="history-text">轨迹</span>
+                        </div>
+                        <!-- 历史按钮（地理位置类型也显示） -->
                         <div
                           v-if="item.storagePolicy"
                           class="history-btn"
                           @click="lookMeta(item, 'PROPERTIES')"
                           title="查看历史数据"
                         >
+                          <a-icon type="history" />
                           <span class="history-text">历史</span>
                         </div>
-                        <div
-                          class="copy-btn"
-                          @click="copyValue(item.formatValue)"
-                          title="复制数值"
-                        >
-                          <a-icon type="copy"/>
-                        </div>
+                         <div
+                           class="copy-btn"
+                           @click.stop="copyValue(item.formatValue || item.desireValue)"
+                           title="复制数值"
+                         >
+                           <a-icon type="copy"/>
+                         </div>
                       </div>
                     </div>
                   </div>
@@ -416,6 +449,7 @@
                             @click="lookMeta(item, 'EVENT')"
                             title="查看历史数据"
                           >
+                            <a-icon type="history" />
                             <span class="history-text">历史</span>
                           </div>
                           <!-- <div
@@ -580,6 +614,16 @@
         :symbol="metaSymbol"
         @close="closeMetaLog"
       />
+      <!-- 轨迹地图弹窗 -->
+      <map-track-modal
+        v-if="devId && devDetails.productKey"
+        :show="showTrackModal"
+        :device-id="devId"
+        :product-key="devDetails.productKey"
+        :meta-id="trackMetaId"
+        :meta-name="trackMetaName"
+        @close="closeTrackModal"
+      />
       <!-- 物模型详细信息 -->
       <metadata-show
         v-if="productDetails.id"
@@ -616,6 +660,7 @@ import JsonViewer from 'vue-json-viewer'
 import LogManage from './logManage'
 import Subscribe from './Subscribe'
 import DeviceDataTrend from './DeviceDataTrend'
+import MapTrackModal from './MapTrackModal'
 import CreateForm from './CreateForm'
 import FunctionDown from './FunctionDown'
 import metadata from './metadata'
@@ -635,6 +680,7 @@ export default {
     JsonViewer,
     LogManage,
     DeviceDataTrend,
+    MapTrackModal,
     CreateForm,
     FunctionDown,
     DeviceDebugging,
@@ -811,6 +857,10 @@ export default {
       iccid: '',
       activeTab: '1',
       mapModalVisible: false,
+      // 轨迹地图弹窗相关
+      showTrackModal: false,
+      trackMetaId: '',
+      trackMetaName: '',
       mapInstance: null,
       mapInitToken: 0,
       alertList: [
@@ -982,28 +1032,28 @@ export default {
           version: "2.0", // Loca 版本
         },
       })
-      .then((AMap) => {
-        window.AMap = AMap
-        this.map = new AMap.Map('showmap-modal-container', {
-          zoom: 12,
-          center: [81.368244, 44.620889]
+        .then((AMap) => {
+          window.AMap = AMap
+          this.map = new AMap.Map('showmap-modal-container', {
+            zoom: 12,
+            center: [81.368244, 44.620889]
+          })
+
+          // 添加比例尺组件到地图实例上
+          this.map.addControl(new AMap.Scale())
+
+          this.geocoder = new AMap.Geocoder()
+          this.autoComplete = new AMap.AutoComplete()
+
+          // 如果有位置信息，绘制标点
+          if (this.location.lng && this.location.lat) {
+            this.drawPoint()
+            this.map.panTo([this.location.lng, this.location.lat])
+          }
         })
-
-        // 添加比例尺组件到地图实例上
-        this.map.addControl(new AMap.Scale())
-
-        this.geocoder = new AMap.Geocoder()
-        this.autoComplete = new AMap.AutoComplete()
-
-        // 如果有位置信息，绘制标点
-        if (this.location.lng && this.location.lat) {
-          this.drawPoint()
-          this.map.panTo([this.location.lng, this.location.lat])
-        }
-      })
-      .catch((e) => {
-        console.error('地图初始化失败:', e) // 加载错误提示
-      })
+        .catch((e) => {
+          console.error('地图初始化失败:', e) // 加载错误提示
+        })
     },
 
     drawPoint() {
@@ -1281,9 +1331,7 @@ export default {
     },
     // 规范化设备详情中的时间字段
     normalizeDevTimeFields(dev) {
-      if (!dev || typeof dev !== 'object') {
-        return
-      }
+      if (!dev || typeof dev !== 'object') return
       // registryTime 兼容 activeTime
       if (!dev.registryTime && dev.activeTime) {
         dev.registryTime = dev.activeTime
@@ -1303,13 +1351,9 @@ export default {
     },
     // 将任意时间值格式化为字符串
     formatTimeValue(value) {
-      if (!value) {
-        return '无'
-      }
+      if (!value) return '无'
       const d = toDate(value)
-      if (isNaN(d.getTime())) {
-        return '无'
-      }
+      if (isNaN(d.getTime())) return '无'
       return this.formatDate(d)
     },
     // 时间转换
@@ -1377,6 +1421,20 @@ export default {
         this.metaId = item.property
         this.metaSymbol = item.symbol
       }
+    },
+    // 判断是否为地理位置类型
+    isGeoPointType(item) {
+      return item.type === 'geoPoint' || item.type === 'geo_point'
+    },
+    // 显示轨迹地图
+    showTrackMap(item) {
+      this.trackMetaId = item.property
+      this.trackMetaName = item.name
+      this.showTrackModal = true
+    },
+    // 关闭轨迹地图弹窗
+    closeTrackModal() {
+      this.showTrackModal = false
     },
     // 关闭查看事件或者设备详细日志
     closeMetaLog() {
@@ -2125,10 +2183,24 @@ export default {
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+  box-shadow: 0 1px 2px rgba(24, 144, 255, 0.2);
 }
 
 .history-btn:hover {
   background: #40a9ff;
+  box-shadow: 0 2px 4px rgba(24, 144, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+/* 轨迹按钮样式 */
+.track-btn {
+  background: #52c41a;
+}
+
+.track-btn:hover {
+  background: #73d13d;
+  box-shadow: 0 2px 4px rgba(82, 196, 26, 0.3);
+  transform: translateY(-1px);
 }
 
 .history-text {

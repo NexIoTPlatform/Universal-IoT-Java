@@ -25,7 +25,12 @@ public enum CameraCommand {
   CAMERA_PLAYBACK("cameraPlayback"),
   CAMERA_SNAPSHOT("cameraSnapshot"),
   CAMERA_TURN("cameraTurn"),
-  CAMERA_FLIP_SET("cameraFlipSet");
+  CAMERA_FLIP_SET("cameraFlipSet"),
+  
+  // 录像查询相关
+  QUERY_RECORDS("queryRecords"),
+  QUERY_CLOUD_RECORDS("queryCloudRecords"),
+  LOAD_CLOUD_RECORD("loadCloudRecord");
 
   private final String functionName;
 

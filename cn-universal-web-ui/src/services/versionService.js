@@ -19,17 +19,16 @@ class VersionService {
   async getVersionInfo(forceRefresh = false) {
     // 检查本地配置的版本号
     const localVersion = this.config.currentVersion
-
+    
     // 检查缓存中的版本号
     const storedData = storage.get(this.storageKey)
     if (storedData && storedData.currentVersion !== localVersion) {
       // 版本号不匹配，清除缓存
-      console.log(
-        `检测到版本更新: ${storedData.currentVersion} -> ${localVersion}`)
+      console.log(`检测到版本更新: ${storedData.currentVersion} -> ${localVersion}`)
       this.clearCache()
       forceRefresh = true
     }
-
+    
     // 如果缓存存在且未过期，直接返回缓存
     if (!forceRefresh && this.cache && this.isCacheValid()) {
       // 再次验证版本号
@@ -64,8 +63,7 @@ class VersionService {
         return apiData
       }
     } catch (error) {
-      console.warn('Failed to fetch version from API, using local config:',
-        error)
+      console.warn('Failed to fetch version from API, using local config:', error)
     }
 
     // 如果API失败，使用本地配置
@@ -111,9 +109,7 @@ class VersionService {
    * @returns {boolean}
    */
   isCacheValid(checkTime = this.lastCheckTime) {
-    if (!checkTime) {
-      return false
-    }
+    if (!checkTime) return false
     const now = Date.now()
     const interval = this.config.checkInterval || 3600000 // 默认1小时
     return (now - checkTime) < interval
@@ -124,13 +120,10 @@ class VersionService {
    * @returns {number}
    */
   getNewVersionCount() {
-    if (!this.cache) {
-      return 0
-    }
+    if (!this.cache) return 0
     const lastReadVersion = storage.get(this.readVersionKey)
     // 只要当前版本与最后读过的版本不同，就认为有新版本
-    return this.cache.versions.filter(
-      v => v.isNew && v.version !== lastReadVersion).length
+    return this.cache.versions.filter(v => v.isNew && v.version !== lastReadVersion).length
   }
 
   /**
@@ -164,14 +157,12 @@ class VersionService {
    * @param {string} version 版本号
    */
   markAsRead(version) {
-    if (!this.cache) {
-      return
-    }
-
+    if (!this.cache) return
+    
     // 直接保存当前版本号
     storage.set(this.readVersionKey, version)
     console.log(`版本 ${version} 已标记为已读`)
-
+    
     // 更新缓存中的版本状态
     const versionItem = this.cache.versions.find(v => v.version === version)
     if (versionItem) {

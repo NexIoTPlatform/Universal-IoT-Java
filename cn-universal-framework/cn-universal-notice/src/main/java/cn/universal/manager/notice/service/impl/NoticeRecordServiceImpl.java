@@ -30,6 +30,11 @@ public class NoticeRecordServiceImpl implements NoticeRecordService {
 
   @Override
   public List<NoticeSendRecord> search(String keyword, String type, String status) {
+    return search(keyword, type, status, null);
+  }
+
+  @Override
+  public List<NoticeSendRecord> search(String keyword, String type, String status, String creator) {
     Example example = new Example(NoticeSendRecord.class);
     Example.Criteria c = example.createCriteria();
     if (StrUtil.isNotEmpty(keyword)) {
@@ -41,6 +46,10 @@ public class NoticeRecordServiceImpl implements NoticeRecordService {
     if (StrUtil.isNotEmpty(status)) {
       c.andEqualTo("status", status);
     }
+    if (StrUtil.isNotEmpty(creator)) {
+      c.andEqualTo("creator", creator);
+    }
+    example.orderBy("sendTime").desc();
     return recordMapper.selectByExample(example);
   }
 }

@@ -105,9 +105,10 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         "selectDictDataById",
         "selectDictLabel",
         "selectDictDataByTypes",
+        "selectDictDataByType",
         "selectWhitelist",
         "selectDictTypeByType"
-      })
+      },allEntries = true)
   public void deleteDictDataByIds(Long[] dictCodes) {
     for (Long dictCode : dictCodes) {
       SysDictData data = selectDictDataById(dictCode);
@@ -130,7 +131,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         "selectDictDataByTypes",
         "selectWhitelist",
         "selectDictTypeByType"
-      })
+      },allEntries = true)
   public int insertDictData(SysDictData data) {
     int row = sysDictDataMapper.insert(data);
     return row;
@@ -148,9 +149,11 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         "selectDictDataById",
         "selectDictLabel",
         "selectDictDataByTypes",
+        "selectDictDataByType",
         "selectWhitelist",
         "selectDictTypeByType"
-      })
+      },
+      allEntries = true)
   public int updateDictData(SysDictData data) {
     int row = sysDictDataMapper.updateByPrimaryKey(data);
     return row;

@@ -65,42 +65,35 @@ public class VersionController {
       result.put("success", true);
       result.put("loggerName", name);
       result.put("requestedLevel", level.name());
-      result.put(
-          "actualLevel",
-          verifyLogger.getLevel() != null ? verifyLogger.getLevel().toString() : "null");
+      result.put("actualLevel", verifyLogger.getLevel() != null ? verifyLogger.getLevel().toString() : "null");
       result.put("effectiveLevel", verifyLogger.getEffectiveLevel().toString());
       result.put("message", "日志级别修改成功");
       return result;
     } catch (Exception e) {
       log.error("修改日志级别失败: name={}, level={}", name, level, e);
       return Map.of(
-          "success",
-          false,
-          "loggerName",
-          name,
-          "requestedLevel",
-          level.name(),
-          "error",
-          e.getMessage(),
-          "message",
-          "日志级别修改失败");
+        "success", false,
+        "loggerName", name,
+        "requestedLevel", level.name(),
+        "error", e.getMessage(),
+        "message", "日志级别修改失败"
+      );
     }
   }
 
   @GetMapping("/v1/debug/log/status")
   public Object getLogStatus(@RequestParam String name) {
     try {
-      ch.qos.logback.classic.Logger logger =
+      ch.qos.logback.classic.Logger logger = 
           (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(name);
-
+      
       Map<String, Object> result = new HashMap<>();
       result.put("loggerName", name);
       result.put("currentLevel", logger.getLevel() != null ? logger.getLevel().toString() : "null");
       result.put("effectiveLevel", logger.getEffectiveLevel().toString());
       result.put("isAdditive", logger.isAdditive());
-      result.put(
-          "appenderCount", logger.iteratorForAppenders().hasNext() ? "有appender" : "无appender");
-
+      result.put("appenderCount", logger.iteratorForAppenders().hasNext() ? "有appender" : "无appender");
+      
       return result;
     } catch (Exception e) {
       log.error("获取日志状态失败: name={}", name, e);
@@ -116,21 +109,258 @@ public class VersionController {
   public Object testLog(@RequestParam String name) {
     try {
       Logger testLogger = org.slf4j.LoggerFactory.getLogger(name);
-
+      
       testLogger.trace("TRACE级别测试日志 - {}", name);
       testLogger.debug("DEBUG级别测试日志 - {}", name);
       testLogger.info("INFO级别测试日志 - {}", name);
       testLogger.warn("WARN级别测试日志 - {}", name);
       testLogger.error("ERROR级别测试日志 - {}", name);
-
-      return Map.of("success", true, "loggerName", name, "message", "测试日志已输出，请检查日志文件");
+      
+      return Map.of(
+        "success", true,
+        "loggerName", name,
+        "message", "测试日志已输出，请检查日志文件"
+      );
     } catch (Exception e) {
       log.error("测试日志失败: name={}", name, e);
-      return Map.of("success", false, "loggerName", name, "error", e.getMessage());
+      return Map.of(
+        "success", false,
+        "loggerName", name,
+        "error", e.getMessage()
+      );
+    }
+  }
+
+  @GetMapping("/v1/debug/log/testsql")
+  public Object testSqlLog() {
+    try {
+      // 获取 MyBatis mapper logger
+      ch.qos.logback.classic.Logger mybatisLogger = 
+          (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger("cn.universal.persistence.mapper");
+      
+      // 获取 root logger
+      ch.qos.logback.classic.Logger rootLogger = 
+          (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+      
+      // 创建返回结果
+      Map<String, Object> result = new HashMap<>();
+      result.put("timestamp", System.currentTimeMillis());
+      
+      // 检查 MyBatis logger 状态
+      Map<String, Object> mybatisLoggerInfo = new HashMap<>();
+      mybatisLoggerInfo.put("name", "cn.universal.persistence.mapper");
+      mybatisLoggerInfo.put("level", mybatisLogger.getLevel() != null ? mybatisLogger.getLevel().toString() : "null");
+      mybatisLoggerInfo.put("effectiveLevel", mybatisLogger.getEffectiveLevel().toString());
+      mybatisLoggerInfo.put("isAdditive", mybatisLogger.isAdditive());
+      
+      // 检查 root logger 状态
+      Map<String, Object> rootLoggerInfo = new HashMap<>();
+      rootLoggerInfo.put("name", "ROOT");
+      rootLoggerInfo.put("level", rootLogger.getLevel() != null ? rootLogger.getLevel().toString() : "null");
+      rootLoggerInfo.put("effectiveLevel", rootLogger.getEffectiveLevel().toString());
+      
+      result.put("mybatisLogger", mybatisLoggerInfo);
+      result.put("rootLogger", rootLoggerInfo);
+      
+      // 尝试输出一些 SQL 相关的日志
+      log.info("开始测试 SQL 日志输出...");
+      
+      // 使用 PerformanceInterceptor 输出 SQL 日志（如果已配置）
+      Logger perfLogger = org.slf4j.LoggerFactory.getLogger("mybatisPerformanceInterceptor");
+      if (perfLogger.isDebugEnabled()) {
+        perfLogger.debug("这是一个测试 SQL 性能拦截器的日志");
+        result.put("performanceInterceptorEnabled", true);
+      } else {
+        result.put("performanceInterceptorEnabled", false);
+      }
+      
+      // 检查是否有其他相关的 SQL 日志记录器
+      Logger sqlLogger = org.slf4j.LoggerFactory.getLogger("org.apache.ibatis");
+      if (sqlLogger.isDebugEnabled()) {
+        sqlLogger.debug("这是一个测试 Apache MyBatis 的日志");
+        result.put("mybatisDebugEnabled", true);
+      } else {
+        result.put("mybatisDebugEnabled", false);
+      }
+      
+      result.put("success", true);
+      result.put("message", "SQL 日志诊断完成，请检查日志输出");
+      
+      return result;
+    } catch (Exception e) {
+      log.error("SQL 日志诊断失败", e);
+      return Map.of(
+        "success", false,
+        "error", e.getMessage(),
+        "message", "SQL 日志诊断失败"
+      );
     }
   }
 
   // 移除强制/批量/测试接口，保留最小化的设置与查询
+
+  @GetMapping("/v1/debug/log/diagnose")
+  public Object diagnoseLogConfig() {
+    try {
+      Map<String, Object> result = new HashMap<>();
+      result.put("timestamp", System.currentTimeMillis());
+      
+      // 获取各种关键 logger 的状态
+      String[] loggerNames = {
+        "ROOT",
+        "api",
+        "mqtt",
+        "tcp",
+        "udp",
+        "cn.universal.http.protocol",
+        "cn.ctaiot.protocol",
+        "cn.onenet.protocol",
+        "cn.imoulife.protocol",
+        "cn.ezviz.protocol",
+        "cn.wvp.protocol",
+        "cn.hik.isc.protocol",
+        "cn.dahua.icc.protocol",
+        "cn.universal.persistence.mapper",
+        "org.apache.ibatis",
+        "org.springframework",
+        "cn.hutool"
+      };
+      
+      Map<String, Object> loggerDetails = new HashMap<>();
+      
+      for (String loggerName : loggerNames) {
+        ch.qos.logback.classic.Logger logger;
+        if ("ROOT".equals(loggerName)) {
+          logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        } else {
+          logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(loggerName);
+        }
+        
+        Map<String, Object> loggerInfo = new HashMap<>();
+        loggerInfo.put("name", loggerName);
+        loggerInfo.put("level", logger.getLevel() != null ? logger.getLevel().toString() : "null");
+        loggerInfo.put("effectiveLevel", logger.getEffectiveLevel().toString());
+        loggerInfo.put("isAdditive", logger.isAdditive());
+        
+        // 检查是否有 appender
+        int appenderCount = 0;
+        ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent> appender;
+        java.util.Iterator<ch.qos.logback.core.Appender<ch.qos.logback.classic.spi.ILoggingEvent>> iterator = logger.iteratorForAppenders();
+        while (iterator.hasNext()) {
+          appender = iterator.next();
+          appenderCount++;
+        }
+        loggerInfo.put("appenderCount", appenderCount);
+        
+        loggerDetails.put(loggerName, loggerInfo);
+      }
+      
+      result.put("loggers", loggerDetails);
+      
+      // 测试不同级别的日志输出
+      Logger testLogger = org.slf4j.LoggerFactory.getLogger("cn.universal.persistence.mapper");
+      testLogger.trace("TRACE级别测试日志 - 诊断接口");
+      testLogger.debug("DEBUG级别测试日志 - 诊断接口");
+      testLogger.info("INFO级别测试日志 - 诊断接口");
+      testLogger.warn("WARN级别测试日志 - 诊断接口");
+      testLogger.error("ERROR级别测试日志 - 诊断接口");
+      
+      result.put("success", true);
+      result.put("message", "日志配置诊断完成，请检查日志文件输出");
+      
+      return result;
+    } catch (Exception e) {
+      log.error("日志配置诊断失败", e);
+      return Map.of(
+        "success", false,
+        "error", e.getMessage(),
+        "message", "日志配置诊断失败"
+      );
+    }
+  }
+
+  /**
+   * 获取所有协议模块的日志状态
+   */
+  @GetMapping("/v1/debug/log/protocols")
+  public Object getProtocolLogStatus() {
+    try {
+      Map<String, Object> result = new HashMap<>();
+      result.put("timestamp", System.currentTimeMillis());
+      
+      String[] protocolLoggers = {
+        "api",
+        "mqtt",
+        "tcp",
+        "udp",
+        "cn.universal.http.protocol",
+        "cn.ctaiot.protocol",
+        "cn.onenet.protocol",
+        "cn.imoulife.protocol",
+        "cn.ezviz.protocol",
+        "cn.wvp.protocol",
+        "cn.hik.isc.protocol",
+        "cn.dahua.icc.protocol"
+      };
+      
+      Map<String, Object> protocolStatus = new HashMap<>();
+      
+      for (String loggerName : protocolLoggers) {
+        ch.qos.logback.classic.Logger logger = 
+            (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory.getLogger(loggerName);
+        
+        Map<String, Object> status = new HashMap<>();
+        status.put("level", logger.getLevel() != null ? logger.getLevel().toString() : "inherit");
+        status.put("effectiveLevel", logger.getEffectiveLevel().toString());
+        status.put("additivity", logger.isAdditive());
+        
+        protocolStatus.put(loggerName, status);
+      }
+      
+      result.put("protocols", protocolStatus);
+      result.put("success", true);
+      result.put("message", "协议日志状态获取成功");
+      
+      return result;
+    } catch (Exception e) {
+      log.error("获取协议日志状态失败", e);
+      return Map.of(
+        "success", false,
+        "error", e.getMessage(),
+        "message", "获取协议日志状态失败"
+      );
+    }
+  }
+
+  /**
+   * 测试指定协议的日志输出
+   */
+  @GetMapping("/v1/debug/log/testprotocol")
+  public Object testProtocolLog(@RequestParam String protocol) {
+    try {
+      Logger testLogger = org.slf4j.LoggerFactory.getLogger(protocol);
+      
+      testLogger.trace("[协议日志测试] TRACE级别 - protocol={}", protocol);
+      testLogger.debug("[协议日志测试] DEBUG级别 - protocol={}", protocol);
+      testLogger.info("[协议日志测试] INFO级别 - protocol={}", protocol);
+      testLogger.warn("[协议日志测试] WARN级别 - protocol={}", protocol);
+      testLogger.error("[协议日志测试] ERROR级别 - protocol={}", protocol);
+      
+      return Map.of(
+        "success", true,
+        "protocol", protocol,
+        "message", "协议日志测试完成，请检查对应日志文件: logs/" + protocol.replaceAll("\\.", "-") + ".log"
+      );
+    } catch (Exception e) {
+      log.error("协议日志测试失败: protocol={}", protocol, e);
+      return Map.of(
+        "success", false,
+        "protocol", protocol,
+        "error", e.getMessage(),
+        "message", "协议日志测试失败"
+      );
+    }
+  }
 
   @GetMapping("/version")
   public Object versionInformation() {
@@ -139,31 +369,56 @@ public class VersionController {
 
   @Resource private LogbackLoggingSystem loggingSystem;
   @Resource private StringRedisTemplate stringRedisTemplate;
+  
 
-  // ==========================================
+  // ========================================== 
   // 协议扩展模块日志管理API
   // ==========================================
 
-  /** 设置协议模块日志级别 */
+  /**
+   * 设置协议模块日志级别
+   */
   // 以下协议日志管理接口已移除，保留最小化动态级别设置
 
-  /** 批量设置协议模块日志级别 */
+  /**
+   * 批量设置协议模块日志级别
+   */
+  
 
-  /** 恢复协议模块原始日志级别 */
+  /**
+   * 恢复协议模块原始日志级别
+   */
+  
 
-  /** 获取协议模块日志状态 */
+  /**
+   * 获取协议模块日志状态
+   */
+  
 
-  /** 获取支持的协议模块列表 */
+  /**
+   * 获取支持的协议模块列表
+   */
+  
 
-  /** 获取已修改的协议模块信息 */
+  /**
+   * 获取已修改的协议模块信息
+   */
+  
 
-  /** 测试协议模块日志输出 */
+  /**
+   * 测试协议模块日志输出
+   */
+  
 
-  // ==========================================
+  
+
+  // ========================================== 
   // TCP协议设备统计调试API
   // ==========================================
 
-  /** 获取TCP协议设备统计信息（调试用） */
+  /**
+   * 获取TCP协议设备统计信息（调试用）
+   */
   @GetMapping("/v1/tcp/stats")
   public Object getTcpStats() {
     try {
@@ -172,7 +427,7 @@ public class VersionController {
       result.put("success", true);
       result.put("message", "TCP协议设备统计功能已优化");
       result.put("timestamp", System.currentTimeMillis());
-
+      
       // 模拟统计数据
       result.put("currentInstance", "instance-001");
       result.put("currentDeviceCount", 150);
@@ -180,7 +435,7 @@ public class VersionController {
       result.put("totalActiveDevices", 450);
       result.put("totalDevicesIncludingZombie", 500);
       result.put("zombieDeviceCount", 50);
-
+      
       return result;
     } catch (Exception e) {
       log.error("获取TCP协议统计失败", e);
@@ -188,7 +443,9 @@ public class VersionController {
     }
   }
 
-  /** 调试Redis中的TCP实例设备索引 */
+  /**
+   * 调试Redis中的TCP实例设备索引
+   */
   @GetMapping("/v1/tcp/debug/redis")
   public Object debugTcpRedis() {
     try {
@@ -196,21 +453,21 @@ public class VersionController {
       result.put("success", true);
       result.put("message", "TCP Redis调试信息");
       result.put("timestamp", System.currentTimeMillis());
-
+      
       // Redis Key信息
       result.put("deviceRoutesKey", "tcp:device:routes");
       result.put("instanceDevicesKeyPrefix", "tcp:instance:devices:");
       result.put("expectedPattern", "tcp:instance:devices:*");
-
+      
       // 可能的问题分析
       Map<String, Object> analysis = new HashMap<>();
       analysis.put("ttlIssue", "实例设备索引TTL设置为10分钟，可能已过期");
       analysis.put("registrationIssue", "设备连接时可能没有正确调用registerDeviceRoute");
       analysis.put("scanIssue", "SCAN命令可能没有找到匹配的key");
       analysis.put("redisConnectionIssue", "Redis连接可能有问题");
-
+      
       result.put("analysis", analysis);
-
+      
       // 建议的检查步骤
       String[] checkSteps = {
         "1. 检查Redis中是否存在 tcp:device:routes key",
@@ -220,7 +477,7 @@ public class VersionController {
         "5. 检查Redis连接是否正常"
       };
       result.put("checkSteps", checkSteps);
-
+      
       return result;
     } catch (Exception e) {
       log.error("调试TCP Redis失败", e);
@@ -253,6 +510,8 @@ public class VersionController {
     }
     return stringBuilder.toString();
   }
+
+  
 
   @Resource private BatchFunctionTask batchFunctionTask;
 
@@ -301,10 +560,7 @@ public class VersionController {
             StringBuilder message = new StringBuilder();
             message.append("🔔 系统状态报告通知\n");
             message.append("📍 用户IP: ").append(jsonData.get("ip")).append("\n");
-            message
-                .append("🌐 客户端IP: ")
-                .append(JakartaServletUtil.getClientIP(request))
-                .append("\n");
+            message.append("🌐 客户端IP: ").append(JakartaServletUtil.getClientIP(request)).append("\n");
             message.append("🌐 访问URL: ").append(jsonData.get("url")).append("\n");
             message.append("📱 用户代理: ").append(jsonData.get("ua")).append("\n");
             message.append("⏰ 时间戳: ").append(DateUtil.now()).append("\n");

@@ -84,6 +84,9 @@ public class SystemProtocolController extends BaseController {
                 details.put("category", protocol.getCategory().name());
                 details.put("available", true); // 运行时注册表中的都是可用的
                 details.put("status", "已启用");
+                // 添加是否支持手动创建产品的信息
+                details.put("isManualCreatable", protocol.isManualCreatable());
+                details.put("notCreatableReason", protocol.getNotCreatableReason());
                 runtimeProtocols.put(protocol.getCode(), details);
               });
 

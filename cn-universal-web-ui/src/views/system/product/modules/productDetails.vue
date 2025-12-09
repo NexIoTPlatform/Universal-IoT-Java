@@ -37,14 +37,14 @@
           >
             设备管理
           </div>
-          <div
+          <!-- <div
             v-if="productDetails.creatorId === $store.state.user.name"
             class="custom-tab-item"
             :class="{ active: activeKey === '4' }"
             @click="activeKey = '4'"
           >
-            协议管理
-          </div>
+            驱动信息
+          </div> -->
           <div
             v-if="['tcp','udp','mqtt'].includes(productDetails.thirdPlatform) && productDetails.creatorId === $store.state.user.name && productDetails.deviceNode !== 'GATEWAY_SUB_DEVICE'"
             class="custom-tab-item"
@@ -74,16 +74,17 @@
                   <!-- 左侧：产品详情 -->
                   <div class="product-left-section">
                     <div class="product-header-section">
-                      <h1 class="product-name">{{ productDetails.name || '产品名称' }}</h1>
+                      <div class="product-name-row">
+                        <h1 class="product-name">{{ productDetails.name || '产品名称' }}</h1>
+                        <!-- 产品介绍图标 - 紧贴产品名称 -->
+                        <div v-if="productDetailUrl" class="detail-badge" @click="openDetailPreview" title="查看产品介绍">
+                          <a-icon type="file-text" class="badge-icon"/>
+                        </div>
+                      </div>
                       <div class="product-meta-tags">
                         <a-tag color="blue">{{ productDetails.thirdPlatform || '-' }}</a-tag>
-                        <a-tag color="cyan">{{
-                            getDeviceNodeText(productDetails.deviceNode) || '-'
-                          }}
-                        </a-tag>
-                        <a-tag v-if="productDetails.transportProtocol" color="purple">
-                          {{ productDetails.transportProtocol }}
-                        </a-tag>
+                        <a-tag color="cyan">{{ getDeviceNodeText(productDetails.deviceNode) || '-' }}</a-tag>
+                        <a-tag v-if="productDetails.transportProtocol" color="purple">{{ productDetails.transportProtocol }}</a-tag>
                       </div>
                       <div class="product-key-row">
                         <span class="key-label">ProductKey</span>
@@ -126,24 +127,20 @@
                       <div class="detail-item"
                            v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin">
                         <span class="detail-label">数据协议</span>
-                        <span class="detail-value">{{
-                            productDetails.transportProtocol || '-'
-                          }}</span>
+                        <span class="detail-value">{{ productDetails.transportProtocol || '-' }}</span>
                       </div>
                       <div class="detail-item">
                         <span class="detail-label">设备节点</span>
-                        <span class="detail-value">{{
-                            getDeviceNodeText(productDetails.deviceNode) || '-'
-                          }}</span>
+                        <span class="detail-value">{{ getDeviceNodeText(productDetails.deviceNode) || '-' }}</span>
                       </div>
                       <div class="detail-item" v-if="productDetails.storePolicy">
-                        <span class="detail-label">存储类型</span>
+                        <span class="detail-label">设备日志存储类型</span>
                         <span class="detail-value">
                           <!-- 编辑模式：显示下拉选择 -->
                           <template v-if="editStorePolicyMode">
                             <a-select
                               v-model="productDetails.storePolicy"
-                              placeholder="请选择存储策略"
+                              placeholder="请选择存储类型"
                               style="width: 150px"
                               @change="handleStorePolicyChange"
                             >
@@ -180,7 +177,7 @@
                       <div class="detail-item">
                         <span class="detail-label">产品状态</span>
                         <span class="detail-value">
-                          <a-badge :status="productDetails.state === 0 ? 'success' : 'default'"/>
+                          <a-badge :status="productDetails.state === 0 ? 'success' : 'default'" />
                           {{ productDetails.state === 0 ? '启用' : '禁用' }}
                         </span>
                       </div>
@@ -190,15 +187,11 @@
                       </div>
                       <div class="detail-item">
                         <span class="detail-label">创建时间</span>
-                        <span class="detail-value">{{
-                            formatTime(productDetails.createTime) || '-'
-                          }}</span>
+                        <span class="detail-value">{{ formatTime(productDetails.createTime) || '-' }}</span>
                       </div>
                       <div class="detail-item" v-if="productDetails.updateTime">
                         <span class="detail-label">更新时间</span>
-                        <span class="detail-value">{{
-                            formatTime(productDetails.updateTime) || '-'
-                          }}</span>
+                        <span class="detail-value">{{ formatTime(productDetails.updateTime) || '-' }}</span>
                       </div>
                     </div>
                   </div>
@@ -206,18 +199,15 @@
                   <!-- 右侧：产品图片 -->
                   <div class="product-right-section">
                     <div class="product-image-section">
-                      <div class="image-wrapper" @click="openImagePreview"
-                           :class="{ clickable: !!productImageUrl }">
-                        <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片"
-                             class="product-image"/>
+                      <div class="image-wrapper" @click="openImagePreview" :class="{ clickable: !!productImageUrl }">
+                        <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片" class="product-image"/>
                         <div v-else class="image-placeholder">
                           <a-icon type="picture" class="placeholder-icon"/>
                           <span class="placeholder-text">暂无图片</span>
                         </div>
                       </div>
                       <div class="image-actions">
-                        <a v-if="productImageUrl" @click.prevent="openImagePreview"
-                           class="action-link">
+                        <a v-if="productImageUrl" @click.prevent="openImagePreview" class="action-link">
                           <a-icon type="eye"/>
                           {{ $t('app.view') }}
                         </a>
@@ -245,8 +235,7 @@
               </div>
 
               <!-- 设备标签卡片 -->
-              <div class="info-card"
-                   v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin">
+              <div class="info-card"  v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin">
                 <div class="card-header">
                   <div class="card-title">
                     <a-icon type="tags"/>
@@ -300,15 +289,14 @@
               </div>
 
               <!-- 网关产品卡片 -->
-              <div class="info-card gateway-card"
-                   v-if="productDetails.deviceNode === 'GATEWAY_SUB_DEVICE'">
+              <div class="info-card gateway-card" v-if="productDetails.deviceNode === 'GATEWAY_SUB_DEVICE'">
                 <div class="card-header">
                   <div class="card-title">
                     <a-icon type="gateway"/>
                     <span>关联网关</span>
                   </div>
                   <a-button
-                    v-if="!selectedGateway"
+                    v-if="!selectedGateway && (productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin)"
                     type="primary"
                     size="small"
                     icon="plus"
@@ -318,7 +306,7 @@
                     添加网关
                   </a-button>
                   <a-button
-                    v-else
+                    v-else-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin"
                     type="default"
                     size="small"
                     icon="swap"
@@ -327,14 +315,17 @@
                   >
                     更换网关
                   </a-button>
+                  <div v-else class="add-gateway-tip">
+                    <a-icon type="info-circle" class="tip-icon" />
+                    <span class="tip-text">需要产品(创建人/管理员)权限，关联网关产品</span>
+                  </div>
                 </div>
                 <div class="card-content">
                   <div v-if="selectedGateway" class="gateway-selected">
                     <div class="gateway-info-box">
                       <!-- 网关图片或默认图标 -->
                       <div class="gateway-image">
-                        <img v-if="gatewayImageUrl" :src="gatewayImageUrl" alt="网关图片"
-                             class="gateway-photo"/>
+                        <img v-if="gatewayImageUrl" :src="gatewayImageUrl" alt="网关图片" class="gateway-photo"/>
                         <a-icon v-else type="gateway" class="gateway-icon"/>
                       </div>
                       <div class="gateway-details">
@@ -342,6 +333,7 @@
                         <div class="gateway-key">ProductKey: {{ selectedGateway.productKey }}</div>
                       </div>
                       <a-button
+                        v-if="productDetails.creatorId === $store.state.user.name || $store.state.user.currentAdmin"
                         type="link"
                         size="small"
                         icon="close"
@@ -358,8 +350,7 @@
                     <p class="empty-text">暂未关联网关产品</p>
                     <p class="empty-hint">子设备需要通过网关连接到平台</p>
                   </div>
-                  <SelectGateway ref="selectGateway" @add="addGateway"
-                                 :selectedGateway="selectedGateway"/>
+                  <SelectGateway ref="selectGateway" @add="addGateway" :selectedGateway="selectedGateway"/>
                 </div>
               </div>
 
@@ -383,7 +374,7 @@
                   <div class="card-header">
                     <div class="card-title">
                       <a-icon type="database"/>
-                      <span>设备日志存储类型</span>
+                      <span>设备数据留存策略（按属性或事件独立配置存储时长）</span>
                     </div>
                     <a-button
                       type="link"
@@ -506,7 +497,7 @@
           <div v-show="activeKey === '4'" class="tab-pane"
                v-if="productDetails.creatorId === $store.state.user.name">
             <!-- <div class="simple-header">
-              <h3>协议管理</h3>
+              <h3>驱动管理</h3>
               <p>管理产品的通信协议和数据解析规则</p>
             </div> -->
             <product-protocol
@@ -567,10 +558,8 @@
       :type="metadataShowType"
       @close="closeMetadataDetail"/>
     <!-- 图片预览 -->
-    <a-modal :visible="imagePreviewVisible" :footer="null" @cancel="imagePreviewVisible=false"
-             :width="520">
-      <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片"
-           style="width: 100%; border-radius: 8px;"/>
+    <a-modal :visible="imagePreviewVisible" :footer="null" @cancel="imagePreviewVisible=false" :width="520">
+      <img v-if="productImageUrl" :src="productImageUrl" alt="产品图片" style="width: 100%; border-radius: 8px;"/>
     </a-modal>
     <!-- 物模型导入 -->
     <import-metadata
@@ -579,6 +568,7 @@
       :show="importMetadataShow"
       @close="closeImportMetadata"
       @ok="successUpdateMetadata"/>
+    <Resizabler ref="resizabler"/>
   </div>
 </template>
 <style scoped lang="less">
@@ -992,12 +982,59 @@
 
 /* 产品头部区域 - 优化 */
 .product-header-section {
+  .product-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 12px;
+  }
+
   .product-name {
     font-size: 24px;
     font-weight: 600;
     color: #1a202c;
-    margin: 0 0 12px 0;
+    margin: 0;
     line-height: 1.3;
+    display: inline-block;
+  }
+
+  // 产品介绍图标 - 紧贴产品名称最后一个字
+  .detail-badge {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+    vertical-align: middle;
+    border-radius: 4px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+
+    .badge-icon {
+      font-size: 14px;
+      line-height: 1;
+      color: #475569;
+      transition: all 0.2s ease;
+    }
+
+    &:hover {
+      background: #e0f2fe;
+      border-color: #1966ff;
+
+      .badge-icon {
+        color: #1966ff;
+        transform: scale(1.1);
+      }
+    }
+
+    &:active {
+      transform: scale(0.95);
+      background: #bae6fd;
+    }
   }
 
   .product-meta-tags {
@@ -1917,12 +1954,7 @@
 </style>
 <script>
 
-import {
-  getProduct,
-  modifyProductGateway,
-  updateProduct,
-  uploadProductImage
-} from '@/api/system/dev/product'
+import {getProduct, modifyProductGateway, updateProduct, uploadProductImage} from '@/api/system/dev/product'
 import {getInfo} from '@/api/system/dev/sort'
 import CreateForm from './CreateForm'
 import metadata from './metadata'
@@ -1939,6 +1971,7 @@ import TcpConnectionInfo from './TcpConnectionInfo'
 import {bindCertificate, getCertificateList, unbindCertificate} from '@/api/system/certificate'
 import CertificateBind from './CertificateBind.vue'
 import ConfigurationEditor from './ConfigurationEditor.vue'
+import Resizabler from './Resizabler.vue'
 import storage from 'store'
 import {ACCESS_TOKEN} from '@/store/mutation-types'
 
@@ -1958,7 +1991,8 @@ export default {
     NetworkComponentBind,
     TcpConnectionInfo,
     CertificateBind,
-    ConfigurationEditor
+    ConfigurationEditor,
+    Resizabler
   },
   props: [],
   data() {
@@ -2045,6 +2079,7 @@ export default {
       bindCert: null,
       // 产品图片
       productImageUrl: '',
+      productDetailUrl: '',
       imagePreviewVisible: false,
       uploadFileUrl: process.env.VUE_APP_BASE_API + '/admin/v1/product/uploadImage',
       uploadHeaders: {
@@ -2109,6 +2144,11 @@ export default {
     openImagePreview() {
       if (this.productImageUrl) {
         this.imagePreviewVisible = true
+      }
+    },
+    openDetailPreview() {
+      if (this.productDetailUrl) {
+        this.$refs.resizabler.open(this.productDetailUrl)
       }
     },
     // 编辑设备标签
@@ -2190,17 +2230,20 @@ export default {
 
         // 解析产品图片 - 优先使用 photoUrl 中的 img 字段
         this.productImageUrl = ''
+        this.productDetailUrl = ''
         if (this.productDetails.photoUrl) {
           try {
             const photoObj = typeof this.productDetails.photoUrl === 'string'
               ? JSON.parse(this.productDetails.photoUrl)
               : this.productDetails.photoUrl
             this.productImageUrl = photoObj && photoObj.img ? photoObj.img : ''
+            this.productDetailUrl = photoObj && photoObj.detail ? photoObj.detail : ''
           } catch (e) {
             this.productImageUrl = ''
+            this.productDetailUrl = ''
           }
         }
-
+        
         if (this.productDetails.tags) {
           this.tagList = this.productDetails.tags.split(',')
         }
@@ -2450,9 +2493,9 @@ export default {
     modifyGateway() {
       const gwProductKey = this.selectedGateway ? this.selectedGateway.productKey : ''
       modifyProductGateway(this.productId, gwProductKey)
-      .then(() => {
-        this.$message.success('操作成功!')
-      })
+        .then(() => {
+          this.$message.success('操作成功!')
+        })
     },
     // 搜索|过滤产品
     filterOption(value, option) {
@@ -2614,21 +2657,16 @@ export default {
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
         d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
     },
-
+    
     formatTime(val) {
-      if (!val) {
-        return '-'
-      }
+      if (!val) return '-'
       // 如果是时间戳，转换为日期
       const timestamp = typeof val === 'string' ? new Date(val).getTime() : val
       const d = new Date(timestamp)
-      if (isNaN(d.getTime())) {
-        return '-'
-      }
-
+      if (isNaN(d.getTime())) return '-'
+      
       const pad = n => n < 10 ? '0' + n : n
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(
-        d.getHours())}:${pad(d.getMinutes())}`
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
     },
     getSslKeyFromConfig(config) {
       if (!config) {
@@ -2641,7 +2679,7 @@ export default {
         return ''
       }
     },
-
+    
     // 处理存储策略变更
     handleStorePolicyChange(value) {
       // 显示确认对话框
@@ -2674,21 +2712,21 @@ export default {
         }
       })
     },
-
+    
     // 开始编辑存储策略
     startEditStorePolicy() {
       // 保存原始值
       this.originalStorePolicy = this.productDetails.storePolicy
       this.editStorePolicyMode = true
     },
-
+    
     // 取消编辑存储策略
     cancelEditStorePolicy() {
       // 恢复原值
       this.productDetails.storePolicy = this.originalStorePolicy
       this.editStorePolicyMode = false
     },
-
+    
     // 获取存储策略标签
     getStorePolicyLabel(value) {
       const option = this.storePolicyOptions.find(item => item.value === value)
@@ -2961,5 +2999,29 @@ export default {
 .no-gateways {
   color: #999;
   font-style: italic;
+}
+
+// 添加网关提示样式
+.add-gateway-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f0f5ff;
+  border: 1px solid #d6e4ff;
+  // border-left: 3px solid #1890ff;
+  border-radius: 4px;
+  color: #1890ff;
+  font-size: 13px;
+
+  .tip-icon {
+    font-size: 14px;
+    color: #1890ff;
+  }
+
+  .tip-text {
+    color: #595959;
+    font-weight: normal;
+  }
 }
 </style>

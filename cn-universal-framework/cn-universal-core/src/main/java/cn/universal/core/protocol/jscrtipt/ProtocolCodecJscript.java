@@ -235,7 +235,7 @@ public class ProtocolCodecJscript extends ProtocolCodecSupportWrapper
     try {
       Object result =
           invocable.invokeFunction(
-              CodecMethod.preDecode.name(), protocolDecodeRequest.getPayload());
+              CodecMethod.preDecode.name(), protocolDecodeRequest.getPayload(),protocolDecodeRequest.getContext());
       return str(result);
     } catch (Exception e) {
       String error = ExceptionUtil.getMessage(e);

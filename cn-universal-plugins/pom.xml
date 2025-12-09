@@ -12,10 +12,11 @@
 
   <artifactId>cn-universal-plugins</artifactId>
   <modules>
-    <module>cn-universal-plugins-web-debug</module>
+    <module>nexiot-web-ide-debug-plugins</module>
     <module>cn-universal-plugins-extend-jdbc</module>
     <module>cn-universal-plugins-extend-kafka</module>
     <module>cn-universal-plugins-message-format</module>
+    <module>nexiot-jar-deiver-extend-plugins</module>
 
   </modules>
 

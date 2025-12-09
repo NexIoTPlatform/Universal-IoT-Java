@@ -155,18 +155,16 @@
             <h2>{{ $t('login.welcome') }}</h2>
             <p>{{ $t('login.please.input.account') }}</p>
             <div class="lang-switch in-title">
-              <select-lang/>
+              <select-lang />
             </div>
           </div>
           <a-form-model-item prop="username">
-            <a-input v-model="form.username" size="large"
-                     :placeholder="$t('login.placeholder.username')">
+            <a-input v-model="form.username" size="large" :placeholder="$t('login.placeholder.username')">
               <a-icon slot="prefix" type="user" :style="{ color: '#1f26c2' }"/>
             </a-input>
           </a-form-model-item>
           <a-form-model-item prop="password">
-            <a-input-password v-model="form.password" size="large"
-                              :placeholder="$t('login.placeholder.password')">
+            <a-input-password v-model="form.password" size="large" :placeholder="$t('login.placeholder.password')">
               <a-icon slot="prefix" type="lock" :style="{ color: '#1f26c2' }"/>
             </a-input-password>
           </a-form-model-item>
@@ -184,10 +182,7 @@
             </a-col>
           </a-row>
           <a-form-model-item prop="rememberMe">
-            <a-checkbox :checked="form.rememberMe" @change="rememberMe">{{
-                $t('login.remember')
-              }}
-            </a-checkbox>
+            <a-checkbox :checked="form.rememberMe" @change="rememberMe">{{ $t('login.remember') }}</a-checkbox>
           </a-form-model-item>
           <a-form-item style="margin-top:24px">
             <a-button
@@ -225,7 +220,7 @@ import {validPwdLevel2} from '@/utils/validate'
 import SelectLang from '@/components/SelectLang'
 
 export default {
-  components: {SelectLang},
+  components: { SelectLang },
   data() {
     const validatePass = (rule, value, callback) => {
       if (value === '') {
@@ -310,12 +305,12 @@ export default {
             storage.remove(LOGIN_REMEMBERME)
           }
           this.Login(this.form)
-          .then((res) => this.loginSuccess(res))
-          .catch(err => this.requestFailed(err))
-          .finally(() => {
-            this.form.password = resoucePwd
-            this.logining = false
-          })
+            .then((res) => this.loginSuccess(res))
+            .catch(err => this.requestFailed(err))
+            .finally(() => {
+              this.form.password = resoucePwd
+              this.logining = false
+            })
         } else {
           setTimeout(() => {
             this.logining = false
@@ -459,11 +454,9 @@ export default {
   top: 16px;
   right: 16px;
 }
-
 .title {
   position: relative;
 }
-
 .lang-switch.in-title {
   position: absolute;
   top: 0;

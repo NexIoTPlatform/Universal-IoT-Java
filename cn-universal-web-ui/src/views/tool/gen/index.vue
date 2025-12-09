@@ -41,8 +41,7 @@
       </div>
       <div class="table-operations">
         <a-button type="primary" @click="$refs.importTable.show()" v-hasPermi="['tool:gen:import']">
-          <iot-icon type="icon-u-upload"/>
-          {{ $t('button.import') }}
+          <iot-icon type="icon-u-upload"/>{{ $t('button.import') }}
         </a-button>
         <a-button type="primary" @click="handleGenTable" v-hasPermi="['tool:gen:code']">
           <iot-icon type="icon-u-export"/>
@@ -50,13 +49,11 @@
         </a-button>
         <a-button type="primary" :disabled="single" @click="handleEditTable"
                   v-hasPermi="['tool:gen:edit']">
-          <iot-icon type="icon-u-edit"/>
-          {{ $t('button.edit') }}
+          <iot-icon type="icon-u-edit"/>{{ $t('button.edit') }}
         </a-button>
         <a-button type="danger" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['tool:gen:remove']">
-          <iot-icon type="icon-u-del"/>
-          {{ $t('button.delete') }}
+          <iot-icon type="icon-u-del"/>{{ $t('button.delete') }}
         </a-button>
         <a-button
           type="dashed"
@@ -285,14 +282,14 @@ export default {
         content: '当前选中编号为' + tableIds + '的数据',
         onOk() {
           return delTable(tableIds)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '删除成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '删除成功',
+                3
+              )
+            })
         },
         onCancel() {
         }
@@ -307,14 +304,14 @@ export default {
         content: '当前同步表名为' + tableName + '的数据',
         onOk() {
           return synchDb(tableName)
-          .then(() => {
-            that.onSelectChange([], [])
-            that.getList()
-            that.$message.success(
-              '同步成功',
-              3
-            )
-          })
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success(
+                '同步成功',
+                3
+              )
+            })
         },
         onCancel() {
         }

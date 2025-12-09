@@ -98,8 +98,6 @@ public class MysqlDeviceLogService extends AbstractIoTDeviceLogService {
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
       try {
         IoTDeviceLog log = build(upRequest, ioTDeviceDTO);
-        //        ioTDeviceLogMapper.insertSelective(log);
-        // 日志分表 暂时双写单读
         if (enable) {
           ioTDeviceLogShardMapper.insertSelective(log);
         }
@@ -126,6 +124,9 @@ public class MysqlDeviceLogService extends AbstractIoTDeviceLogService {
     /** 产品数据存储策略，不为空则保存日志 */
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
       try {
+        //        ioTDeviceLog.setPoint(ioTDeviceDTO.getCoordinate());
+        //        ioTDeviceLogMapper.insertSelective(ioTDeviceLog);
+        // 日志分表 暂时双写单读
         if (enable) {
           ioTDeviceLogShardMapper.insertSelective(ioTDeviceLog);
         }
