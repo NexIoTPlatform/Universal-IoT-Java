@@ -45,8 +45,8 @@
                 >
                   <a-select-option
                     v-for="product in productSearchList"
-                    :key="product.id"
-                    :value="product.productKey"
+                    :key="product.productKey"
+                    :value="product.name"
                     :title="product.productKey"
                   >
                     <div class="product-search-option">

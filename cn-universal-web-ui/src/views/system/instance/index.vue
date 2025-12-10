@@ -12,14 +12,14 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item :label="$t('product.name')" prop="productName">
-                <a-select v-model="queryParam.productName" placeholder="请选择或搜索产品名称"
+              <a-form-item :label="$t('product.name')" prop="productKey">
+                <a-select v-model="queryParam.productKey" placeholder="请选择或搜索产品名称"
                           show-search :filter-option="false"
                           :loading="productLoading" @search="handleProductSearch"
                           @focus="handleProductFocus" allow-clear
                           style="width: 100%">
-                  <a-select-option v-for="product in productList" :key="product.id"
-                                   :value="product.name"
+                  <a-select-option v-for="product in productList" :key="product.productKey"
+                                   :value="product.productKey"
                                    :title="product.name">
                     <div class="product-option">
                       <div class="product-name">{{ product.name }}</div>
@@ -180,7 +180,7 @@
                     :showTotal="total => `共 ${total} 条`"
                     @showSizeChange="onShowSizeChange" @change="changeSize"/>
     </a-card>
-    
+
     <!-- 视频平台设备通道选择弹窗 -->
     <video-channel-select-modal
       :visible="channelSelectVisible"
@@ -330,9 +330,6 @@ export default {
       }
       if (this.queryParam.deviceName !== undefined && this.queryParam.deviceName !== null) {
         this.queryParam.deviceName = this.queryParam.deviceName.replace(/^\s*|\s*$/g, '')
-      }
-      if (this.queryParam.productName !== undefined && this.queryParam.productName !== null) {
-        this.queryParam.productName = this.queryParam.productName.replace(/^\s*|\s*$/g, '')
       }
       if (this.queryParam.productKey !== undefined && this.queryParam.productKey !== null) {
         this.queryParam.productKey = this.queryParam.productKey.replace(/^\s*|\s*$/g, '')

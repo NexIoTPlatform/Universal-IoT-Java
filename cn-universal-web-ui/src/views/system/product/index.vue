@@ -7,9 +7,9 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item :label="$t('product.name')" prop="name">
+              <a-form-item :label="$t('product.name')" prop="productKey">
                 <a-select
-                  v-model="queryParam.name"
+                  v-model="queryParam.productKey"
                   placeholder="请选择或搜索产品名称"
                   show-search
                   :filter-option="false"
@@ -21,8 +21,8 @@
                 >
                   <a-select-option
                     v-for="product in productSearchList"
-                    :key="product.id"
-                    :value="product.name"
+                    :key="product.productKey"
+                    :value="product.productKey"
                     :title="product.name"
                   >
                     <div class="product-search-option">
@@ -40,11 +40,17 @@
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
+              <a-form-item label="产品分类" prop="classifiedName">
+                <a-input v-model="queryParam.classifiedName" placeholder="请输入产品分类"
+                         @keyup.enter="handleQuery" allow-clear/>
+              </a-form-item>
+            </a-col>
+            <!-- <a-col :md="8" :sm="24">
               <a-form-item label="ProductKey" prop="productKey">
                 <a-input v-model="queryParam.productKey" placeholder="请输入ProductKey"
                          @keyup.enter="handleQuery" allow-clear/>
               </a-form-item>
-            </a-col>
+            </a-col> -->
 
             <template v-if="advanced">
               <a-col :md="8" :sm="24">
