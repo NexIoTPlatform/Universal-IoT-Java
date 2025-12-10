@@ -58,7 +58,7 @@
 
 - **一键启动**：`docker-compose up -d`
 - **访问地址**：
-  - 后台 `http://localhost:80`（默认 `test/nexiot@123321`）
+  - 后台 `http://localhost:80`（默认 `nexiot/nexiot@123321`）
   - IDE调试器 `http://localhost:9092/magic/debug/index.html` (密码同后台）
   - EMQX 管理 `http://localhost:18083`（默认 `admin/public`）
 
