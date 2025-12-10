@@ -1,6 +1,6 @@
 services:
   backend:
-    image: nexiot/back:2.1
+    image: nexiot/enterprise-temp-back:2.1
     container_name: cn-universal-backend
     restart: unless-stopped
     ports:
@@ -27,11 +27,12 @@ services:
       - SERVER_PORT=9092
       - SERVER_HTTP2_ENABLED=false
       - JAVA_TOOL_OPTIONS=-Dio.netty.native.workdir=/app/logs
-      - TCP_PROTOCOL_ENABLED=false
-      - UDP_PROTOCOL_ENABLED=false
+      - TCP_PROTOCOL_ENABLED=true
+      - UDP_PROTOCOL_ENABLED=true
       - CTAIOT_PROTOCOL_ENABLE=false
-      - ONENET_PROTOCOL_ENABLED=false
-      - IMOULIFE_PROTOCOL_ENABLED=false
+      - ONENET_PROTOCOL_ENABLED=true
+      - IMOULIFE_PROTOCOL_ENABLED=true
+      - WVP_PROTOCOL_ENABLED=true
       - SHARD_LOG_ENABLE=true
       - SPRING_APPLICATION_JSON={"server":{"port":9092},"management":{"endpoints":{"web":{"exposure":{"include":"health,info,metrics,prometheus"},"base-path":"/actuator"}}}},"shard":{"log":{"enable":true,"table":{"number":24},"virtual":{"number":8}},"logMeta":{"enable":true,"table":{"number":24},"virtual":{"number":8}}},"iot":{"register":{"auto":{"unionId":"auto_register","latitude":31.081598,"longitude":81.314141}}}}
     depends_on:

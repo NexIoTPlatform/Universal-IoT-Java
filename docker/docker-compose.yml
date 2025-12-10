@@ -43,11 +43,11 @@ services:
       - JAVA_TOOL_OPTIONS=-Dio.netty.native.workdir=/app/logs
       # 启用数据库与 Redis 自动配置（由环境变量提供连接信息）
       # 关闭外部协议模块，避免阻塞启动（Docker 内可按需开启）
-      - TCP_PROTOCOL_ENABLED=false
-      - UDP_PROTOCOL_ENABLED=false
-      - CTAIOT_PROTOCOL_ENABLE=false
-      - ONENET_PROTOCOL_ENABLED=false
-      - IMOULIFE_PROTOCOL_ENABLED=false
+      - TCP_PROTOCOL_ENABLED=true
+      - UDP_PROTOCOL_ENABLED=true
+      - CTAIOT_PROTOCOL_ENABLE=true
+      - ONENET_PROTOCOL_ENABLED=true
+      - IMOULIFE_PROTOCOL_ENABLED=true
       # 兼容未打包的 local profile 配置
       - SHARD_LOG_ENABLE=true
       - SPRING_APPLICATION_JSON={"server":{"port":9092},"management":{"endpoints":{"web":{"exposure":{"include":"health,info,metrics,prometheus"},"base-path":"/actuator"}}}},"shard":{"log":{"enable":true,"table":{"number":24},"virtual":{"number":8}},"logMeta":{"enable":true,"table":{"number":24},"virtual":{"number":8}}},"iot":{"register":{"auto":{"unionId":"auto_register","latitude":31.081598,"longitude":81.314141}}}}

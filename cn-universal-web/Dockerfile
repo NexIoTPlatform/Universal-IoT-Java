@@ -36,4 +36,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
 RUN mkdir -p /app/logs /app/logs/global /app/logs/api /app/logs/tcp /app/logs/mqtt
 
 # 启动命令：创建日志目录与文件，执行启动脚本，前台跟随 info.log 保持容器存活
-ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && touch /app/logs/info.log && /app/cn-universal-web/bin/start.sh && tail -n +1 -F /app/logs/info.log"]
+ENTRYPOINT ["sh", "-c", "mkdir -p /app/logs && touch /app/logs/info.log && /app/cn-universal-web/bin/start.sh && tail -n +1 -F /app/logs/all.log"]
