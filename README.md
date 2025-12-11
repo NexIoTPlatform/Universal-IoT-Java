@@ -17,6 +17,9 @@
 
 [📖 文档地址](https://nexiotplatform.github.io/universal-iot-docs/) | [🌐 在线演示](http://iot.192886.xyz:81/) | [🔧 AI调试IDE](http://iot.192886.xyz:81/magic/debug/index.html)
 
+**中文 | [English](README_EN.md)**
+
+
 </div>
 
 ## ✨ 平台简介
