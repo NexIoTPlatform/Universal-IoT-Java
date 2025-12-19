@@ -228,8 +228,8 @@
 
 |                                    |                                   |                                   | 
 |------------------------------------|-----------------------------------|-----------------------------------|
-| ![小程序](/__MACOSX/shot/1217/01.jpg) | ![app](__MACOSX/shot/1217/02.jpg) | ![app](__MACOSX/shot/1217/03.jpg) |
-| ![小程序](/__MACOSX/shot/1217/04.jpg) | ![app](__MACOSX/shot/1217/05.jpg) | ![app](__MACOSX/shot/1217/06.jpg) |
+| ![小程序](/__MACOSX/shot/1217/00.jpg) | ![app](__MACOSX/shot/1217/01.jpg) | ![app](__MACOSX/shot/1217/02.jpg) |
+| ![小程序](/__MACOSX/shot/1217/03.jpg) | ![app](__MACOSX/shot/1217/04.jpg) | ![app](__MACOSX/shot/1217/05.jpg) |
 
 
 
