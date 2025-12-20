@@ -46,6 +46,7 @@ import jakarta.annotation.Resource;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,17 +60,20 @@ import org.springframework.stereotype.Component;
  * InfluxDB 存储日志
  *
  * <p>通过配置文件动态加载
+ *
  * <p>InfluxDB 2.x 时序数据库适配实现
+ *
  * <p>数据模型：
+ *
  * <ul>
- *   <li>measurement: device_log / property_metadata / event_metadata</li>
- *   <li>tags: productKey, deviceId, messageType, event, property (索引字段)</li>
- *   <li>fields: content, deviceName, commandId, commandStatus, point 等 (数值字段)</li>
- *   <li>timestamp: 使用数据产生时间作为时间戳</li>
+ *   <li>measurement: device_log / property_metadata / event_metadata
+ *   <li>tags: productKey, deviceId, messageType, event, property (索引字段)
+ *   <li>fields: content, deviceName, commandId, commandStatus, point 等 (数值字段)
+ *   <li>timestamp: 使用数据产生时间作为时间戳
  * </ul>
  *
  * @author gitee.com/NexIoT
- * @version 1.0
+ * @version 1.2 // 版本升级：适配Unix时间戳查询
  * @since 2025/10/30
  */
 @Component
@@ -96,6 +100,9 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
   @Resource private IoTProductDeviceService iotProductDeviceService;
 
   private InfluxDBClient influxDBClient;
+  // 时间格式化器：适配InfluxDB的RFC3339格式
+  private static final DateTimeFormatter RFC3339_FORMATTER =
+      DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault());
 
   @PostConstruct
   public void initClient() {
@@ -168,10 +175,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /**
-   * 根据存储策略保存元数据日志
-   * 支持属性和事件的详细信息存储
-   */
+  /** 根据存储策略保存元数据日志 支持属性和事件的详细信息存储 */
   private void saveLogStorePolicy(
       LogStorePolicyDTO logStorePolicyDTO, BaseUPRequest up, IoTProduct ioTProduct) {
     // 处理属性消息
@@ -201,8 +205,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
                     // 注意：InfluxDB 通过保留策略自动清理旧数据，不需要手动删除超出maxStorage的记录
                     // 建议在 InfluxDB 中配置 retention policy，例如：30天自动删除
                   } catch (Exception e) {
-                    log.error(
-                        "InfluxDB保存属性元数据失败: iotId={}, property={}", up.getIotId(), key, e);
+                    log.error("InfluxDB保存属性元数据失败: iotId={}, property={}", up.getIotId(), key, e);
                   }
                 }
               });
@@ -226,10 +229,8 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
   }
 
   /**
-   * 保存属性元数据到InfluxDB
-   * measurement: property_metadata
-   * tags: productKey, deviceId, iotId, messageType, property
-   * fields: content, deviceName, ext1(propertyName), ext2(formatValue), ext3(symbol)
+   * 保存属性元数据到InfluxDB measurement: property_metadata tags: productKey, deviceId, iotId, messageType,
+   * property fields: content, deviceName, ext1(propertyName), ext2(formatValue), ext3(symbol)
    */
   private void savePropertyMetadataToInfluxDB(
       BaseUPRequest up,
@@ -245,35 +246,32 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
 
     WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
 
-    Point point = Point.measurement("property_metadata")
-        .addTag("productKey", up.getProductKey())
-        .addTag("deviceId", up.getDeviceId())
-        .addTag("iotId", up.getIotId())
-        .addTag("messageType", MessageType.PROPERTIES.name())
-        .addTag("property", property)
-        .addField("content", content != null ? content : "")
-        .addField("deviceName", up.getDeviceName() != null ? up.getDeviceName() : "")
-        .addField("ext1", propertyName != null ? propertyName : "")
-        .addField("ext2", formatValue != null ? formatValue : "")
-        .addField("ext3", symbol != null ? symbol : "")
-        .time(Instant.now(), WritePrecision.MS);
+    Point point =
+        Point.measurement("property_metadata")
+            .addTag("productKey", up.getProductKey())
+            .addTag("deviceId", up.getDeviceId())
+            .addTag("iotId", up.getIotId())
+            .addTag("messageType", MessageType.PROPERTIES.name())
+            .addTag("property", property)
+            .addField("content", content != null ? content : "")
+            .addField("deviceName", up.getDeviceName() != null ? up.getDeviceName() : "")
+            .addField("ext1", propertyName != null ? propertyName : "")
+            .addField("ext2", formatValue != null ? formatValue : "")
+            .addField("ext3", symbol != null ? symbol : "")
+            .time(Instant.now(), WritePrecision.MS);
 
     try {
       writeApi.writePoint(point);
-      log.debug(
-          "InfluxDB插入属性元数据成功: property={}, iotId={}", property, up.getIotId());
+      log.debug("InfluxDB插入属性元数据成功: property={}, iotId={}", property, up.getIotId());
     } catch (Exception e) {
-      log.error(
-          "InfluxDB插入属性元数据失败: property={}, iotId={}", property, up.getIotId(), e);
+      log.error("InfluxDB插入属性元数据失败: property={}, iotId={}", property, up.getIotId(), e);
       throw e;
     }
   }
 
   /**
-   * 保存事件元数据到InfluxDB
-   * measurement: event_metadata
-   * tags: productKey, deviceId, iotId, messageType, event
-   * fields: content(eventName), deviceName, ext1(JSONData), maxStorage
+   * 保存事件元数据到InfluxDB measurement: event_metadata tags: productKey, deviceId, iotId, messageType,
+   * event fields: content(eventName), deviceName, ext1(JSONData), maxStorage
    */
   private void saveEventMetadataToInfluxDB(BaseUPRequest up, int maxStorage) throws Exception {
     if (influxDBClient == null) {
@@ -282,33 +280,30 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
 
     WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
 
-    Point point = Point.measurement("event_metadata")
-        .addTag("productKey", up.getProductKey())
-        .addTag("deviceId", up.getDeviceId())
-        .addTag("iotId", up.getIotId())
-        .addTag("messageType", MessageType.EVENT.name())
-        .addTag("event", up.getEvent())
-        .addField("content", up.getEventName() != null ? up.getEventName() : "")
-        .addField("deviceName", up.getDeviceName() != null ? up.getDeviceName() : "")
-        .addField("ext1", JSONUtil.toJsonStr(up.getData()))
-        .addField("maxStorage", maxStorage)
-        .time(Instant.now(), WritePrecision.MS);
+    Point point =
+        Point.measurement("event_metadata")
+            .addTag("productKey", up.getProductKey())
+            .addTag("deviceId", up.getDeviceId())
+            .addTag("iotId", up.getIotId())
+            .addTag("messageType", MessageType.EVENT.name())
+            .addTag("event", up.getEvent())
+            .addField("content", up.getEventName() != null ? up.getEventName() : "")
+            .addField("deviceName", up.getDeviceName() != null ? up.getDeviceName() : "")
+            .addField("ext1", JSONUtil.toJsonStr(up.getData()))
+            .addField("maxStorage", maxStorage)
+            .time(Instant.now(), WritePrecision.MS);
 
     try {
       writeApi.writePoint(point);
-      log.debug(
-          "InfluxDB插入事件元数据成功: event={}, iotId={}", up.getEvent(), up.getIotId());
+      log.debug("InfluxDB插入事件元数据成功: event={}, iotId={}", up.getEvent(), up.getIotId());
     } catch (Exception e) {
-      log.error(
-          "InfluxDB插入事件元数据失败: event={}, iotId={}", up.getEvent(), up.getIotId(), e);
+      log.error("InfluxDB插入事件元数据失败: event={}, iotId={}", up.getEvent(), up.getIotId(), e);
       throw e;
     }
   }
 
   /**
-   * 保存设备日志到InfluxDB
-   * measurement: device_log
-   * tags: productKey, deviceId, iotId, messageType, event
+   * 保存设备日志到InfluxDB measurement: device_log tags: productKey, deviceId, iotId, messageType, event
    * fields: content, deviceName, commandId, commandStatus, point
    */
   private void saveDeviceLogToInfluxDB(IoTDeviceLog ioTDeviceLog) throws Exception {
@@ -319,30 +314,40 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     WriteApiBlocking writeApi = influxDBClient.getWriteApiBlocking();
 
     // 时间戳（毫秒）
-    Instant timestamp = ioTDeviceLog.getCreateTime()
-        .atZone(ZoneId.systemDefault())
-        .toInstant();
+    Instant timestamp = ioTDeviceLog.getCreateTime().atZone(ZoneId.systemDefault()).toInstant();
 
-    Point point = Point.measurement("device_log")
-        .addTag("productKey", ioTDeviceLog.getProductKey())
-        .addTag("deviceId", ioTDeviceLog.getDeviceId())
-        .addTag("iotId", ioTDeviceLog.getIotId())
-        .addTag("messageType", ioTDeviceLog.getMessageType())
-        .addTag("event", ioTDeviceLog.getEvent() != null ? ioTDeviceLog.getEvent() : "")
-        .addField("content", ioTDeviceLog.getContent() != null ? ioTDeviceLog.getContent() : "")
-        .addField("deviceName", ioTDeviceLog.getDeviceName() != null ? ioTDeviceLog.getDeviceName() : "")
-        .addField("commandId", ioTDeviceLog.getCommandId() != null ? ioTDeviceLog.getCommandId() : "")
-        .addField("commandStatus", ioTDeviceLog.getCommandStatus() != null ? ioTDeviceLog.getCommandStatus() : 0)
-        .addField("point", ioTDeviceLog.getPoint() != null ? ioTDeviceLog.getPoint() : "")
-        .time(timestamp, WritePrecision.MS);
+    Point point =
+        Point.measurement("device_log")
+            .addTag("productKey", ioTDeviceLog.getProductKey())
+            .addTag("deviceId", ioTDeviceLog.getDeviceId())
+            .addTag("iotId", ioTDeviceLog.getIotId())
+            .addTag("messageType", ioTDeviceLog.getMessageType())
+            .addTag("event", ioTDeviceLog.getEvent() != null ? ioTDeviceLog.getEvent() : "")
+            .addField("content", ioTDeviceLog.getContent() != null ? ioTDeviceLog.getContent() : "")
+            .addField(
+                "deviceName",
+                ioTDeviceLog.getDeviceName() != null ? ioTDeviceLog.getDeviceName() : "")
+            .addField(
+                "commandId", ioTDeviceLog.getCommandId() != null ? ioTDeviceLog.getCommandId() : "")
+            .addField(
+                "commandStatus",
+                ioTDeviceLog.getCommandStatus() != null ? ioTDeviceLog.getCommandStatus() : 0)
+            .addField("point", ioTDeviceLog.getPoint() != null ? ioTDeviceLog.getPoint() : "")
+            .time(timestamp, WritePrecision.MS);
 
     try {
       writeApi.writePoint(point);
-      log.debug("InfluxDB插入设备日志成功: productKey={}, deviceId={}, timestamp={}",
-                ioTDeviceLog.getProductKey(), ioTDeviceLog.getDeviceId(), timestamp);
+      log.debug(
+          "InfluxDB插入设备日志成功: productKey={}, deviceId={}, timestamp={}",
+          ioTDeviceLog.getProductKey(),
+          ioTDeviceLog.getDeviceId(),
+          timestamp);
     } catch (Exception e) {
-      log.error("InfluxDB插入设备日志失败: productKey={}, deviceId={}, error={}",
-                ioTDeviceLog.getProductKey(), ioTDeviceLog.getDeviceId(), e.getMessage());
+      log.error(
+          "InfluxDB插入设备日志失败: productKey={}, deviceId={}, error={}",
+          ioTDeviceLog.getProductKey(),
+          ioTDeviceLog.getDeviceId(),
+          e.getMessage());
       throw e;
     }
   }
@@ -358,31 +363,46 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
       // 构建 Flux 查询语句
       StringBuilder flux = new StringBuilder();
       flux.append("from(bucket: \"").append(bucket).append("\")\n");
-      flux.append("  |> range(start: -30d)\n");  // 查询最近30天数据
+      // 动态时间范围：适配Unix时间戳
+      flux.append(buildRangeClause(logQuery)).append("\n");
       flux.append("  |> filter(fn: (r) => r._measurement == \"device_log\")\n");
 
       // 添加过滤条件
       if (StrUtil.isNotBlank(logQuery.getProductKey())) {
-        flux.append("  |> filter(fn: (r) => r.productKey == \"").append(logQuery.getProductKey()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.productKey == \"")
+            .append(logQuery.getProductKey())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getDeviceId())) {
-        flux.append("  |> filter(fn: (r) => r.deviceId == \"").append(logQuery.getDeviceId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.deviceId == \"")
+            .append(logQuery.getDeviceId())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getIotId())) {
-        flux.append("  |> filter(fn: (r) => r.iotId == \"").append(logQuery.getIotId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.iotId == \"")
+            .append(logQuery.getIotId())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getMessageType())) {
-        flux.append("  |> filter(fn: (r) => r.messageType == \"").append(logQuery.getMessageType()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.messageType == \"")
+            .append(logQuery.getMessageType())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getEvent())) {
-        flux.append("  |> filter(fn: (r) => r.event == \"").append(logQuery.getEvent()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.event == \"")
+            .append(logQuery.getEvent())
+            .append("\")\n");
       }
 
       flux.append("  |> sort(columns: [\"_time\"], desc: true)\n");
 
       // InfluxDB 分页实现：limit + offset
       int offset = (logQuery.getPageNum() - 1) * logQuery.getPageSize();
-      flux.append("  |> limit(n: ").append(logQuery.getPageSize()).append(", offset: ").append(offset).append(")\n");
+      flux.append("  |> limit(n: ")
+          .append(logQuery.getPageSize())
+          .append(", offset: ")
+          .append(offset)
+          .append(")\n");
 
       log.debug("InfluxDB查询Flux: {}", flux);
 
@@ -406,31 +426,40 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /**
-   * 查询总记录数
-   */
+  /** 查询总记录数（适配Unix时间戳） */
   private long queryTotalCount(LogQuery logQuery) {
     try {
       StringBuilder flux = new StringBuilder();
       flux.append("from(bucket: \"").append(bucket).append("\")\n");
-      flux.append("  |> range(start: -30d)\n");
+      // 动态时间范围：与分页查询保持一致
+      flux.append(buildRangeClause(logQuery)).append("\n");
       flux.append("  |> filter(fn: (r) => r._measurement == \"device_log\")\n");
 
       // 添加过滤条件
       if (StrUtil.isNotBlank(logQuery.getProductKey())) {
-        flux.append("  |> filter(fn: (r) => r.productKey == \"").append(logQuery.getProductKey()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.productKey == \"")
+            .append(logQuery.getProductKey())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getDeviceId())) {
-        flux.append("  |> filter(fn: (r) => r.deviceId == \"").append(logQuery.getDeviceId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.deviceId == \"")
+            .append(logQuery.getDeviceId())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getIotId())) {
-        flux.append("  |> filter(fn: (r) => r.iotId == \"").append(logQuery.getIotId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.iotId == \"")
+            .append(logQuery.getIotId())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getMessageType())) {
-        flux.append("  |> filter(fn: (r) => r.messageType == \"").append(logQuery.getMessageType()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.messageType == \"")
+            .append(logQuery.getMessageType())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getEvent())) {
-        flux.append("  |> filter(fn: (r) => r.event == \"").append(logQuery.getEvent()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.event == \"")
+            .append(logQuery.getEvent())
+            .append("\")\n");
       }
 
       flux.append("  |> count()\n");
@@ -450,10 +479,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /**
-   * 解析设备日志查询结果
-   * InfluxDB 返回的是 field-value 形式，需要组装成完整记录
-   */
+  /** 解析设备日志查询结果 InfluxDB 返回的是 field-value 形式，需要组装成完整记录 */
   private List<IoTDeviceLogVO> parseDeviceLogResults(List<FluxTable> tables, LogQuery logQuery) {
     List<IoTDeviceLogVO> resultList = new ArrayList<>();
 
@@ -465,18 +491,21 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
         Instant time = record.getTime();
         if (time == null) continue;
 
-        IoTDeviceLogVO vo = recordMap.computeIfAbsent(time, t -> {
-          IoTDeviceLogVO newVo = new IoTDeviceLogVO();
-          newVo.setId(t.toEpochMilli());
-          newVo.setCreateTime(LocalDateTime.ofInstant(t, ZoneId.systemDefault()));
-          // 从 tags 中提取字段
-          newVo.setProductKey(getStringValue(record.getValueByKey("productKey")));
-          newVo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
-          newVo.setIotId(getStringValue(record.getValueByKey("iotId")));
-          newVo.setMessageType(getStringValue(record.getValueByKey("messageType")));
-          newVo.setEvent(getStringValue(record.getValueByKey("event")));
-          return newVo;
-        });
+        IoTDeviceLogVO vo =
+            recordMap.computeIfAbsent(
+                time,
+                t -> {
+                  IoTDeviceLogVO newVo = new IoTDeviceLogVO();
+                  newVo.setId(t.toEpochMilli());
+                  newVo.setCreateTime(LocalDateTime.ofInstant(t, ZoneId.systemDefault()));
+                  // 从 tags 中提取字段
+                  newVo.setProductKey(getStringValue(record.getValueByKey("productKey")));
+                  newVo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
+                  newVo.setIotId(getStringValue(record.getValueByKey("iotId")));
+                  newVo.setMessageType(getStringValue(record.getValueByKey("messageType")));
+                  newVo.setEvent(getStringValue(record.getValueByKey("event")));
+                  return newVo;
+                });
 
         // 从 _field 和 _value 中提取字段值
         String field = getStringValue(record.getField());
@@ -525,11 +554,17 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
 
       StringBuilder flux = new StringBuilder();
       flux.append("from(bucket: \"").append(bucket).append("\")\n");
-      flux.append("  |> range(start: ").append(timestamp.toString()).append(", stop: ").append(timestamp.plusMillis(1).toString()).append(")\n");
+      flux.append("  |> range(start: ")
+          .append(timestamp.toString())
+          .append(", stop: ")
+          .append(timestamp.plusMillis(1).toString())
+          .append(")\n");
       flux.append("  |> filter(fn: (r) => r._measurement == \"device_log\")\n");
 
       if (StrUtil.isNotBlank(logQuery.getIotId())) {
-        flux.append("  |> filter(fn: (r) => r.iotId == \"").append(logQuery.getIotId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.iotId == \"")
+            .append(logQuery.getIotId())
+            .append("\")\n");
       }
 
       log.debug("InfluxDB查询日志详情Flux: {}", flux);
@@ -561,11 +596,14 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
         // 查询事件元数据统计
         StringBuilder flux = new StringBuilder();
         flux.append("from(bucket: \"").append(bucket).append("\")\n");
+        // 这里也可以替换为 buildRangeClause，但该方法无LogQuery入参，暂保留默认30天
         flux.append("  |> range(start: -30d)\n");
         flux.append("  |> filter(fn: (r) => r._measurement == \"event_metadata\")\n");
         flux.append("  |> filter(fn: (r) => r.iotId == \"").append(iotId).append("\")\n");
-        flux.append("  |> filter(fn: (r) => r.event == \"").append(devEvent.getId()).append("\")\n");
-        flux.append("  |> filter(fn: (r) => r._field == \"content\")\n");  // 只统计一个字段避免重复计数
+        flux.append("  |> filter(fn: (r) => r.event == \"")
+            .append(devEvent.getId())
+            .append("\")\n");
+        flux.append("  |> filter(fn: (r) => r._field == \"content\")\n"); // 只统计一个字段避免重复计数
         flux.append("  |> count()\n");
 
         QueryApi queryApi = influxDBClient.getQueryApi();
@@ -585,7 +623,9 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
         flux.append("  |> range(start: -30d)\n");
         flux.append("  |> filter(fn: (r) => r._measurement == \"event_metadata\")\n");
         flux.append("  |> filter(fn: (r) => r.iotId == \"").append(iotId).append("\")\n");
-        flux.append("  |> filter(fn: (r) => r.event == \"").append(devEvent.getId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.event == \"")
+            .append(devEvent.getId())
+            .append("\")\n");
         flux.append("  |> filter(fn: (r) => r._field == \"content\")\n");
         flux.append("  |> sort(columns: [\"_time\"], desc: true)\n");
         flux.append("  |> limit(n: 1)\n");
@@ -617,35 +657,49 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
       }
 
       // 根据查询条件选择 measurement
-      String measurement = StrUtil.isNotBlank(logQuery.getProperty())
-          ? "property_metadata"
-          : "event_metadata";
+      String measurement =
+          StrUtil.isNotBlank(logQuery.getProperty()) ? "property_metadata" : "event_metadata";
 
       // 构建 Flux 查询语句
       StringBuilder flux = new StringBuilder();
       flux.append("from(bucket: \"").append(bucket).append("\")\n");
-      flux.append("  |> range(start: -30d)\n");
-      flux.append("  |> filter(fn: (r) => r._measurement == \"").append(measurement).append("\")\n");
+      // 核心改造：适配Unix时间戳的动态时间范围
+      flux.append(buildRangeClause(logQuery)).append("\n");
+      flux.append("  |> filter(fn: (r) => r._measurement == \"")
+          .append(measurement)
+          .append("\")\n");
 
       // 添加过滤条件
       if (StrUtil.isNotBlank(logQuery.getIotId())) {
-        flux.append("  |> filter(fn: (r) => r.iotId == \"").append(logQuery.getIotId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.iotId == \"")
+            .append(logQuery.getIotId())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getDeviceId())) {
-        flux.append("  |> filter(fn: (r) => r.deviceId == \"").append(logQuery.getDeviceId()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.deviceId == \"")
+            .append(logQuery.getDeviceId())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getProperty())) {
-        flux.append("  |> filter(fn: (r) => r.property == \"").append(logQuery.getProperty()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.property == \"")
+            .append(logQuery.getProperty())
+            .append("\")\n");
       }
       if (StrUtil.isNotBlank(logQuery.getEvent())) {
-        flux.append("  |> filter(fn: (r) => r.event == \"").append(logQuery.getEvent()).append("\")\n");
+        flux.append("  |> filter(fn: (r) => r.event == \"")
+            .append(logQuery.getEvent())
+            .append("\")\n");
       }
 
       flux.append("  |> sort(columns: [\"_time\"], desc: true)\n");
 
       // 分页
       int offset = (logQuery.getPageNum() - 1) * logQuery.getPageSize();
-      flux.append("  |> limit(n: ").append(logQuery.getPageSize()).append(", offset: ").append(offset).append(")\n");
+      flux.append("  |> limit(n: ")
+          .append(logQuery.getPageSize())
+          .append(", offset: ")
+          .append(offset)
+          .append(")\n");
 
       log.debug("InfluxDB查询元数据Flux: {}", flux);
 
@@ -658,7 +712,8 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
 
       log.debug("InfluxDB查询元数据成功，返回 {} 条记录", resultList.size());
 
-      return new PageBean<>(resultList, (long) resultList.size(), logQuery.getPageSize(), logQuery.getPageNum());
+      return new PageBean<>(
+          resultList, (long) resultList.size(), logQuery.getPageSize(), logQuery.getPageNum());
 
     } catch (Exception e) {
       log.error("InfluxDB查询设备元数据失败", e);
@@ -666,9 +721,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /**
-   * 解析元数据查询结果
-   */
+  /** 解析元数据查询结果 */
   private List<IoTDeviceLogMetadataVO> parseMetadataResults(List<FluxTable> tables) {
     List<IoTDeviceLogMetadataVO> resultList = new ArrayList<>();
 
@@ -680,18 +733,21 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
         Instant time = record.getTime();
         if (time == null) continue;
 
-        IoTDeviceLogMetadataVO vo = recordMap.computeIfAbsent(time, t -> {
-          IoTDeviceLogMetadataVO newVo = new IoTDeviceLogMetadataVO();
-          newVo.setCreateTime(LocalDateTime.ofInstant(t, ZoneId.systemDefault()));
-          // 从 tags 中提取字段
-          newVo.setProductKey(getStringValue(record.getValueByKey("productKey")));
-          newVo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
-          newVo.setIotId(getStringValue(record.getValueByKey("iotId")));
-          newVo.setMessageType(getStringValue(record.getValueByKey("messageType")));
-          newVo.setProperty(getStringValue(record.getValueByKey("property")));
-          newVo.setEvent(getStringValue(record.getValueByKey("event")));
-          return newVo;
-        });
+        IoTDeviceLogMetadataVO vo =
+            recordMap.computeIfAbsent(
+                time,
+                t -> {
+                  IoTDeviceLogMetadataVO newVo = new IoTDeviceLogMetadataVO();
+                  newVo.setCreateTime(LocalDateTime.ofInstant(t, ZoneId.systemDefault()));
+                  // 从 tags 中提取字段
+                  newVo.setProductKey(getStringValue(record.getValueByKey("productKey")));
+                  newVo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
+                  newVo.setIotId(getStringValue(record.getValueByKey("iotId")));
+                  newVo.setMessageType(getStringValue(record.getValueByKey("messageType")));
+                  newVo.setProperty(getStringValue(record.getValueByKey("property")));
+                  newVo.setEvent(getStringValue(record.getValueByKey("event")));
+                  return newVo;
+                });
 
         // 从 _field 和 _value 中提取字段值
         String field = getStringValue(record.getField());
@@ -728,8 +784,45 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
   }
 
   /**
-   * 安全获取字符串值
+   * 构建动态时间范围子句（适配Unix时间戳）
+   *
+   * @param logQuery 查询参数（包含秒级Unix时间戳 beginCreateTime/endCreateTime）
+   * @return Flux的range子句
    */
+  private String buildRangeClause(LogQuery logQuery) {
+    // 1. 定义默认时间范围（最近30天）
+    String defaultStart = "-30d";
+    String defaultStop = "now()";
+
+    // 2. 解析Unix时间戳（秒级）并转换为RFC3339格式
+    String start = defaultStart;
+    String stop = defaultStop;
+
+    try {
+      // 处理开始时间：beginCreateTime（秒级Unix戳）
+      if (logQuery.getBeginCreateTime() != null && logQuery.getBeginCreateTime() > 0) {
+        // 秒级转毫秒级，再转为Instant
+        Instant startInstant = Instant.ofEpochSecond(logQuery.getBeginCreateTime());
+        start = RFC3339_FORMATTER.format(startInstant);
+      }
+
+      // 处理结束时间：endCreateTime（秒级Unix戳）
+      if (logQuery.getEndCreateTime() != null && logQuery.getEndCreateTime() > 0) {
+        Instant endInstant = Instant.ofEpochSecond(logQuery.getEndCreateTime());
+        stop = RFC3339_FORMATTER.format(endInstant);
+      }
+
+      log.debug("InfluxDB时间范围：start={}, stop={}", start, stop);
+    } catch (Exception e) {
+      log.warn("Unix时间戳解析失败，使用默认30天范围: {}", e.getMessage());
+      start = defaultStart;
+      stop = defaultStop;
+    }
+
+    return String.format("  |> range(start: %s, stop: %s)", start, stop);
+  }
+
+  /** 安全获取字符串值 */
   private String getStringValue(Object value) {
     if (value == null) {
       return null;
@@ -737,9 +830,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     return value.toString();
   }
 
-  /**
-   * 安全获取整型值
-   */
+  /** 安全获取整型值 */
   private Integer getIntValue(Object value) {
     if (value == null) {
       return null;
