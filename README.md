@@ -233,6 +233,7 @@
 | ![小程序](/__MACOSX/shot/1217/03.jpg) | ![app](__MACOSX/shot/1217/04.jpg) | ![app](__MACOSX/shot/1217/05.jpg) |
 
 
+> 视频【NexIoT小程序，这次很强！】 https://www.bilibili.com/video/BV1WMqDB6EAc/?share_source=copy_web&vd_source=c9e1500efcc8aa0763f711fadaa68dff
 
 ## 📺 视频教程
 
