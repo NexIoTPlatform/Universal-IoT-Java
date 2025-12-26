@@ -49,7 +49,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -137,11 +136,12 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
   public void saveDeviceLog(BaseUPRequest upRequest, IoTDeviceDTO noUse, IoTProduct ioTProduct) {
     /** 产品数据存储策略，不为空则保存日志 */
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
-      IoTDeviceDTO ioTDeviceDTO = iotDeviceService.selectDevInstanceBO(upRequest.getIotId());
+      IoTDeviceDTO ioTDeviceDTO =
+          iotDeviceService.selectDevInstanceBO(upRequest.getProductKey(), upRequest.getDeviceId());
       try {
         IoTDeviceLog ioTDeviceLog = build(upRequest, ioTDeviceDTO);
         saveDeviceLogToInfluxDB(ioTDeviceLog);
-        log.debug("InfluxDB插入设备日志成功，iotId={}", upRequest.getIotId());
+        log.debug("InfluxDB插入设备日志成功，deviceId={}", upRequest.getDeviceId());
       } catch (Exception e) {
         log.error("保存设备日志到InfluxDB报错={}", e);
       }
@@ -168,7 +168,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
       try {
         saveDeviceLogToInfluxDB(ioTDeviceLog);
-        log.debug("InfluxDB插入设备日志成功，iotId={}", ioTDeviceDTO.getIotId());
+        log.debug("InfluxDB插入设备日志成功，deviceId={}", ioTDeviceDTO.getDeviceId());
       } catch (Exception e) {
         log.error("保存设备日志到InfluxDB报错={}", e);
       }
@@ -305,6 +305,8 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
   /**
    * 保存设备日志到InfluxDB measurement: device_log tags: productKey, deviceId, iotId, messageType, event
    * fields: content, deviceName, commandId, commandStatus, point
+   *
+   * <p>注意:deviceName为必填字段,用于count统计;content可能为空
    */
   private void saveDeviceLogToInfluxDB(IoTDeviceLog ioTDeviceLog) throws Exception {
     if (influxDBClient == null) {
@@ -394,6 +396,13 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
             .append("\")\n");
       }
 
+      // 关键修复:使用pivot将多个field合并为一行记录
+      flux.append(
+          "  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n");
+      // 取消所有分组,确保数据合并为一个table
+      flux.append("  |> group()\n");
+      // 删除系统列,避免干扰
+      flux.append("  |> drop(columns: [\"_start\", \"_stop\", \"_measurement\"])\n");
       flux.append("  |> sort(columns: [\"_time\"], desc: true)\n");
 
       // InfluxDB 分页实现：limit + offset
@@ -404,11 +413,15 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
           .append(offset)
           .append(")\n");
 
-      log.debug("InfluxDB查询Flux: {}", flux);
+      log.info("InfluxDB分页查询Flux: {}", flux);
 
-      // 执行查询
       QueryApi queryApi = influxDBClient.getQueryApi();
       List<FluxTable> tables = queryApi.query(flux.toString());
+
+      log.info(
+          "InfluxDB返回tables数量: {}, 每个table的records数: {}",
+          tables.size(),
+          tables.isEmpty() ? 0 : tables.stream().mapToInt(t -> t.getRecords().size()).sum());
 
       // 解析结果
       List<IoTDeviceLogVO> resultList = parseDeviceLogResults(tables, logQuery);
@@ -416,7 +429,7 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
       // 查询总数（使用count聚合）
       long total = queryTotalCount(logQuery);
 
-      log.debug("InfluxDB查询成功，返回 {} 条记录，总数 {}", resultList.size(), total);
+      log.info("InfluxDB查询成功，返回 {} 条记录，总数 {}", resultList.size(), total);
 
       return new PageBean<>(resultList, total, logQuery.getPageSize(), logQuery.getPageNum());
 
@@ -426,12 +439,12 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /** 查询总记录数（适配Unix时间戳） */
+  /** 查询总记录数(适配Unix时间戳) */
   private long queryTotalCount(LogQuery logQuery) {
     try {
       StringBuilder flux = new StringBuilder();
       flux.append("from(bucket: \"").append(bucket).append("\")\n");
-      // 动态时间范围：与分页查询保持一致
+      // 动态时间范围:与分页查询保持一致
       flux.append(buildRangeClause(logQuery)).append("\n");
       flux.append("  |> filter(fn: (r) => r._measurement == \"device_log\")\n");
 
@@ -462,80 +475,64 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
             .append("\")\n");
       }
 
+      // 关键修复:统计deviceName字段(必填字段)避免重复计数
+      // 注意:不能用content因为可能为空,应该用productKey/deviceId等必填字段对应的field
+      flux.append("  |> filter(fn: (r) => r._field == \"deviceName\")\n");
       flux.append("  |> count()\n");
 
       QueryApi queryApi = influxDBClient.getQueryApi();
       List<FluxTable> tables = queryApi.query(flux.toString());
 
-      if (!tables.isEmpty() && !tables.get(0).getRecords().isEmpty()) {
-        Object value = tables.get(0).getRecords().get(0).getValue();
-        return value != null ? ((Number) value).longValue() : 0L;
+      // 累加所有table的count结果
+      long totalCount = 0L;
+      for (FluxTable table : tables) {
+        for (FluxRecord record : table.getRecords()) {
+          Object value = record.getValue();
+          if (value != null) {
+            totalCount += ((Number) value).longValue();
+          }
+        }
       }
 
-      return 0L;
+      return totalCount;
     } catch (Exception e) {
       log.warn("InfluxDB查询总数失败: {}", e.getMessage());
       return 0L;
     }
   }
 
-  /** 解析设备日志查询结果 InfluxDB 返回的是 field-value 形式，需要组装成完整记录 */
+  /** 解析设备日志查询结果 使用pivot后,每条记录的所有field已经合并在一行,直接解析即可 */
   private List<IoTDeviceLogVO> parseDeviceLogResults(List<FluxTable> tables, LogQuery logQuery) {
     List<IoTDeviceLogVO> resultList = new ArrayList<>();
-
-    // InfluxDB 每个 field 会返回一个 table，需要按时间戳分组
-    Map<Instant, IoTDeviceLogVO> recordMap = new java.util.HashMap<>();
 
     for (FluxTable table : tables) {
       for (FluxRecord record : table.getRecords()) {
         Instant time = record.getTime();
         if (time == null) continue;
 
-        IoTDeviceLogVO vo =
-            recordMap.computeIfAbsent(
-                time,
-                t -> {
-                  IoTDeviceLogVO newVo = new IoTDeviceLogVO();
-                  newVo.setId(t.toEpochMilli());
-                  newVo.setCreateTime(LocalDateTime.ofInstant(t, ZoneId.systemDefault()));
-                  // 从 tags 中提取字段
-                  newVo.setProductKey(getStringValue(record.getValueByKey("productKey")));
-                  newVo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
-                  newVo.setIotId(getStringValue(record.getValueByKey("iotId")));
-                  newVo.setMessageType(getStringValue(record.getValueByKey("messageType")));
-                  newVo.setEvent(getStringValue(record.getValueByKey("event")));
-                  return newVo;
-                });
+        IoTDeviceLogVO vo = new IoTDeviceLogVO();
+        vo.setId(time.toEpochMilli());
+        vo.setCreateTime(LocalDateTime.ofInstant(time, ZoneId.systemDefault()));
 
-        // 从 _field 和 _value 中提取字段值
-        String field = getStringValue(record.getField());
-        Object value = record.getValue();
+        // 从tags中提取字段
+        vo.setProductKey(getStringValue(record.getValueByKey("productKey")));
+        vo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
+        vo.setIotId(getStringValue(record.getValueByKey("iotId")));
+        vo.setMessageType(getStringValue(record.getValueByKey("messageType")));
+        vo.setEvent(getStringValue(record.getValueByKey("event")));
 
-        if (field != null && value != null) {
-          switch (field) {
-            case "content":
-              vo.setContent(getStringValue(value));
-              break;
-            case "deviceName":
-              vo.setDeviceName(getStringValue(value));
-              break;
-            case "commandId":
-              vo.setCommandId(getStringValue(value));
-              break;
-            case "commandStatus":
-              vo.setCommandStatus(getIntValue(value));
-              break;
-            case "point":
-              vo.setPoint(getStringValue(value));
-              break;
-          }
-        }
+        // pivot后,field值直接在record中可以通过getValueByKey获取
+        vo.setContent(getStringValue(record.getValueByKey("content")));
+        vo.setDeviceName(getStringValue(record.getValueByKey("deviceName")));
+        vo.setCommandId(getStringValue(record.getValueByKey("commandId")));
+        vo.setCommandStatus(getIntValue(record.getValueByKey("commandStatus")));
+        vo.setPoint(getStringValue(record.getValueByKey("point")));
+
+        resultList.add(vo);
       }
     }
 
-    resultList.addAll(recordMap.values());
-
-    // 按时间降序排序
+    // 按时间降序排序(虽然Flux已经排序,但保险起见)
     resultList.sort((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()));
 
     return resultList;
@@ -566,6 +563,12 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
             .append(logQuery.getIotId())
             .append("\")\n");
       }
+
+      // 添加pivot合并field
+      flux.append(
+          "  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n");
+      // 取消所有分组
+      flux.append("  |> group()\n");
 
       log.debug("InfluxDB查询日志详情Flux: {}", flux);
 
@@ -660,60 +663,38 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
       String measurement =
           StrUtil.isNotBlank(logQuery.getProperty()) ? "property_metadata" : "event_metadata";
 
-      // 构建 Flux 查询语句
-      StringBuilder flux = new StringBuilder();
-      flux.append("from(bucket: \"").append(bucket).append("\")\n");
-      // 核心改造：适配Unix时间戳的动态时间范围
-      flux.append(buildRangeClause(logQuery)).append("\n");
-      flux.append("  |> filter(fn: (r) => r._measurement == \"")
-          .append(measurement)
-          .append("\")\n");
+      // 构建基础过滤条件（不含pivot和分页）
+      String baseFilterFlux = buildBaseFilterFlux(logQuery, measurement);
 
-      // 添加过滤条件
-      if (StrUtil.isNotBlank(logQuery.getIotId())) {
-        flux.append("  |> filter(fn: (r) => r.iotId == \"")
-            .append(logQuery.getIotId())
-            .append("\")\n");
-      }
-      if (StrUtil.isNotBlank(logQuery.getDeviceId())) {
-        flux.append("  |> filter(fn: (r) => r.deviceId == \"")
-            .append(logQuery.getDeviceId())
-            .append("\")\n");
-      }
-      if (StrUtil.isNotBlank(logQuery.getProperty())) {
-        flux.append("  |> filter(fn: (r) => r.property == \"")
-            .append(logQuery.getProperty())
-            .append("\")\n");
-      }
-      if (StrUtil.isNotBlank(logQuery.getEvent())) {
-        flux.append("  |> filter(fn: (r) => r.event == \"")
-            .append(logQuery.getEvent())
-            .append("\")\n");
-      }
-
-      flux.append("  |> sort(columns: [\"_time\"], desc: true)\n");
-
-      // 分页
-      int offset = (logQuery.getPageNum() - 1) * logQuery.getPageSize();
-      flux.append("  |> limit(n: ")
-          .append(logQuery.getPageSize())
-          .append(", offset: ")
-          .append(offset)
-          .append(")\n");
-
-      log.debug("InfluxDB查询元数据Flux: {}", flux);
-
-      // 执行查询
       QueryApi queryApi = influxDBClient.getQueryApi();
-      List<FluxTable> tables = queryApi.query(flux.toString());
+
+      // 1. 先查询总数（pivot后添加计数列，再进行count）
+      // 关键：pivot后添加record_count=1列，然后对该列count
+      String countFlux = baseFilterFlux
+          + "  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+          + "  |> group()\n"  // 合并所有分组
+          + "  |> map(fn: (r) => ({r with record_count: 1}))\n"  // 添加计数列
+          + "  |> count(column: \"record_count\")\n";  // 统计记录数
+      log.debug("InfluxDB查询元数据总数Flux: {}", countFlux);
+      List<FluxTable> countTables = queryApi.query(countFlux);
+      long total = parseCountResult(countTables);
+
+      // 2. 再查询分页数据（包含pivot转换）
+      int offset = (logQuery.getPageNum() - 1) * logQuery.getPageSize();
+      String dataFlux = baseFilterFlux
+          + "  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+          + "  |> group()\n"
+          + "  |> sort(columns: [\"_time\"], desc: true)\n"
+          + "  |> limit(n: " + logQuery.getPageSize() + ", offset: " + offset + ")\n";
+      log.debug("InfluxDB查询元数据分页Flux: {}", dataFlux);
+      List<FluxTable> dataTables = queryApi.query(dataFlux);
 
       // 解析结果
-      List<IoTDeviceLogMetadataVO> resultList = parseMetadataResults(tables);
+      List<IoTDeviceLogMetadataVO> resultList = parseMetadataResults(dataTables);
 
-      log.debug("InfluxDB查询元数据成功，返回 {} 条记录", resultList.size());
+      log.info("InfluxDB查询元数据成功，总数: {}, 当前页: {} 条记录", total, resultList.size());
 
-      return new PageBean<>(
-          resultList, (long) resultList.size(), logQuery.getPageSize(), logQuery.getPageNum());
+      return new PageBean<>(resultList, total, logQuery.getPageSize(), logQuery.getPageNum());
 
     } catch (Exception e) {
       log.error("InfluxDB查询设备元数据失败", e);
@@ -721,63 +702,105 @@ public class InfluxDBDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /** 解析元数据查询结果 */
+  /**
+   * 构建基础过滤条件（不含pivot、排序和分页）
+   */
+  private String buildBaseFilterFlux(LogQuery logQuery, String measurement) {
+    StringBuilder flux = new StringBuilder();
+    flux.append("from(bucket: \"").append(bucket).append("\")\n");
+    // 核心改造：适配Unix时间戳的动态时间范围
+    flux.append(buildRangeClause(logQuery)).append("\n");
+    flux.append("  |> filter(fn: (r) => r._measurement == \"")
+        .append(measurement)
+        .append("\")\n");
+
+    // 添加过滤条件
+    if (StrUtil.isNotBlank(logQuery.getIotId())) {
+      flux.append("  |> filter(fn: (r) => r.iotId == \"")
+          .append(logQuery.getIotId())
+          .append("\")\n");
+    }
+    if (StrUtil.isNotBlank(logQuery.getDeviceId())) {
+      flux.append("  |> filter(fn: (r) => r.deviceId == \"")
+          .append(logQuery.getDeviceId())
+          .append("\")\n");
+    }
+    if (StrUtil.isNotBlank(logQuery.getProperty())) {
+      flux.append("  |> filter(fn: (r) => r.property == \"")
+          .append(logQuery.getProperty())
+          .append("\")\n");
+    }
+    if (StrUtil.isNotBlank(logQuery.getEvent())) {
+      flux.append("  |> filter(fn: (r) => r.event == \"")
+          .append(logQuery.getEvent())
+          .append("\")\n");
+    }
+
+    return flux.toString();
+  }
+
+  /**
+   * 解析count查询结果，获取总记录数
+   */
+  private long parseCountResult(List<FluxTable> tables) {
+    if (tables == null || tables.isEmpty()) {
+      log.warn("Count查询返回空结果");
+      return 0L;
+    }
+
+    for (FluxTable table : tables) {
+      List<FluxRecord> records = table.getRecords();
+      if (records != null && !records.isEmpty()) {
+        FluxRecord record = records.get(0);
+
+        // count(column: "record_count") 后，结果在 record_count 字段中
+        Object countValue = record.getValueByKey("record_count");
+        if (countValue instanceof Number) {
+          long total = ((Number) countValue).longValue();
+          log.debug("解析到总记录数: {}", total);
+          return total;
+        } else {
+          log.warn("Count结果类型异常: {}", countValue);
+        }
+      }
+    }
+
+    log.warn("无法从Count查询结果中解析总数");
+    return 0L;
+  }
+
+  /** 解析元数据查询结果 使用pivot后,每条记录的所有field已经合并在一行,直接解析即可 */
   private List<IoTDeviceLogMetadataVO> parseMetadataResults(List<FluxTable> tables) {
     List<IoTDeviceLogMetadataVO> resultList = new ArrayList<>();
-
-    // 按时间戳分组
-    Map<Instant, IoTDeviceLogMetadataVO> recordMap = new java.util.HashMap<>();
 
     for (FluxTable table : tables) {
       for (FluxRecord record : table.getRecords()) {
         Instant time = record.getTime();
         if (time == null) continue;
 
-        IoTDeviceLogMetadataVO vo =
-            recordMap.computeIfAbsent(
-                time,
-                t -> {
-                  IoTDeviceLogMetadataVO newVo = new IoTDeviceLogMetadataVO();
-                  newVo.setCreateTime(LocalDateTime.ofInstant(t, ZoneId.systemDefault()));
-                  // 从 tags 中提取字段
-                  newVo.setProductKey(getStringValue(record.getValueByKey("productKey")));
-                  newVo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
-                  newVo.setIotId(getStringValue(record.getValueByKey("iotId")));
-                  newVo.setMessageType(getStringValue(record.getValueByKey("messageType")));
-                  newVo.setProperty(getStringValue(record.getValueByKey("property")));
-                  newVo.setEvent(getStringValue(record.getValueByKey("event")));
-                  return newVo;
-                });
+        IoTDeviceLogMetadataVO vo = new IoTDeviceLogMetadataVO();
+        vo.setCreateTime(LocalDateTime.ofInstant(time, ZoneId.systemDefault()));
 
-        // 从 _field 和 _value 中提取字段值
-        String field = getStringValue(record.getField());
-        Object value = record.getValue();
+        // 从tags中提取字段
+        vo.setProductKey(getStringValue(record.getValueByKey("productKey")));
+        vo.setDeviceId(getStringValue(record.getValueByKey("deviceId")));
+        vo.setIotId(getStringValue(record.getValueByKey("iotId")));
+        vo.setMessageType(getStringValue(record.getValueByKey("messageType")));
+        vo.setProperty(getStringValue(record.getValueByKey("property")));
+        vo.setEvent(getStringValue(record.getValueByKey("event")));
 
-        if (field != null && value != null) {
-          switch (field) {
-            case "content":
-              vo.setContent(getStringValue(value));
-              break;
-            case "deviceName":
-              vo.setDeviceName(getStringValue(value));
-              break;
-            case "ext1":
-              vo.setExt1(getStringValue(value));
-              break;
-            case "ext2":
-              vo.setExt2(getStringValue(value));
-              break;
-            case "ext3":
-              vo.setExt3(getStringValue(value));
-              break;
-          }
-        }
+        // pivot后,field值直接在record中可以通过getValueByKey获取
+        vo.setContent(getStringValue(record.getValueByKey("content")));
+        vo.setDeviceName(getStringValue(record.getValueByKey("deviceName")));
+        vo.setExt1(getStringValue(record.getValueByKey("ext1")));
+        vo.setExt2(getStringValue(record.getValueByKey("ext2")));
+        vo.setExt3(getStringValue(record.getValueByKey("ext3")));
+
+        resultList.add(vo);
       }
     }
 
-    resultList.addAll(recordMap.values());
-
-    // 按时间降序排序
+    // 按时间降序排序(虽然Flux已经排序,但保险起见)
     resultList.sort((a, b) -> b.getCreateTime().compareTo(a.getCreateTime()));
 
     return resultList;
