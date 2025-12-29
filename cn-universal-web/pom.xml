@@ -165,11 +165,6 @@
     </dependency>
     <dependency>
       <groupId>cn.universal.iot</groupId>
-      <artifactId>cn-wvp-protocol</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>cn.universal.iot</groupId>
       <artifactId>cn-universal-mqtt-protocol</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -15,8 +15,6 @@
     <!-- 设备插件 -->
     <module>cn-universal-mqtt-protocol</module>
     <module>cn-universal-http-protocol</module>
-    <!-- 视频平台协议子模块 -->
-    <module>cn-wvp-protocol</module>
   </modules>
 
   <build>
