@@ -57,9 +57,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * ClickHouse 存储日志服务
- * 
+ *
  * <p>使用 HikariCP + Spring JdbcTemplate 实现，提供高性能、稳定的数据库访问
- * 
+ *
  * <p>通过配置文件动态加载
  *
  * @since 2025/9/30 16:10
@@ -114,7 +114,7 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
       config.setUsername(username);
       config.setPassword(password);
       config.setDriverClassName("com.clickhouse.jdbc.ClickHouseDriver");
-      
+
       // 连接池配置
       config.setMaximumPoolSize(maxPoolSize);
       config.setMinimumIdle(minIdle);
@@ -123,35 +123,38 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
       config.setMaxLifetime(1800000); // 30分钟最大生命周期
       config.setValidationTimeout(3000); // 3秒验证超时
       config.setLeakDetectionThreshold(60000); // 60秒连接泄漏检测
-      
+
       // 连接池名称
       config.setPoolName("ClickHouse-Pool");
-      
+
       // ClickHouse 特定配置
       config.setConnectionTestQuery("SELECT 1");
       config.setAutoCommit(true);
       config.setRegisterMbeans(false); // 关闭JMX监控
-      
+
       // 创建数据源
       dataSource = new HikariDataSource(config);
       jdbcTemplate = new JdbcTemplate(dataSource);
-      
+
       // 测试连接
       jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-      
-      log.info("初始化 ClickHouse 数据源成功，连接池配置: maxSize={}, minIdle={}, batchSize={}", 
-          maxPoolSize, minIdle, batchSize);
-      
+
+      log.info(
+          "初始化 ClickHouse 数据源成功，连接池配置: maxSize={}, minIdle={}, batchSize={}",
+          maxPoolSize,
+          minIdle,
+          batchSize);
+
       // 自动创建表
       createTablesIfNotExist();
       log.info("ClickHouse 表结构检查/创建完成");
-      
+
     } catch (Exception e) {
       log.error("初始化 ClickHouse 数据源失败", e);
       throw new RuntimeException("初始化 ClickHouse 数据源失败", e);
     }
   }
-  
+
   @PreDestroy
   public void destroy() {
     if (dataSource != null && !dataSource.isClosed()) {
@@ -159,14 +162,13 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
       log.info("ClickHouse 数据源已关闭");
     }
   }
-  
-  /**
-   * 自动创建表（如果不存在）
-   */
+
+  /** 自动创建表（如果不存在） */
   private void createTablesIfNotExist() {
     try {
       // 创建设备日志主表
-      String createDeviceLogTable = """
+      String createDeviceLogTable =
+          """
           CREATE TABLE IF NOT EXISTS %s (
             `id` Int64,
             `iot_id` String,
@@ -184,13 +186,15 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
           PARTITION BY toYYYYMM(create_time)
           ORDER BY (iot_id, create_time)
           SETTINGS index_granularity = 8192
-          """.formatted(devLogTableName);
-      
+          """
+              .formatted(devLogTableName);
+
       jdbcTemplate.execute(createDeviceLogTable);
       log.info("ClickHouse 表 {} 检查/创建成功", devLogTableName);
-      
+
       // 创建设备元数据日志表
-      String createMetadataTable = """
+      String createMetadataTable =
+          """
           CREATE TABLE IF NOT EXISTS %s (
             `id` Int64,
             `iot_id` String,
@@ -209,11 +213,12 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
           PARTITION BY toYYYYMM(create_time)
           ORDER BY (iot_id, create_time)
           SETTINGS index_granularity = 8192
-          """.formatted(devLogMetaTableName);
-      
+          """
+              .formatted(devLogMetaTableName);
+
       jdbcTemplate.execute(createMetadataTable);
       log.info("ClickHouse 表 {} 检查/创建成功", devLogMetaTableName);
-      
+
     } catch (Exception e) {
       log.error("ClickHouse 创建表失败", e);
       throw new RuntimeException("ClickHouse 创建表失败", e);
@@ -225,7 +230,8 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
   public void saveDeviceLog(BaseUPRequest upRequest, IoTDeviceDTO noUse, IoTProduct ioTProduct) {
     /** 产品数据存储策略，不为空则保存日志 */
     if (StrUtil.isNotBlank(ioTProduct.getStorePolicy())) {
-      IoTDeviceDTO ioTDeviceDTO = iotDeviceService.selectDevInstanceBO(upRequest.getIotId());
+      IoTDeviceDTO ioTDeviceDTO =
+          iotDeviceService.selectDevInstanceBO(upRequest.getProductKey(), upRequest.getDeviceId());
       try {
         IoTDeviceLog ioTDeviceLog = build(upRequest, ioTDeviceDTO);
         insertDeviceLog(ioTDeviceLog);
@@ -260,16 +266,17 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /**
-   * 插入设备日志
-   */
+  /** 插入设备日志 */
   private void insertDeviceLog(IoTDeviceLog log) {
-    String sql = "INSERT INTO " + devLogTableName + 
-        " (id, iot_id, device_id, product_key, device_name, message_type, " +
-        "command_id, command_status, event, content, point, create_time) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    jdbcTemplate.update(sql,
+    String sql =
+        "INSERT INTO "
+            + devLogTableName
+            + " (id, iot_id, device_id, product_key, device_name, message_type, "
+            + "command_id, command_status, event, content, point, create_time) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    jdbcTemplate.update(
+        sql,
         log.getId(),
         log.getIotId(),
         log.getDeviceId(),
@@ -281,14 +288,15 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
         log.getEvent(),
         log.getContent(),
         log.getPoint(),
-        log.getCreateTime() != null ? Timestamp.valueOf(log.getCreateTime()) : Timestamp.valueOf(LocalDateTime.now())
-    );
+        log.getCreateTime() != null
+            ? Timestamp.valueOf(log.getCreateTime())
+            : Timestamp.valueOf(LocalDateTime.now()));
   }
 
   private void saveLogStorePolicy(
       LogStorePolicyDTO logStorePolicyDTO, UPRequest up, IoTProduct ioTProduct) {
     List<Object[]> batchArgs = new ArrayList<>();
-    
+
     if (MessageType.PROPERTIES.equals(up.getMessageType()) && up.getProperties() != null) {
       up.getProperties()
           .forEach(
@@ -298,7 +306,7 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
                       getDeviceMetadata(ioTProduct.getMetadata()).getPropertyOrNull(key);
                   IoTDevicePropertiesBO ioTDevicePropertiesBO = new IoTDevicePropertiesBO();
                   ioTDevicePropertiesBO.withValue(propertyOrNull, value);
-                  
+
                   IoTDeviceLogMetadataBuilder builder = builder(up);
                   builder.id(IdUtil.getSnowflake().nextId());
                   builder.property(key);
@@ -306,23 +314,26 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
                   builder.ext1(ioTDevicePropertiesBO.getPropertyName());
                   builder.ext2(ioTDevicePropertiesBO.getFormatValue());
                   builder.ext3(ioTDevicePropertiesBO.getSymbol());
-                  
+
                   var metadata = builder.build();
-                  batchArgs.add(new Object[]{
-                      metadata.getId(),
-                      metadata.getIotId(),
-                      metadata.getProductKey(),
-                      metadata.getDeviceName(),
-                      metadata.getDeviceId(),
-                      metadata.getMessageType(),
-                      metadata.getEvent(),
-                      metadata.getProperty(),
-                      metadata.getContent(),
-                      metadata.getExt1(),
-                      metadata.getExt2(),
-                      metadata.getExt3(),
-                      metadata.getCreateTime() != null ? Timestamp.valueOf(metadata.getCreateTime()) : Timestamp.valueOf(LocalDateTime.now())
-                  });
+                  batchArgs.add(
+                      new Object[] {
+                        metadata.getId(),
+                        metadata.getIotId(),
+                        metadata.getProductKey(),
+                        metadata.getDeviceName(),
+                        metadata.getDeviceId(),
+                        metadata.getMessageType(),
+                        metadata.getEvent(),
+                        metadata.getProperty(),
+                        metadata.getContent(),
+                        metadata.getExt1(),
+                        metadata.getExt2(),
+                        metadata.getExt3(),
+                        metadata.getCreateTime() != null
+                            ? Timestamp.valueOf(metadata.getCreateTime())
+                            : Timestamp.valueOf(LocalDateTime.now())
+                      });
                 }
               });
     }
@@ -332,32 +343,37 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
       builder.id(IdUtil.getSnowflake().nextId());
       builder.event(up.getEvent());
       builder.content(up.getEventName());
-      
+
       var metadata = builder.build();
-      batchArgs.add(new Object[]{
-          metadata.getId(),
-          metadata.getIotId(),
-          metadata.getProductKey(),
-          metadata.getDeviceName(),
-          metadata.getDeviceId(),
-          metadata.getMessageType(),
-          metadata.getEvent(),
-          metadata.getProperty(),
-          metadata.getContent(),
-          metadata.getExt1(),
-          metadata.getExt2(),
-          metadata.getExt3(),
-          metadata.getCreateTime() != null ? Timestamp.valueOf(metadata.getCreateTime()) : Timestamp.valueOf(LocalDateTime.now())
-      });
+      batchArgs.add(
+          new Object[] {
+            metadata.getId(),
+            metadata.getIotId(),
+            metadata.getProductKey(),
+            metadata.getDeviceName(),
+            metadata.getDeviceId(),
+            metadata.getMessageType(),
+            metadata.getEvent(),
+            metadata.getProperty(),
+            metadata.getContent(),
+            metadata.getExt1(),
+            metadata.getExt2(),
+            metadata.getExt3(),
+            metadata.getCreateTime() != null
+                ? Timestamp.valueOf(metadata.getCreateTime())
+                : Timestamp.valueOf(LocalDateTime.now())
+          });
     }
-    
+
     // 批量插入
     if (!batchArgs.isEmpty()) {
-      String sql = "INSERT INTO " + devLogMetaTableName + 
-          " (id, iot_id, product_key, device_name, device_id, message_type, " +
-          "event, property, content, ext1, ext2, ext3, create_time) " +
-          "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      
+      String sql =
+          "INSERT INTO "
+              + devLogMetaTableName
+              + " (id, iot_id, product_key, device_name, device_id, message_type, "
+              + "event, property, content, ext1, ext2, ext3, create_time) "
+              + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
       try {
         int[] counts = jdbcTemplate.batchUpdate(sql, batchArgs);
         log.debug("ClickHouse 批量插入元数据成功，数量={}", counts.length);
@@ -371,7 +387,7 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
   public PageBean<IoTDeviceLogVO> pageList(LogQuery logQuery) {
     StringBuilder sql = new StringBuilder("SELECT * FROM " + devLogTableName + " WHERE 1=1");
     List<Object> params = new ArrayList<>();
-    
+
     if (StrUtil.isNotBlank(logQuery.getIotId())) {
       sql.append(" AND iot_id = ?");
       params.add(logQuery.getIotId());
@@ -394,45 +410,43 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
     }
     if (MapUtil.isNotEmpty(logQuery.getParams())
         && ObjectUtil.isNotNull(logQuery.getParams().get("properties"))) {
-      sql.append(" AND JSONHas(content,'properties','" + logQuery.getParams().get("properties") + "')=1");
+      sql.append(
+          " AND JSONHas(content,'properties','" + logQuery.getParams().get("properties") + "')=1");
     }
     if (MapUtil.isNotEmpty(logQuery.getParams())
         && ObjectUtil.isNotNull(logQuery.getParams().get("event"))) {
       sql.append(" AND event = ?");
       params.add(logQuery.getParams().get("event"));
     }
-    if (MapUtil.isNotEmpty(logQuery.getParams())
-        && ObjectUtil.isNotNull(logQuery.getParams().get("beginCreateTime"))) {
+    // 添加时间查询条件 - 使用 logQuery 的字段，不从 params 获取
+    if (logQuery.getBeginCreateTime() != null) {
       sql.append(" AND create_time >= ?");
-      params.add(logQuery.getParams().get("beginCreateTime"));
+      params.add(new Timestamp(logQuery.getBeginCreateTime() * 1000));
     }
-    if (MapUtil.isNotEmpty(logQuery.getParams())
-        && ObjectUtil.isNotNull(logQuery.getParams().get("endCreateTime"))) {
+    if (logQuery.getEndCreateTime() != null) {
       sql.append(" AND create_time <= ?");
-      params.add(logQuery.getParams().get("endCreateTime"));
+      params.add(new Timestamp(logQuery.getEndCreateTime() * 1000));
     }
+
     sql.append(" ORDER BY create_time DESC");
-    
+
     try {
       // 查询总数
       String countSql = "SELECT COUNT(*) FROM (" + sql + ")";
       Long total = jdbcTemplate.queryForObject(countSql, Long.class, params.toArray());
-      
+
       // 分页查询
       String pageSql = sql + " LIMIT ? OFFSET ?";
       List<Object> pageParams = new ArrayList<>(params);
       int offset = (logQuery.getPageNum() - 1) * logQuery.getPageSize();
       pageParams.add(logQuery.getPageSize());
       pageParams.add(offset);
-      
-      List<IoTDeviceLogVO> list = jdbcTemplate.query(pageSql, 
-          new DeviceLogRowMapper(), pageParams.toArray());
-      
+
+      List<IoTDeviceLogVO> list =
+          jdbcTemplate.query(pageSql, new DeviceLogRowMapper(), pageParams.toArray());
+
       return new PageBean<>(
-          list,
-          total != null ? total : 0L,
-          logQuery.getPageSize(),
-          logQuery.getPageNum());
+          list, total != null ? total : 0L, logQuery.getPageSize(), logQuery.getPageNum());
 
     } catch (Exception e) {
       log.warn("ClickHouse 查询日志错误", e);
@@ -444,8 +458,7 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
   public IoTDeviceLogVO queryById(LogQuery logQuery) {
     String sql = "SELECT * FROM " + devLogTableName + " WHERE id = ?";
     try {
-      return jdbcTemplate.queryForObject(sql, 
-          new DeviceLogRowMapper(), logQuery.getId());
+      return jdbcTemplate.queryForObject(sql, new DeviceLogRowMapper(), logQuery.getId());
     } catch (Exception e) {
       log.warn("ClickHouse 根据ID查询日志错误", e);
       return null;
@@ -456,15 +469,18 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
   public PageBean<IoTDeviceEvents> queryEventTotal(String productKey, String iotId) {
     List<IoTDeviceEvents> list = selectDevEvents(productKey);
     for (IoTDeviceEvents devEvent : list) {
-      String sql = "SELECT COUNT(1) as qty, max(create_time) as create_time " +
-          "FROM " + devLogTableName + 
-          " WHERE event = ? AND message_type = 'EVENT' AND iot_id = ? " +
-          "ORDER BY create_time DESC";
+      String sql =
+          "SELECT COUNT(1) as qty, max(create_time) as create_time "
+              + "FROM "
+              + devLogTableName
+              + " WHERE event = ? AND message_type = 'EVENT' AND iot_id = ? "
+              + "ORDER BY create_time DESC";
       try {
         Map<String, Object> result = jdbcTemplate.queryForMap(sql, devEvent.getId(), iotId);
         Integer qty = result.get("qty") != null ? ((Number) result.get("qty")).intValue() : 0;
         devEvent.setQty(qty >= 100 ? "99+" : String.valueOf(qty));
-        devEvent.setTime(result.get("create_time") != null ? result.get("create_time").toString() : null);
+        devEvent.setTime(
+            result.get("create_time") != null ? result.get("create_time").toString() : null);
       } catch (Exception e) {
         log.warn("ClickHouse 查询事件统计错误", e);
       }
@@ -476,7 +492,7 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
   public PageBean<IoTDeviceLogMetadataVO> queryLogMeta(LogQuery logQuery) {
     StringBuilder sql = new StringBuilder("SELECT * FROM " + devLogMetaTableName + " WHERE 1=1");
     List<Object> params = new ArrayList<>();
-    
+
     if (StrUtil.isNotBlank(logQuery.getIotId())) {
       sql.append(" AND iot_id = ?");
       params.add(logQuery.getIotId());
@@ -493,28 +509,34 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
       sql.append(" AND event = ?");
       params.add(logQuery.getEvent());
     }
+    // 添加时间查询条件 - ClickHouse DateTime64 类型直接使用 Timestamp
+    if (logQuery.getBeginCreateTime() != null) {
+      sql.append(" AND create_time >= ?");
+      params.add(new Timestamp(logQuery.getBeginCreateTime() * 1000));
+    }
+    if (logQuery.getEndCreateTime() != null) {
+      sql.append(" AND create_time <= ?");
+      params.add(new Timestamp(logQuery.getEndCreateTime() * 1000));
+    }
     sql.append(" ORDER BY create_time DESC");
-    
+
     try {
       // 查询总数
       String countSql = "SELECT COUNT(*) FROM (" + sql + ")";
       Long total = jdbcTemplate.queryForObject(countSql, Long.class, params.toArray());
-      
+
       // 分页查询
       String pageSql = sql + " LIMIT ? OFFSET ?";
       List<Object> pageParams = new ArrayList<>(params);
       int offset = (logQuery.getPageNum() - 1) * logQuery.getPageSize();
       pageParams.add(logQuery.getPageSize());
       pageParams.add(offset);
-      
-      List<IoTDeviceLogMetadataVO> list = jdbcTemplate.query(pageSql,
-          new DeviceLogMetadataRowMapper(), pageParams.toArray());
-      
+
+      List<IoTDeviceLogMetadataVO> list =
+          jdbcTemplate.query(pageSql, new DeviceLogMetadataRowMapper(), pageParams.toArray());
+
       return new PageBean<>(
-          list,
-          total != null ? total : 0L,
-          logQuery.getPageSize(),
-          logQuery.getPageNum());
+          list, total != null ? total : 0L, logQuery.getPageSize(), logQuery.getPageNum());
 
     } catch (Exception e) {
       log.warn("ClickHouse 查询元数据日志错误", e);
@@ -532,10 +554,8 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
     return null;
   }
 
-  /**
-   * 设备日志行映射器
-   */
-  private static class DeviceLogRowMapper implements RowMapper<IoTDeviceLogVO> {
+  /** 设备日志行映射器 */
+  private class DeviceLogRowMapper implements RowMapper<IoTDeviceLogVO> {
     @Override
     public IoTDeviceLogVO mapRow(ResultSet rs, int rowNum) throws SQLException {
       IoTDeviceLogVO vo = new IoTDeviceLogVO();
@@ -546,7 +566,8 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
       vo.setDeviceName(rs.getString("device_name"));
       vo.setMessageType(rs.getString("message_type"));
       vo.setCommandId(rs.getString("command_id"));
-      vo.setCommandStatus(rs.getObject("command_status") != null ? rs.getInt("command_status") : null);
+      vo.setCommandStatus(
+          rs.getObject("command_status") != null ? rs.getInt("command_status") : null);
       vo.setEvent(rs.getString("event"));
       vo.setContent(rs.getString("content"));
       vo.setPoint(rs.getString("point"));
@@ -558,10 +579,8 @@ public class CkDeviceLogService extends AbstractIoTDeviceLogService {
     }
   }
 
-  /**
-   * 设备日志元数据行映射器
-   */
-  private static class DeviceLogMetadataRowMapper implements RowMapper<IoTDeviceLogMetadataVO> {
+  /** 设备日志元数据行映射器 */
+  private class DeviceLogMetadataRowMapper implements RowMapper<IoTDeviceLogMetadataVO> {
     @Override
     public IoTDeviceLogMetadataVO mapRow(ResultSet rs, int rowNum) throws SQLException {
       IoTDeviceLogMetadataVO vo = new IoTDeviceLogMetadataVO();
