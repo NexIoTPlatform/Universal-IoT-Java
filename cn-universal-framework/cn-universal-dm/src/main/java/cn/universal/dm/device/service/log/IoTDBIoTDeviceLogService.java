@@ -30,7 +30,6 @@ import cn.universal.persistence.entity.IoTDeviceLog;
 import cn.universal.persistence.entity.IoTProduct;
 import cn.universal.persistence.entity.vo.IoTDeviceLogMetadataVO;
 import cn.universal.persistence.entity.vo.IoTDeviceLogVO;
-import cn.universal.persistence.query.DeviceLogQuery;
 import cn.universal.persistence.query.LogQuery;
 import cn.universal.persistence.query.PageBean;
 import jakarta.annotation.PostConstruct;
@@ -40,7 +39,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.iotdb.isession.SessionDataSet;
@@ -1686,104 +1684,6 @@ public class IoTDBIoTDeviceLogService extends AbstractIoTDeviceLogService {
     return storePolicy;
   }
 
-  /**
-   * 查询最近的指令记录 使用 productKey 和 deviceId 构建精确的查询路径 路径格式: root.device.{productKey}.{deviceId}.log
-   * 注意：IoTDB中未存储iot_id字段，路径已精确定位设备，无需额外过滤
-   */
-  @Override
-  public IoTDeviceLog getRecentCommand(
-      String productKey,
-      String deviceId,
-      String commandId,
-      String messageType,
-      Long createTime,
-      Integer commandStatus) {
-    try {
-      // 使用 productKey 和 deviceId 构建精确路径
-      String queryPath = buildDevicePath(productKey, deviceId) + ".log";
-
-      // 构造IoTDB SQL查询语句
-      // 注意：路径已精确定位到设备，无需iot_id过滤
-      StringBuilder sql = new StringBuilder();
-      sql.append("SELECT * FROM ").append(queryPath);
-      sql.append(" WHERE message_type='").append(messageType).append("'");
-      sql.append(" AND command_id='").append(commandId).append("'");
-      sql.append(" AND command_status=").append(commandStatus != null ? commandStatus : 0);
-      if (createTime != null) {
-        sql.append(" AND time >= ").append(toMillisTimestamp(createTime));
-      }
-      sql.append(" LIMIT 1");
-
-      log.debug("IoTDB查询指令记录SQL: {}", sql);
-
-      List<IoTDeviceLog> logs = queryDeviceLogsFromIoTDB(sql.toString());
-      return logs.isEmpty() ? null : logs.get(0);
-    } catch (Exception e) {
-      log.error("IoTDB查询指令记录异常: {}", e.getMessage(), e);
-      return null;
-    }
-  }
-
-  /** 通用设备日志查询接口 注意：IoTDB路径格式为 root.device.{productKey}.{deviceId}.log */
-  @Override
-  public List<IoTDeviceLog> queryDeviceLogs(DeviceLogQuery query) {
-    try {
-      // 构建查询路径
-      String queryPath = buildQueryPathFromIotId(query.getIotId());
-      if (queryPath == null) {
-        log.warn("IoTDB无法构建查询路径: iotId={}", query.getIotId());
-        return Collections.emptyList();
-      }
-
-      StringBuilder sqlBuilder = new StringBuilder();
-      sqlBuilder.append("SELECT * FROM ").append(queryPath);
-
-      // 构造WHERE条件
-      // 注意：IoTDB中未存储iot_id字段，路径已精确定位设备，无需iot_id过滤
-      List<String> conditions = new ArrayList<>();
-
-      if (query.getMessageType() != null) {
-        conditions.add(String.format("message_type='%s'", query.getMessageType()));
-      }
-
-      if (query.getCommandId() != null) {
-        conditions.add(String.format("command_id='%s'", query.getCommandId()));
-      }
-
-      if (query.getCommandStatus() != null) {
-        conditions.add(String.format("command_status=%d", query.getCommandStatus()));
-      }
-
-      if (query.getStartTime() != null) {
-        conditions.add(String.format("time >= %d", toMillisTimestamp(query.getStartTime())));
-      }
-
-      if (query.getEndTime() != null) {
-        conditions.add(String.format("time <= %d", toMillisTimestamp(query.getEndTime())));
-      }
-
-      if (query.getEventType() != null) {
-        conditions.add(String.format("event='%s'", query.getEventType()));
-      }
-
-      // 添加WHERE子句
-      if (!conditions.isEmpty()) {
-        sqlBuilder.append(" WHERE ").append(String.join(" AND ", conditions));
-      }
-
-      // 添加LIMIT子句
-      if (query.getLimit() > 0) {
-        sqlBuilder.append(String.format(" LIMIT %d", query.getLimit()));
-      }
-
-      log.debug("IoTDB通用查询SQL: {}", sqlBuilder);
-
-      return queryDeviceLogsFromIoTDB(sqlBuilder.toString());
-    } catch (Exception e) {
-      log.error("IoTDB通用查询异常: {}", e.getMessage(), e);
-      return Collections.emptyList();
-    }
-  }
 
   /** 根据 iotId 构建查询路径 路径格式: root.device.{productKey}.{deviceId}.log 如果无法解析，使用通配符查询 */
   private String buildQueryPathFromIotId(String iotId) {
